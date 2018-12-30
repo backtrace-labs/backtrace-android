@@ -156,7 +156,7 @@ backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
 ## Reporting unhandled application exceptions
 `BacktraceClient` also supports reporting of unhandled application exceptions not captured by your try-catch blocks. To enable reporting of unhandled exceptions:
 ```java
-new BacktraceExceptionHandler(getApplicationContext(), backtraceClient);
+new BacktraceExceptionHandler(backtraceClient);
 ``` 
 
 ## Custom client and report classes <a name="documentation-customization"></a>
