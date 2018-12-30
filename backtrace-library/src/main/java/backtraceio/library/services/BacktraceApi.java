@@ -48,7 +48,7 @@ public class BacktraceApi {
         try {
             AsyncTask<Void, Void, BacktraceResult> task = sendAsync(requestId, json,
                     attachments, report);
-            result = task.execute().get();
+            result = task.get();
         } catch (Exception e) {
             return BacktraceResult.OnError(report, e);
         }
