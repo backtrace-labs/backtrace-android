@@ -88,7 +88,6 @@ public class BacktraceData {
     /// </summary>
     public BacktraceReport report;
 
-
     public transient Context context;
 
 
@@ -101,15 +100,17 @@ public class BacktraceData {
         this.context = context;
         this.report = report;
         setReportInformation();
-        setAttributes(clientAttributes);
+
         setThreadsInformation();
+        setAttributes(clientAttributes);
+
         new DeviceAttributesHelper(this.context);
     }
 
     private void setAttributes(Map<String,Object> clientAttributes) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
-        this.attributes = backtraceAttributes.Attributes;
+        this.attributes = backtraceAttributes.attributes;
     }
 
     private void setReportInformation()

@@ -3,6 +3,7 @@ package backtraceio.library.models.json;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class BacktraceReport {
@@ -29,7 +30,8 @@ public class BacktraceReport {
     public long Timestamp = System.currentTimeMillis() / 1000;
 
     /// <summary>
-    /// Get information aboout report type. If value is true the BacktraceReport has an error information
+    /// Get information aboout report type. If value is true the BacktraceReport has an error
+    // information
     /// </summary>
 
     public Boolean ExceptionTypeReport = false;
@@ -42,7 +44,7 @@ public class BacktraceReport {
     /// <summary>
     /// Get an report attributes
     /// </summary>
-    public HashMap<String, Object> Attributes;
+    public Map<String, Object> Attributes;
 
     /// <summary>
     /// Get a custom client message
@@ -68,7 +70,7 @@ public class BacktraceReport {
 
     public BacktraceReport(
             String message,
-            HashMap<String, Object> attributes,
+            Map<String, Object> attributes,
             List<String> attachmentPaths
     ) {
         this((Exception) null, attributes, attachmentPaths);
@@ -84,7 +86,7 @@ public class BacktraceReport {
 
     public BacktraceReport(
             Exception exception,
-            HashMap<String, Object> attributes,
+            Map<String, Object> attributes,
             List<String> attachmentPaths) {
         Attributes = attributes == null ? new HashMap<String, Object>() {
         } : attributes;
@@ -92,5 +94,16 @@ public class BacktraceReport {
         Exception = exception;
         ExceptionTypeReport = exception != null;
         Classifier = ExceptionTypeReport ? exception.getClass().getCanonicalName() : "";
+    }
+
+    public static Map<String, Object> concatAttributes(
+            BacktraceReport report, Map<String, Object> attributes) {
+        Map<String, Object> reportAttributes = report.Attributes != null ? report.Attributes :
+                new HashMap<String, Object>();
+        if (attributes == null) {
+            return reportAttributes;
+        }
+        reportAttributes.putAll(attributes);
+        return reportAttributes;
     }
 }
