@@ -2,16 +2,11 @@ package backtraceio.library.services;
 
 import android.os.AsyncTask;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,7 +28,9 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     private OnServerResponseEventListener onServerResponse = null;
     private OnServerErrorEventListener onServerError = null;
 
-    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String> attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse, OnServerErrorEventListener onServerError) {
+    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
+            attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
+                                  OnServerErrorEventListener onServerError) {
         this.requestId = requestId;
         this.json = json;
         this.attachments = attachments;
@@ -43,7 +40,8 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
         this.onServerError = onServerError;
     }
 
-    // This is a function that we are overriding from AsyncTask. It takes Strings as parameters because that is what we defined for the parameters of our async task
+    // This is a function that we are overriding from AsyncTask. It takes Strings as parameters
+    // because that is what we defined for the parameters of our async task
     @Override
     protected BacktraceResult doInBackground(Void... params) {
         HttpURLConnection urlConnection = null;
@@ -65,16 +63,26 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             int statusCode = urlConnection.getResponseCode();
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = BacktraceSerializeHelper.backtraceResultFromJson(getResponseJson(urlConnection));
+                result = BacktraceSerializeHelper.backtraceResultFromJson(getResponse
+                        (urlConnection));
                 result.setBacktraceReport(report);
+                if (this.onServerResponse != null) {
+                    this.onServerResponse.onEvent(result);
+                }
             } else {
-                // TODO handle other http codes:
-                // result = BacktraceResult.OnError(report, );
+                Object x = urlConnection;
+                String message = getResponse(urlConnection);
+                if (message == null || message.equals("")) {
+                    // TODO: replace with HttpException and add http status
+                    throw new IOException(urlConnection.getResponseCode() + ":" + urlConnection
+                            .getResponseMessage());
+                } else {
+                    throw new IOException(message);
+                }
             }
 
         } catch (Exception e) {
-            if(this.onServerError != null)
-            {
+            if (this.onServerError != null) {
                 this.onServerError.onEvent(e);
             }
             return BacktraceResult.OnError(report, e);
@@ -90,16 +98,17 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
         return result;
     }
 
-    @Override
-    protected void onPostExecute(BacktraceResult result) {
-        if(this.onServerResponse != null) {
-            this.onServerResponse.onEvent(result);
-        }
-    }
+    private String getResponse(HttpURLConnection urlConnection) throws IOException {
+        InputStream inputStream;
 
-    private String getResponseJson(HttpURLConnection urlConnection) throws IOException {
+        if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+            inputStream = urlConnection.getInputStream();
+        } else {
+            inputStream = urlConnection.getErrorStream();
+        }
+
         BufferedReader br = new BufferedReader(new InputStreamReader(
-                (urlConnection.getInputStream())));
+                inputStream));
 
         StringBuilder responseSB = new StringBuilder();
         String line;
