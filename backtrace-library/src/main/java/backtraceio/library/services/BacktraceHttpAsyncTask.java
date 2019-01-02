@@ -17,6 +17,7 @@ import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.HttpException;
 
 
 public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResult> {
@@ -70,15 +71,11 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
                     this.onServerResponse.onEvent(result);
                 }
             } else {
-                Object x = urlConnection;
                 String message = getResponse(urlConnection);
-                if (message == null || message.equals("")) {
-                    // TODO: replace with HttpException and add http status
-                    throw new IOException(urlConnection.getResponseCode() + ":" + urlConnection
-                            .getResponseMessage());
-                } else {
-                    throw new IOException(message);
-                }
+                message = (message == null || message.equals("")) ?
+                        urlConnection.getResponseMessage() : message;
+                throw new HttpException(statusCode, String.format("%s: %s",
+                        Integer.toString(statusCode), message));
             }
 
         } catch (Exception e) {
