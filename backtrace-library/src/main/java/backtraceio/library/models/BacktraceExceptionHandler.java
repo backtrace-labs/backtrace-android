@@ -1,8 +1,5 @@
 package backtraceio.library.models;
 
-import android.content.Context;
-import android.util.Log;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -21,7 +18,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     @Override
     public void uncaughtException(final Thread thread, final Throwable ex) {
         if (ex instanceof Exception) {
-            this.client.send(new BacktraceReport((Exception)ex));
+            this.client.send(new BacktraceReport((Exception) ex));
         }
         rootHandler.uncaughtException(thread, ex);
     }
