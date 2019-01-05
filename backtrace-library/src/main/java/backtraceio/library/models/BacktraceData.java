@@ -86,7 +86,9 @@ public class BacktraceData {
     /// <summary>
     /// Current BacktraceReport
     /// </summary>
-    public BacktraceReport report;
+    public transient BacktraceReport report;
+
+
 
     public transient Context context;
 
@@ -103,7 +105,6 @@ public class BacktraceData {
 
         setThreadsInformation();
         setAttributes(clientAttributes);
-
         new DeviceAttributesHelper(this.context);
     }
 
@@ -115,9 +116,9 @@ public class BacktraceData {
 
     private void setReportInformation()
     {
-        uuid = report.Uuid;
-        timestamp = report.Timestamp;
-        classifier = report.ExceptionTypeReport ? new String[]{ report.Classifier }: null;
+        uuid = report.uuid;
+        timestamp = report.timestamp;
+        classifier = report.exceptionTypeReport ? new String[]{ report.classifier}: null;
         // TODO:
         langVersion = System.getProperty("java.version");
         agentVersion = "0.0.0";
@@ -125,8 +126,7 @@ public class BacktraceData {
 
     private void setThreadsInformation()
     {
-        //TODO: REPLACE WITH REAL EXCEPTION STACK
-        ThreadData threadData = new ThreadData(null);
+        ThreadData threadData = new ThreadData(report.diagnosticStack);
         mainThread = threadData.getMainThread();
         threadInformations = threadData.threadInformations;
     }

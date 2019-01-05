@@ -53,8 +53,8 @@ public class BacktraceAttributes {
 //        int versionNumber = pInfo.versionCode;
 //        String versionName = pInfo.versionName;
 //
-//        Attributes.put("app.version_number", Integer.toString(versionNumber));
-//        Attributes.put("app.version_name", versionName);
+//        attributes.put("app.version_number", Integer.toString(versionNumber));
+//        attributes.put("app.version_name", versionName);
     }
 
     private void setScreenInformation() {
@@ -75,13 +75,13 @@ public class BacktraceAttributes {
         {
             return;
         }
-        if (!report.ExceptionTypeReport)
+        if (!report.exceptionTypeReport)
         {
-            this.attributes.put("error.message", report.Message);
+            this.attributes.put("error.message", report.message);
             return;
         }
-        this.attributes.put("classifier", report.Exception.getClass().getName());
-        this.attributes.put("error.message", report.Exception.getMessage());
+        this.attributes.put("classifier", report.exception.getClass().getName());
+        this.attributes.put("error.message", report.exception.getMessage());
     }
 
     private String getScreenOrientation() {
@@ -107,9 +107,9 @@ public class BacktraceAttributes {
             }
         }
         // add exception information to Complex attributes.
-        if(report.ExceptionTypeReport)
+        if(report.exceptionTypeReport)
         {
-            this.complexAttributes.put("Exception properties", report.Exception);
+            this.complexAttributes.put("Exception properties", report.exception);
         }
     }
 }
