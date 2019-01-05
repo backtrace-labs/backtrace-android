@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
@@ -19,6 +20,7 @@ public class BacktraceApi {
     private String format = "json";
     private OnServerResponseEventListener onServerResponse = null;
     private OnServerErrorEventListener onServerError = null;
+    private OnAfterSendEventListener afterSend = null;
     private RequestHandler requestHandler = null;
 
     public BacktraceApi(BacktraceCredentials credentials) {
@@ -36,6 +38,10 @@ public class BacktraceApi {
 
     public void setOnServerError(OnServerErrorEventListener onServerError) {
         this.onServerError = onServerError;
+    }
+
+    public void setAfterSend(OnAfterSendEventListener afterSend) {
+        this.afterSend = afterSend;
     }
 
     public void setRequestHandler(RequestHandler requestHandler) {
@@ -56,10 +62,10 @@ public class BacktraceApi {
     }
 
     private AsyncTask<Void, Void, BacktraceResult> sendAsync(UUID requestId, String json,
-                                                               ArrayList<String> attachments,
-                                                               BacktraceReport report) {
+                                                             ArrayList<String> attachments,
+                                                             BacktraceReport report) {
         return new BacktraceHttpAsyncTask(serverUrl, requestId, json, attachments, report,
-                this.onServerResponse, this.onServerError).execute();
+                this.onServerResponse, this.onServerError, this.afterSend).execute();
     }
 
     public BacktraceResult send(BacktraceData data) {
@@ -67,15 +73,13 @@ public class BacktraceApi {
             return requestHandler.onRequest(data);
         }
         String json = BacktraceSerializeHelper.toJson(data);
-        //TODO: add attachments:
-        ArrayList<String> attachments = new ArrayList<>();
+        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments:
         return send(UUID.randomUUID(), json, attachments, data.report);
     }
 
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
         String json = BacktraceSerializeHelper.toJson(data);
-        //TODO: add attachments:
-        ArrayList<String> attachments = new ArrayList<>();
+        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments:
         return sendAsync(UUID.randomUUID(), json, attachments, data.report);
     }
 }

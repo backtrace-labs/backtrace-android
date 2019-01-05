@@ -1,10 +1,8 @@
 package backtraceio.library.models.base;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import java.util.function.Function;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.OnAfterSendEventListener;
@@ -24,7 +22,6 @@ public class BacktraceBase implements IBacktraceClient {
     protected BacktraceCredentials credentials;
     protected Context context;
     private OnBeforeSendEventListener beforeSendEventListener = null;
-    private OnAfterSendEventListener afterSendEventListener = null; // TODO: handle
 
     public BacktraceBase(Context context, BacktraceCredentials credentials)
     {
@@ -37,12 +34,13 @@ public class BacktraceBase implements IBacktraceClient {
         this.beforeSendEventListener = eventListener;
     }
 
-    public void setOnAfterSendEventListener(OnAfterSendEventListener eventListener){
-        this.afterSendEventListener = eventListener;
-    }
-
     public void setOnServerResponseEventListner(OnServerResponseEventListener eventListner){
         this.backtraceApi.setOnServerResponse(eventListner);
+    }
+
+    public void setOnAfterSendEventListener(OnAfterSendEventListener eventListener)
+    {
+        this.backtraceApi.setAfterSend(eventListener);
     }
 
     public void setOnServerErrorEventListner(OnServerErrorEventListener eventListener){

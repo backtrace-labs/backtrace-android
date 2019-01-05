@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceResult;
@@ -28,10 +29,11 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     private String url;
     private OnServerResponseEventListener onServerResponse;
     private OnServerErrorEventListener onServerError;
+    private OnAfterSendEventListener afterSend;
 
     public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
             attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
-                                  OnServerErrorEventListener onServerError) {
+                                  OnServerErrorEventListener onServerError, OnAfterSendEventListener afterSend) {
         this.requestId = requestId;
         this.json = json;
         this.attachments = attachments;
@@ -39,14 +41,13 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
         this.url = url;
         this.onServerResponse = onServerResponse;
         this.onServerError = onServerError;
+        this.afterSend = afterSend;
     }
 
-    // This is a function that we are overriding from AsyncTask. It takes Strings as parameters
-    // because that is what we defined for the parameters of our async task
     @Override
     protected BacktraceResult doInBackground(Void... params) {
         HttpURLConnection urlConnection = null;
-        BacktraceResult result = null;
+        BacktraceResult result;
 
         try {
             URL url = new URL(this.url);
@@ -94,6 +95,16 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             }
         }
         return result;
+    }
+
+    @Override
+    public void onPostExecute(BacktraceResult result)
+    {
+        if (afterSend != null)
+        {
+            afterSend.onEvent(result);
+        }
+        super.onPostExecute(result);
     }
 
     private String getResponse(HttpURLConnection urlConnection) throws IOException {
