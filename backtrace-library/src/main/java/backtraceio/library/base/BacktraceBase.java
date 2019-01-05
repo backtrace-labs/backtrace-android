@@ -1,5 +1,6 @@
 package backtraceio.library.models.base;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -10,6 +11,7 @@ import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.IBacktraceClient;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
@@ -43,8 +45,12 @@ public class BacktraceBase implements IBacktraceClient {
         this.backtraceApi.setOnServerResponse(eventListner);
     }
 
-    public void setOnServerErrorEventListner(OnServerErrorEventListener eventListner){
-        this.backtraceApi.setOnServerError(eventListner);
+    public void setOnServerErrorEventListner(OnServerErrorEventListener eventListener){
+        this.backtraceApi.setOnServerError(eventListener);
+    }
+
+    public void setOnRequestHandler(RequestHandler requestHandler){
+        this.backtraceApi.setRequestHandler(requestHandler);
     }
 
     public BacktraceResult send(String message)

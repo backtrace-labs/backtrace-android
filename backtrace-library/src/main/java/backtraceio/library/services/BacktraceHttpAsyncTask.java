@@ -26,8 +26,8 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     private ArrayList<String> attachments;
     private BacktraceReport report;
     private String url;
-    private OnServerResponseEventListener onServerResponse = null;
-    private OnServerErrorEventListener onServerError = null;
+    private OnServerResponseEventListener onServerResponse;
+    private OnServerErrorEventListener onServerError;
 
     public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
             attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
@@ -64,8 +64,9 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             int statusCode = urlConnection.getResponseCode();
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = BacktraceSerializeHelper.backtraceResultFromJson(getResponse
-                        (urlConnection));
+                result = BacktraceSerializeHelper.backtraceResultFromJson(
+                        getResponse(urlConnection)
+                );
                 result.setBacktraceReport(report);
                 if (this.onServerResponse != null) {
                     this.onServerResponse.onEvent(result);
