@@ -15,6 +15,10 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
+    public static void enable(BacktraceClient client) {
+        new BacktraceExceptionHandler(client);
+    }
+
     @Override
     public void uncaughtException(final Thread thread, final Throwable ex) {
         if (ex instanceof Exception) {
