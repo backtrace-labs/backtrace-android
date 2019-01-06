@@ -1,12 +1,10 @@
 package backtraceio.library;
 
-import android.Manifest;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -96,7 +94,7 @@ public class EventsInstrumentedTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final ArrayList<Exception> exceptions = new ArrayList<>();
-        backtraceClient.setOnServerErrorEventListner(new OnServerErrorEventListener() {
+        backtraceClient.setOnServerErrorEventListener(new OnServerErrorEventListener() {
             @Override
             public void onEvent(Exception exception) {
                 exceptions.add(exception);
