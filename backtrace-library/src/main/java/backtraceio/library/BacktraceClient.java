@@ -3,46 +3,82 @@ package backtraceio.library;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 
+/**
+ * Backtrace Java Android Client
+ */
 public class BacktraceClient extends BacktraceBase {
-    private BacktraceCredentials backtraceCredentials;
 
-    public BacktraceClient(Context context, BacktraceCredentials credentials)
-    {
+    /**
+     * Initializing Backtrace client instance with BacktraceCredentials
+     *
+     * @param context     application context
+     * @param credentials credentials to Backtrace API server
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials) {
         super(context, credentials);
     }
 
-    public BacktraceResult send(String message)
-    {
+    /**
+     * Sending a message to Backtrace API
+     *
+     * @param message custom client message
+     * @return server response
+     */
+    public BacktraceResult send(String message) {
         return super.send(message);
     }
 
-    public BacktraceResult send(Exception exception)
-    {
+    /**
+     * Sending an exception to Backtrace API
+     *
+     * @param exception current exception
+     * @return server response
+     */
+    public BacktraceResult send(Exception exception) {
         return super.send(exception);
     }
 
-    public BacktraceResult send(BacktraceReport report)
-    {
+    /**
+     * Sending a Backtrace report to Backtrace API
+     *
+     * @param report current BacktraceReport
+     * @return server response
+     */
+    public BacktraceResult send(BacktraceReport report) {
         return super.send(report);
     }
 
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message)
-    {
+    /**
+     * Sending asynchronously a message to Backtrace API
+     *
+     * @param message custom client message
+     * @return async task which send data to Backtrace API and return server response
+     */
+    public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message) {
         return super.sendAsync(message);
     }
 
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception)
-    {
+    /**
+     * Sending asynchronously an Exception to Backtrace API
+     *
+     * @param exception current exception
+     * @return async task which send data to Backtrace API and return server response
+     */
+    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception) {
         return super.sendAsync(exception);
     }
 
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report)
-    {
+    /**
+     * Sending asynchronously a Backtrace report to Backtrace API
+     *
+     * @param report current BacktraceReport
+     * @return async task which send data to Backtrace API and return server response
+     */
+    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report) {
         return super.sendAsync(report);
     }
 }

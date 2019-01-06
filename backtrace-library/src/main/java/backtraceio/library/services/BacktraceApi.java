@@ -15,18 +15,48 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 
+/**
+ * Backtrace Api class that allows to send a diagnostic data to server
+ */
 public class BacktraceApi {
+    /**
+     * URL to server
+     */
     private String serverUrl;
-    private String format = "json";
+
+    /**
+     * Data format
+     */
+    private final String format = "json";
+
+    /**
+     * Event triggered when server respond to diagnostic data
+     */
     private OnServerResponseEventListener onServerResponse = null;
+
+    /**
+     * Event triggered when server respond with error
+     */
     private OnServerErrorEventListener onServerError = null;
+
+    /**
+     * Event triggered after sending diagnostic data to server
+     */
     private OnAfterSendEventListener afterSend = null;
+
+    /**
+     * User custom request method
+     */
     private RequestHandler requestHandler = null;
 
+    /**
+     * Create a new instance of Backtrace API
+     *
+     * @param credentials API credentials
+     */
     public BacktraceApi(BacktraceCredentials credentials) {
         if (credentials == null) {
-            throw new IllegalArgumentException(String.format("%s cannot be null",
-                    credentials.getClass().getName()));
+            throw new IllegalArgumentException("BacktraceCredentials cannot be null");
         }
         serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
                 this.format, credentials.getSubmissionToken());
@@ -68,18 +98,31 @@ public class BacktraceApi {
                 this.onServerResponse, this.onServerError, this.afterSend).execute();
     }
 
+    /**
+     * Sending synchronously a diagnostic report data to Backtrace server API.
+     *
+     * @param data diagnostic data
+     * @return server response
+     */
     public BacktraceResult send(BacktraceData data) {
         if (requestHandler != null) {
             return requestHandler.onRequest(data);
         }
         String json = BacktraceSerializeHelper.toJson(data);
-        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments:
+        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments
         return send(UUID.randomUUID(), json, attachments, data.report);
     }
 
+
+    /**
+     * Sending asynchronously a diagnostic report data to Backtrace server API.
+     *
+     * @param data diagnostic data
+     * @return AsyncTask which returns server response after execution
+     */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
         String json = BacktraceSerializeHelper.toJson(data);
-        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments:
+        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments
         return sendAsync(UUID.randomUUID(), json, attachments, data.report);
     }
 }

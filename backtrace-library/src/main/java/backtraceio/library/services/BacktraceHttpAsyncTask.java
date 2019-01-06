@@ -22,18 +22,46 @@ import backtraceio.library.models.types.HttpException;
 
 
 public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResult> {
+    /**
+     * Data which will be send to Backtrace API saved in JSON format
+     */
     private String json;
+
+    /**
+     * Request identifier
+     */
     private UUID requestId;
+
+    /**
+     * Path to attachments which should be send to Backtrace API with request
+     */
     private ArrayList<String> attachments;
     private BacktraceReport report;
+
+    /**
+     * Server URL
+     */
     private String url;
+
+    /**
+     * Event triggered on server response
+     */
     private OnServerResponseEventListener onServerResponse;
+
+    /**
+     * Event triggered on server error
+     */
     private OnServerErrorEventListener onServerError;
+
+    /**
+     * Event triggered after send request to Backtrace API
+     */
     private OnAfterSendEventListener afterSend;
 
     public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
             attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
-                                  OnServerErrorEventListener onServerError, OnAfterSendEventListener afterSend) {
+                                  OnServerErrorEventListener onServerError,
+                                  OnAfterSendEventListener afterSend) {
         this.requestId = requestId;
         this.json = json;
         this.attachments = attachments;
@@ -44,6 +72,9 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
         this.afterSend = afterSend;
     }
 
+    /**
+     * Sending diagnostic data into Backtrace server API
+     */
     @Override
     protected BacktraceResult doInBackground(Void... params) {
         HttpURLConnection urlConnection = null;
@@ -98,15 +129,20 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     }
 
     @Override
-    public void onPostExecute(BacktraceResult result)
-    {
-        if (afterSend != null)
-        {
+    public void onPostExecute(BacktraceResult result) {
+        if (afterSend != null) {
             afterSend.onEvent(result);
         }
         super.onPostExecute(result);
     }
 
+    /**
+     * Read response message from HTTP response
+     *
+     * @param urlConnection current HTTP connection
+     * @return response from HTTP request
+     * @throws IOException
+     */
     private String getResponse(HttpURLConnection urlConnection) throws IOException {
         InputStream inputStream;
 
