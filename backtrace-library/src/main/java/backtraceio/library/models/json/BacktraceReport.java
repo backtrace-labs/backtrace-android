@@ -11,58 +11,62 @@ import java.util.UUID;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
 
+/**
+ * Captured application error
+ */
 public class BacktraceReport {
 
-
-    /// <summary>
-    /// 16 bytes of randomness in human readable UUID format
-    /// server will reject request if uuid is already found
-    /// </summary>s
+    /**
+     * 16 bytes of randomness in human readable UUID format
+     * server will reject request if uuid is already found
+     */
     public UUID uuid = UUID.randomUUID();
 
-    /// <summary>
-    /// UTC timestamp in seconds
-    /// </summary>
+    /**
+     * UTC timestamp in seconds
+     */
     public long timestamp = System.currentTimeMillis() / 1000;
 
-    /// <summary>
-    /// Get information aboout report type. If value is true the BacktraceReport has an error
-    // information
-    /// </summary>
-
+    /**
+     * Get information about report type. If value is true the BacktraceReport has an error
+     */
     public Boolean exceptionTypeReport = false;
 
-    /// <summary>
-    /// Get a report classification
-    /// </summary>
+    /**
+     * Get a report classification
+     */
     public String classifier = "";
 
-    /// <summary>
-    /// Get an report attributes
-    /// </summary>
+    /**
+     * Get an report attributes
+     */
     public Map<String, Object> attributes;
 
-    /// <summary>
-    /// Get a custom client message
-    /// </summary>
+    /**
+     * Get a custom client message
+     */
     public String message;
 
-    /// <summary>
-    /// Get a report exception
-    /// </summary>
+    /**
+     * Get a report exception
+     */
     public Exception exception;
 
-    /// <summary>
-    /// Get all paths to attachments
-    /// </summary>
+    /**
+     * Get all paths to attachments
+     */
     public List<String> attachmentPaths;
 
-    /// <summary>
-    /// Current report exception stack
-    /// </summary>
-    @SerializedName("diagnosticStack")
+    /**
+     * Current report exception stack
+     */
     public ArrayList<BacktraceStackFrame> diagnosticStack;
 
+    /**
+     * Create new instance of Backtrace report to sending a report with custom client message
+     *
+     * @param message custom client message
+     */
     public BacktraceReport(
             String message
     ) {
@@ -70,6 +74,14 @@ public class BacktraceReport {
         this.message = message;
     }
 
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with custom client message, attributes and attachments
+     *
+     * @param message         custom client message
+     * @param attributes      additional information about application state
+     * @param attachmentPaths path to all report attachments
+     */
     public BacktraceReport(
             String message,
             Map<String, Object> attributes,
@@ -79,26 +91,49 @@ public class BacktraceReport {
         this.message = message;
     }
 
-
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception
+     *
+     * @param exception current exception
+     */
     public BacktraceReport(
             Exception exception) {
         this(exception, null, null);
-        //classifier = exceptionTypeReport ? exception.GetType().Name : String.Empty;
     }
 
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception, attributes and attachments
+     *
+     * @param exception       current exception
+     * @param attributes      additional information about application state
+     * @param attachmentPaths path to all report attachments
+     */
     public BacktraceReport(
             Exception exception,
             Map<String, Object> attributes,
             List<String> attachmentPaths) {
+
         this.attributes = attributes == null ? new HashMap<String, Object>() {
         } : attributes;
         this.attachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
         this.exception = exception;
-        exceptionTypeReport = exception != null;
+        this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
-        classifier = exceptionTypeReport ? exception.getClass().getCanonicalName() : "";
+
+        if (this.exceptionTypeReport && exception != null) {
+            this.classifier = exception.getClass().getCanonicalName();
+        }
     }
 
+    /**
+     * Concat two dictionaries with attributes
+     *
+     * @param report     current report
+     * @param attributes attributes to concatenate
+     * @return concatenated map of attributes from report and from passed attributes
+     */
     public static Map<String, Object> concatAttributes(
             BacktraceReport report, Map<String, Object> attributes) {
         Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
