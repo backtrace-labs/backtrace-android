@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
-import backtraceio.library.models.base.BacktraceBase;
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceClient extends BacktraceBase {
