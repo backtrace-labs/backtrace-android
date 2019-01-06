@@ -21,9 +21,9 @@ public class BacktraceClient extends BacktraceBase {
         return super.send(message);
     }
 
-    public BacktraceResult send(Exception e)
+    public BacktraceResult send(Exception exception)
     {
-        return super.send(e);
+        return super.send(exception);
     }
 
     public BacktraceResult send(BacktraceReport report)
@@ -36,9 +36,9 @@ public class BacktraceClient extends BacktraceBase {
         return super.sendAsync(message);
     }
 
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception e)
+    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception)
     {
-        return super.sendAsync(e);
+        return super.sendAsync(exception);
     }
 
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report)
