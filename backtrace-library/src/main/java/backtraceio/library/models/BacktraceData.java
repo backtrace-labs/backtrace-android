@@ -89,14 +89,12 @@ public class BacktraceData {
     public transient BacktraceReport report;
 
 
-
     public transient Context context;
 
 
-    public BacktraceData(Context context, BacktraceReport report, Map<String, Object> clientAttributes)
-    {
-        if (report == null)
-        {
+    public BacktraceData(Context context, BacktraceReport report, Map<String, Object>
+            clientAttributes) {
+        if (report == null) {
             return;
         }
         this.context = context;
@@ -108,26 +106,24 @@ public class BacktraceData {
         new DeviceAttributesHelper(this.context);
     }
 
-    private void setAttributes(Map<String,Object> clientAttributes) {
+    private void setAttributes(Map<String, Object> clientAttributes) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
         this.attributes = backtraceAttributes.attributes;
     }
 
-    private void setReportInformation()
-    {
+    private void setReportInformation() {
         uuid = report.uuid;
         timestamp = report.timestamp;
-        classifier = report.exceptionTypeReport ? new String[]{ report.classifier}: null;
+        classifier = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         // TODO:
         langVersion = System.getProperty("java.version");
         agentVersion = "0.0.0";
     }
 
-    private void setThreadsInformation()
-    {
+    private void setThreadsInformation() {
         ThreadData threadData = new ThreadData(report.diagnosticStack);
         mainThread = threadData.getMainThread();
-        threadInformations = threadData.threadInformations;
+        threadInformations = threadData.threadInformation;
     }
 }

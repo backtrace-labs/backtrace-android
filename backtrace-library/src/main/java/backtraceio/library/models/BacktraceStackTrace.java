@@ -1,15 +1,28 @@
 package backtraceio.library.models;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Backtrace stack trace
+ */
 public class BacktraceStackTrace {
 
+    /**
+     * Current exception
+     */
     private Exception exception;
+
+    /**
+     * Collection of stacktrace elements
+     */
     private ArrayList<BacktraceStackFrame> stackFrames = new ArrayList<>();
 
-    public BacktraceStackTrace(Exception exception)
-    {
+    /**
+     * Create new instance of BacktraceStackTrace object
+     *
+     * @param exception current exception
+     */
+    public BacktraceStackTrace(Exception exception) {
         this.exception = exception;
         Initialize();
     }
@@ -18,14 +31,12 @@ public class BacktraceStackTrace {
         return stackFrames;
     }
 
-    private void Initialize()
-    {
+    private void Initialize() {
         SetStacktraceInformation(this.exception.getStackTrace());
     }
 
     private void SetStacktraceInformation(StackTraceElement[] frames) {
-        if (frames == null || frames.length == 0)
-        {
+        if (frames == null || frames.length == 0) {
             return;
         }
 

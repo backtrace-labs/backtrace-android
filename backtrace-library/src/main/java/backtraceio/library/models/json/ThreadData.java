@@ -6,38 +6,59 @@ import java.util.Map;
 
 import backtraceio.library.models.BacktraceStackFrame;
 
+/**
+ * Generate information about application threads
+ */
 public class ThreadData {
 
-
-    /// <summary>
-    /// All collected application threads information
-    /// </summary>
-    public HashMap<String, ThreadInformation> threadInformations = new HashMap<String,
+    /**
+     * All collected application threads information
+     */
+    public HashMap<String, ThreadInformation> threadInformation = new HashMap<String,
             ThreadInformation>();
 
+    /**
+     * Get main thread id
+     *
+     * @return main thread id
+     */
     public String getMainThread() {
         return mainThread;
     }
 
-    /// <summary>
-    /// Application Id for current thread. This value is used in mainThreadSection in output JSON
-    // file
-    /// </summary>
+    /**
+     * Application Id for current thread.
+     * This value is used in mainThreadSection in output JSON file
+     */
     private String mainThread = "";
 
+    /**
+     * Create instance of ThreadData class to collect information about used threads
+     *
+     * @param exceptionStack current BacktraceReport exception stack
+     */
     public ThreadData(ArrayList<BacktraceStackFrame> exceptionStack) {
         generateCurrentThreadInformation(exceptionStack);
         processThreads();
     }
 
+    /**
+     * Generate information for current thread
+     *
+     * @param exceptionStack current BacktraceReport exception stack
+     */
     private void generateCurrentThreadInformation(ArrayList<BacktraceStackFrame> exceptionStack) {
         Thread currThread = Thread.currentThread();
         mainThread = currThread.getName().toLowerCase();
-        this.threadInformations.put(mainThread, new ThreadInformation(currThread, exceptionStack,
-                true));
+        this.threadInformation.put(mainThread,
+                new ThreadInformation(currThread, exceptionStack, true)
+        );
     }
 
-    public void processThreads() {
+    /**
+     * Process all threads and save information about thread and stacktrace
+     */
+    private void processThreads() {
         Map<Thread, StackTraceElement[]> myMap = Thread.getAllStackTraces();
 
         for (Map.Entry<Thread, StackTraceElement[]> entry : myMap.entrySet()) {
@@ -56,7 +77,7 @@ public class ThreadData {
                     stackFrame.add(new BacktraceStackFrame(stackTraceElement));
                 }
             }
-            this.threadInformations.put(threadName, new ThreadInformation(thread, stackFrame,
+            this.threadInformation.put(threadName, new ThreadInformation(thread, stackFrame,
                     false));
         }
     }
