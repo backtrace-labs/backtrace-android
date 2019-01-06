@@ -13,11 +13,20 @@ public class PermissionHelper {
         this.context = context;
     }
 
+    /**
+     * Check is permission for Bluetooth is granted (permission.BLUETOOTH)
+     * @return true if permission is granted
+     */
     public boolean isPermissionForBluetoothGranted()
     {
         return ContextCompat.checkSelfPermission( this.context, Manifest.permission.BLUETOOTH ) == PackageManager.PERMISSION_GRANTED;
     }
 
+
+    /**
+     * Check is permission for Bluetooth is granted (permission.INTERNET)
+     * @return true if permission is granted
+     */
     public boolean isPermissionForInternetGranted()
     {
         return ContextCompat.checkSelfPermission( this.context, Manifest.permission.INTERNET ) == PackageManager.PERMISSION_GRANTED;

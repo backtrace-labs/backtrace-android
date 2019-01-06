@@ -13,6 +13,9 @@ import android.provider.Settings;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import backtraceio.library.enums.BluetoothStatus;
+import backtraceio.library.enums.NfcStatus;
+
 public class DeviceAttributesHelper {
     private Context context;
     private PermissionHelper permissionHelper;
@@ -23,20 +26,19 @@ public class DeviceAttributesHelper {
         getDeviceAttributes();
     }
 
-    public void getDeviceAttributes() {
+    private void getDeviceAttributes() {
         boolean airplane = isAirplaneModeOn();
         boolean location = isLocationServicesEnabled();
-        String nfc = getNfcStatus();
+        String nfc = getNfcStatus().toString();
         boolean gps = isGpsEnabled();
-        String bluetooth = isBluetoothEnabled();
+        String bluetooth = isBluetoothEnabled().toString();
         float cpuTemp = getCpuTemperature();
 //        String cpuDetails = getCPUDetails();
         boolean powerSavingMode = isPowerSavingMode();
     }
 
     /**
-     * Gets the state of Airplane Mode.
-     *
+     * Gets the state of Airplane Mode
      * @return true if enabled.
      */
     private boolean isAirplaneModeOn() {
@@ -44,41 +46,56 @@ public class DeviceAttributesHelper {
                 Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     }
 
+    /**
+     * Check is location service is enabled
+     * @return true if location service is enabled
+     */
     private boolean isLocationServicesEnabled() {
         int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE,
                 Settings.Secure.LOCATION_MODE_OFF);
-        final boolean enabled = (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF);
-        return enabled;
+        return (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF);
     }
 
-    private String getNfcStatus() {
+    /**
+     * Check is nfc available and enabled
+     * @return NFC status (not available, disabled, enabled)
+     */
+    private NfcStatus getNfcStatus() {
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this.context);
 
         if (nfcAdapter == null) {
-            return "not available";
+            return NfcStatus.NOT_AVAILABLE;
         } else if (!nfcAdapter.isEnabled()) {
             // NFC is available for device but not enabled
-            return "disabled";
+            return NfcStatus.DISABLED;
         }
-        return "enabled";
+        return NfcStatus.ENABLED;
     }
 
+    /**
+     * Check is bluetooth permitted and enabled
+     * @return Bluetooth status (not permitted, disabled, enabled)
+     */
     @SuppressLint("MissingPermission")
-    public String isBluetoothEnabled() {
+    private BluetoothStatus isBluetoothEnabled() {
 
         if(!permissionHelper.isPermissionForBluetoothGranted())
         {
-            return "not permitted";
+            return BluetoothStatus.NOT_PERMITTED;
         }
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter.isEnabled())
         {
-            return "enabled";
+            return BluetoothStatus.ENABLED;
         }
-        return "disabled";
+        return BluetoothStatus.DISABLED;
     }
 
-    public float getCpuTemperature() {
+    /**
+     * Get device CPU temperature
+     * @return measured temperature value in degrees Celsius
+     */
+    private float getCpuTemperature() {
         Process p;
         try {
             p = Runtime.getRuntime().exec("cat sys/class/thermal/thermal_zone0/temp");
@@ -86,33 +103,41 @@ public class DeviceAttributesHelper {
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             String line = reader.readLine();
-            float temp = Float.parseFloat(line) / 1000.0f;
-
-            return temp;
-
+            return Float.parseFloat(line) / 1000.0f;
         } catch (Exception e) {
             e.printStackTrace();
             return 0.0f;
         }
     }
 
+    /**
+     * Check is GPS enabled
+     * @return true if GPS is enabled
+     */
     private boolean isGpsEnabled() {
         LocationManager manager = (LocationManager) this.context.getSystemService(Context.LOCATION_SERVICE);
         return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     private boolean isWifiEnabled() {
-        WifiManager mng = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiManager mng = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         return mng.isWifiEnabled();
     }
 
+    /**
+     * Check is power saving mode activated
+     * @return TODO:
+     */
+    // TODO: replace
     private boolean isPowerSavingMode() {
         if (Build.VERSION.SDK_INT < 21) {
             return true;
         }
-        PowerManager powerManager = (PowerManager) this.context.getSystemService(this.context.POWER_SERVICE);
+        PowerManager powerManager = (PowerManager) this.context.getSystemService(Context.POWER_SERVICE);
         return powerManager.isPowerSaveMode();
     }
+
+    // TODO: remove
 //    public static String getCPUDetails(){
 //        ProcessBuilder processBuilder;
 //        String cpuDetails = "";
@@ -140,5 +165,4 @@ public class DeviceAttributesHelper {
 //
 //        return cpuDetails;
 //    }
-
 }
