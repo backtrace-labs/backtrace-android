@@ -109,7 +109,7 @@ public class BacktraceApi {
             return requestHandler.onRequest(data);
         }
         String json = BacktraceSerializeHelper.toJson(data);
-        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments
+        ArrayList<String> attachments = new ArrayList<>(); // TODO: add attachments
         return send(UUID.randomUUID(), json, attachments, data.report);
     }
 
@@ -122,7 +122,7 @@ public class BacktraceApi {
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
         String json = BacktraceSerializeHelper.toJson(data);
-        ArrayList<String> attachments = new ArrayList<>(); //TODO: add attachments
+        ArrayList<String> attachments = new ArrayList<>(); // TODO: add attachments
         return sendAsync(UUID.randomUUID(), json, attachments, data.report);
     }
 }

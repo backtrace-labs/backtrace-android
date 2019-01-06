@@ -68,14 +68,6 @@ public class BacktraceAttributes {
     private void setAppInformation() {
         this.attributes.put("app.package.name", this.context.getApplicationContext()
                 .getPackageName());
-        // TODO:
-//        PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName()
-// , 0);
-//        int versionNumber = pInfo.versionCode;
-//        String versionName = pInfo.versionName;
-//
-//        attributes.put("app.version_number", Integer.toString(versionNumber));
-//        attributes.put("app.version_name", versionName);
     }
 
     /**
