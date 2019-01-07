@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.DeviceAttributesHelper;
+import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.ThreadData;
@@ -79,6 +80,12 @@ public class BacktraceData {
     public String[] classifiers;
 
     /**
+     * Not supported yet
+     */
+    @SerializedName("annotations")
+    public Annotations annotations;
+
+    /**
      * Current BacktraceReport
      */
     public transient BacktraceReport report;
@@ -103,6 +110,7 @@ public class BacktraceData {
         }
         this.context = context;
         this.report = report;
+        this.annotations = new Annotations(); // TODO: handle annotations
         setReportInformation();
 
         setThreadsInformation();
