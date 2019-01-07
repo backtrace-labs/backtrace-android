@@ -22,7 +22,7 @@ public class BacktraceData {
      * server will reject request if uuid is already found
      */
     @SerializedName("uuid")
-    public UUID uuid;
+    public String uuid;
 
     /**
      * UTC timestamp in seconds
@@ -122,7 +122,7 @@ public class BacktraceData {
      * Set report information such as report identifier (UUID), timestamp, classifier
      */
     private void setReportInformation() {
-        uuid = report.uuid;
+        uuid = report.uuid.toString();
         timestamp = report.timestamp;
         classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
