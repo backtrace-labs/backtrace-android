@@ -107,13 +107,15 @@ public class BacktraceData {
 
         setThreadsInformation();
         setAttributes(clientAttributes);
-        new DeviceAttributesHelper(this.context);
+
     }
 
     private void setAttributes(Map<String, Object> clientAttributes) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
         this.attributes = backtraceAttributes.attributes;
+        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
+        this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
     }
 
     /**

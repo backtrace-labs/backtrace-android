@@ -12,6 +12,7 @@ import android.provider.Settings;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 import backtraceio.library.enums.BluetoothStatus;
 import backtraceio.library.enums.NfcStatus;
@@ -23,18 +24,22 @@ public class DeviceAttributesHelper {
     public DeviceAttributesHelper(Context context) {
         this.context = context;
         permissionHelper = new PermissionHelper(this.context);
-        getDeviceAttributes();
     }
 
-    private void getDeviceAttributes() {
-        boolean airplane = isAirplaneModeOn();
-        boolean location = isLocationServicesEnabled();
-        String nfc = getNfcStatus().toString();
-        boolean gps = isGpsEnabled();
-        String bluetooth = isBluetoothEnabled().toString();
-        float cpuTemp = getCpuTemperature();
-//        String cpuDetails = getCPUDetails();
-        boolean powerSavingMode = isPowerSavingMode();
+    /**
+     * Get attributes about device such as GPS status, Bluetooth status, NFC status
+     * @return device attributes
+     */
+    public HashMap<String, Object> getDeviceAttributes() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("device.airplane_mode", isAirplaneModeOn());
+        result.put("device.location_enabled", isLocationServicesEnabled());
+        result.put("device.nfc_status", getNfcStatus().toString());
+        result.put("device.gps_enabled", isGpsEnabled());
+        result.put("device.bluetooth_status", isBluetoothEnabled().toString());
+        result.put("device.cpu_temperature", getCpuTemperature());
+        result.put("device.is_power_saving_mode", isPowerSavingMode());
+        return result;
     }
 
     /**
