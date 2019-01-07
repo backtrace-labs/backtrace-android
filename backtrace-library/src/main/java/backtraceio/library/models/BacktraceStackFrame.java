@@ -2,6 +2,8 @@ package backtraceio.library.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.UUID;
+
 public class BacktraceStackFrame {
 
     /**
@@ -14,6 +16,20 @@ public class BacktraceStackFrame {
      */
     @SerializedName("line")
     public int line;
+
+    /// <summary>
+    /// Source code file name where exception occurs
+    /// </summary>
+    /**
+     *
+     */
+    @SerializedName("sourceCode")
+    public String sourceCode;
+
+    /**
+     * Source code file name where exception occurs
+     */
+    public transient String sourceCodeFileName;
 
     /**
      * Create new instance of BacktraceStackFrame
@@ -31,5 +47,7 @@ public class BacktraceStackFrame {
         }
         this.functionName = frame.getMethodName();
         this.line = frame.getLineNumber();
+        this.sourceCodeFileName = frame.getFileName();
+        this.sourceCode = UUID.randomUUID().toString();
     }
 }

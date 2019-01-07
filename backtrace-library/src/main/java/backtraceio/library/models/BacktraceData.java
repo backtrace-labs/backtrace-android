@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,6 +12,8 @@ import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.json.SourceCode;
+import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
 
@@ -85,6 +88,10 @@ public class BacktraceData {
     @SerializedName("annotations")
     public Annotations annotations;
 
+
+    @SerializedName("sourceCode")
+    private Map<String, SourceCode> sourceCode;
+
     /**
      * Current BacktraceReport
      */
@@ -142,7 +149,9 @@ public class BacktraceData {
      */
     private void setThreadsInformation() {
         ThreadData threadData = new ThreadData(report.diagnosticStack);
-        mainThread = threadData.getMainThread();
-        threadInformationMap = threadData.threadInformation;
+        this.mainThread = threadData.getMainThread();
+        this.threadInformationMap = threadData.threadInformation;
+        SourceCodeData sourceCodeData = new SourceCodeData(report.diagnosticStack);
+        this.sourceCode = sourceCodeData.data.isEmpty() ? null : sourceCodeData.data;
     }
 }
