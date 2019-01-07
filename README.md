@@ -17,7 +17,7 @@
 ## Usage
 ```java
 // replace with your endpoint url and token
-BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+BacktraceCredentials credentials = new BacktraceCredentials("<endpoint-url>", "<token>");
 BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
 
 try {
