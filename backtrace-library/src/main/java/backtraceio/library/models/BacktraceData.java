@@ -75,8 +75,8 @@ public class BacktraceData {
     /**
      * Get a report classifiers. If user send custom message, then variable should be null
      */
-    @SerializedName("classifier")
-    public String[] classifier;
+    @SerializedName("classifiers")
+    public String[] classifiers;
 
     /**
      * Current BacktraceReport
@@ -124,7 +124,7 @@ public class BacktraceData {
     private void setReportInformation() {
         uuid = report.uuid;
         timestamp = report.timestamp;
-        classifier = report.exceptionTypeReport ? new String[]{report.classifier} : null;
+        classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
         agentVersion = "1.0.0";
     }
