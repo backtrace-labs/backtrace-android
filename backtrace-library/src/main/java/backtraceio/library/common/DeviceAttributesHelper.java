@@ -13,6 +13,7 @@ import android.provider.Settings;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.UUID;
 
 import backtraceio.library.enums.BluetoothStatus;
 import backtraceio.library.enums.NfcStatus;
@@ -39,6 +40,7 @@ public class DeviceAttributesHelper {
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
         result.put("device.cpu_temperature", getCpuTemperature());
         result.put("device.is_power_saving_mode", isPowerSavingMode());
+        result.put("guid", this.generateDeviceId());
         return result;
     }
 
@@ -133,12 +135,23 @@ public class DeviceAttributesHelper {
      * Check is power saving mode activated
      * @return is power saving mode activated
      */
-    // TODO: replace
+    // TODO: replace bool to enum
     private boolean isPowerSavingMode() {
         if (Build.VERSION.SDK_INT < 21) {
             return false;
         }
         PowerManager powerManager = (PowerManager) this.context.getSystemService(Context.POWER_SERVICE);
         return powerManager.isPowerSaveMode();
+    }
+
+    /**
+     * Generate unique identifier to unambiguously identify the device
+     * @return unique device identifier
+     */
+    private String generateDeviceId(){
+        String androidId = Settings.Secure.getString(this.context.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        return UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
     }
 }
