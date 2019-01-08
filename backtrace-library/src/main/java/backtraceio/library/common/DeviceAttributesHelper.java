@@ -9,6 +9,7 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -151,6 +152,11 @@ public class DeviceAttributesHelper {
     private String generateDeviceId(){
         String androidId = Settings.Secure.getString(this.context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
+
+        if(TextUtils.isEmpty(androidId))
+        {
+            return null;
+        }
 
         return UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
     }
