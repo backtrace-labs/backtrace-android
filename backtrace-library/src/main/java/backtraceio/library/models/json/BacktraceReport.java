@@ -1,96 +1,147 @@
 package backtraceio.library.models.json;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.models.BacktraceStackFrame;
+import backtraceio.library.models.BacktraceStackTrace;
+
+/**
+ * Captured application error
+ */
 public class BacktraceReport {
 
-    /// <summary>
-    /// Fingerprint
-    /// </summary>
-    public String Fingerprint;
+    /**
+     * 16 bytes of randomness in human readable UUID format
+     * server will reject request if uuid is already found
+     */
+    public UUID uuid = UUID.randomUUID();
 
-    /// <summary>
-    /// Factor
-    /// </summary>
-    public String Factor;
+    /**
+     * UTC timestamp in seconds
+     */
+    public long timestamp = System.currentTimeMillis() / 1000;
 
-    /// <summary>
-    /// 16 bytes of randomness in human readable UUID format
-    /// server will reject request if uuid is already found
-    /// </summary>s
-    public UUID Uuid = UUID.randomUUID();
+    /**
+     * Get information about report type. If value is true the BacktraceReport has an error
+     */
+    public Boolean exceptionTypeReport = false;
 
-    /// <summary>
-    /// UTC timestamp in seconds
-    /// </summary>
-    public long Timestamp = System.currentTimeMillis() / 1000;
+    /**
+     * Get a report classification
+     */
+    public String classifier = "";
 
-    /// <summary>
-    /// Get information aboout report type. If value is true the BacktraceReport has an error information
-    /// </summary>
+    /**
+     * Get an report attributes
+     */
+    public Map<String, Object> attributes;
 
-    public Boolean ExceptionTypeReport = false;
+    /**
+     * Get a custom client message
+     */
+    public String message;
 
-    /// <summary>
-    /// Get a report classification
-    /// </summary>
-    public String Classifier = "";
+    /**
+     * Get a report exception
+     */
+    public Exception exception;
 
-    /// <summary>
-    /// Get an report attributes
-    /// </summary>
-    public HashMap<String, Object> Attributes;
+    /**
+     * Get all paths to attachments
+     */
+    public List<String> attachmentPaths;
 
-    /// <summary>
-    /// Get a custom client message
-    /// </summary>
-    public String Message;
+    /**
+     * Current report exception stack
+     */
+    public ArrayList<BacktraceStackFrame> diagnosticStack;
 
-    /// <summary>
-    /// Get a report exception
-    /// </summary>
-    public Exception Exception;
-
-    /// <summary>
-    /// Get all paths to attachments
-    /// </summary>
-    public List<String> AttachmentPaths;
-
+    /**
+     * Create new instance of Backtrace report to sending a report with custom client message
+     *
+     * @param message custom client message
+     */
     public BacktraceReport(
             String message
     ) {
         this((Exception) null, null, null);
-        Message = message;
+        this.message = message;
     }
 
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with custom client message, attributes and attachments
+     *
+     * @param message         custom client message
+     * @param attributes      additional information about application state
+     * @param attachmentPaths path to all report attachments
+     */
     public BacktraceReport(
             String message,
-            HashMap<String, Object> attributes,
+            Map<String, Object> attributes,
             List<String> attachmentPaths
     ) {
         this((Exception) null, attributes, attachmentPaths);
-        Message = message;
+        this.message = message;
     }
 
-
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception
+     *
+     * @param exception current exception
+     */
     public BacktraceReport(
             Exception exception) {
         this(exception, null, null);
-        //classifier = ExceptionTypeReport ? exception.GetType().Name : String.Empty;
     }
 
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception, attributes and attachments
+     *
+     * @param exception       current exception
+     * @param attributes      additional information about application state
+     * @param attachmentPaths path to all report attachments
+     */
     public BacktraceReport(
             Exception exception,
-            HashMap<String, Object> attributes,
+            Map<String, Object> attributes,
             List<String> attachmentPaths) {
-        Attributes = attributes == null ? new HashMap<String, Object>() {
+
+        this.attributes = attributes == null ? new HashMap<String, Object>() {
         } : attributes;
-        AttachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
-        Exception = exception;
-        ExceptionTypeReport = exception != null;
-        Classifier = ExceptionTypeReport ? exception.getClass().getCanonicalName() : "";
+        this.attachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
+        this.exception = exception;
+        this.exceptionTypeReport = exception != null;
+        this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
+
+        if (this.exceptionTypeReport && exception != null) {
+            this.classifier = exception.getClass().getCanonicalName();
+        }
+    }
+
+    /**
+     * Concat two dictionaries with attributes
+     *
+     * @param report     current report
+     * @param attributes attributes to concatenate
+     * @return concatenated map of attributes from report and from passed attributes
+     */
+    public static Map<String, Object> concatAttributes(
+            BacktraceReport report, Map<String, Object> attributes) {
+        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
+                new HashMap<String, Object>();
+        if (attributes == null) {
+            return reportAttributes;
+        }
+        reportAttributes.putAll(attributes);
+        return reportAttributes;
     }
 }

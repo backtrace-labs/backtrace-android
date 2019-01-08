@@ -1,15 +1,15 @@
-package backtraceio.library.models.base;
+package backtraceio.library.base;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
-import java.util.function.Function;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.IBacktraceClient;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
@@ -18,47 +18,89 @@ import backtraceio.library.services.BacktraceApi;
 
 public class BacktraceBase implements IBacktraceClient {
 
-    protected BacktraceApi backtraceApi;
-    protected BacktraceCredentials credentials;
+    private BacktraceApi backtraceApi;
     protected Context context;
     private OnBeforeSendEventListener beforeSendEventListener = null;
-    private OnAfterSendEventListener afterSendEventListener = null; // TODO: handle
 
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     * @param context context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     */
     public BacktraceBase(Context context, BacktraceCredentials credentials)
     {
         this.context = context;
-        this.credentials = credentials;
         this.backtraceApi = new BacktraceApi(credentials);
     }
 
+    /**
+     * Set event executed before sending data to Backtrace API
+     * @param eventListener object with method which will be executed
+     */
     public void setOnBeforeSendEventListener(OnBeforeSendEventListener eventListener){
         this.beforeSendEventListener = eventListener;
     }
 
-    public void setOnAfterSendEventListener(OnAfterSendEventListener eventListener){
-        this.afterSendEventListener = eventListener;
+    /**
+     * Set an event executed when Backtrace API return information about send report
+     * @param eventListener object with method which will be executed
+     */
+    public void setOnServerResponseEventListner(OnServerResponseEventListener eventListener){
+        this.backtraceApi.setOnServerResponse(eventListener);
     }
 
-    public void setOnServerResponseEventListner(OnServerResponseEventListener eventListner){
-        this.backtraceApi.setOnServerResponse(eventListner);
+    /**
+     * Set an event executed after sending data to Backtrace API
+     * @param eventListener object with method which will be executed
+     */
+    public void setOnAfterSendEventListener(OnAfterSendEventListener eventListener)
+    {
+        this.backtraceApi.setAfterSend(eventListener);
     }
 
-    public void setOnServerErrorEventListner(OnServerErrorEventListener eventListner){
-        this.backtraceApi.setOnServerError(eventListner);
+    /**
+     * Set an event executed when received bad request, unauthorize request or other information from server
+     * @param eventListener object with method which will be executed
+     */
+    public void setOnServerErrorEventListener(OnServerErrorEventListener eventListener){
+        this.backtraceApi.setOnServerError(eventListener);
     }
 
+    /**
+     * Custom request handler for call to server
+     * @param requestHandler object with method which will be executed
+     */
+    public void setOnRequestHandler(RequestHandler requestHandler){
+        this.backtraceApi.setRequestHandler(requestHandler);
+    }
+
+    /**
+     * Sending an exception to Backtrace API
+     * @param message custom client message
+     * @return server response
+     */
     public BacktraceResult send(String message)
     {
         BacktraceReport backtraceReport = new BacktraceReport(message);
         return this.send(backtraceReport);
     }
 
-    public BacktraceResult send(Exception e)
+    /**
+     * Sending an exception to Backtrace API
+     * @param exception current exception
+     * @return server response
+     */
+    public BacktraceResult send(Exception exception)
     {
-        BacktraceReport backtraceReport = new BacktraceReport(e);
+        BacktraceReport backtraceReport = new BacktraceReport(exception);
         return this.send(backtraceReport);
     }
 
+    /**
+     * Sending an exception to Backtrace API
+     * @param report current BacktraceReport
+     * @return server response
+     */
     public BacktraceResult send(BacktraceReport report)
     {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
@@ -69,18 +111,33 @@ public class BacktraceBase implements IBacktraceClient {
         return this.backtraceApi.send(backtraceData);
     }
 
+    /**
+     * Sending asynchronously an exception to Backtrace API
+     * @param message custom client message
+     * @return server response
+     */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message)
     {
         BacktraceReport backtraceReport = new BacktraceReport(message);
         return this.sendAsync(backtraceReport);
     }
 
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception e)
+    /**
+     * Sending asynchronously an exception to Backtrace API
+     * @param exception current exception
+     * @return server response
+     */
+    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception)
     {
-        BacktraceReport backtraceReport = new BacktraceReport(e);
+        BacktraceReport backtraceReport = new BacktraceReport(exception);
         return this.sendAsync(backtraceReport);
     }
 
+    /**
+     * Sending asynchronously an exception to Backtrace API
+     * @param report current BacktraceReport
+     * @return server response
+     */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report)
     {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);

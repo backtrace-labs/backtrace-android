@@ -14,10 +14,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BacktraceCredentials credentials =
-                new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
-                        "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
+                new BacktraceCredentials("<endpoint-url>", "<token>");
         BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
-        new BacktraceExceptionHandler(getApplicationContext(), backtraceClient);
+        BacktraceExceptionHandler.enable(backtraceClient);
         Object x = null;
         x.toString();
     }

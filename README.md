@@ -1,9 +1,13 @@
 # Backtrace
+<!--
 [![Backtrace@release](https://img.shields.io/badge/Backtrace%40master-2.0.5-blue.svg)](https://www.nuget.org/packages/Backtrace)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp) -->
+ [![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp) 
+ -->
 
+<!--
 [![Backtrace@pre-release](https://img.shields.io/badge/Backtrace%40dev-2.0.6-blue.svg)](https://www.nuget.org/packages/Backtrace)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu/branch/dev?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp/branch/dev) -->
+[![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu/branch/dev?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp/branch/dev) 
+-->
 
 
 
@@ -13,7 +17,7 @@
 ## Usage
 ```java
 // replace with your endpoint url and token
-BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+BacktraceCredentials credentials = new BacktraceCredentials("<endpoint-url>", "<token>");
 BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
 
 try {
@@ -51,7 +55,7 @@ TODO
 # Running sample application
 ## Android Studio <a name="sample-app-android-studio"></a>
 
-- Open `MainActivity.java` class in **app\src\main\java\backtraceio\backtraceio** and replace `BacktraceCredential` constructor parameters with with your `Backtrace endpoint URL` (e.g. https://xxx.sp.backtrace.io:6098) and `submission token`:
+- Open `MainActivity.java` class in **app\src\main\java\backtraceio\backtraceio** and replace `BacktraceCredential` constructor parameters with your `Backtrace endpoint URL` (e.g. https://xxx.sp.backtrace.io:6098) and `submission token`:
 
 ```java
 BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
@@ -152,7 +156,7 @@ backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
 ## Reporting unhandled application exceptions
 `BacktraceClient` also supports reporting of unhandled application exceptions not captured by your try-catch blocks. To enable reporting of unhandled exceptions:
 ```java
-new BacktraceExceptionHandler(getApplicationContext(), backtraceClient);
+BacktraceExceptionHandler.enable(backtraceClient);
 ``` 
 
 ## Custom client and report classes <a name="documentation-customization"></a>

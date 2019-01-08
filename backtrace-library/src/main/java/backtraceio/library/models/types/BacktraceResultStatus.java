@@ -5,20 +5,13 @@ package backtraceio.library.models.types;
 /// </summary>
 public enum BacktraceResultStatus
 {
-    /// <summary>
-    /// Set when client limit is reached
-    /// </summary>
-    //    LimitReached,
-    /// <summary>
-    /// Set when error occurs while sending diagnostic data
-    /// </summary>
+    /**
+     * Set when error occurs while sending diagnostic data
+     */
     ServerError,
-    /// <summary>
-    /// Set when data were send to API
-    /// </summary>
+    
+    /**
+     * Set when data were send to API
+     */
     Ok,
-    /// <summary>
-    /// Status generated Backtrace client receive empty report (Aggregate Exception purpose)
-    /// </summary>
-    //    Empty
 }

@@ -2,38 +2,66 @@ package backtraceio.library.services;
 
 import android.os.AsyncTask;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.HttpException;
 
 
 public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResult> {
+    /**
+     * Data which will be send to Backtrace API saved in JSON format
+     */
     private String json;
+
+    /**
+     * Request identifier
+     */
     private UUID requestId;
+
+    /**
+     * Path to attachments which should be send to Backtrace API with request
+     */
     private ArrayList<String> attachments;
     private BacktraceReport report;
-    private String url;
-    private OnServerResponseEventListener onServerResponse = null;
-    private OnServerErrorEventListener onServerError = null;
 
-    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String> attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse, OnServerErrorEventListener onServerError) {
+    /**
+     * Server URL
+     */
+    private String url;
+
+    /**
+     * Event triggered on server response
+     */
+    private OnServerResponseEventListener onServerResponse;
+
+    /**
+     * Event triggered on server error
+     */
+    private OnServerErrorEventListener onServerError;
+
+    /**
+     * Event triggered after send request to Backtrace API
+     */
+    private OnAfterSendEventListener afterSend;
+
+    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
+            attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
+                                  OnServerErrorEventListener onServerError,
+                                  OnAfterSendEventListener afterSend) {
         this.requestId = requestId;
         this.json = json;
         this.attachments = attachments;
@@ -41,13 +69,16 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
         this.url = url;
         this.onServerResponse = onServerResponse;
         this.onServerError = onServerError;
+        this.afterSend = afterSend;
     }
 
-    // This is a function that we are overriding from AsyncTask. It takes Strings as parameters because that is what we defined for the parameters of our async task
+    /**
+     * Sending diagnostic data into Backtrace server API
+     */
     @Override
     protected BacktraceResult doInBackground(Void... params) {
         HttpURLConnection urlConnection = null;
-        BacktraceResult result = null;
+        BacktraceResult result;
 
         try {
             URL url = new URL(this.url);
@@ -65,16 +96,23 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             int statusCode = urlConnection.getResponseCode();
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = BacktraceSerializeHelper.backtraceResultFromJson(getResponseJson(urlConnection));
+                result = BacktraceSerializeHelper.backtraceResultFromJson(
+                        getResponse(urlConnection)
+                );
                 result.setBacktraceReport(report);
+                if (this.onServerResponse != null) {
+                    this.onServerResponse.onEvent(result);
+                }
             } else {
-                // TODO handle other http codes:
-                // result = BacktraceResult.OnError(report, );
+                String message = getResponse(urlConnection);
+                message = (message == null || message.equals("")) ?
+                        urlConnection.getResponseMessage() : message;
+                throw new HttpException(statusCode, String.format("%s: %s",
+                        Integer.toString(statusCode), message));
             }
 
         } catch (Exception e) {
-            if(this.onServerError != null)
-            {
+            if (this.onServerError != null) {
                 this.onServerError.onEvent(e);
             }
             return BacktraceResult.OnError(report, e);
@@ -91,15 +129,31 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     }
 
     @Override
-    protected void onPostExecute(BacktraceResult result) {
-        if(this.onServerResponse != null) {
-            this.onServerResponse.onEvent(result);
+    public void onPostExecute(BacktraceResult result) {
+        if (afterSend != null) {
+            afterSend.onEvent(result);
         }
+        super.onPostExecute(result);
     }
 
-    private String getResponseJson(HttpURLConnection urlConnection) throws IOException {
+    /**
+     * Read response message from HTTP response
+     *
+     * @param urlConnection current HTTP connection
+     * @return response from HTTP request
+     * @throws IOException
+     */
+    private String getResponse(HttpURLConnection urlConnection) throws IOException {
+        InputStream inputStream;
+
+        if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+            inputStream = urlConnection.getInputStream();
+        } else {
+            inputStream = urlConnection.getErrorStream();
+        }
+
         BufferedReader br = new BufferedReader(new InputStreamReader(
-                (urlConnection.getInputStream())));
+                inputStream));
 
         StringBuilder responseSB = new StringBuilder();
         String line;
