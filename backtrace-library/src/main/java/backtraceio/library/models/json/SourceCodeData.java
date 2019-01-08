@@ -31,9 +31,8 @@ public class SourceCodeData {
                 continue;
             }
             String id = backtraceStackFrame.sourceCode;
-            SourceCode value = SourceCode.FromExceptionStack(backtraceStackFrame);
+            SourceCode value = new SourceCode(backtraceStackFrame);
             data.put(id, value);
         }
     }
-
 }

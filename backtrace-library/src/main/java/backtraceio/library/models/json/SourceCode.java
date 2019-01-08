@@ -20,23 +20,10 @@ public class SourceCode{
     @SerializedName("path")
     public String sourceCodeFileName;
 
-    public SourceCode()
+
+    public SourceCode(BacktraceStackFrame stackFrame)
     {
-
+        this.sourceCodeFileName = stackFrame.sourceCodeFileName;
+        this.startLine = stackFrame.line;
     }
-
-    /**
-     * Get a SourceData instance from Exception stack
-     * @param stackFrame exception stack
-     * @return new instance of SourceCode
-     */
-    public static SourceCode FromExceptionStack(final BacktraceStackFrame stackFrame)
-    {
-        return new SourceCode()
-        {{
-            startLine = stackFrame.line;
-            sourceCodeFileName = stackFrame.sourceCodeFileName;
-        }};
-    }
-
 }

@@ -90,7 +90,7 @@ public class BacktraceData {
 
 
     @SerializedName("sourceCode")
-    private Map<String, SourceCode> sourceCode;
+    public Map<String, SourceCode> sourceCode;
 
     /**
      * Current BacktraceReport
