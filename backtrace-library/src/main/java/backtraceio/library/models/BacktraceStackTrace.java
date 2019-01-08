@@ -32,6 +32,9 @@ public class BacktraceStackTrace {
     }
 
     private void Initialize() {
+        if(this.exception == null) {
+            return;
+        }
         SetStacktraceInformation(this.exception.getStackTrace());
     }
 
