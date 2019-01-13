@@ -37,11 +37,30 @@ try {
 7. [Architecture](#architecture)
 
 
+# Download
+Gradle
+```
+dependencies {
+    compile 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.0rc1'
+}
+```
+
+Maven
+```
+<dependency>
+  <groupId>com.github.backtrace-labs.backtrace-android</groupId>
+  <artifactId>backtrace-library</artifactId>
+  <version>1.0rc1</version>
+  <type>aar</type>
+</dependency>
+```
+
 # Features Summary <a name="features-summary"></a>
 * Light-weight Java client library that quickly submits exceptions and crashes to your Backtrace dashboard. Can include callstack, system metadata, custom metadata.<!--, and file attachments if needed.-->
 * Supports a wide range of Android SDKs.
 * Supports asynchronous Tasks.
 * Fully customizable and extendable event handlers and base classes for custom implementations.
+
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>
 
