@@ -16,6 +16,7 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.HttpException;
@@ -36,6 +37,10 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
      * Path to attachments which should be send to Backtrace API with request
      */
     private ArrayList<String> attachments;
+
+    /**
+     * Current BacktraceReport
+     */
     private BacktraceReport report;
 
     /**

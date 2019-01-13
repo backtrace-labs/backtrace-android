@@ -14,6 +14,7 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.wrappers.AsyncTaskRequestHandlerWrapper;
 
 /**
  * Backtrace Api class that allows to send a diagnostic data to server
@@ -105,8 +106,8 @@ public class BacktraceApi {
      * @return server response
      */
     public BacktraceResult send(BacktraceData data) {
-        if (requestHandler != null) {
-            return requestHandler.onRequest(data);
+        if (this.requestHandler != null) {
+            return this.requestHandler.onRequest(data);
         }
         String json = BacktraceSerializeHelper.toJson(data);
         ArrayList<String> attachments = new ArrayList<>(); // TODO: add attachments
@@ -121,6 +122,10 @@ public class BacktraceApi {
      * @return AsyncTask which returns server response after execution
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
+        if(this.requestHandler != null)
+        {
+            return new AsyncTaskRequestHandlerWrapper(this.requestHandler, data).execute();
+        }
         String json = BacktraceSerializeHelper.toJson(data);
         ArrayList<String> attachments = new ArrayList<>(); // TODO: add attachments
         return sendAsync(UUID.randomUUID(), json, attachments, data.report);

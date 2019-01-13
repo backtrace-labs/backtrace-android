@@ -6,8 +6,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
