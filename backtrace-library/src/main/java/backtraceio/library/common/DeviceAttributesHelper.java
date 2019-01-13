@@ -1,6 +1,7 @@
 package backtraceio.library.common;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.location.LocationManager;
@@ -18,6 +19,9 @@ import java.util.UUID;
 
 import backtraceio.library.enums.BluetoothStatus;
 import backtraceio.library.enums.NfcStatus;
+import backtraceio.library.enums.WifiStatus;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 public class DeviceAttributesHelper {
     private Context context;
@@ -41,6 +45,10 @@ public class DeviceAttributesHelper {
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
         result.put("device.cpu_temperature", getCpuTemperature());
         result.put("device.is_power_saving_mode", isPowerSavingMode());
+        result.put("device.ram_max", getMaxRamSize());
+        result.put("device.ram_free", getDeviceFreeRam());
+        result.put("device.ram_%_available", getDeviceRamPercentageAvailable());
+        result.put("app.memory_used", getAppUsedMemorySize());
         result.put("guid", this.generateDeviceId());
         return result;
     }
@@ -159,5 +167,47 @@ public class DeviceAttributesHelper {
         }
 
         return UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
+    }
+
+    /**
+     * Get RAM size of current device
+     * available from API 16
+     * @return device RAM size
+     */
+    private String getMaxRamSize()
+    {
+        return Long.toString(getMemoryInformation().totalMem);
+    }
+
+    private String getDeviceFreeRam(){
+        return Double.toString(getMemoryInformation().availMem);
+    }
+
+    private String getDeviceRamPercentageAvailable(){
+        ActivityManager.MemoryInfo mi = getMemoryInformation();
+        double percentageAvailable = mi.availMem / (double)mi.totalMem * 100.0;
+        return String.format("%.2f", percentageAvailable) + "%";
+    }
+
+    private ActivityManager.MemoryInfo getMemoryInformation(){
+        ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) this.context.getSystemService(ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(memInfo);
+        return memInfo;
+    }
+
+    private String getAppUsedMemorySize(){
+        long freeSize = 0L;
+        long totalSize = 0L;
+        long usedSize = -1L;
+        try {
+            Runtime info = Runtime.getRuntime();
+            freeSize = info.freeMemory();
+            totalSize = info.totalMemory();
+            usedSize = totalSize - freeSize;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Long.toString(usedSize);
     }
 }
