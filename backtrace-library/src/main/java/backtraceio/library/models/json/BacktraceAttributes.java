@@ -60,9 +60,10 @@ public class BacktraceAttributes {
         this.attributes.put("device.model", Build.MODEL);
         this.attributes.put("device.brand", Build.BRAND);
         this.attributes.put("device.product", Build.PRODUCT);
+        this.attributes.put("device.os", Build.VERSION.RELEASE);
         this.attributes.put("device.sdk", Build.VERSION.SDK_INT);
         this.attributes.put("device.manufacturer", Build.MANUFACTURER);
-        this.attributes.put("device.os", System.getProperty("os.version"));
+        this.attributes.put("device.os_version", System.getProperty("os.version"));
     }
 
     private void setAppInformation() {
