@@ -45,6 +45,7 @@ public class DeviceAttributesHelper {
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
         result.put("device.cpu_temperature", getCpuTemperature());
         result.put("device.is_power_saving_mode", isPowerSavingMode());
+        result.put("device.wifi_status", getWifiStatus().toString());
         result.put("device.ram_max", getMaxRamSize());
         result.put("device.ram_free", getDeviceFreeRam());
         result.put("device.ram_%_available", getDeviceRamPercentageAvailable());
@@ -135,9 +136,23 @@ public class DeviceAttributesHelper {
         return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-    private boolean isWifiEnabled() {
+    /**
+     * Check Wifi status ('enabled', 'disabled', 'not permitted' to get wifi status)
+     * Requires permission.ACCESS_WIFI_STATE
+     * @return Wifi status
+     */
+    private WifiStatus getWifiStatus() {
+        if (!permissionHelper.isPermissionForAccessWifiStateGranted())
+        {
+            return WifiStatus.NOT_PERMITTED;
+        }
+
         WifiManager mng = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        return mng.isWifiEnabled();
+        if(mng.isWifiEnabled())
+        {
+            return WifiStatus.ENABLED;
+        }
+        return WifiStatus.DISABLED;
     }
 
     /**
