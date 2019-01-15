@@ -1,6 +1,7 @@
 package backtraceio.library.models.json;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.util.DisplayMetrics;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import backtraceio.library.BuildConfig;
 import backtraceio.library.enums.ScreenOrientation;
 
 /**
@@ -50,6 +52,7 @@ public class BacktraceAttributes {
         setAppInformation();
         setDeviceInformation();
         setScreenInformation();
+        setBacktraceLibraryAttributes();
     }
 
     /**
@@ -69,6 +72,21 @@ public class BacktraceAttributes {
     private void setAppInformation() {
         this.attributes.put("app.package.name", this.context.getApplicationContext()
                 .getPackageName());
+
+        this.attributes.put("app.name", this.context.getApplicationInfo().loadLabel(this.context
+                .getPackageManager()));
+
+        try {
+            this.attributes.put("app.version_name", this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setBacktraceLibraryAttributes() {
+        this.attributes.put("backtrace.version_code", BuildConfig.VERSION_CODE);
+        this.attributes.put("backtrace.version_name", BuildConfig.VERSION_NAME);
     }
 
     /**
