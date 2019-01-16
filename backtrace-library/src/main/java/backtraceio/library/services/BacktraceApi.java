@@ -2,7 +2,7 @@ package backtraceio.library.services;
 
 import android.os.AsyncTask;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import backtraceio.library.BacktraceCredentials;
@@ -79,7 +79,7 @@ public class BacktraceApi {
         this.requestHandler = requestHandler;
     }
 
-    private BacktraceResult send(UUID requestId, String json, ArrayList<String> attachments,
+    private BacktraceResult send(UUID requestId, String json, List<String> attachments,
                                  BacktraceReport report) {
         BacktraceResult result;
         try {
@@ -93,7 +93,7 @@ public class BacktraceApi {
     }
 
     private AsyncTask<Void, Void, BacktraceResult> sendAsync(UUID requestId, String json,
-                                                             ArrayList<String> attachments,
+                                                             List<String> attachments,
                                                              BacktraceReport report) {
         return new BacktraceHttpAsyncTask(serverUrl, requestId, json, attachments, report,
                 this.onServerResponse, this.onServerError, this.afterSend).execute();
@@ -110,7 +110,7 @@ public class BacktraceApi {
             return this.requestHandler.onRequest(data);
         }
         String json = BacktraceSerializeHelper.toJson(data);
-        ArrayList<String> attachments = new ArrayList<>(); // TODO: add attachments
+        List<String> attachments = data.getAttachments();
         return send(UUID.randomUUID(), json, attachments, data.report);
     }
 
@@ -122,12 +122,11 @@ public class BacktraceApi {
      * @return AsyncTask which returns server response after execution
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
-        if(this.requestHandler != null)
-        {
+        if (this.requestHandler != null) {
             return new AsyncTaskRequestHandlerWrapper(this.requestHandler, data).execute();
         }
         String json = BacktraceSerializeHelper.toJson(data);
-        ArrayList<String> attachments = new ArrayList<>(); // TODO: add attachments
+        List<String> attachments = data.getAttachments();
         return sendAsync(UUID.randomUUID(), json, attachments, data.report);
     }
 }

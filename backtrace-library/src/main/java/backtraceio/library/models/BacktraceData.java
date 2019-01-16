@@ -4,7 +4,10 @@ import android.content.Context;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.models.json.Annotations;
@@ -100,7 +103,6 @@ public class BacktraceData {
      */
     public transient Context context;
 
-
     /**
      * Create instance of report data
      *
@@ -122,6 +124,15 @@ public class BacktraceData {
         setAttributes(clientAttributes);
 
     }
+
+    /**
+     * Get absolute paths to report attachments
+     * @return paths to attachments
+     */
+    public List<String> getAttachments() {
+        return new ArrayList<>(new HashSet<>(report.attachmentPaths)); // get only unique elements
+    }
+
 
     private void setAttributes(Map<String, Object> clientAttributes) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,

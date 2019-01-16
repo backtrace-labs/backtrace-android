@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
@@ -36,7 +37,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     /**
      * Path to attachments which should be send to Backtrace API with request
      */
-    private ArrayList<String> attachments;
+    private List<String> attachments;
 
     /**
      * Current BacktraceReport
@@ -63,7 +64,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
      */
     private OnAfterSendEventListener afterSend;
 
-    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
+    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, List<String>
             attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
                                   OnServerErrorEventListener onServerError,
                                   OnAfterSendEventListener afterSend) {
