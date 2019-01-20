@@ -3,21 +3,20 @@ package backtraceio.library.services;
 import android.os.AsyncTask;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
-import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.HttpException;
@@ -90,14 +89,24 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             URL url = new URL(this.url);
             urlConnection = (HttpURLConnection) url.openConnection();
 
+            urlConnection.setUseCaches(false);
+            urlConnection.setDoOutput(true); // indicates POST method
             urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-            urlConnection.setRequestProperty("Content-Type", "application/json");
-            urlConnection.setRequestMethod("POST");
 
-            OutputStream os = urlConnection.getOutputStream();
-            os.write(json.getBytes());
-            os.flush();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Connection", "Keep-Alive");
+            urlConnection.setRequestProperty("Cache-Control", "no-cache");
+            urlConnection.setRequestProperty("Content-Type",
+                    MultiFormRequestHelper.getContentType());
+
+            DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
+
+            MultiFormRequestHelper.addJson(request, json);
+//            MultiFormRequestHelper.addFile(request);
+            MultiFormRequestHelper.addEndOfRequest(request);
+
+            request.flush();
+            request.close();
 
             int statusCode = urlConnection.getResponseCode();
 
