@@ -102,7 +102,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
 
             MultiFormRequestHelper.addJson(request, json);
-//            MultiFormRequestHelper.addFile(request);
+            MultiFormRequestHelper.addFiles(request, attachments);
             MultiFormRequestHelper.addEndOfRequest(request);
 
             request.flush();
