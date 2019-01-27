@@ -32,10 +32,12 @@ public class BacktraceStackTrace {
     }
 
     private void Initialize() {
-        if(this.exception == null) {
+        StackTraceElement[] stackTraceElements = this.exception != null ?
+                this.exception.getStackTrace() : Thread.currentThread().getStackTrace();
+        if (stackTraceElements == null || stackTraceElements.length == 0) {
             return;
         }
-        SetStacktraceInformation(this.exception.getStackTrace());
+        SetStacktraceInformation(stackTraceElements);
     }
 
     private void SetStacktraceInformation(StackTraceElement[] frames) {

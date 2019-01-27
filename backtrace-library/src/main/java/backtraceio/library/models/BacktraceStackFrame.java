@@ -15,7 +15,7 @@ public class BacktraceStackFrame {
      * Line number in source code where exception occurs
      */
     @SerializedName("line")
-    public int line;
+    public Integer line = null;
 
     /// <summary>
     /// Source code file name where exception occurs
@@ -46,8 +46,8 @@ public class BacktraceStackFrame {
             return;
         }
         this.functionName = frame.getMethodName();
-        this.line = frame.getLineNumber();
         this.sourceCodeFileName = frame.getFileName();
         this.sourceCode = UUID.randomUUID().toString();
+        this.line = frame.getLineNumber() > 0 ? frame.getLineNumber() : null;
     }
 }

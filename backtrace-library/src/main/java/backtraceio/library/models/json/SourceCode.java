@@ -12,7 +12,7 @@ public class SourceCode{
      * Line number in source code where exception occurs
      */
     @SerializedName("startLine")
-    public int startLine;
+    public Integer startLine;
 
     /**
      * Filename to source file where exception occurs
