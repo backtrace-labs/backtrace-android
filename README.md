@@ -41,7 +41,7 @@ try {
 Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.0rc1'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.0'
 }
 ```
 
