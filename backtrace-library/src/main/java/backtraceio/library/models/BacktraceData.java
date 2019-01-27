@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
@@ -150,7 +152,7 @@ public class BacktraceData {
         timestamp = report.timestamp;
         classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
-        agentVersion = "1.0.0";
+        agentVersion = BuildConfig.VERSION_NAME;
     }
 
     /**

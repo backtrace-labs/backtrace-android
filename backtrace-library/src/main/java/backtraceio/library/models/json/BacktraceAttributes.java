@@ -52,7 +52,6 @@ public class BacktraceAttributes {
         setAppInformation();
         setDeviceInformation();
         setScreenInformation();
-        setBacktraceLibraryAttributes();
     }
 
     /**
@@ -82,11 +81,6 @@ public class BacktraceAttributes {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    private void setBacktraceLibraryAttributes() {
-        this.attributes.put("backtrace.version_code", BuildConfig.VERSION_CODE);
-        this.attributes.put("backtrace.version_name", BuildConfig.VERSION_NAME);
     }
 
     /**
