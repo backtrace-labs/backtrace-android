@@ -18,8 +18,8 @@ public class PermissionHelper {
      * @return true if permission is granted
      */
     public boolean isPermissionForBluetoothGranted() {
-        return ContextCompat.checkSelfPermission(this.context, Manifest.permission.BLUETOOTH) ==
-                PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this.context,
+                Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
     }
 
 
@@ -29,12 +29,21 @@ public class PermissionHelper {
      * @return true if permission is granted
      */
     public boolean isPermissionForInternetGranted() {
-        return ContextCompat.checkSelfPermission(this.context, Manifest.permission.INTERNET) ==
-                PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this.context,
+                Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED;
     }
 
     public boolean isPermissionForAccessWifiStateGranted() {
-        return ContextCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_WIFI_STATE) ==
-                PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this.context,
+                Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Check is permission for Read external storage grande
+     * @return true if permission is granted
+     */
+    public boolean isPermissionForRearExternalStorageGranted() {
+        return ContextCompat.checkSelfPermission(this.context,
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 }

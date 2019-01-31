@@ -89,13 +89,16 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             URL url = new URL(this.url);
             urlConnection = (HttpURLConnection) url.openConnection();
 
+            urlConnection.setRequestMethod("POST");
             urlConnection.setUseCaches(false);
-            urlConnection.setDoOutput(true); // indicates POST method
+
+            urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
 
-            urlConnection.setRequestMethod("POST");
+            urlConnection.setChunkedStreamingMode(128 * 1024);
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Cache-Control", "no-cache");
+
             urlConnection.setRequestProperty("Content-Type",
                     MultiFormRequestHelper.getContentType());
 

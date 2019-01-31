@@ -1,86 +1,98 @@
 package backtraceio.library.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.List;
 
 public class MultiFormRequestHelper {
-    private static final String BOUNDARY =  "*****";
+    private static final String BOUNDARY = "*****";
     private static final String CRLF = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
-    public static String getContentType()
-    {
+    public static String getContentType() {
         return "multipart/form-data;boundary=" + MultiFormRequestHelper.BOUNDARY;
     }
 
-    public static void addEndOfRequest(DataOutputStream request) throws IOException
-    {
-        request.writeBytes(MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
-                MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.CRLF);
-    }
-
-    public static void addJson(DataOutputStream request, String json) throws IOException
-    {
-        if (json == null || json.equals(""))
-        {
+    public static void addEndOfRequest(OutputStream request) throws IOException {
+        if (request == null) {
             return;
         }
-        request.writeBytes(MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY + MultiFormRequestHelper.CRLF);
-        request.writeBytes(MultiFormRequestHelper.getFileInfo("upload_file"));
-        request.writeBytes(MultiFormRequestHelper.CRLF);
+
+        request.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
+                MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.CRLF).getBytes());
+    }
+
+    public static void addJson(OutputStream request, String json) throws IOException {
+        if (json == null || json.isEmpty()) {
+            return;
+        }
+        request.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
+                MultiFormRequestHelper.CRLF).getBytes());
+        request.write((MultiFormRequestHelper.getFileInfo("upload_file")).getBytes());
+        request.write((MultiFormRequestHelper.CRLF).getBytes());
 
         byte[] bytes = json.getBytes("utf-8");
         request.write(bytes);
-        request.writeBytes(MultiFormRequestHelper.CRLF);
+        request.write((MultiFormRequestHelper.CRLF).getBytes());
     }
 
-    public static void addFiles(DataOutputStream request, List<String> attachments) throws IOException
-    {
-        if (attachments == null)
-        {
+    public static void addFiles(OutputStream request, List<String> attachments) throws IOException {
+        if (attachments == null) {
             return;
         }
 
-        for(String filePath : attachments) {
-            addFile(request, filePath);
+        for (String fileAbsolutePath : attachments) {
+            if (MultiFormRequestHelper.isFilePathValid(fileAbsolutePath)) {
+                continue;
+            }
+            addFile(request, fileAbsolutePath);
         }
     }
 
-    public static void addFile(DataOutputStream request, String absolutePath) throws IOException
-    {
-        FileInputStream fis = new FileInputStream(absolutePath);
+    private static void addFile(OutputStream request, String absolutePath) throws IOException {
+        String fileContentType = URLConnection.guessContentTypeFromName(getFileNameFromPath
+                (absolutePath));
 
-        byte[] b = new byte[1024];
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        request.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
+                MultiFormRequestHelper.CRLF).getBytes());
+        request.write((MultiFormRequestHelper.getFileInfo("attachment_" + getFileNameFromPath
+                (absolutePath))).getBytes());
+        request.write(("Content-Type: " + fileContentType + MultiFormRequestHelper.CRLF).getBytes
+                ());
+        request.write((MultiFormRequestHelper.CRLF).getBytes());
+        streamFile(request, absolutePath);
+        request.write((MultiFormRequestHelper.CRLF).getBytes());
+
+    }
+
+    public static void streamFile(OutputStream outputStream, String absolutePath) throws
+            IOException {
+        FileInputStream fis = new FileInputStream(absolutePath);
+        byte[] b = new byte[4096];
         int c;
         while ((c = fis.read(b)) != -1) {
-            os.write(b, 0, c);
+            outputStream.write(b, 0, c);
         }
-        byte[] bytes =  os.toByteArray();
-        request.writeBytes(MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY + MultiFormRequestHelper.CRLF);
-        request.writeBytes(MultiFormRequestHelper.getFileInfo("attachment_" + getFileNameFromPath(absolutePath)));
-        request.writeBytes("Content-Type: application/octet-stream" + MultiFormRequestHelper.CRLF);
-        request.writeBytes(MultiFormRequestHelper.CRLF);
-        request.write(bytes);
-        request.writeBytes(MultiFormRequestHelper.CRLF);
-
     }
 
-    private static String getFileNameFromPath(String absolutePath)
-    {
-        return absolutePath.substring(absolutePath.lastIndexOf("/")+1);
+    private static String getFileNameFromPath(String absolutePath) {
+        return absolutePath.substring(absolutePath.lastIndexOf("/") + 1);
     }
 
-    private static String getFileInfo(String fileName){
+    private static String getFileInfo(String fileName) {
         return "Content-Disposition: form-data; name=\"" +
-                 fileName + "\";filename=\"" +
-                 fileName + "\"" + MultiFormRequestHelper.CRLF;
+                fileName + "\";filename=\"" +
+                fileName + "\"" + MultiFormRequestHelper.CRLF;
+    }
+
+    private static boolean isFilePathValid(String filePath) {
+        return filePath == null || filePath.isEmpty() || !isFileExists(filePath);
+    }
+
+    private static boolean isFileExists(String absoluteFilePath) {
+        return new File(absoluteFilePath).exists();
     }
 }
