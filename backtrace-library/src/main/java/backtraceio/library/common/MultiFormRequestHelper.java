@@ -45,9 +45,6 @@ public class MultiFormRequestHelper {
         }
 
         for (String fileAbsolutePath : attachments) {
-            if (MultiFormRequestHelper.isFilePathValid(fileAbsolutePath)) {
-                continue;
-            }
             addFile(request, fileAbsolutePath);
         }
     }
@@ -86,13 +83,5 @@ public class MultiFormRequestHelper {
         return "Content-Disposition: form-data; name=\"" +
                 fileName + "\";filename=\"" +
                 fileName + "\"" + MultiFormRequestHelper.CRLF;
-    }
-
-    private static boolean isFilePathValid(String filePath) {
-        return filePath == null || filePath.isEmpty() || !isFileExists(filePath);
-    }
-
-    private static boolean isFileExists(String absoluteFilePath) {
-        return new File(absoluteFilePath).exists();
     }
 }
