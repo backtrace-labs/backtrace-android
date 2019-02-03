@@ -25,11 +25,9 @@ import static android.content.Context.ACTIVITY_SERVICE;
 
 public class DeviceAttributesHelper {
     private Context context;
-    private PermissionHelper permissionHelper;
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;
-        permissionHelper = new PermissionHelper(this.context);
     }
 
     /**
@@ -96,7 +94,7 @@ public class DeviceAttributesHelper {
     @SuppressLint("MissingPermission")
     private BluetoothStatus isBluetoothEnabled() {
 
-        if(!permissionHelper.isPermissionForBluetoothGranted())
+        if(!PermissionHelper.isPermissionForBluetoothGranted(this.context))
         {
             return BluetoothStatus.NOT_PERMITTED;
         }
@@ -142,7 +140,7 @@ public class DeviceAttributesHelper {
      * @return Wifi status
      */
     private WifiStatus getWifiStatus() {
-        if (!permissionHelper.isPermissionForAccessWifiStateGranted())
+        if (!PermissionHelper.isPermissionForAccessWifiStateGranted(this.context))
         {
             return WifiStatus.NOT_PERMITTED;
         }

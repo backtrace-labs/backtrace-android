@@ -1,6 +1,7 @@
 package backtraceio.library.models;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -10,8 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.BacktraceClient;
+import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
+import backtraceio.library.common.FileHelper;
+import backtraceio.library.common.PermissionHelper;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
@@ -132,7 +137,7 @@ public class BacktraceData {
      * @return paths to attachments
      */
     public List<String> getAttachments() {
-        return new ArrayList<>(new HashSet<>(report.attachmentPaths)); // get only unique elements
+        return FileHelper.filterOutFiles(this.context, report.attachmentPaths);
     }
 
 
