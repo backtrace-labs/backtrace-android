@@ -1,22 +1,15 @@
 package backtraceio.library.models;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.BacktraceClient;
-import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
-import backtraceio.library.common.PermissionHelper;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
@@ -91,7 +84,7 @@ public class BacktraceData {
     public String[] classifiers;
 
     /**
-     * Not supported yet
+     * Current host environment variables
      */
     @SerializedName("annotations")
     public Annotations annotations;
@@ -124,7 +117,6 @@ public class BacktraceData {
         }
         this.context = context;
         this.report = report;
-        this.annotations = new Annotations(); // TODO: handle annotations
         setReportInformation();
 
         setThreadsInformation();
@@ -145,8 +137,11 @@ public class BacktraceData {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
         this.attributes = backtraceAttributes.attributes;
+
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
         this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+
+        this.annotations = new Annotations(backtraceAttributes.getComplexAttributes());
     }
 
     /**

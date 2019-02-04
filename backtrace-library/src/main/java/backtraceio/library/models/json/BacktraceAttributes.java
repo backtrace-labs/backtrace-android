@@ -54,6 +54,10 @@ public class BacktraceAttributes {
         setScreenInformation();
     }
 
+    public Map<String, Object> getComplexAttributes() {
+        return complexAttributes;
+    }
+
     /**
      * Set information about device eg. lang, model, brand, sdk, manufacturer, os version
      */
