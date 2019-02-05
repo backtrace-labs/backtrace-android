@@ -8,11 +8,15 @@ import java.util.Map;
  */
 public class Annotations extends HashMap<String, Object>{
 
-    public Annotations(Map<String, Object> complexAttributes)
+    public Annotations()
+    {
+        this.put("Environment Variables", System.getenv());
+    }
+
+    public void addComplexAttributes(Map<String, Object> complexAttributes)
     {
         if(complexAttributes != null) {
             this.putAll(complexAttributes);
         }
-        this.put("Environment Variables", System.getenv());
     }
 }

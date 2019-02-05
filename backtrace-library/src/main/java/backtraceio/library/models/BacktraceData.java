@@ -117,11 +117,12 @@ public class BacktraceData {
         }
         this.context = context;
         this.report = report;
+        this.annotations = new Annotations();
+
         setReportInformation();
 
         setThreadsInformation();
         setAttributes(clientAttributes);
-
     }
 
     /**
@@ -132,7 +133,10 @@ public class BacktraceData {
         return FileHelper.filterOutFiles(this.context, report.attachmentPaths);
     }
 
-
+    /**
+     * Set attributes and add complex attributes to annotations
+     * @param clientAttributes
+     */
     private void setAttributes(Map<String, Object> clientAttributes) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
@@ -141,7 +145,10 @@ public class BacktraceData {
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
         this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
-        this.annotations = new Annotations(backtraceAttributes.getComplexAttributes());
+        if(this.annotations != null)
+        {
+            this.annotations.addComplexAttributes(backtraceAttributes.getComplexAttributes());
+        }
     }
 
     /**
