@@ -1,28 +1,18 @@
 package backtraceio.library.models.json;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Get report annotations - environment variables and application dependencies
  */
-public class Annotations {
-
-    @SerializedName("ComplexAttributes ")
-    public Map<String, Object> complexAttributes;
-
-    @SerializedName("Environment Variables")
-    public Map<String, String> environmentVariables;
-
-    @SerializedName("Dependencies")
-    public Map<String, Object> dependencies = new HashMap<>();
+public class Annotations extends HashMap<String, Object>{
 
     public Annotations(Map<String, Object> complexAttributes)
     {
-        this.complexAttributes = complexAttributes;
-
-        this.environmentVariables = System.getenv();
+        if(complexAttributes != null) {
+            this.putAll(complexAttributes);
+        }
+        this.put("Environment Variables", System.getenv());
     }
 }
