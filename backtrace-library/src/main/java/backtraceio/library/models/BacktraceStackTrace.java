@@ -24,28 +24,32 @@ public class BacktraceStackTrace {
      */
     public BacktraceStackTrace(Exception exception) {
         this.exception = exception;
-        Initialize();
+        initialize();
     }
 
     public ArrayList<BacktraceStackFrame> getStackFrames() {
         return stackFrames;
     }
 
-    private void Initialize() {
+    private void initialize() {
         StackTraceElement[] stackTraceElements = this.exception != null ?
                 this.exception.getStackTrace() : Thread.currentThread().getStackTrace();
         if (stackTraceElements == null || stackTraceElements.length == 0) {
             return;
         }
-        SetStacktraceInformation(stackTraceElements);
+        setStacktraceInformation(stackTraceElements);
     }
 
-    private void SetStacktraceInformation(StackTraceElement[] frames) {
+    private void setStacktraceInformation(StackTraceElement[] frames) {
         if (frames == null || frames.length == 0) {
             return;
         }
 
         for (StackTraceElement frame : frames) {
+            if(frame.getFileName().startsWith("Backtrace"))
+            {
+                continue;
+            }
             BacktraceStackFrame backtraceStackFrame = new BacktraceStackFrame(frame);
             this.stackFrames.add(backtraceStackFrame);
         }
