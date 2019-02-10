@@ -5,9 +5,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 
+/***
+ * Helper class for checking permissions
+ */
 public class PermissionHelper {
-    private Context context;
-
 
     /**
      * Check is permission for Bluetooth is granted (permission.BLUETOOTH)
@@ -37,6 +38,7 @@ public class PermissionHelper {
 
     /**
      * Check is permission for Read external storage grande
+     *
      * @return true if permission is granted
      */
     public static boolean isPermissionForReadExternalStorageGranted(Context context) {

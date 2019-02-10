@@ -23,6 +23,9 @@ import backtraceio.library.enums.WifiStatus;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
+/**
+ * Helper class for extract a device attributes
+ */
 public class DeviceAttributesHelper {
     private Context context;
 
