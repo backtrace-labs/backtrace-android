@@ -94,6 +94,21 @@ public class BacktraceReport {
      * with custom client message, attributes and attachments
      *
      * @param message         custom client message
+     * @param attachmentPaths path to all report attachments
+     */
+    public BacktraceReport(
+            String message,
+            List<String> attachmentPaths
+    ) {
+        this(message, null, attachmentPaths);
+    }
+
+
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with custom client message, attributes and attachments
+     *
+     * @param message         custom client message
      * @param attributes      additional information about application state
      * @param attachmentPaths path to all report attachments
      */
@@ -128,6 +143,19 @@ public class BacktraceReport {
             Exception exception,
             Map<String, Object> attributes) {
         this(exception, attributes, null);
+    }
+
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception, attributes and attachments
+     *
+     * @param exception       current exception
+     * @param attachmentPaths path to all report attachments
+     */
+    public BacktraceReport(
+            Exception exception,
+            List<String> attachmentPaths) {
+        this(exception, null, attachmentPaths);
     }
 
     /**
