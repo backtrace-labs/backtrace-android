@@ -1,5 +1,8 @@
 package backtraceio.library.enums;
 
+/**
+ * Screen orientation statuses
+ */
 public enum ScreenOrientation {
     PORTRAIT("portrait"),
     LANDSCAPE("landscape"),

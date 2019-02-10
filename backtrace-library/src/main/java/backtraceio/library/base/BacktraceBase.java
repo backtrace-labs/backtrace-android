@@ -16,6 +16,9 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceApi;
 
+/**
+ * Base Backtrace Android client
+ */
 public class BacktraceBase implements IBacktraceClient {
 
     private BacktraceApi backtraceApi;

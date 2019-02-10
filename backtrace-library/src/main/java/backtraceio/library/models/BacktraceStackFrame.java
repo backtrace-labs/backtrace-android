@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
 
+/**
+ * Backtrace stack frame
+ */
 public class BacktraceStackFrame {
 
     /**
@@ -17,11 +20,8 @@ public class BacktraceStackFrame {
     @SerializedName("line")
     public Integer line = null;
 
-    /// <summary>
-    /// Source code file name where exception occurs
-    /// </summary>
     /**
-     *
+     * Source code file name where exception occurs
      */
     @SerializedName("sourceCode")
     public String sourceCode;

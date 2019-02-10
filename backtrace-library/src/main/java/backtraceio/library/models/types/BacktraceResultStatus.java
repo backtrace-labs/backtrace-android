@@ -1,8 +1,8 @@
 package backtraceio.library.models.types;
 
-/// <summary>
-/// Existing send method result statuses
-/// </summary>
+/**
+ * Existing send method result statuses
+ */
 public enum BacktraceResultStatus
 {
     /**
