@@ -4,7 +4,7 @@ package backtraceio.library.enums;
  * NFC statuses
  */
 public enum NfcStatus {
-    NOT_AVAILABLE("not available"),
+    NOT_AVAILABLE("not_available"),
     DISABLED("disabled"),
     ENABLED("enabled");
 

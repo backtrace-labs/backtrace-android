@@ -4,7 +4,7 @@ package backtraceio.library.enums;
  * WiFi statuses
  */
 public enum WifiStatus {
-    NOT_PERMITTED("not permitted"),
+    NOT_PERMITTED("not_permitted"),
     DISABLED("disabled"),
     ENABLED("enabled");
 
