@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import backtraceio.library.enums.BluetoothStatus;
+import backtraceio.library.enums.GpsStatus;
+import backtraceio.library.enums.LocationStatus;
 import backtraceio.library.enums.NfcStatus;
 import backtraceio.library.enums.WifiStatus;
 
@@ -39,19 +41,22 @@ public class DeviceAttributesHelper {
      */
     public HashMap<String, Object> getDeviceAttributes() {
         HashMap<String, Object> result = new HashMap<>();
+        result.put("guid", this.generateDeviceId());
+        result.put("uname.sysname", "Android");
+        result.put("uname.machine", System.getProperty("os.arch"));
+        result.put("cpu.boottime", java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime());
         result.put("device.airplane_mode", isAirplaneModeOn());
-        result.put("device.location_enabled", isLocationServicesEnabled());
+        result.put("device.location", getLocationServiceStatus().toString());
         result.put("device.nfc_status", getNfcStatus().toString());
-        result.put("device.gps_enabled", isGpsEnabled());
+        result.put("device.gps_enabled", getGpsStatus().toString());
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
         result.put("device.cpu_temperature", getCpuTemperature());
         result.put("device.is_power_saving_mode", isPowerSavingMode());
         result.put("device.wifi_status", getWifiStatus().toString());
-        result.put("device.ram_max", getMaxRamSize());
-        result.put("device.ram_free", getDeviceFreeRam());
-        result.put("device.ram_%_available", getDeviceRamPercentageAvailable());
-        result.put("app.memory_used", getAppUsedMemorySize());
-        result.put("guid", this.generateDeviceId());
+        result.put("system.memory.total", getMaxRamSize());
+        result.put("system.memory.free", getDeviceFreeRam());
+        result.put("system.memory.active", getDeviceActiveRam());
+        result.put("app.storage_used", getAppUsedStorageSize());
         return result;
     }
 
@@ -66,12 +71,16 @@ public class DeviceAttributesHelper {
 
     /**
      * Check is location service is enabled
-     * @return true if location service is enabled
+     * @return location status (enabled/disabled)
      */
-    private boolean isLocationServicesEnabled() {
+    private LocationStatus getLocationServiceStatus() {
         int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE,
                 Settings.Secure.LOCATION_MODE_OFF);
-        return (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF);
+        if (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF)
+        {
+            return LocationStatus.ENABLED;
+        }
+        return LocationStatus.DISABLED;
     }
 
     /**
@@ -129,12 +138,12 @@ public class DeviceAttributesHelper {
     }
 
     /**
-     * Check is GPS enabled
-     * @return true if GPS is enabled
+     * Get GPS status
+     * @return GPS status (enabled/disabled)
      */
-    private boolean isGpsEnabled() {
+    private GpsStatus getGpsStatus() {
         LocationManager manager = (LocationManager) this.context.getSystemService(Context.LOCATION_SERVICE);
-        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER)? GpsStatus.ENABLED : GpsStatus.DISABLED;
     }
 
     /**
@@ -196,13 +205,13 @@ public class DeviceAttributesHelper {
     }
 
     private String getDeviceFreeRam(){
-        return Double.toString(getMemoryInformation().availMem);
+        return Long.toString(getMemoryInformation().availMem);
     }
 
-    private String getDeviceRamPercentageAvailable(){
+    private String getDeviceActiveRam(){
         ActivityManager.MemoryInfo mi = getMemoryInformation();
-        double percentageAvailable = mi.availMem / (double)mi.totalMem * 100.0;
-        return String.format("%.2f", percentageAvailable) + "%";
+        return Long.toString(mi.totalMem - mi.availMem);
+
     }
 
     private ActivityManager.MemoryInfo getMemoryInformation(){
@@ -212,7 +221,7 @@ public class DeviceAttributesHelper {
         return memInfo;
     }
 
-    private String getAppUsedMemorySize(){
+    private String getAppUsedStorageSize(){
         long freeSize = 0L;
         long totalSize = 0L;
         long usedSize = -1L;
