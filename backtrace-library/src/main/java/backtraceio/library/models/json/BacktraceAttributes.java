@@ -62,14 +62,15 @@ public class BacktraceAttributes {
      * Set information about device eg. lang, model, brand, sdk, manufacturer, os version
      */
     private void setDeviceInformation() {
+        this.attributes.put("uname.version", Build.VERSION.RELEASE);
         this.attributes.put("culture", Locale.getDefault().getDisplayLanguage());
         this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug": "Release");
         this.attributes.put("device.model", Build.MODEL);
         this.attributes.put("device.brand", Build.BRAND);
         this.attributes.put("device.product", Build.PRODUCT);
-        this.attributes.put("uname.version", Build.VERSION.RELEASE);
         this.attributes.put("device.sdk", Build.VERSION.SDK_INT);
         this.attributes.put("device.manufacturer", Build.MANUFACTURER);
+
         this.attributes.put("device.os_version", System.getProperty("os.version"));
     }
 
@@ -101,6 +102,8 @@ public class BacktraceAttributes {
         this.attributes.put("screen.dpi", metrics.densityDpi);
         this.attributes.put("screen.orientation", getScreenOrientation().toString());
     }
+
+
 
     /**
      * Set information about exception (message and classifier)
