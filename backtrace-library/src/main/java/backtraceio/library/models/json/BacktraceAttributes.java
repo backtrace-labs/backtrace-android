@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -64,7 +65,7 @@ public class BacktraceAttributes {
     private void setDeviceInformation() {
         this.attributes.put("uname.version", Build.VERSION.RELEASE);
         this.attributes.put("culture", Locale.getDefault().getDisplayLanguage());
-        this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug": "Release");
+        this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug" : "Release");
         this.attributes.put("device.model", Build.MODEL);
         this.attributes.put("device.brand", Build.BRAND);
         this.attributes.put("device.product", Build.PRODUCT);
@@ -101,9 +102,8 @@ public class BacktraceAttributes {
         this.attributes.put("screen.height", metrics.heightPixels);
         this.attributes.put("screen.dpi", metrics.densityDpi);
         this.attributes.put("screen.orientation", getScreenOrientation().toString());
+        this.attributes.put("screen.brightness", getScreenBrightness());
     }
-
-
 
     /**
      * Set information about exception (message and classifier)
@@ -136,6 +136,18 @@ public class BacktraceAttributes {
             return ScreenOrientation.LANDSCAPE;
         }
         return ScreenOrientation.UNDEFINED;
+    }
+
+    /**
+     * Get screen brightness value
+     *
+     * @return screen backlight brightness between 0 and 255
+     */
+    private int getScreenBrightness() {
+        return Settings.System.getInt(
+                this.context.getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS,
+                0);
     }
 
     /**
