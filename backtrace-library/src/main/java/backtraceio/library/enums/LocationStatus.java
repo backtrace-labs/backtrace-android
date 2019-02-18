@@ -4,8 +4,8 @@ package backtraceio.library.enums;
  * Location statuses
  */
 public enum LocationStatus {
-    DISABLED("disabled"),
-    ENABLED("enabled");
+    DISABLED("Disabled"),
+    ENABLED("Enabled");
 
     private final String text;
 

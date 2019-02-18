@@ -4,8 +4,8 @@ package backtraceio.library.enums;
  * GPS statuses
  */
 public enum GpsStatus {
-    DISABLED("disabled"),
-    ENABLED("enabled");
+    DISABLED("Disabled"),
+    ENABLED("Enabled");
 
     private final String text;
 
