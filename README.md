@@ -15,15 +15,30 @@
 
 
 ## Usage
+Java
 ```java
 // replace with your endpoint url and token
 BacktraceCredentials credentials = new BacktraceCredentials("<endpoint-url>", "<token>");
 BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
 
 try {
-    //throw exception here
+    // throw exception here
 } catch (Exception exception) {
     backtraceClient.send(new BacktraceReport(e));
+}
+```
+
+Kotlin
+```kotlin
+// replace with your endpoint url and token
+val backtraceCredentials = BacktraceCredentials("<endpoint-url>", "<token>")
+val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
+
+try {
+    // throw exception here
+}
+catch (e: Exception) {
+    backtraceClient.send(BacktraceReport(e))
 }
 ```
 
@@ -41,7 +56,7 @@ try {
 Gradle
 ```
 dependencies {
-    compile 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.0rc1'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.0'
 }
 ```
 
@@ -50,7 +65,7 @@ Maven
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>1.0rc1</version>
+  <version>1.0</version>
   <type>aar</type>
 </dependency>
 ```
@@ -76,8 +91,14 @@ TODO
 
 - Open `MainActivity.java` class in **app\src\main\java\backtraceio\backtraceio** and replace `BacktraceCredential` constructor parameters with your `Backtrace endpoint URL` (e.g. https://xxx.sp.backtrace.io:6098) and `submission token`:
 
+Java
 ```java
 BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+```
+
+Kotlin
+```kotlin
+val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0")
 ```
 
 First start:
@@ -91,9 +112,16 @@ First start:
 
 First create a `BacktraceCredential` instance with your `Backtrace endpoint URL` (e.g. https://xxx.sp.backtrace.io:6098) and `submission token`, and supply it as a parameter in the `BacktraceClient` constructor:
 
+Java
 ```java
 BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
 BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
+```
+
+Kotlin
+```kotlin
+val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0")
+val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
 ## Sending an error report <a name="documentation-sending-report"></a>
@@ -105,9 +133,10 @@ Methods `BacktraceClient.send` and `BacktraceClient.sendAsync` will send an erro
 
 The `BacktraceReport` class represents a single error report. (Optional) You can also submit custom attributes using the `attributes` parameter. <!--, or attach files by supplying an array of file paths in the `attachmentPaths` parameter.-->
 
+Java
 ```java
 try {
-    //throw exception here
+    // throw exception here
 } catch (Exception exception) {
     BacktraceReport report = new BacktraceReport(e, 
     new HashMap<String, Object>() {{
@@ -120,40 +149,76 @@ try {
 }
 ```
 
+Kotlin
+```kotlin
+try {
+    // throw exception here
+}
+catch (e: Exception) {
+    val report = BacktraceReport(e, mapOf("key" to "value"), listOf("file_path_1", "file_path_2"))
+    backtraceClient.send(report)
+}
+```
+
 #### Asynchronous Send Support
 
 Method `send` behind the mask use `AsyncTask` and wait until method `doInBackground` is not completed. Library gives you the option of not blocking code execution by using method `sendAsync` which returning the `AsyncTask<Void, Void, BacktraceResult>` object. Additionally, it is possible to specify the method that should be performed after completion `AsyncTask` by using events described in [events](#events). 
 
 
+Java
 ```java
 AsyncTask<Void, Void, BacktraceResult> sendAsyncTask = backtraceClient.sendAsync(report);
 // another code
 BacktraceResult result = sendAsyncTask.get();
 ```
 
+Kotlin
+```kotlin
+val sendAsyncTask = backtraceClient.sendAsync(report)
+// another code
+val result = asynctask.get()
+```
+
 ### Other BacktraceReport Overloads
 
 `BacktraceClient` can also automatically create `BacktraceReport` given an exception or a custom message using the following overloads of the `BacktraceClient.send` or `BacktraceClient.sendAsync` methods:
 
+Java
 ```java
 try {
-  //throw exception here
+  // throw exception here
 } catch (Exception exception) {
 
-  backtraceClient.Send(report);
+  backtraceClient.send(new BacktraceReport(exception));
   
-  //pass exception to Send method
-  backtraceClient.Send(exception);
+  // pass exception to Send method
+  backtraceClient.send(exception);
   
-  //pass your custom message to Send method
-  backtraceClient.SendAsync("Message");
+  // pass your custom message to Send method
+  backtraceClient.sendAsync("Message");
 }
 ```
+Kotlin
+```kotlin
+try {
+    // throw exception here
+} catch (exception: Exception) {
+  backtraceClient.send(BacktraceReport(exception));
+  
+  // pass exception to Send method
+  backtraceClient.send(exception);
+  
+  // pass your custom message to Send method
+  backtraceClient.sendAsync("Message");
+}
+```
+
 
 ## Attaching custom event handlers <a name="documentation-events"></a>
 
 All events are written in *listener* pattern. `BacktraceClient` allows you to attach your custom event handlers. For example, you can trigger actions before the `send` method:
  
+ Java
 ```java
 backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
             @Override
@@ -162,6 +227,14 @@ backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
                 return data;
             }
         });
+```
+
+Kotlin
+```kotlin
+backtraceClient.setOnBeforeSendEventListener { data ->
+    // another code
+    data
+}
 ```
 
 `BacktraceClient` currently supports the following events:
