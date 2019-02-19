@@ -11,7 +11,7 @@
 
 
 
-[Backtrace](http://backtrace.io/)'s integration with Android applications written in Java allows customers to capture and report handled and unhandled java exceptions to their Backtrace instance, instantly offering the ability to prioritize and debug software errors.
+[Backtrace](http://backtrace.io/)'s integration with Android applications written in Java or Kotlin which allows customers to capture and report handled and unhandled java exceptions to their Backtrace instance, instantly offering the ability to prioritize and debug software errors.
 
 
 ## Usage
@@ -52,39 +52,53 @@ catch (e: Exception) {
 7. [Architecture](#architecture)
 
 
-# Download
-Gradle
-```
-dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.0'
-}
-```
-
-Maven
-```
-<dependency>
-  <groupId>com.github.backtrace-labs.backtrace-android</groupId>
-  <artifactId>backtrace-library</artifactId>
-  <version>1.0</version>
-  <type>aar</type>
-</dependency>
-```
-
 # Features Summary <a name="features-summary"></a>
-* Light-weight Java client library that quickly submits exceptions and crashes to your Backtrace dashboard. Can include callstack, system metadata, custom metadata.<!--, and file attachments if needed.-->
+* Light-weight Java client library that quickly submits exceptions and crashes to your Backtrace dashboard. Can include callstack, system metadata, custom metadata and file attachments if needed.<!--, and file attachments if needed.-->
 * Supports a wide range of Android SDKs.
 * Supports asynchronous Tasks.
 * Fully customizable and extendable event handlers and base classes for custom implementations.
-
-
-# Differences and limitations of the SDKs version <a name="limitations"></a>
 
 # Supported SDKs <a name="supported-sdks"></a>
 * Minimal SDK version 19 (Android 4.4)
 * Target SDK version 28 (Android 9.0)
 
+# Differences and limitations of the SDKs version <a name="limitations"></a>
+* Getting the status that the device is in power saving mode is available from API 21.
+
 # Installation <a name="installation"></a>
-TODO
+## Download library via Gradle or Maven
+* Gradle
+```
+dependencies {
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.1.0'
+}
+```
+
+* Maven
+```
+<dependency>
+  <groupId>com.github.backtrace-labs.backtrace-android</groupId>
+  <artifactId>backtrace-library</artifactId>
+  <version>1.1.0</version>
+  <type>aar</type>
+</dependency>
+```
+
+## Permissions
+### Internet permission
+* To send errors to the server instance you need to add permissions for Internet connection into `AndroidManifest.xml` file in your application.
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+### File access
+* To send file attachments from external storage to the server instance you need to add permissions for read external storage into `AndroidManifest.xml` file in your application.
+
+```xml
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```
+
 
 # Running sample application
 ## Android Studio <a name="sample-app-android-studio"></a>
@@ -142,8 +156,8 @@ try {
     new HashMap<String, Object>() {{
         put("key", "value");
     }}, new ArrayList<String>() {{
-        add("file_path_1");
-        add("file_path2");
+        add("absoulte_file_path_1");
+        add("absoulte_file_path_2");
     }});
     backtraceClient.send(report);
 }
@@ -155,12 +169,12 @@ try {
     // throw exception here
 }
 catch (e: Exception) {
-    val report = BacktraceReport(e, mapOf("key" to "value"), listOf("file_path_1", "file_path_2"))
+    val report = BacktraceReport(e, mapOf("key" to "value"), listOf("absolute_file_path_1", "absolute_file_path_2"))
     backtraceClient.send(report)
 }
 ```
 
-#### Asynchronous Send Support
+### Asynchronous Send support
 
 Method `send` behind the mask use `AsyncTask` and wait until method `doInBackground` is not completed. Library gives you the option of not blocking code execution by using method `sendAsync` which returning the `AsyncTask<Void, Void, BacktraceResult>` object. Additionally, it is possible to specify the method that should be performed after completion `AsyncTask` by using events described in [events](#events). 
 
@@ -179,7 +193,7 @@ val sendAsyncTask = backtraceClient.sendAsync(report)
 val result = asynctask.get()
 ```
 
-### Other BacktraceReport Overloads
+### Other BacktraceReport overloads
 
 `BacktraceClient` can also automatically create `BacktraceReport` given an exception or a custom message using the following overloads of the `BacktraceClient.send` or `BacktraceClient.sendAsync` methods:
 
@@ -268,14 +282,10 @@ You can extend `BacktraceBase` to create your own Backtrace client and error rep
 
 ## BacktraceApi  <a name="architecture-BacktraceApi"></a>
 **`BacktraceApi`** is a class that sends diagnostic JSON to the Backtrace endpoint. `BacktraceApi` is instantiated when the `BacktraceClient` constructor is called. You use the following event handlers in `BacktraceApi` to customize how you want to handle JSON data:
-- `RequestHandler` - attach an event handler to this event to override the default `BacktraceApi.send` method. <!--A `RequestHandler`  TODO -->
-- `OnServerError` - attach an event handler to be invoked when the server returns with a `400 bad request`, `401 unauthorized` or other HTTP error codes. <!-- TODO -->
+- `RequestHandler` - attach an event handler to this event to override the default `BacktraceApi.send` and `BacktraceApi.sendAsync` methods.
+- `OnServerError` - attach an event handler to be invoked when the server returns with a `400 bad request`, `401 unauthorized` or other HTTP error codes.
 - `OnServerResponse` - attach an event handler to be invoked when the server returns with a valid response.
 
 
 ## BacktraceResult  <a name="architecture-BacktraceResult"></a>
 **`BacktraceResult`** is a class that holds response and result from a `send` or `sendAsync` call. The class contains a `Status` property that indicates whether the call was completed (`OK`), the call returned with an error (`ServerError`), . Additionally, the class has a `Message` property that contains details about the status.
-
-
-
-
