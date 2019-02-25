@@ -53,12 +53,12 @@ public class DeviceAttributesHelper {
                 .elapsedRealtime());
         result.put("device.airplane_mode", isAirplaneModeOn());
         result.put("device.location", getLocationServiceStatus().toString());
-        result.put("device.nfc_status", getNfcStatus().toString());
-        result.put("device.gps_enabled", getGpsStatus().toString());
+        result.put("device.nfc.status", getNfcStatus().toString());
+        result.put("device.gps.enabled", getGpsStatus().toString());
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
-        result.put("device.cpu_temperature", getCpuTemperature());
+        result.put("device.cpu.temperature", getCpuTemperature());
         result.put("device.is_power_saving_mode", isPowerSavingMode());
-        result.put("device.wifi_status", getWifiStatus().toString());
+        result.put("device.wifi.status", getWifiStatus().toString());
         result.put("system.memory.total", getMaxRamSize());
         result.put("system.memory.free", getDeviceFreeRam());
         result.put("system.memory.active", getDeviceActiveRam());
