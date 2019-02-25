@@ -1,5 +1,8 @@
 package backtraceio.library.models.types;
 
+/**
+ * Exception which represents a HTTP fault
+ */
 public class HttpException extends Exception {
 
     /**

@@ -6,6 +6,9 @@ import com.google.gson.GsonBuilder;
 
 import backtraceio.library.models.BacktraceResult;
 
+/**
+ * Helper class for serialize and deserialize objects
+ */
 public class BacktraceSerializeHelper{
 
     /**

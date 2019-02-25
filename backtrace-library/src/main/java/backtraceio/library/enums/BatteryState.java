@@ -1,19 +1,17 @@
 package backtraceio.library.enums;
 
-/**
- * NFC statuses
- */
-public enum NfcStatus {
-    NOT_AVAILABLE("NotAvailable"),
-    DISABLED("Disabled"),
-    ENABLED("Enabled");
+public enum BatteryState {
+    CHARGING("Charging"),
+    UNKNOWN("Unknown"),
+    FULL("Full"),
+    UNPLAGGED("Unplagged");
 
     private final String text;
 
     /**
      * @param text text related to enum
      */
-    NfcStatus(final String text) {
+    BatteryState(final String text) {
         this.text = text;
     }
 

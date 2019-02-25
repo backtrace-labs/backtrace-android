@@ -24,6 +24,7 @@ public class SourceCodeData {
         {
             return;
         }
+
         for(BacktraceStackFrame backtraceStackFrame : exceptionStack)
         {
             if (backtraceStackFrame == null || backtraceStackFrame.sourceCode.equals(""))

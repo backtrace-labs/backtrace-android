@@ -3,10 +3,11 @@ package backtraceio.library.models;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.models.json.BacktraceReport;
 
+/**
+ * Backtrace UncaughtExceptionHandler which will be invoked when a Thread abruptly terminates due
+ * to an uncaught exception
+ */
 public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandler {
-    /**
-     *
-     */
     private final Thread.UncaughtExceptionHandler rootHandler;
     private BacktraceClient client;
 

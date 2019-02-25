@@ -1,10 +1,9 @@
 package backtraceio.library.enums;
 
 /**
- * NFC statuses
+ * GPS statuses
  */
-public enum NfcStatus {
-    NOT_AVAILABLE("NotAvailable"),
+public enum GpsStatus {
     DISABLED("Disabled"),
     ENABLED("Enabled");
 
@@ -13,7 +12,7 @@ public enum NfcStatus {
     /**
      * @param text text related to enum
      */
-    NfcStatus(final String text) {
+    GpsStatus(final String text) {
         this.text = text;
     }
 

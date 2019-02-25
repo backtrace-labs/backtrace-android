@@ -1,9 +1,12 @@
 package backtraceio.library.enums;
 
+/**
+ * Bluetooth statuses
+ */
 public enum BluetoothStatus {
-    NOT_PERMITTED("not permitted"),
-    DISABLED("disabled"),
-    ENABLED("enabled");
+    NOT_PERMITTED("NotPermitted"),
+    DISABLED("Disabled"),
+    ENABLED("Enabled");
 
     private final String text;
 

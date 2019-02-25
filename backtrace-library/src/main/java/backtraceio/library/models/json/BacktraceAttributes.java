@@ -1,8 +1,10 @@
 package backtraceio.library.models.json;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import backtraceio.library.BuildConfig;
 import backtraceio.library.enums.ScreenOrientation;
 
 /**
@@ -52,22 +55,39 @@ public class BacktraceAttributes {
         setScreenInformation();
     }
 
+    public Map<String, Object> getComplexAttributes() {
+        return complexAttributes;
+    }
+
     /**
      * Set information about device eg. lang, model, brand, sdk, manufacturer, os version
      */
     private void setDeviceInformation() {
-        this.attributes.put("device.lang", Locale.getDefault().getDisplayLanguage());
+        this.attributes.put("uname.version", Build.VERSION.RELEASE);
+        this.attributes.put("culture", Locale.getDefault().getDisplayLanguage());
+        this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug" : "Release");
         this.attributes.put("device.model", Build.MODEL);
         this.attributes.put("device.brand", Build.BRAND);
         this.attributes.put("device.product", Build.PRODUCT);
         this.attributes.put("device.sdk", Build.VERSION.SDK_INT);
         this.attributes.put("device.manufacturer", Build.MANUFACTURER);
-        this.attributes.put("device.os", System.getProperty("os.version"));
+
+        this.attributes.put("device.os_version", System.getProperty("os.version"));
     }
 
     private void setAppInformation() {
-        this.attributes.put("app.package.name", this.context.getApplicationContext()
+        this.attributes.put("application.package", this.context.getApplicationContext()
                 .getPackageName());
+
+        this.attributes.put("application", this.context.getApplicationInfo().loadLabel(this.context
+                .getPackageManager()));
+
+        try {
+            this.attributes.put("app.version_name", this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -78,10 +98,11 @@ public class BacktraceAttributes {
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-        this.attributes.put("device.screen.width", metrics.widthPixels);
-        this.attributes.put("device.screen.height", metrics.heightPixels);
-        this.attributes.put("device.screen.dpi", metrics.densityDpi);
-        this.attributes.put("device.screen.orientation", getScreenOrientation().toString());
+        this.attributes.put("screen.width", metrics.widthPixels);
+        this.attributes.put("screen.height", metrics.heightPixels);
+        this.attributes.put("screen.dpi", metrics.densityDpi);
+        this.attributes.put("screen.orientation", getScreenOrientation().toString());
+        this.attributes.put("screen.brightness", getScreenBrightness());
     }
 
     /**
@@ -115,6 +136,18 @@ public class BacktraceAttributes {
             return ScreenOrientation.LANDSCAPE;
         }
         return ScreenOrientation.UNDEFINED;
+    }
+
+    /**
+     * Get screen brightness value
+     *
+     * @return screen backlight brightness between 0 and 255
+     */
+    private int getScreenBrightness() {
+        return Settings.System.getInt(
+                this.context.getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS,
+                0);
     }
 
     /**
