@@ -16,6 +16,9 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceApi;
 
+/**
+ * Base Backtrace Android client
+ */
 public class BacktraceBase implements IBacktraceClient {
 
     private BacktraceApi backtraceApi;
@@ -76,28 +79,6 @@ public class BacktraceBase implements IBacktraceClient {
 
     /**
      * Sending an exception to Backtrace API
-     * @param message custom client message
-     * @return server response
-     */
-    public BacktraceResult send(String message)
-    {
-        BacktraceReport backtraceReport = new BacktraceReport(message);
-        return this.send(backtraceReport);
-    }
-
-    /**
-     * Sending an exception to Backtrace API
-     * @param exception current exception
-     * @return server response
-     */
-    public BacktraceResult send(Exception exception)
-    {
-        BacktraceReport backtraceReport = new BacktraceReport(exception);
-        return this.send(backtraceReport);
-    }
-
-    /**
-     * Sending an exception to Backtrace API
      * @param report current BacktraceReport
      * @return server response
      */
@@ -109,28 +90,6 @@ public class BacktraceBase implements IBacktraceClient {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
         }
         return this.backtraceApi.send(backtraceData);
-    }
-
-    /**
-     * Sending asynchronously an exception to Backtrace API
-     * @param message custom client message
-     * @return server response
-     */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message)
-    {
-        BacktraceReport backtraceReport = new BacktraceReport(message);
-        return this.sendAsync(backtraceReport);
-    }
-
-    /**
-     * Sending asynchronously an exception to Backtrace API
-     * @param exception current exception
-     * @return server response
-     */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception)
-    {
-        BacktraceReport backtraceReport = new BacktraceReport(exception);
-        return this.sendAsync(backtraceReport);
     }
 
     /**

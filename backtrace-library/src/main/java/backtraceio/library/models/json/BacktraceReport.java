@@ -76,6 +76,36 @@ public class BacktraceReport {
 
     /**
      * Create new instance of Backtrace report to sending a report
+     * with custom client message and attributes
+     *
+     * @param message         custom client message
+     * @param attributes      additional information about application state
+     */
+    public BacktraceReport(
+            String message,
+            Map<String, Object> attributes
+    ) {
+        this((Exception) null, attributes, null);
+        this.message = message;
+    }
+
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with custom client message, attributes and attachments
+     *
+     * @param message         custom client message
+     * @param attachmentPaths path to all report attachments
+     */
+    public BacktraceReport(
+            String message,
+            List<String> attachmentPaths
+    ) {
+        this(message, null, attachmentPaths);
+    }
+
+
+    /**
+     * Create new instance of Backtrace report to sending a report
      * with custom client message, attributes and attachments
      *
      * @param message         custom client message
@@ -100,6 +130,32 @@ public class BacktraceReport {
     public BacktraceReport(
             Exception exception) {
         this(exception, null, null);
+    }
+
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception and attributes
+     *
+     * @param exception       current exception
+     * @param attributes      additional information about application state
+     */
+    public BacktraceReport(
+            Exception exception,
+            Map<String, Object> attributes) {
+        this(exception, attributes, null);
+    }
+
+    /**
+     * Create new instance of Backtrace report to sending a report
+     * with application exception, attributes and attachments
+     *
+     * @param exception       current exception
+     * @param attachmentPaths path to all report attachments
+     */
+    public BacktraceReport(
+            Exception exception,
+            List<String> attachmentPaths) {
+        this(exception, null, attachmentPaths);
     }
 
     /**

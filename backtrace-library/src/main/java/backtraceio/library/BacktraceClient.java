@@ -29,7 +29,7 @@ public class BacktraceClient extends BacktraceBase {
      * @return server response
      */
     public BacktraceResult send(String message) {
-        return super.send(message);
+        return super.send(new BacktraceReport(message));
     }
 
     /**
@@ -39,7 +39,7 @@ public class BacktraceClient extends BacktraceBase {
      * @return server response
      */
     public BacktraceResult send(Exception exception) {
-        return super.send(exception);
+        return super.send(new BacktraceReport(exception));
     }
 
     /**
@@ -59,7 +59,7 @@ public class BacktraceClient extends BacktraceBase {
      * @return async task which send data to Backtrace API and return server response
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message) {
-        return super.sendAsync(message);
+        return super.sendAsync(new BacktraceReport(message));
     }
 
     /**
@@ -69,7 +69,7 @@ public class BacktraceClient extends BacktraceBase {
      * @return async task which send data to Backtrace API and return server response
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception) {
-        return super.sendAsync(exception);
+        return super.sendAsync(new BacktraceReport(exception));
     }
 
     /**

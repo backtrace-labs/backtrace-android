@@ -3,16 +3,17 @@ package backtraceio.library.services;
 import android.os.AsyncTask;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -35,7 +36,11 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     /**
      * Path to attachments which should be send to Backtrace API with request
      */
-    private ArrayList<String> attachments;
+    private List<String> attachments;
+
+    /**
+     * Current BacktraceReport
+     */
     private BacktraceReport report;
 
     /**
@@ -58,7 +63,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
      */
     private OnAfterSendEventListener afterSend;
 
-    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, ArrayList<String>
+    public BacktraceHttpAsyncTask(String url, UUID requestId, String json, List<String>
             attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
                                   OnServerErrorEventListener onServerError,
                                   OnAfterSendEventListener afterSend) {
@@ -84,14 +89,27 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             URL url = new URL(this.url);
             urlConnection = (HttpURLConnection) url.openConnection();
 
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-            urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestMethod("POST");
+            urlConnection.setUseCaches(false);
 
-            OutputStream os = urlConnection.getOutputStream();
-            os.write(json.getBytes());
-            os.flush();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+
+            urlConnection.setChunkedStreamingMode(128 * 1024);
+            urlConnection.setRequestProperty("Connection", "Keep-Alive");
+            urlConnection.setRequestProperty("Cache-Control", "no-cache");
+
+            urlConnection.setRequestProperty("Content-Type",
+                    MultiFormRequestHelper.getContentType());
+
+            DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
+
+            MultiFormRequestHelper.addJson(request, json);
+            MultiFormRequestHelper.addFiles(request, attachments);
+            MultiFormRequestHelper.addEndOfRequest(request);
+
+            request.flush();
+            request.close();
 
             int statusCode = urlConnection.getResponseCode();
 

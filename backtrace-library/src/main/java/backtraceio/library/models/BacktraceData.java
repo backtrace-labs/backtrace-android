@@ -4,11 +4,12 @@ import android.content.Context;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
+import backtraceio.library.common.FileHelper;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
@@ -83,7 +84,7 @@ public class BacktraceData {
     public String[] classifiers;
 
     /**
-     * Not supported yet
+     * Current host environment variables
      */
     @SerializedName("annotations")
     public Annotations annotations;
@@ -102,7 +103,6 @@ public class BacktraceData {
      */
     public transient Context context;
 
-
     /**
      * Create instance of report data
      *
@@ -117,20 +117,38 @@ public class BacktraceData {
         }
         this.context = context;
         this.report = report;
-        this.annotations = new Annotations(); // TODO: handle annotations
+        this.annotations = new Annotations();
+
         setReportInformation();
 
         setThreadsInformation();
         setAttributes(clientAttributes);
-
     }
 
+    /**
+     * Get absolute paths to report attachments
+     * @return paths to attachments
+     */
+    public List<String> getAttachments() {
+        return FileHelper.filterOutFiles(this.context, report.attachmentPaths);
+    }
+
+    /**
+     * Set attributes and add complex attributes to annotations
+     * @param clientAttributes
+     */
     private void setAttributes(Map<String, Object> clientAttributes) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
         this.attributes = backtraceAttributes.attributes;
+
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
         this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+
+        if(this.annotations != null)
+        {
+            this.annotations.addComplexAttributes(backtraceAttributes.getComplexAttributes());
+        }
     }
 
     /**
@@ -141,7 +159,7 @@ public class BacktraceData {
         timestamp = report.timestamp;
         classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
-        agentVersion = "1.0.0";
+        agentVersion = BuildConfig.VERSION_NAME;
     }
 
     /**
