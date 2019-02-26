@@ -31,6 +31,10 @@ public class BacktraceStackTrace {
         return stackFrames;
     }
 
+    public Exception getException() {
+        return exception;
+    }
+
     private void initialize() {
         StackTraceElement[] stackTraceElements = this.exception != null ?
                 this.exception.getStackTrace() : Thread.currentThread().getStackTrace();
@@ -46,8 +50,8 @@ public class BacktraceStackTrace {
         }
 
         for (StackTraceElement frame : frames) {
-            if(frame.getFileName().startsWith("Backtrace"))
-            {
+            if (frame != null && frame.getFileName() != null &&
+                    frame.getFileName().startsWith("Backtrace")) {
                 continue;
             }
             BacktraceStackFrame backtraceStackFrame = new BacktraceStackFrame(frame);
