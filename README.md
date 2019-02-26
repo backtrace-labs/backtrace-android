@@ -70,7 +70,7 @@ catch (e: Exception) {
 * Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.1.0'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.1.1'
 }
 ```
 
@@ -79,7 +79,7 @@ dependencies {
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <type>aar</type>
 </dependency>
 ```
