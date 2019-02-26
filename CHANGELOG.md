@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+
+## Version 1.1.1 - 26.02.2019
+- Fixed exception on filter out Backtrace files from StackTraceElements when file name is null
+
 ## Version 1.1.0 - 25.02.2019
 - Added support for file attachments and annotations
 - Added battery level and status attributes
