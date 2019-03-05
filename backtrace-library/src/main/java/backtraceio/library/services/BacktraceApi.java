@@ -11,6 +11,7 @@ import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
+import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
@@ -19,7 +20,7 @@ import backtraceio.library.wrappers.AsyncTaskRequestHandlerWrapper;
 /**
  * Backtrace Api class that allows to send a diagnostic data to server
  */
-public class BacktraceApi {
+public class BacktraceApi implements IBacktraceApi {
     /**
      * URL to server
      */
