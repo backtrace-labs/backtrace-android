@@ -45,7 +45,7 @@ public class BacktraceStackFrame {
         if (frame == null || frame.getMethodName() == null) {
             return;
         }
-        this.functionName = frame.getMethodName();
+        this.functionName = frame.getClassName() + "." + frame.getMethodName();
         this.sourceCodeFileName = frame.getFileName();
         this.sourceCode = UUID.randomUUID().toString();
         this.line = frame.getLineNumber() > 0 ? frame.getLineNumber() : null;
