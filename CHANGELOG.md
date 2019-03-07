@@ -1,6 +1,10 @@
 # Backtrace Android Release Notes
 
 
+## Version 1.1.2 - 07.03.2019
+- Added class name to function name in exception StackFrame
+- Added exception message to annotations
+
 ## Version 1.1.1 - 26.02.2019
 - Fixed exception on filter out Backtrace files from StackTraceElements when file name is null
 
