@@ -117,24 +117,38 @@ public class BacktraceData {
         }
         this.context = context;
         this.report = report;
-        this.annotations = new Annotations();
 
         setReportInformation();
-
         setThreadsInformation();
         setAttributes(clientAttributes);
     }
 
     /**
      * Get absolute paths to report attachments
+     *
      * @return paths to attachments
      */
     public List<String> getAttachments() {
         return FileHelper.filterOutFiles(this.context, report.attachmentPaths);
     }
 
+    /***
+     * Set annotations object
+     * @param complexAttributes
+     */
+    private void setAnnotations(Map<String, Object> complexAttributes) {
+        Object exceptionMessage = null;
+
+        if (this.attributes != null &&
+                this.attributes.containsKey("error.message")) {
+            exceptionMessage = this.attributes.get("error.message");
+        }
+        this.annotations = new Annotations(exceptionMessage, complexAttributes);
+    }
+
     /**
      * Set attributes and add complex attributes to annotations
+     *
      * @param clientAttributes
      */
     private void setAttributes(Map<String, Object> clientAttributes) {
@@ -145,10 +159,7 @@ public class BacktraceData {
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
         this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
-        if(this.annotations != null)
-        {
-            this.annotations.addComplexAttributes(backtraceAttributes.getComplexAttributes());
-        }
+        setAnnotations(backtraceAttributes.getComplexAttributes());
     }
 
     /**
