@@ -60,7 +60,7 @@ public class FileHelper {
      * @param absoluteFilePath
      * @return true if file exists
      */
-    private static boolean isFileExists(String absoluteFilePath) {
+    public static boolean isFileExists(String absoluteFilePath) {
         return new File(absoluteFilePath).exists();
     }
 
