@@ -1,5 +1,7 @@
 package backtraceio.library;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.common.FileHelper;
@@ -7,6 +9,7 @@ import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
+import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -75,7 +78,22 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         if(DatabaseSettings == null){
             return;
         }
+//        TODO:
+//        if(BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty())
+//        {
+//
+//        }
     }
+
+    /**
+     * Get settings
+     * @return current database settings
+     */
+    public BacktraceDatabaseSettings getSettings(){
+        return DatabaseSettings;
+    }
+
+
 
     public void flush() {
 
@@ -86,7 +104,12 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     public void clear() {
-
+        if (BacktraceDatabaseContext != null) {
+            BacktraceDatabaseContext.clear();
+        }
+        if (BacktraceDatabaseFileContext != null) {
+            BacktraceDatabaseFileContext.clear();
+        }
     }
 
     public boolean validConsistency() {
@@ -94,23 +117,62 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     public BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object> attributes) {
-        return null;
+        if(!this._enable || backtraceReport == null)
+        {
+            return null;
+        }
+
+        boolean validationResult = ValidateDatabaseSize();
+        if(!validationResult)
+        {
+            return null;
+        }
+
+        BacktraceData data = backtraceReport.toBacktraceData(null, attributes); // TODO: change null with application context!
+        return BacktraceDatabaseContext.add(data);
     }
 
     public Iterable<BacktraceDatabaseRecord> get() {
-        return null;
-    }
+        throw new UnsupportedOperationException();
+    } // TODO:
 
 
     public void delete(BacktraceDatabaseRecord record) {
 
     }
 
-    public BacktraceDatabaseSettings getSettings() {
-        return null;
+    int count(){
+        return BacktraceDatabaseContext.count();
+    }
+
+    private void loadReports()
+    {
+        Iterable<File> files = BacktraceDatabaseFileContext.GetRecords();
+
+        for(File file : files)
+        {
+            BacktraceDatabaseRecord record = BacktraceDatabaseRecord.readFromFile(file);
+            if(!record.valid())
+            {
+                record.delete();
+                continue;
+            }
+            BacktraceDatabaseContext.add(record);
+            validateDatabaseSize();
+
+        }
+    }
+
+    private boolean validateDatabaseSize(){
+        throw new UnsupportedOperationException();
     }
 
     public long getDatabaseSize() {
         return 0;
+    }
+
+    public boolean ValidateDatabaseSize()
+    {
+        return false;
     }
 }

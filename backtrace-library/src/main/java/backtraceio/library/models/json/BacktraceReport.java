@@ -1,5 +1,7 @@
 package backtraceio.library.models.json;
 
+import android.content.Context;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
 
@@ -181,6 +184,11 @@ public class BacktraceReport {
         if (this.exceptionTypeReport && exception != null) {
             this.classifier = exception.getClass().getCanonicalName();
         }
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes)
+    {
+        return new BacktraceData(context, this, clientAttributes);
     }
 
     /**
