@@ -14,6 +14,7 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.IBacktraceDatabaseRecordWriter;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceDatabaseRecord {
     /**
@@ -59,7 +60,7 @@ public class BacktraceDatabaseRecord {
     /**
      * Path to database directory
      */
-    private transient final String _path = "";
+    private transient final String _path;
 
     /**
      * Record writer
@@ -67,6 +68,23 @@ public class BacktraceDatabaseRecord {
     transient IBacktraceDatabaseRecordWriter RecordWriter;
 
 
+    BacktraceDatabaseRecord()
+    {
+        this._path = "";
+        this.RecordPath = String.format("%s-record.json", this.Id);
+    }
+
+    public BacktraceDatabaseRecord(BacktraceData data, String path){
+        this.Id = UUID.fromString(data.uuid); // TODO: Check
+        this.Record = data;
+        this._path = path;
+        RecordWriter = new BacktraceDatabaseRecordWriter(path);
+    }
+
+    /**
+     * Get valid BacktraceData from current record
+     * @return valid BacktraceData object
+     */
     public BacktraceData getBacktraceData(){
         if(this.Record != null)
         {
@@ -81,8 +99,16 @@ public class BacktraceDatabaseRecord {
         String jsonData = ""; // TODO:
         String jsonReport = ""; // TODO:
 
+        // deserialize data - if deserialize fails, we receive invalid entry
         try {
-            BacktraceData diagnosticData = BacktraceSerializeHelper.
+            BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData, BacktraceData.class); // TODO: Check
+            BacktraceReport report = BacktraceSerializeHelper.fromJson(jsonReport, BacktraceReport.class); // TODO: Check
+            // add report to diagnostic data
+            // we don't store report with diagnostic data in the same json
+            // because we have easier way to serialize and deserialize data
+            // and no problem/condition with serialization when BacktraceApi want to send diagnostic data to API
+            diagnosticData.report = report;
+            return diagnosticData;
         }
         catch (Exception ex)
         {
@@ -106,12 +132,13 @@ public class BacktraceDatabaseRecord {
             RecordWriter.write(this, String.format("%s-record", this.Id));
             return true;
         }
-        catch (IOException io)
-        {
-            Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
-            Log.d("Backtrace.IO", String.format("Message %s", io.getMessage()));
-            return false;
-        }
+        // TODO:
+//        catch (IOException io)
+//        {
+//            Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
+//            Log.d("Backtrace.IO", String.format("Message %s", io.getMessage()));
+//            return false;
+//        }
         catch (Exception ex)
         {
             Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
