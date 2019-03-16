@@ -41,10 +41,24 @@ public class BacktraceDatabaseRecord {
     String DiagnosticDataPath;
 
     /**
+     * Path to counter data json
+     */
+    @SerializedName("CounterPath")
+    String CounterDataPath;
+
+    /**
      * Path to Backtrace Report json
      */
     @SerializedName("ReportPath")
     String ReportPath;
+
+    public long getSize() {
+        return Size;
+    }
+
+    public void setSize(long size) {
+        Size = size;
+    }
 
     /**
      * Total size of record

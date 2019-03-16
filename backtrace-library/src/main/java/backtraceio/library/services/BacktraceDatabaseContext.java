@@ -9,6 +9,7 @@ import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
     /**
@@ -41,6 +42,13 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      */
     RetryOrder _RetryOrder;
 
+
+
+    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings)
+    {
+        this(settings.databasePath, settings.retryLimit, settings.retryOrder);
+    }
+
     /**
      * Initialize new instance of Backtrace Database Context
      * @param path path to database directory
@@ -72,7 +80,11 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         if (backtraceData == null) {
             throw new NullPointerException("BacktraceData");
         }
-        return null;
+
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(backtraceData, this._path);
+        record.save();
+
+        return add(record);
     }
 
     public BacktraceDatabaseRecord add(BacktraceDatabaseRecord backtraceDatabaseRecord) {
@@ -80,7 +92,10 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
             throw new NullPointerException("BacktraceDatabaseRecord");
         }
 
-        return null;
+        this.TotalSize += backtraceDatabaseRecord.getSize();
+        this.BatchRetry.get(0).add(backtraceDatabaseRecord); // TODO: null
+        this.TotalRecords++;
+        return backtraceDatabaseRecord;
     }
 
     public BacktraceDatabaseRecord first() {
