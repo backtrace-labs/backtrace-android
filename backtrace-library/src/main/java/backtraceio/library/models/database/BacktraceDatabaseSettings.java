@@ -1,6 +1,8 @@
 package backtraceio.library.models.database;
 
+import backtraceio.library.enums.database.DeduplicationStrategy;
 import backtraceio.library.enums.database.RetryBehavior;
+import backtraceio.library.enums.database.RetryOrder;
 
 /**
  * Backtrace library database settings
@@ -9,18 +11,18 @@ public class BacktraceDatabaseSettings
 {
     public BacktraceDatabaseSettings(String path)
     {
-        DatabasePath = path;
+        databasePath = path;
     }
 
     /**
      * Directory path where reports are stored
      */
-    public String DatabasePath;
+    public String databasePath;
 
     /**
      * Maximum number of stored reports in Database. If value is equal to zero, then limit not exists
      */
-    public int MaxRecordCount  = 0;
+    public int maxRecordCount = 0;
 
     /**
      * Database size in MB
@@ -44,22 +46,23 @@ public class BacktraceDatabaseSettings
     /**
      * Resend report when http client throw exception
      */
-    public boolean AutoSendMode  = false;
+    public boolean autoSendMode = false;
 
     /**
      * Retry behaviour
      */
-//    public RetryBehavior RetryBehavior = RetryBehavior.ByInterval; // TODO:
+    public RetryBehavior retryBehavior = RetryBehavior.ByInterval;
 
     /**
      * How much seconds library should wait before next retry.
      */
-    public int RetryInterval  = 5; // TODO: prevent negative value
+    public int retryInterval = 5; // TODO: prevent negative value
 
     /**
      * Maximum number of retries
      */
-    public int RetryLimit  = 3; // TODO: prevent negative value
+    public int retryLimit = 3; // TODO: prevent negative value
 
-//    public RetryOrder RetryOrder = RetryOrder.Queue; // TODO:
+
+    public RetryOrder retryOrder = RetryOrder.Queue;
 }

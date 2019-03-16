@@ -22,10 +22,10 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
         return write(file, prefix);
     }
 
-    public String write(byte[] data, String prefix) {
+    public String write(byte[] data, String prefix){
         String filename = String.format("%s.json", prefix);
         String tempFilePath = ""; // TODO: fix  Path.Combine(_destinationPath, $"temp_{filename}");
-        saveTemporaryFile(tempFilePath, data);
+//        saveTemporaryFile(tempFilePath, data); // TODO: uncomment
 
         String destFilePath = ""; // TODO: fix Path.Combine(_destinationPath, $"temp_{filename}");
         this.saveValidRecord(tempFilePath, destFilePath);

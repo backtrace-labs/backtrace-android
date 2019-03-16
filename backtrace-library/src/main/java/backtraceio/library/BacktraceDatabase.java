@@ -1,10 +1,10 @@
 package backtraceio.library;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.common.FileHelper;
+import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
@@ -59,30 +59,42 @@ public class BacktraceDatabase implements IBacktraceDatabase {
      */
     public BacktraceDatabase(BacktraceDatabaseSettings databaseSettings)
     {
-        if(databaseSettings == null || (databaseSettings.DatabasePath != null && !databaseSettings.DatabasePath.isEmpty())
+        if(databaseSettings == null || (databaseSettings.databasePath != null && !databaseSettings.databasePath.isEmpty()))
         {
             return;
         }
 
-        if(!FileHelper.isFileExists(databaseSettings.DatabasePath))
+        if(!FileHelper.isFileExists(databaseSettings.databasePath))
         {
             throw new IllegalArgumentException("Database path does not exists");
         }
 
         DatabaseSettings = databaseSettings;
-        BacktraceDatabaseContext = new BacktraceDatabaseContext(DatabasePath, DatabaseSettings.RetryLimit, DatabaseSettings.RetryOrder);
-        BacktraceDatabaseFileContext = new BacktraceDatabaseFileContext(DatabasePath, DatabaseSettings.MaxDatabaseSize, DatabaseSettings.MaxRecordCount);
+        BacktraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
+        BacktraceDatabaseFileContext = new BacktraceDatabaseFileContext(DatabasePath, DatabaseSettings.MaxDatabaseSize, DatabaseSettings.maxRecordCount);
     }
 
     public void start() {
         if(DatabaseSettings == null){
             return;
         }
+
 //        TODO:
 //        if(BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty())
 //        {
 //
 //        }
+
+        this.loadReports();
+
+        this.removeOrphanded();
+        
+        if(DatabaseSettings.retryBehavior == RetryBehavior.ByInterval || DatabaseSettings.autoSendMode)
+        {
+            setupTimer();
+        }
+
+        this._enable = true;
     }
 
     /**
@@ -94,13 +106,31 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
 
-
-    public void flush() {
-
+    public void setupTimer(){
+        throw new UnsupportedOperationException();
     }
 
-    public void setApi(IBacktraceApi backtraceApi) {
+    public void flush() {
+        if(this.BacktraceApi == null)
+        {
+            throw new IllegalArgumentException("BacktraceApi is required if you want to use Flush method");
+        }
 
+        BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
+        while (record != null)
+        {
+            BacktraceData backtraceData = record.getBacktraceData();
+            this.delete(record);
+            record = BacktraceDatabaseContext.first();
+            if (backtraceData != null) {
+                BacktraceApi.send(backtraceData);
+            }
+        }
+    }
+
+
+    public void setApi(IBacktraceApi backtraceApi) {
+        this.BacktraceApi = backtraceApi;
     }
 
     public void clear() {
@@ -110,6 +140,11 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         if (BacktraceDatabaseFileContext != null) {
             BacktraceDatabaseFileContext.clear();
         }
+    }
+
+    private void removeOrphanded(){
+        Iterable<BacktraceDatabaseRecord> records = BacktraceDatabaseContext.get();
+        BacktraceDatabaseFileContext.RemoveOrphaned(records);
     }
 
     public boolean validConsistency() {
@@ -138,7 +173,11 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
 
     public void delete(BacktraceDatabaseRecord record) {
-
+        if(this.BacktraceDatabaseContext == null)
+        {
+            return;
+        }
+        this.BacktraceDatabaseContext.delete(record);
     }
 
     int count(){
