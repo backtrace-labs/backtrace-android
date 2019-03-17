@@ -105,7 +105,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     public BacktraceDatabaseSettings getSettings() {
         return DatabaseSettings;
     }
-    
+
     public void setupTimer() {
         throw new UnsupportedOperationException();
     }
