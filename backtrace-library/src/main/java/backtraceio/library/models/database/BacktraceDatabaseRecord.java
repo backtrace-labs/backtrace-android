@@ -5,9 +5,8 @@ import android.util.Log;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.util.Scanner;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
@@ -82,13 +81,12 @@ public class BacktraceDatabaseRecord {
     transient IBacktraceDatabaseRecordWriter RecordWriter;
 
 
-    BacktraceDatabaseRecord()
-    {
+    BacktraceDatabaseRecord() {
         this._path = "";
         this.RecordPath = String.format("%s-record.json", this.Id);
     }
 
-    public BacktraceDatabaseRecord(BacktraceData data, String path){
+    public BacktraceDatabaseRecord(BacktraceData data, String path) {
         this.Id = UUID.fromString(data.uuid); // TODO: Check
         this.Record = data;
         this._path = path;
@@ -97,16 +95,15 @@ public class BacktraceDatabaseRecord {
 
     /**
      * Get valid BacktraceData from current record
+     *
      * @return valid BacktraceData object
      */
-    public BacktraceData getBacktraceData(){
-        if(this.Record != null)
-        {
+    public BacktraceData getBacktraceData() {
+        if (this.Record != null) {
             return this.Record;
         }
 
-        if(!this.valid())
-        {
+        if (!this.valid()) {
             return null;
         }
 
@@ -115,46 +112,41 @@ public class BacktraceDatabaseRecord {
 
         // deserialize data - if deserialize fails, we receive invalid entry
         try {
-            BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData, BacktraceData.class); // TODO: Check
-            BacktraceReport report = BacktraceSerializeHelper.fromJson(jsonReport, BacktraceReport.class); // TODO: Check
+            BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData,
+                    BacktraceData.class); // TODO: Check
+            BacktraceReport report = BacktraceSerializeHelper.fromJson(jsonReport,
+                    BacktraceReport.class); // TODO: Check
             // add report to diagnostic data
             // we don't store report with diagnostic data in the same json
             // because we have easier way to serialize and deserialize data
-            // and no problem/condition with serialization when BacktraceApi want to send diagnostic data to API
+            // and no problem/condition with serialization when BacktraceApi want to send
+            // diagnostic data to API
             diagnosticData.report = report;
             return diagnosticData;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return null;
         }
     }
+
     /**
      * Save data to internal app storage
+     *
      * @return is saving successful
      */
-    public boolean save(){
+    public boolean save() {
         try {
             this.DiagnosticDataPath = save(Record, String.format("%s-attachment", Id));
             this.ReportPath = save(Record, String.format("%s-report", Id));
 
-            this.RecordPath = Paths.get("", "").toString();
+            this.RecordPath = new File(this._path, String.format("%s-record.json", this.Id))
+                    .getAbsolutePath();
 
             String json = BacktraceSerializeHelper.toJson(this);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
             this.Size += file.length;
             RecordWriter.write(this, String.format("%s-record", this.Id));
             return true;
-        }
-        // TODO:
-//        catch (IOException io)
-//        {
-//            Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
-//            Log.d("Backtrace.IO", String.format("Message %s", io.getMessage()));
-//            return false;
-//        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
             Log.d("Backtrace.IO", String.format("Message %s", ex.getMessage()));
             return false;
@@ -163,13 +155,13 @@ public class BacktraceDatabaseRecord {
 
     /**
      * Save single file from database record
-     * @param data single json file
+     *
+     * @param data   single json file
      * @param prefix file prefix
      * @return path to file
      */
-    private String save(Object data, String prefix){
-        if(data == null)
-        {
+    private String save(Object data, String prefix) {
+        if (data == null) {
             return "";
         }
         String json = BacktraceSerializeHelper.toJson(this);
@@ -180,16 +172,18 @@ public class BacktraceDatabaseRecord {
 
     /**
      * Check if all necessary files declared on record exists
+     *
      * @return is record valid
      */
-    public boolean valid(){
-        return FileHelper.isFileExists(this.DiagnosticDataPath) && FileHelper.isFileExists(this.ReportPath);
+    public boolean valid() {
+        return FileHelper.isFileExists(this.DiagnosticDataPath) && FileHelper.isFileExists(this
+                .ReportPath);
     }
 
     /**
      * Delete all record files
      */
-    public void delete(){
+    public void delete() {
         delete(this.ReportPath);
         delete(this.DiagnosticDataPath);
         delete(this.RecordPath);
@@ -197,20 +191,41 @@ public class BacktraceDatabaseRecord {
 
     /**
      * Delete single file on database record
+     *
      * @param path path to file
      */
-    private void delete(String path){
-        try{
-            if(FileHelper.isFileExists(path)){
+    private void delete(String path) {
+        try {
+            if (FileHelper.isFileExists(path)) {
                 new File(path).delete();
             }
-        }
-        catch (Exception ex){
-            Log.e("Backtrace.IO", String.format("Cannot delete file: %s. Message: %s", path, ex.getMessage()));
+        } catch (Exception ex) {
+            Log.e("Backtrace.IO", String.format("Cannot delete file: %s. Message: %s", path, ex
+                    .getMessage()));
         }
     }
 
-    public static BacktraceDatabaseRecord readFromFile(File file){
-        throw new UnsupportedOperationException();
+    /**
+     * Read single record from file
+     *
+     * @param file current file
+     * @return saved database record
+     */
+    public static BacktraceDatabaseRecord readFromFile(File file) {
+        try {
+            Scanner scanner = new Scanner(file);
+            StringBuilder sb = new StringBuilder();
+
+            while (scanner.hasNext()) {
+                sb.append(scanner.next());
+            }
+
+            scanner.close();
+
+            String json = sb.toString();
+            return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
