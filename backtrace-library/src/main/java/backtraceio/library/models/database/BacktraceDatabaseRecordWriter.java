@@ -15,19 +15,19 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
         this._destinationPath = path;
     }
 
-    public String write(Object data, String prefix) {
+    public String write(Object data, String prefix) throws IOException{
         String json = toJsonFile(data);
 
         byte[] file = json.getBytes(StandardCharsets.UTF_8);
         return write(file, prefix);
     }
 
-    public String write(byte[] data, String prefix){
+    public String write(byte[] data, String prefix) throws IOException{
         String filename = String.format("%s.json", prefix);
-        String tempFilePath = ""; // TODO: fix  Path.Combine(_destinationPath, $"temp_{filename}");
-//        saveTemporaryFile(tempFilePath, data); // TODO: uncomment
+        String tempFilePath = new File(this._destinationPath, String.format("temp_%s", filename)).getAbsolutePath();
+        saveTemporaryFile(tempFilePath, data);
 
-        String destFilePath = ""; // TODO: fix Path.Combine(_destinationPath, $"temp_{filename}");
+        String destFilePath = new File(this._destinationPath, filename).getAbsolutePath();
         this.saveValidRecord(tempFilePath, destFilePath);
         return destFilePath;
     }
@@ -40,10 +40,13 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
         return BacktraceSerializeHelper.toJson(data);
     }
 
-    public void saveValidRecord(String sourcePath, String destinationPath) {
+    public void saveValidRecord(String sourcePath, String destinationPath) throws IOException{
         File fromFile = new File(sourcePath);
         File toFile = new File(destinationPath);
-        fromFile.renameTo(toFile);
+        boolean renameResult = fromFile.renameTo(toFile);
+        if(!renameResult) {
+            throw new IOException(String.format("Can not rename file. Source path: %s, destination path: %s", sourcePath, destinationPath));
+        }
     }
 
     public void saveTemporaryFile(String path, byte[] file) throws IOException {

@@ -161,13 +161,20 @@ public class BacktraceDatabaseRecord {
      * @return path to file
      */
     private String save(Object data, String prefix) {
-        if (data == null) {
-            return "";
+        try {
+            if (data == null) {
+                return "";
+            }
+            String json = BacktraceSerializeHelper.toJson(this);
+            byte[] file = json.getBytes(StandardCharsets.UTF_8);
+            this.Size += file.length;
+            return RecordWriter.write(file, prefix);
         }
-        String json = BacktraceSerializeHelper.toJson(this);
-        byte[] file = json.getBytes(StandardCharsets.UTF_8);
-        this.Size += file.length;
-        return RecordWriter.write(file, prefix);
+        catch (Exception ex) {
+            Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
+            Log.d("Backtrace.IO", String.format("Message %s", ex.getMessage()));
+            return ""; // TODO: consider a better solution
+        }
     }
 
     /**
