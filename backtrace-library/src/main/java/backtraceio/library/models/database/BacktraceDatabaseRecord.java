@@ -26,7 +26,7 @@ public class BacktraceDatabaseRecord {
     /**
      * Check if current record is in use
      */
-    transient boolean Locked = false;
+    public transient boolean Locked = false;
 
     /**
      * Path to json stored all information about current record
