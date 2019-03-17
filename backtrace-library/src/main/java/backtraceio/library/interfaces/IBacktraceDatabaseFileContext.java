@@ -10,13 +10,13 @@ public interface IBacktraceDatabaseFileContext {
      * Get all valid physical records stored in database directory
      * @return all existing physical records
      */
-    Iterable<File> GetRecords();
+    Iterable<File> getRecords();
 
     /**
      * Get all physical files stored in database directory
      * @return all existing physical files
      */
-    Iterable<File>GetAll();
+    Iterable<File> getAll();
 
 
     /**
@@ -30,7 +30,7 @@ public interface IBacktraceDatabaseFileContext {
      * Remove orphaned files existing in database directory
      * @param existingRecords existing entries in BacktraceDatabaseContext
      */
-    void RemoveOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords);
+    void removeOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords);
 
     /**
      * Remove all files from database directory
