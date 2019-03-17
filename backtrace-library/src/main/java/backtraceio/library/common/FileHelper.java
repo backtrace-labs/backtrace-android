@@ -46,6 +46,23 @@ public class FileHelper {
         return result;
     }
 
+    /**
+     * Get file extension
+     * @param file file whose extension will be returned
+     * @return file extension
+     */
+    public static String getFileExtension(File file) {
+
+        String name = file.getName().substring(Math.max(file.getName().lastIndexOf('/'),
+                file.getName().lastIndexOf('\\')) < 0 ? 0 : Math.max(file.getName().lastIndexOf('/'),
+                file.getName().lastIndexOf('\\')));
+        int lastIndexOf = name.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return ""; // empty extension
+        }
+        return name.substring(lastIndexOf + 1); // doesn't return "." with extension
+    }
+
     /***
      * Check does file path is invalid, null, empty or file not exists
      * @param filePath

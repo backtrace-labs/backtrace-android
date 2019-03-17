@@ -1,7 +1,11 @@
 package backtraceio.library.services;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
@@ -10,6 +14,8 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
     private final String _databasePath;
     private final long _maxDatabaseSize;
     private final int _maxRecordNumber;
+    private final File _databaseDirectory;
+    private final String recordFilterRegex = "\\*-record.json";
 
     public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber)
     {
@@ -17,27 +23,101 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
         _databasePath = databasePath;
         _maxDatabaseSize = maxDatabaseSize;
         _maxRecordNumber = maxRecordNumber;
-//        _databaseDirectoryInfo = new DirectoryInfo(_databasePath); // TODO:
+        _databaseDirectory = new File(_databasePath);
     }
 
-    public Iterable<File> GetRecords() {
+    /**
+     * Get all physical files stored in database directory
+     * @return all existing physical files
+     */
+    public Iterable<File> getAll() {
+        return Arrays.asList(this._databaseDirectory.listFiles());
+    }
+
+    /**
+     * Get all valid physical records stored in database directory
+     * @return all existing physical records
+     */
+    public Iterable<File> getRecords() {
         throw new UnsupportedOperationException();
     }
 
-    public Iterable<File> GetAll() {
-        throw new UnsupportedOperationException();
-    }
-
+    /**
+     * Valid all files consistencies
+     * @return is database consistent
+     */
     public boolean validFileConsistency() {
-        throw new UnsupportedOperationException();
+        Iterable<File> files = this.getAll();
 
+        long size = 0;
+        long totalRecordFiles = 0;
+
+        for(File file : files)
+        {
+            if(file.getName().matches(this.recordFilterRegex)) // TODO: CHECK IS IT WORKING
+            {
+
+                totalRecordFiles++;
+                if(_maxRecordNumber > totalRecordFiles)
+                {
+                    return false;
+                }
+            }
+            size += file.length();
+            if( size> _maxDatabaseSize)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public void RemoveOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords) {
-        throw new UnsupportedOperationException();
+    /**
+     * Remove orphaned files existing in database directory
+     * @param existingRecords existing entries in BacktraceDatabaseContext
+     */
+    public void removeOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords) {
+        List<String> recordStringIds = new ArrayList<>();
+
+        for(BacktraceDatabaseRecord record : existingRecords){
+            recordStringIds.add(record.Id.toString());
+        }
+
+        Iterable<File> files = this.getAll();
+        for (File file : files){
+            String extension = FileHelper.getFileExtension(file);
+            //TODO: CHECK
+            if(!extension.equals("json"))
+            {
+                file.delete();
+                continue;
+            }
+
+            int fileNameIndex = file.getName().lastIndexOf('-');
+
+            if (fileNameIndex == -1)
+            {
+                file.delete();
+                continue;
+            }
+
+            String fileUuid = file.getName().substring(0, fileNameIndex);
+
+            if(recordStringIds.contains(fileUuid))
+            {
+                file.delete();
+            }
+        }
     }
 
+    /**
+     * Remove all files from database directory
+     */
     public void clear() {
-        throw new UnsupportedOperationException();
+        Iterable<File> files = this.getAll();
+        for(File file : files)
+        {
+            file.delete();
+        }
     }
 }

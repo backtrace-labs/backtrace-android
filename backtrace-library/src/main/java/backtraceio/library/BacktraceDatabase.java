@@ -144,7 +144,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     private void removeOrphanded(){
         Iterable<BacktraceDatabaseRecord> records = BacktraceDatabaseContext.get();
-        BacktraceDatabaseFileContext.RemoveOrphaned(records);
+        BacktraceDatabaseFileContext.removeOrphaned(records);
     }
 
     public boolean validConsistency() {
@@ -186,7 +186,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     private void loadReports()
     {
-        Iterable<File> files = BacktraceDatabaseFileContext.GetRecords();
+        Iterable<File> files = BacktraceDatabaseFileContext.getRecords();
 
         for(File file : files)
         {
