@@ -7,10 +7,8 @@ import backtraceio.library.enums.database.RetryOrder;
 /**
  * Backtrace library database settings
  */
-public class BacktraceDatabaseSettings
-{
-    public BacktraceDatabaseSettings(String path)
-    {
+public class BacktraceDatabaseSettings {
+    public BacktraceDatabaseSettings(String path) {
         databasePath = path;
     }
 
@@ -35,11 +33,11 @@ public class BacktraceDatabaseSettings
     public long MaxDatabaseSize;
 
 
-    public long getMaxDatabaseSize(){
-        return _maxDatabaseSize * 1000 *1000;
+    public long getMaxDatabaseSize() {
+        return _maxDatabaseSize * 1000 * 1000;
     }
 
-    public void setMaxDatabaseSize(long value){
+    public void setMaxDatabaseSize(long value) {
         this._maxDatabaseSize = value;
     }
 

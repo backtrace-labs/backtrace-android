@@ -1,5 +1,7 @@
 package backtraceio.library;
 
+import android.provider.ContactsContract;
+
 import java.io.File;
 import java.util.Map;
 
@@ -30,7 +32,9 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     private BacktraceDatabaseSettings DatabaseSettings;
 
-    private String DatabasePath;
+    private String getDatabasePath(){
+        return DatabaseSettings.databasePath;
+    };
 
     private boolean _timerBackgroundWork = false;
 
@@ -60,8 +64,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
      * @param databaseSettings Backtrace database settings
      */
     public BacktraceDatabase(BacktraceDatabaseSettings databaseSettings) {
-        if (databaseSettings == null || (databaseSettings.databasePath != null &&
-                !databaseSettings.databasePath.isEmpty())) {
+        if (databaseSettings == null || databaseSettings.databasePath.isEmpty()) {
             return;
         }
 
@@ -69,10 +72,10 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             throw new IllegalArgumentException("Database path does not exists");
         }
 
-        DatabaseSettings = databaseSettings;
-        BacktraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
-        BacktraceDatabaseFileContext = new BacktraceDatabaseFileContext(DatabasePath,
-                DatabaseSettings.MaxDatabaseSize, DatabaseSettings.maxRecordCount);
+        this.DatabaseSettings = databaseSettings;
+        this.BacktraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
+        this.BacktraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
+                this.DatabaseSettings.MaxDatabaseSize, this.DatabaseSettings.maxRecordCount);
     }
 
     public void start() {
@@ -156,7 +159,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             return null;
         }
 
-        boolean validationResult = ValidateDatabaseSize();
+        boolean validationResult = this.validateDatabaseSize();
         if (!validationResult) {
             return null;
         }
@@ -236,10 +239,6 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     public long getDatabaseSize() {
-        return 0;
-    }
-
-    public boolean ValidateDatabaseSize() {
-        return false;
+        return BacktraceDatabaseContext.getDatabaseSize();
     }
 }
