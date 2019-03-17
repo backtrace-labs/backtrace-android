@@ -1,6 +1,8 @@
 package backtraceio.library.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,43 +42,46 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
     /**
      * Record order
      */
-    RetryOrder _RetryOrder;
+    RetryOrder retryOrder;
 
 
-
-    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings)
-    {
+    /**
+     * Initialize new instance of Backtrace Database Context
+     *
+     * @param settings database settings
+     */
+    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings) {
         this(settings.databasePath, settings.retryLimit, settings.retryOrder);
     }
 
     /**
      * Initialize new instance of Backtrace Database Context
-     * @param path path to database directory
+     *
+     * @param path        path to database directory
      * @param retryNumber total number of retries
-     * @param retryOrder record order
+     * @param retryOrder  record order
      */
-    public BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder){
+    public BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
         this._path = path;
         this._retryNumber = retryNumber;
-        this._RetryOrder = retryOrder;
+        this.retryOrder = retryOrder;
         SetupBatch();
     }
 
     /**
      * Setup cache
      */
-    private void SetupBatch(){
-        if(this._retryNumber == 0){
+    private void SetupBatch() {
+        if (this._retryNumber == 0) {
             throw new IllegalArgumentException("Retry number must be greater than 0!");
         }
 
-        for (int i = 0; i < _retryNumber; i++)
-        {
+        for (int i = 0; i < _retryNumber; i++) {
             this.BatchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
         }
     }
 
-    public BacktraceDatabaseRecord add(BacktraceData backtraceData) throws NullPointerException{
+    public BacktraceDatabaseRecord add(BacktraceData backtraceData) throws NullPointerException {
         if (backtraceData == null) {
             throw new NullPointerException("BacktraceData");
         }
@@ -99,27 +104,59 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
     }
 
     public BacktraceDatabaseRecord first() {
-        return null;
+        return retryOrder == RetryOrder.Queue
+                ? getFirstRecord()
+                : getLastRecord();
     }
 
     public BacktraceDatabaseRecord last() {
-        return null;
+        return this.retryOrder == RetryOrder.Stack? getLastRecord() : getFirstRecord();
     }
 
     public Iterable<BacktraceDatabaseRecord> get() {
-        return null;
+        List<BacktraceDatabaseRecord> allRecords = new ArrayList<>();
+        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : BatchRetry.entrySet()) {
+            allRecords.addAll(entry.getValue());
+        }
+        return allRecords;
     }
 
     public void delete(BacktraceDatabaseRecord record) {
+        if (record == null) {
+            return;
+        }
 
+        // TODO: Check is it works
+        for (int key : BatchRetry.keySet()) {
+            for (BacktraceDatabaseRecord databaseRecord : BatchRetry.get(key)) {
+                if (databaseRecord == null || record.Id != databaseRecord.Id) {
+                    continue;
+                }
+
+                databaseRecord.delete();
+                BatchRetry.get(key).remove(databaseRecord);
+                this.TotalRecords--;
+                this.TotalSize -= databaseRecord.getSize();
+                return;
+            }
+        }
     }
 
-    public boolean contains(BacktraceDatabaseRecord n) {
+    public boolean contains(BacktraceDatabaseRecord record) {
+        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.BatchRetry.entrySet()) {
+            List<BacktraceDatabaseRecord> records = entry.getValue();
+
+            for (BacktraceDatabaseRecord databaseRecord : records) {
+                if (databaseRecord != null && databaseRecord.Id == record.Id) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
     public boolean isEmpty() {
-        return false;
+        return TotalRecords != 0;
     }
 
     public int count() {
@@ -127,12 +164,28 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
     }
 
     public void clear() {
+        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.BatchRetry.entrySet()) {
+            List<BacktraceDatabaseRecord> records = entry.getValue();
 
+            for (BacktraceDatabaseRecord databaseRecord : records) {
+                databaseRecord.delete();
+            }
+        }
+
+        this.TotalRecords = 0;
+        this.TotalSize = 0;
+
+        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.BatchRetry.entrySet()) {
+            entry.getValue().clear();
+        }
     }
 
-    @Override
+    /**
+     * Increment retry time for current record
+     */
     public void incrementBatchRetry() {
-
+        removeMaxRetries();
+        incrementBatches();
     }
 
     @Override
@@ -142,6 +195,81 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
 
     @Override
     public boolean removeLastRecord() {
-        return false;
+        BacktraceDatabaseRecord record = this.last();
+        if (record == null) {
+            return false;
+        }
+
+        record.delete();
+        this.TotalSize--;
+        this.TotalSize -= record.getSize();
+        return true;
     }
+
+    /**
+     * Increment each batch
+     */
+    private void incrementBatches() {
+        for (int i = this._retryNumber - 2; i >= 0; i--) {
+            List<BacktraceDatabaseRecord> temp = this.BatchRetry.get(i);
+            BatchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            BatchRetry.put(i + 1, temp);
+        }
+    }
+
+    /**
+     * Remove last batch
+     */
+    private void removeMaxRetries() {
+        List<BacktraceDatabaseRecord> currentBatch = this.BatchRetry.get(_retryNumber - 1);
+
+        for (BacktraceDatabaseRecord record : currentBatch) {
+            if (!record.valid()) {
+                continue;
+            }
+            record.delete();
+            this.TotalRecords--;
+            TotalSize -= record.getSize();
+        }
+    }
+
+    /**
+     * Get last record in in-cache BacktraceDatabase
+     * @return last database record
+     */
+
+    /**
+     * Get first record in in-cache BacktraceDatabase
+     * @return first database record
+     */
+    private BacktraceDatabaseRecord getFirstRecord(){
+        return  getRecordFromCache(false);
+    }
+
+    /**
+     * Get last record in in-cache BacktraceDatabase
+     * @return last database record
+     */
+    private BacktraceDatabaseRecord getLastRecord() {
+        return getRecordFromCache(true);
+    }
+
+    private BacktraceDatabaseRecord getRecordFromCache(boolean reverse){
+        for (int i = _retryNumber - 1; i >= 0; i--)
+        {
+            List<BacktraceDatabaseRecord> reverseRecords = BatchRetry.get(i);
+            if(reverse) {
+                Collections.reverse(reverseRecords);
+            }
+            for (BacktraceDatabaseRecord record: reverseRecords){
+                if(!record.Locked)
+                {
+                    record.Locked = true;
+                    return record;
+                }
+            }
+        }
+        return null;
+    }
+
 }
