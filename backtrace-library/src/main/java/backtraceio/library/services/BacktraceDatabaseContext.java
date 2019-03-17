@@ -17,32 +17,32 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
     /**
      * Database cache
      */
-    Map<Integer, List<BacktraceDatabaseRecord>> BatchRetry = new HashMap<>();
+    private Map<Integer, List<BacktraceDatabaseRecord>> BatchRetry = new HashMap<>();
 
     /**
      * Total database size on hard drive
      */
-    long TotalSize = 0;
+    private long TotalSize = 0;
 
     /**
      * Total records in BacktraceDatabase
      */
-    int TotalRecords = 0;
+    private int TotalRecords = 0;
 
     /**
      * Path to database directory
      */
-    private String _path; // TODO: READONLY
+    private final String _path;
 
     /**
      * Maximum number of retries
      */
-    private int _retryNumber; // TODO: READONLY
+    private final int _retryNumber;
 
     /**
      * Record order
      */
-    RetryOrder retryOrder;
+    private RetryOrder retryOrder;
 
 
     /**
@@ -61,7 +61,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @param retryNumber total number of retries
      * @param retryOrder  record order
      */
-    public BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
+    private BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
         this._path = path;
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;
@@ -81,6 +81,13 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         }
     }
 
+    /**
+     * Add new record to database
+     *
+     * @param backtraceData diagnostic data that should be stored in database
+     * @return new instance of DatabaseRecord
+     * @throws NullPointerException if backtraceData is null
+     */
     public BacktraceDatabaseRecord add(BacktraceData backtraceData) throws NullPointerException {
         if (backtraceData == null) {
             throw new NullPointerException("BacktraceData");
@@ -92,27 +99,49 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         return add(record);
     }
 
+    /**
+     * Add existing record to database
+     *
+     * @param backtraceDatabaseRecord database record
+     * @return database record
+     */
     public BacktraceDatabaseRecord add(BacktraceDatabaseRecord backtraceDatabaseRecord) {
         if (backtraceDatabaseRecord == null) {
             throw new NullPointerException("BacktraceDatabaseRecord");
         }
-
+        backtraceDatabaseRecord.Locked = true;
         this.TotalSize += backtraceDatabaseRecord.getSize();
         this.BatchRetry.get(0).add(backtraceDatabaseRecord); // TODO: null
         this.TotalRecords++;
         return backtraceDatabaseRecord;
     }
 
+    /**
+     * Get first existing database record. Method returns record based on order in database
+     *
+     * @return first Backtrace database record
+     */
     public BacktraceDatabaseRecord first() {
         return retryOrder == RetryOrder.Queue
                 ? getFirstRecord()
                 : getLastRecord();
     }
 
+    /**
+     * Get last existing database record. Method returns record based on order in database
+     *
+     * @return last Backtrace database record
+     */
     public BacktraceDatabaseRecord last() {
-        return this.retryOrder == RetryOrder.Stack? getLastRecord() : getFirstRecord();
+        return this.retryOrder == RetryOrder.Stack ? getLastRecord() : getFirstRecord();
     }
 
+
+    /**
+     * Get all database records
+     *
+     * @return all existing database records
+     */
     public Iterable<BacktraceDatabaseRecord> get() {
         List<BacktraceDatabaseRecord> allRecords = new ArrayList<>();
         for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : BatchRetry.entrySet()) {
@@ -121,6 +150,11 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         return allRecords;
     }
 
+    /**
+     * Delete existing record from database
+     *
+     * @param record Database record to delete
+     */
     public void delete(BacktraceDatabaseRecord record) {
         if (record == null) {
             return;
@@ -142,6 +176,12 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         }
     }
 
+    /**
+     * Check if the record passed as parameter exists
+     *
+     * @param record database record
+     * @return is record passed as argument is in the database
+     */
     public boolean contains(BacktraceDatabaseRecord record) {
         for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.BatchRetry.entrySet()) {
             List<BacktraceDatabaseRecord> records = entry.getValue();
@@ -155,14 +195,27 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         return false;
     }
 
+    /**
+     * Check if database is empty
+     *
+     * @return is database empty
+     */
     public boolean isEmpty() {
         return TotalRecords != 0;
     }
 
+    /**
+     * Get total number of records in database
+     *
+     * @return number of records in database
+     */
     public int count() {
         return TotalRecords;
     }
 
+    /**
+     * Delete all records from database
+     */
     public void clear() {
         for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.BatchRetry.entrySet()) {
             List<BacktraceDatabaseRecord> records = entry.getValue();
@@ -188,12 +241,15 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         incrementBatches();
     }
 
-    @Override
+    /**
+     * Get database size
+     *
+     * @return database size
+     */
     public long getDatabaseSize() {
         return this.TotalSize;
     }
 
-    @Override
     public boolean removeLastRecord() {
         BacktraceDatabaseRecord record = this.last();
         if (record == null) {
@@ -233,37 +289,40 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         }
     }
 
-    /**
-     * Get last record in in-cache BacktraceDatabase
-     * @return last database record
-     */
 
     /**
      * Get first record in in-cache BacktraceDatabase
+     *
      * @return first database record
      */
-    private BacktraceDatabaseRecord getFirstRecord(){
-        return  getRecordFromCache(false);
+    private BacktraceDatabaseRecord getFirstRecord() {
+        return getRecordFromCache(false);
     }
 
     /**
      * Get last record in in-cache BacktraceDatabase
+     *
      * @return last database record
      */
     private BacktraceDatabaseRecord getLastRecord() {
         return getRecordFromCache(true);
     }
 
-    private BacktraceDatabaseRecord getRecordFromCache(boolean reverse){
-        for (int i = _retryNumber - 1; i >= 0; i--)
-        {
+
+    /**
+     * Get record in in-cache BacktraceDatabase
+     *
+     * @param reverse reverse the order of records
+     * @return first unlocked record
+     */
+    private BacktraceDatabaseRecord getRecordFromCache(boolean reverse) {
+        for (int i = _retryNumber - 1; i >= 0; i--) {
             List<BacktraceDatabaseRecord> reverseRecords = BatchRetry.get(i);
-            if(reverse) {
+            if (reverse) {
                 Collections.reverse(reverseRecords);
             }
-            for (BacktraceDatabaseRecord record: reverseRecords){
-                if(!record.Locked)
-                {
+            for (BacktraceDatabaseRecord record : reverseRecords) {
+                if (!record.Locked) {
                     record.Locked = true;
                     return record;
                 }

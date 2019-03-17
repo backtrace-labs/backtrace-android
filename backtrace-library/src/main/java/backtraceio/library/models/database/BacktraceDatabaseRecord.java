@@ -40,12 +40,6 @@ public class BacktraceDatabaseRecord {
     String DiagnosticDataPath;
 
     /**
-     * Path to counter data json
-     */
-    @SerializedName("CounterPath")
-    String CounterDataPath;
-
-    /**
      * Path to Backtrace Report json
      */
     @SerializedName("ReportPath")

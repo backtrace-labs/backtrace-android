@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 /**
@@ -20,6 +22,29 @@ public class BacktraceClient extends BacktraceBase {
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials) {
         super(context, credentials);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings)
+    {
+        super(context, credentials, databaseSettings);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials, IBacktraceDatabase database) {
+        super(context, credentials, database);
     }
 
     /**
