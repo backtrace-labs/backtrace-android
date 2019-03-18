@@ -26,12 +26,6 @@ public interface IBacktraceDatabase {
     void setApi(IBacktraceApi backtraceApi);
 
     /**
-     *
-     * @param context
-     */
-    void setApplicationContext(Context context);
-
-    /**
      * Remove all existing reports in BacktraceDatabase
      */
     void clear();

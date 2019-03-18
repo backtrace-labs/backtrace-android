@@ -1,5 +1,7 @@
 package backtraceio.library.services;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.models.BacktraceData;
@@ -14,6 +17,12 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
+
+    /**
+     * Application context
+     */
+    private Context _applicationContext;
+
     /**
      * Database cache
      */
@@ -50,8 +59,8 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      *
      * @param settings database settings
      */
-    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings) {
-        this(settings.databasePath, settings.retryLimit, settings.retryOrder);
+    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
+        this(context, settings.databasePath, settings.retryLimit, settings.retryOrder);
     }
 
     /**
@@ -61,8 +70,9 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @param retryNumber total number of retries
      * @param retryOrder  record order
      */
-    private BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
-        this._path = path;
+    private BacktraceDatabaseContext(Context context, String path, int retryNumber, RetryOrder retryOrder) {
+        this._applicationContext = context;
+        this._path = path;//this.getAbsolutePath(path);
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;
         SetupBatch();
@@ -201,7 +211,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @return is database empty
      */
     public boolean isEmpty() {
-        return TotalRecords != 0;
+        return TotalRecords == 0;
     }
 
     /**
@@ -329,6 +339,11 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
             }
         }
         return null;
+    }
+
+    private String getAbsolutePath(String path){
+        String appPath = this._applicationContext.getFilesDir().getAbsolutePath();
+        throw new UnsupportedOperationException();
     }
 
 }

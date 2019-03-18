@@ -26,10 +26,6 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     public IBacktraceApi BacktraceApi;
 
-    public void setApplicationContext(Context _applicationContext) {
-        this._applicationContext = _applicationContext;
-    }
-
     private Context _applicationContext;
 
     IBacktraceDatabaseContext BacktraceDatabaseContext;
@@ -49,6 +45,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     //TODO: times
 
+
     /**
      * Create disabled instance of BacktraceDatabase
      */
@@ -60,8 +57,8 @@ public class BacktraceDatabase implements IBacktraceDatabase {
      *
      * @param path Path to database directory
      */
-    public BacktraceDatabase(String path) {
-        this(new BacktraceDatabaseSettings(path));
+    public BacktraceDatabase(Context context, String path) {
+        this(context, new BacktraceDatabaseSettings(path));
     }
 
     /**
@@ -69,8 +66,8 @@ public class BacktraceDatabase implements IBacktraceDatabase {
      *
      * @param databaseSettings Backtrace database settings
      */
-    public BacktraceDatabase(BacktraceDatabaseSettings databaseSettings) {
-        if (databaseSettings == null || databaseSettings.databasePath.isEmpty()) {
+    public BacktraceDatabase(Context context, BacktraceDatabaseSettings databaseSettings) {
+        if (databaseSettings == null || databaseSettings.databasePath.isEmpty() || context == null) {
             return;
         }
 
@@ -78,8 +75,9 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             throw new IllegalArgumentException("Database path does not exists");
         }
 
+        this._applicationContext = context;
         this.DatabaseSettings = databaseSettings;
-        this.BacktraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
+        this.BacktraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext, databaseSettings);
         this.BacktraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.DatabaseSettings.MaxDatabaseSize, this.DatabaseSettings.maxRecordCount);
     }
