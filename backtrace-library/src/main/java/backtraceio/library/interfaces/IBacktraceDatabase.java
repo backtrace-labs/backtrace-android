@@ -1,5 +1,7 @@
 package backtraceio.library.interfaces;
 
+import android.content.Context;
+
 import java.util.Map;
 
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -22,6 +24,12 @@ public interface IBacktraceDatabase {
      * @param backtraceApi
      */
     void setApi(IBacktraceApi backtraceApi);
+
+    /**
+     *
+     * @param context
+     */
+    void setApplicationContext(Context context);
 
     /**
      * Remove all existing reports in BacktraceDatabase
