@@ -84,9 +84,10 @@ public class BacktraceBase implements IBacktraceClient {
      * @param database    Backtrace database
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database) {
-        this.setBacktraceApi(new BacktraceApi(credentials));
         this.context = context;
         this.database = database != null ? database : new BacktraceDatabase();
+        this.database.setApplicationContext(context);
+        this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
     }
 

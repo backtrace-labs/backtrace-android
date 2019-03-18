@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
+import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceExceptionHandler;
+import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,9 +18,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         BacktraceCredentials credentials =
                 new BacktraceCredentials("<endpoint-url>", "<token>");
-        BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
+
+
+        BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings("/");
+        BacktraceDatabase database = new BacktraceDatabase(settings);
+        BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials, database);
         BacktraceExceptionHandler.enable(backtraceClient);
-        Object x = null;
-        x.toString();
+        backtraceClient.send("test");
     }
 }

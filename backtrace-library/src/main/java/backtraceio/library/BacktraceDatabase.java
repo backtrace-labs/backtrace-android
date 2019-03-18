@@ -1,5 +1,6 @@
 package backtraceio.library;
 
+import android.content.Context;
 import android.provider.ContactsContract;
 
 import java.io.File;
@@ -25,6 +26,11 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     public IBacktraceApi BacktraceApi;
 
+    public void setApplicationContext(Context _applicationContext) {
+        this._applicationContext = _applicationContext;
+    }
+
+    private Context _applicationContext;
 
     IBacktraceDatabaseContext BacktraceDatabaseContext;
 
@@ -164,8 +170,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             return null;
         }
 
-        BacktraceData data = backtraceReport.toBacktraceData(null, attributes); // TODO: change
-        // null with application context!
+        BacktraceData data = backtraceReport.toBacktraceData(this._applicationContext, attributes);
         return BacktraceDatabaseContext.add(data);
     }
 
