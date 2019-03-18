@@ -1,9 +1,11 @@
 package backtraceio.library.services;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
@@ -15,7 +17,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
     private final long _maxDatabaseSize;
     private final int _maxRecordNumber;
     private final File _databaseDirectory;
-    private final String recordFilterRegex = "\\*-record.json";
+    private final String recordFilterRegex = ".*-record.json";
 
     public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber)
     {
@@ -39,7 +41,14 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
      * @return all existing physical records
      */
     public Iterable<File> getRecords() {
-        throw new UnsupportedOperationException();
+        final Pattern p = Pattern.compile(this.recordFilterRegex);
+        File[] pagesTemplates = this._databaseDirectory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return p.matcher(f.getName()).matches();
+            }
+        });
+        return Arrays.asList(pagesTemplates);
     }
 
     /**
