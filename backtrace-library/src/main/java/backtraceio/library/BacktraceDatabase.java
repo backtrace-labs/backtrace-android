@@ -1,10 +1,13 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.provider.ContactsContract;
+import android.util.Log;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Date;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -13,9 +16,11 @@ import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -24,13 +29,13 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  */
 public class BacktraceDatabase implements IBacktraceDatabase {
 
-    public IBacktraceApi BacktraceApi;
+    private IBacktraceApi BacktraceApi;
 
     private Context _applicationContext;
 
-    IBacktraceDatabaseContext BacktraceDatabaseContext;
+    private IBacktraceDatabaseContext BacktraceDatabaseContext;
 
-    IBacktraceDatabaseFileContext BacktraceDatabaseFileContext;
+    private IBacktraceDatabaseFileContext BacktraceDatabaseFileContext;
 
     private BacktraceDatabaseSettings DatabaseSettings;
 
@@ -43,8 +48,8 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     private boolean _enable = false;
 
-    //TODO: times
 
+    private Timer _timer;
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -113,8 +118,45 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         return DatabaseSettings;
     }
 
-    public void setupTimer() {
-        throw new UnsupportedOperationException();
+    private void setupTimer() {
+        this._timer = new Timer();
+        this._timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
+                if(BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork){
+                    return;
+                }
+                _timerBackgroundWork = true;
+                _timer.cancel();
+                _timer.purge();
+
+                BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
+                while(record != null)
+                {
+                    BacktraceData backtraceData = record.getBacktraceData();
+                    if(backtraceData == null || backtraceData.report ==null){
+                        delete(record);
+                    }
+                    else
+                    {
+                        BacktraceResult result = BacktraceApi.send(backtraceData);
+                        if(result.status == BacktraceResultStatus.Ok)
+                        {
+                            delete(record);
+                        }
+                        else
+                        {
+                            BacktraceDatabaseContext.incrementBatchRetry();
+                            break;
+                        }
+                    }
+                    record = BacktraceDatabaseContext.first();
+                }
+                _timerBackgroundWork = false;
+                setupTimer();
+            }
+        },  new Date(), DatabaseSettings.retryInterval * 1000);
     }
 
     public void flush() {
