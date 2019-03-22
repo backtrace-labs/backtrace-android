@@ -39,17 +39,20 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
     private BacktraceDatabaseSettings DatabaseSettings;
 
-    private String getDatabasePath(){
+    private String getDatabasePath() {
         return DatabaseSettings.databasePath;
-    };
+    }
 
-    private boolean _timerBackgroundWork = false;
+    ;
+
+    private static
+    boolean _timerBackgroundWork = false;
 
 
     private boolean _enable = false;
 
 
-    private Timer _timer;
+    private static Timer _timer;
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -119,34 +122,29 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     private void setupTimer() {
-        this._timer = new Timer();
-        this._timer.scheduleAtFixedRate(new TimerTask() {
+        _timer = new Timer();
+        _timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
-                if(BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork){
+                if (BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
                     return;
                 }
                 _timerBackgroundWork = true;
                 _timer.cancel();
                 _timer.purge();
+                _timer = null;
 
                 BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
-                while(record != null)
-                {
+                while (record != null) {
                     BacktraceData backtraceData = record.getBacktraceData();
-                    if(backtraceData == null || backtraceData.report ==null){
+                    if (backtraceData == null || backtraceData.report == null) {
                         delete(record);
-                    }
-                    else
-                    {
+                    } else {
                         BacktraceResult result = BacktraceApi.send(backtraceData);
-                        if(result.status == BacktraceResultStatus.Ok)
-                        {
+                        if (result.status == BacktraceResultStatus.Ok) {
                             delete(record);
-                        }
-                        else
-                        {
+                        } else {
                             BacktraceDatabaseContext.incrementBatchRetry();
                             break;
                         }
@@ -156,7 +154,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                 _timerBackgroundWork = false;
                 setupTimer();
             }
-        },  new Date(), DatabaseSettings.retryInterval * 1000);
+        }, DatabaseSettings.retryInterval * 1000, DatabaseSettings.retryInterval * 1000);
     }
 
     public void flush() {
