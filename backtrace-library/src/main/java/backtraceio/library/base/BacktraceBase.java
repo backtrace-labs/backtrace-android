@@ -153,6 +153,10 @@ public class BacktraceBase implements IBacktraceClient {
 
         BacktraceResult result = this.backtraceApi.send(backtraceData);
 
+        if(record != null)
+        {
+            record.close();
+        }
         if(result != null && result.status == BacktraceResultStatus.Ok)
         {
             this.database.delete(record);

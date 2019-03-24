@@ -145,6 +145,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                         if (result.status == BacktraceResultStatus.Ok) {
                             delete(record);
                         } else {
+                            record.close();
                             BacktraceDatabaseContext.incrementBatchRetry();
                             break;
                         }
@@ -242,7 +243,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             }
             BacktraceDatabaseContext.add(record);
             validateDatabaseSize();
-
+            record.close();
         }
     }
 
