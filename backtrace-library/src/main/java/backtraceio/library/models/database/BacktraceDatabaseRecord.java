@@ -206,6 +206,19 @@ public class BacktraceDatabaseRecord {
         }
     }
 
+    public boolean close(){
+        try {
+            this.Locked = false;
+            this.Record = null;
+            return true;
+        }
+        catch (Exception e)
+        {
+            Log.e("Backtrace.IO", "Can not unlock record");
+        }
+        return false;
+    }
+
     /**
      * Read single record from file
      *
