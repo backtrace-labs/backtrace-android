@@ -23,7 +23,7 @@ public class Annotations extends HashMap<String, Object>{
     }
 
     private void addExceptionDetails(final Object exceptionMessage){
-        this.put("Exception", new AnnotationException(exceptionMessage));
+        this.put("Exception", new  AnnotationException(exceptionMessage));
     }
 
     class AnnotationException{
