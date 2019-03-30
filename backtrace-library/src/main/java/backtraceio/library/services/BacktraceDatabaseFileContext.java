@@ -19,8 +19,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
     private final File _databaseDirectory;
     private final String recordFilterRegex = ".*-record.json";
 
-    public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber)
-    {
+    public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber) {
 
         _databasePath = databasePath;
         _maxDatabaseSize = maxDatabaseSize;
@@ -30,6 +29,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
 
     /**
      * Get all physical files stored in database directory
+     *
      * @return all existing physical files
      */
     public Iterable<File> getAll() {
@@ -38,6 +38,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
 
     /**
      * Get all valid physical records stored in database directory
+     *
      * @return all existing physical records
      */
     public Iterable<File> getRecords() {
@@ -53,6 +54,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
 
     /**
      * Valid all files consistencies
+     *
      * @return is database consistent
      */
     public boolean validFileConsistency() {
@@ -61,20 +63,16 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
         long size = 0;
         long totalRecordFiles = 0;
 
-        for(File file : files)
-        {
-            if(file.getName().matches(this.recordFilterRegex)) // TODO: CHECK IS IT WORKING
+        for (File file : files) {
+            if (file.getName().matches(this.recordFilterRegex)) // TODO: CHECK IS IT WORKING
             {
-
                 totalRecordFiles++;
-                if(_maxRecordNumber > totalRecordFiles)
-                {
+                if (_maxRecordNumber > totalRecordFiles) {
                     return false;
                 }
             }
             size += file.length();
-            if( size> _maxDatabaseSize)
-            {
+            if (size > _maxDatabaseSize) {
                 return false;
             }
         }
@@ -83,36 +81,34 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
 
     /**
      * Remove orphaned files existing in database directory
+     *
      * @param existingRecords existing entries in BacktraceDatabaseContext
      */
     public void removeOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords) {
         List<String> recordStringIds = new ArrayList<>();
 
-        for(BacktraceDatabaseRecord record : existingRecords){
+        for (BacktraceDatabaseRecord record : existingRecords) {
             recordStringIds.add(record.Id.toString());
         }
 
         Iterable<File> files = this.getAll();
-        for (File file : files){
+        for (File file : files) {
             String extension = FileHelper.getFileExtension(file);
-            if(!extension.equals("json"))
-            {
+            if (!extension.equals("json")) {
                 file.delete();
                 continue;
             }
 
             int fileNameIndex = file.getName().lastIndexOf('-');
 
-            if (fileNameIndex == -1)
-            {
+            if (fileNameIndex == -1) {
                 file.delete();
                 continue;
             }
 
             String fileUuid = file.getName().substring(0, fileNameIndex);
 
-            if(!recordStringIds.contains(fileUuid))
-            {
+            if (!recordStringIds.contains(fileUuid)) {
                 file.delete();
             }
         }
@@ -123,8 +119,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
      */
     public void clear() {
         Iterable<File> files = this.getAll();
-        for(File file : files)
-        {
+        for (File file : files) {
             file.delete();
         }
     }

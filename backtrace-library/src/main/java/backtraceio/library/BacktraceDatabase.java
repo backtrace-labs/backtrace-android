@@ -43,14 +43,9 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         return DatabaseSettings.databasePath;
     }
 
-    ;
-
-    private static
-    boolean _timerBackgroundWork = false;
-
+    private static boolean _timerBackgroundWork = false;
 
     private boolean _enable = false;
-
 
     private static Timer _timer;
 
@@ -75,12 +70,12 @@ public class BacktraceDatabase implements IBacktraceDatabase {
      * @param databaseSettings Backtrace database settings
      */
     public BacktraceDatabase(Context context, BacktraceDatabaseSettings databaseSettings) {
-        if (databaseSettings == null || databaseSettings.databasePath.isEmpty() || context == null) {
-            return;
+        if (databaseSettings == null || context == null) {
+            throw new IllegalArgumentException("Database settings or application context is null");
         }
 
-        if (!FileHelper.isFileExists(databaseSettings.databasePath)) {
-            throw new IllegalArgumentException("Database path does not exists");
+        if (databaseSettings.databasePath.isEmpty() || !FileHelper.isFileExists(databaseSettings.databasePath)) {
+            throw new IllegalArgumentException("Database path is empty or does not exists");
         }
 
         this._applicationContext = context;
@@ -122,59 +117,62 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     private void setupTimer() {
-        _timer = new Timer();
-        _timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
-                if (BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
-                    return;
-                }
-                _timerBackgroundWork = true;
-                _timer.cancel();
-                _timer.purge();
-                _timer = null;
-
-                BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
-                while (record != null) {
-                    BacktraceData backtraceData = record.getBacktraceData();
-                    if (backtraceData == null || backtraceData.report == null) {
-                        delete(record);
-                    } else {
-                        BacktraceResult result = BacktraceApi.send(backtraceData);
-                        if (result.status == BacktraceResultStatus.Ok) {
-                            delete(record);
-                        } else {
-                            record.close();
-                            BacktraceDatabaseContext.incrementBatchRetry();
-                            break;
-                        }
-                    }
-                    record = BacktraceDatabaseContext.first();
-                }
-                _timerBackgroundWork = false;
-                setupTimer();
-            }
-        }, DatabaseSettings.retryInterval * 1000, DatabaseSettings.retryInterval * 1000);
+        return;
+        // TODO: Uncomment
+//        _timer = new Timer();
+//        _timer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
+//                if (BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
+//                    Log.d("NULL OR ANOTHER WORKS", new Date(System.currentTimeMillis()).toString());
+//                    return;
+//                }
+//                Log.d("TIMER CONTINUE WORKING", new Date(System.currentTimeMillis()).toString());
+//                _timerBackgroundWork = true;
+//                _timer.cancel();
+//                _timer.purge();
+//                _timer = null;
+//
+//                BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
+//                while (record != null) {
+//                    BacktraceData backtraceData = record.getBacktraceData();
+//                    if (backtraceData == null || backtraceData.report == null) {
+//                        delete(record);
+//                    } else {
+//                        BacktraceResult result = BacktraceApi.send(backtraceData);
+//                        if (result.status == BacktraceResultStatus.Ok) {
+//                            delete(record);
+//                        } else {
+//                            record.close();
+//                            BacktraceDatabaseContext.incrementBatchRetry();
+//                            break;
+//                        }
+//                    }
+//                    record = BacktraceDatabaseContext.first();
+//                }
+//                _timerBackgroundWork = false;
+//                setupTimer();
+//            }
+//        }, DatabaseSettings.retryInterval * 1000, DatabaseSettings.retryInterval * 1000);
     }
 
     public void flush() {
         if (this.BacktraceApi == null) {
-            throw new IllegalArgumentException("BacktraceApi is required if you want to use Flush" +
-                    " method");
+            throw new IllegalArgumentException("BacktraceApi is required " +
+                    "if you want to use Flush method");
         }
 
         BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
         while (record != null) {
             BacktraceData backtraceData = record.getBacktraceData();
             this.delete(record);
-            record = BacktraceDatabaseContext.first();
             if (backtraceData != null) {
                 BacktraceApi.send(backtraceData);
             }
+            record = BacktraceDatabaseContext.first();
         }
     }
-
 
     public void setApi(IBacktraceApi backtraceApi) {
         this.BacktraceApi = backtraceApi;
@@ -195,7 +193,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     public boolean validConsistency() {
-        return false;
+        return BacktraceDatabaseFileContext.validFileConsistency();
     }
 
     public BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object>
@@ -228,7 +226,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         this.BacktraceDatabaseContext.delete(record);
     }
 
-    int count() {
+    public int count() {
         return BacktraceDatabaseContext.count();
     }
 
