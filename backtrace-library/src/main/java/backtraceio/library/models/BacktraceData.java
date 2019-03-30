@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,7 @@ public class BacktraceData {
      * Current host environment variables
      */
     @SerializedName("annotations")
-    public Annotations annotations;
+    public Map<String, Object> annotations;
 
 
     @SerializedName("sourceCode")
@@ -143,7 +144,7 @@ public class BacktraceData {
                 this.attributes.containsKey("error.message")) {
             exceptionMessage = this.attributes.get("error.message");
         }
-        this.annotations = new Annotations(exceptionMessage, complexAttributes);
+        this.annotations = Annotations.getAnnotations(exceptionMessage, complexAttributes);
     }
 
     /**

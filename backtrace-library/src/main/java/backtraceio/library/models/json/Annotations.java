@@ -6,31 +6,24 @@ import java.util.Map;
 /**
  * Get report annotations - environment variables and application dependencies
  */
-public class Annotations extends HashMap<String, Object>{
+public class Annotations {
 
-    public Annotations(Object exceptionMessage, Map<String, Object> complexAttributes)
-    {
-        this.put("Environment Variables", System.getenv());
-        this.addComplexAttributes(complexAttributes);
-        this.addExceptionDetails(exceptionMessage);
-    }
-
-    private void addComplexAttributes(Map<String, Object> complexAttributes)
-    {
+    public static Map<String, Object> getAnnotations(Object exceptionMessage, Map<String, Object> complexAttributes){
+        Map<String, Object> result = new HashMap<>();
+        result.put("Environment Variables", System.getenv());
         if(complexAttributes != null) {
-            this.putAll(complexAttributes);
+            result.putAll(complexAttributes);
         }
+
+        result.put("Exception", new AnnotationException(exceptionMessage));
+        return result;
     }
+}
 
-    private void addExceptionDetails(final Object exceptionMessage){
-        this.put("Exception", new  AnnotationException(exceptionMessage));
-    }
+class AnnotationException{
+    private Object message;
 
-    class AnnotationException{
-        Object Message;
+    AnnotationException(Object message){ setMessage(message); }
 
-        AnnotationException(Object message){ setMessage(message); }
-
-        void setMessage(Object message){ this.Message = message; }
-    }
+    void setMessage(Object message){ this.message = message; }
 }
