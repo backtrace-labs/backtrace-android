@@ -95,7 +95,6 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
         Iterable<File> files = this.getAll();
         for (File file : files){
             String extension = FileHelper.getFileExtension(file);
-            //TODO: CHECK
             if(!extension.equals("json"))
             {
                 file.delete();
@@ -112,7 +111,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
 
             String fileUuid = file.getName().substring(0, fileNameIndex);
 
-            if(recordStringIds.contains(fileUuid))
+            if(!recordStringIds.contains(fileUuid))
             {
                 file.delete();
             }
