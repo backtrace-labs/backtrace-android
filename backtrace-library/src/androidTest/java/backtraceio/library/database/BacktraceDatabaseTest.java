@@ -1,0 +1,143 @@
+package backtraceio.library.database;
+
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import backtraceio.library.BacktraceClient;
+import backtraceio.library.BacktraceCredentials;
+import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.events.RequestHandler;
+import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import backtraceio.library.models.json.BacktraceReport;
+
+import static org.junit.Assert.assertEquals;
+
+@RunWith(AndroidJUnit4.class)
+public class BacktraceDatabaseTest {
+    private Context context;
+    private String dbPath;
+    private BacktraceDatabase database;
+    private String testMessage = "Example test string";
+
+    @Before
+    public void setUp() {
+        this.context = InstrumentationRegistry.getContext();
+        this.dbPath = this.context.getFilesDir().getAbsolutePath();
+        this.database = new BacktraceDatabase(this.context, dbPath);
+        this.database.start();
+        this.database.clear();
+    }
+
+    @After
+    public void after() {
+        this.database.clear();
+    }
+
+
+    // TODO:
+    @Test
+    public void isDatabaseEmpty() {
+        assertEquals(0, database.getDatabaseSize());
+        assertEquals(0, database.count());
+    }
+
+    @Test
+    public void addSingleRecord() {
+        assertEquals(0, database.getDatabaseSize());
+        assertEquals(0, database.count());
+
+        // GIVEN
+        BacktraceReport report = new BacktraceReport(testMessage);
+
+        // WHEN
+        database.add(report, null);
+
+        // THEN
+        assertEquals(report, database.get().iterator().next().getBacktraceData().report);
+        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().report.message);
+        assertEquals(1, database.count());
+    }
+
+    @Test
+    public void deleteSingleRecord() {
+        BacktraceReport report = new BacktraceReport(testMessage);
+        BacktraceReport report2 = new BacktraceReport(new Exception("Example exception"));
+
+        BacktraceDatabaseRecord record = database.add(report, null);
+        BacktraceDatabaseRecord record2 = database.add(report2, null);
+        assertEquals(2, database.count());
+
+        database.delete(record);
+        assertEquals(1, database.count());
+
+        BacktraceDatabaseRecord recordFromDatabase = database.get().iterator().next();
+        assertEquals(record2, recordFromDatabase);
+        assertEquals(report2, recordFromDatabase.getBacktraceData().report);
+        assertEquals(report2.exception.getMessage(), recordFromDatabase.getBacktraceData().report.exception.getMessage());
+    }
+
+
+    @Test
+    public void clearDatabase() {
+        assertEquals(0, database.getDatabaseSize());
+        assertEquals(0, database.count());
+
+        BacktraceReport report = new BacktraceReport(testMessage);
+
+        database.add(report, null);
+        database.add(report, null);
+        assertEquals(2, database.count());
+
+        database.clear();
+        assertEquals(0, database.getDatabaseSize());
+        assertEquals(0, database.count());
+    }
+
+    @Test
+    public void flushDatabase() {
+
+        // GIVEN
+        BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials, this.database);
+
+        BacktraceReport report = new BacktraceReport(testMessage);
+        BacktraceReport report3 = new BacktraceReport(testMessage);
+        BacktraceReport report2 = new BacktraceReport(testMessage);
+
+        BacktraceDatabaseRecord record = database.add(report, null);
+        BacktraceDatabaseRecord record2 = database.add(report2, null);
+        BacktraceDatabaseRecord record3 = database.add(report3, null);
+
+        final List<Integer> requestsCounter = new ArrayList<>();
+        backtraceClient.setOnRequestHandler(new RequestHandler() {
+            @Override
+            public BacktraceResult onRequest(BacktraceData data) {
+                requestsCounter.add(1);
+                return null;
+            }
+        });
+
+        record.close();
+        record2.close();
+        record3.close();
+
+        // THEN
+        database.flush();
+
+        // WHEN
+        assertEquals(3, requestsCounter.size());
+        assertEquals(0, database.count());
+    }
+}
