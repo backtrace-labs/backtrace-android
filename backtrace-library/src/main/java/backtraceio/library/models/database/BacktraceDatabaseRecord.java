@@ -81,7 +81,7 @@ public class BacktraceDatabaseRecord {
     }
 
     public BacktraceDatabaseRecord(BacktraceData data, String path) {
-        this.Id = UUID.fromString(data.uuid); // TODO: Check
+        this.Id = UUID.fromString(data.uuid);
         this.Record = data;
         this._path = path;
         RecordWriter = new BacktraceDatabaseRecordWriter(path);
@@ -101,23 +101,23 @@ public class BacktraceDatabaseRecord {
             return null;
         }
 
-        String jsonData = ""; // TODO:
-        String jsonReport = ""; // TODO:
+        String jsonData = readJsonString(new File(this.DiagnosticDataPath));
+        String jsonReport = readJsonString(new File(this.ReportPath));
 
         // deserialize data - if deserialize fails, we receive invalid entry
         try {
             BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData,
                     BacktraceData.class); // TODO: Check
-            BacktraceReport report = BacktraceSerializeHelper.fromJson(jsonReport,
-                    BacktraceReport.class); // TODO: Check
             // add report to diagnostic data
             // we don't store report with diagnostic data in the same json
             // because we have easier way to serialize and deserialize data
             // and no problem/condition with serialization when BacktraceApi want to send
             // diagnostic data to API
-            diagnosticData.report = report;
+            diagnosticData.report = BacktraceSerializeHelper.fromJson(jsonReport,
+                    BacktraceReport.class);
             return diagnosticData;
         } catch (Exception ex) {
+            Log.e("Backtrace.IO", ex.getMessage());
             return null;
         }
     }
@@ -130,7 +130,7 @@ public class BacktraceDatabaseRecord {
     public boolean save() {
         try {
             this.DiagnosticDataPath = save(Record, String.format("%s-attachment", Id));
-            this.ReportPath = save(Record, String.format("%s-report", Id));
+            this.ReportPath = save(Record.report, String.format("%s-report", Id));
 
             this.RecordPath = new File(this._path, String.format("%s-record.json", this.Id))
                     .getAbsolutePath();
@@ -159,7 +159,7 @@ public class BacktraceDatabaseRecord {
             if (data == null) {
                 return "";
             }
-            String json = BacktraceSerializeHelper.toJson(this);
+            String json = BacktraceSerializeHelper.toJson(data);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
             this.Size += file.length;
             return RecordWriter.write(file, prefix);
@@ -177,8 +177,8 @@ public class BacktraceDatabaseRecord {
      * @return is record valid
      */
     public boolean valid() {
-        return FileHelper.isFileExists(this.DiagnosticDataPath) && FileHelper.isFileExists(this
-                .ReportPath);
+        return FileHelper.isFileExists(this.DiagnosticDataPath) &&
+                FileHelper.isFileExists(this.ReportPath);
     }
 
     /**
@@ -219,13 +219,7 @@ public class BacktraceDatabaseRecord {
         return false;
     }
 
-    /**
-     * Read single record from file
-     *
-     * @param file current file
-     * @return saved database record
-     */
-    public static BacktraceDatabaseRecord readFromFile(File file) {
+    private static String readJsonString(File file){
         try {
             Scanner scanner = new Scanner(file);
             StringBuilder sb = new StringBuilder();
@@ -236,10 +230,25 @@ public class BacktraceDatabaseRecord {
 
             scanner.close();
 
-            String json = sb.toString();
-            return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
-        } catch (Exception e) {
+            return sb.toString();
+        }
+        catch (Exception e){
+            Log.e("Backtrace.IO", e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Read single record from file
+     *
+     * @param file current file
+     * @return saved database record
+     */
+    public static BacktraceDatabaseRecord readFromFile(File file) {
+        String json = BacktraceDatabaseRecord.readJsonString(file);
+        if(json == null || json.equals("")){
+            return null;
+        }
+        return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
     }
 }
