@@ -170,7 +170,6 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
             return;
         }
 
-        // TODO: Check is it works
         for (int key : BatchRetry.keySet()) {
             for (BacktraceDatabaseRecord databaseRecord : BatchRetry.get(key)) {
                 if (databaseRecord == null || record.Id != databaseRecord.Id) {
