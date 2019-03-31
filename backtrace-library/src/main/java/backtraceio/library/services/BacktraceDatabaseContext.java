@@ -143,7 +143,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @return last Backtrace database record
      */
     public BacktraceDatabaseRecord last() {
-        return this.retryOrder == RetryOrder.Stack ? getLastRecord() : getFirstRecord();
+        return this.retryOrder == RetryOrder.Queue ? getLastRecord() : getFirstRecord();
     }
 
 
@@ -267,7 +267,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         }
 
         record.delete();
-        this.TotalSize--;
+        this.TotalRecords--;
         this.TotalSize -= record.getSize();
         return true;
     }

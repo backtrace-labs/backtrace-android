@@ -25,6 +25,8 @@ import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceDatabaseContext;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -60,10 +62,12 @@ public class BacktraceDatabaseContextTest {
         // THEN
         assertEquals(3, databaseContext.count());
         assertEquals(records.get(0), first);
+        assertNotEquals(records.get(1), first);
+        assertNotEquals(records.get(2), first);
     }
 
     @Test
-    public void LastFromDatabaseContextQueue() {
+    public void lastFromDatabaseContextQueue() {
         // GIVEN
         List<BacktraceDatabaseRecord> records = fillDatabase();
 
@@ -72,7 +76,7 @@ public class BacktraceDatabaseContextTest {
 
         // THEN
         assertEquals(3, databaseContext.count());
-        assertEquals(records.get(3), last);
+        assertEquals(records.get(2), last);
     }
 
     @Test
@@ -87,7 +91,7 @@ public class BacktraceDatabaseContextTest {
 
         // THEN
         assertEquals(3, databaseContext.count());
-        assertEquals(records.get(3), firstOnStack);
+        assertEquals(records.get(2), firstOnStack);
     }
 
     @Test
@@ -111,7 +115,7 @@ public class BacktraceDatabaseContextTest {
         List<BacktraceDatabaseRecord> records = fillDatabase();
 
         // WHEN
-        Iterable<BacktraceDatabaseRecord> contextRecords = databaseContext.get(); // STACK
+        Iterable<BacktraceDatabaseRecord> contextRecords = databaseContext.get();
 
         // THEN
         assertEquals(3, databaseContext.count());
@@ -119,6 +123,62 @@ public class BacktraceDatabaseContextTest {
         {
             assertTrue(records.contains(record));
         }
+    }
+
+    @Test
+    public void containsInDatabaseContext() {
+        // GIVEN
+        List<BacktraceDatabaseRecord> records = fillDatabase();
+
+        // WHEN
+        boolean result = databaseContext.contains(records.get(1));
+
+        // THEN
+        assertTrue(result);
+    }
+
+    @Test
+    public void notContainsInDatabaseContext() {
+        // GIVEN
+        fillDatabase();
+        BacktraceReport report = new BacktraceReport(this.testMessage);
+        BacktraceData data = new BacktraceData(this.context, report, null);
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+
+        // WHEN
+        boolean result = databaseContext.contains(record);
+
+        // THEN
+        assertFalse(result);
+    }
+
+    @Test
+    public void isEmptyDatabaseContext() {
+        assertTrue(this.databaseContext.isEmpty());
+
+        // GIVEN
+        fillDatabase();
+
+        // WHEN
+        boolean result = databaseContext.isEmpty();
+
+        // THEN
+        assertFalse(result);
+    }
+
+    @Test
+    public void removeLastFromDatabaseContext(){
+        // GIVEN
+        List<BacktraceDatabaseRecord> records = fillDatabase();
+
+        // WHEN
+        boolean result = databaseContext.removeLastRecord();
+
+        // THEN
+        assertEquals(2, databaseContext.count());
+        assertTrue(result);
+        assertTrue(databaseContext.contains(records.get(0)));
+        assertTrue(databaseContext.contains(records.get(1)));
     }
 
     private List<BacktraceDatabaseRecord> fillDatabase()
@@ -133,6 +193,12 @@ public class BacktraceDatabaseContextTest {
         result.add(databaseContext.add(data));
         result.add(databaseContext.add(data2));
         result.add(databaseContext.add(data3));
+
+        // Dispose all records
+        for(BacktraceDatabaseRecord record : result){
+            record.close();
+        }
+
         return result;
     }
 }
