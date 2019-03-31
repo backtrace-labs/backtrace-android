@@ -9,7 +9,12 @@ import backtraceio.library.enums.database.RetryOrder;
  */
 public class BacktraceDatabaseSettings {
     public BacktraceDatabaseSettings(String path) {
-        databasePath = path;
+        this(path, RetryOrder.Queue);
+    }
+
+    public BacktraceDatabaseSettings(String path, RetryOrder retryOrder) {
+        this.databasePath = path;
+        this.retryOrder = retryOrder;
     }
 
     /**

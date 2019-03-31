@@ -46,7 +46,6 @@ public class BacktraceDatabaseTest {
     }
 
 
-    // TODO:
     @Test
     public void isDatabaseEmpty() {
         assertEquals(0, database.getDatabaseSize());
