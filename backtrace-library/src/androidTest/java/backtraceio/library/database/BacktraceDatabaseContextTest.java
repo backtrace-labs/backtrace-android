@@ -181,6 +181,35 @@ public class BacktraceDatabaseContextTest {
         assertTrue(databaseContext.contains(records.get(1)));
     }
 
+    @Test
+    public void deleteFromDatabaseContext() {
+        // GIVEN
+        List<BacktraceDatabaseRecord> records = fillDatabase();
+
+        // WHEN
+        databaseContext.delete(records.get(0));
+
+        // THEN
+        assertEquals(2, databaseContext.count());
+        assertTrue(databaseContext.contains(records.get(1)));
+        assertTrue(databaseContext.contains(records.get(2)));
+    }
+
+    @Test
+    public void tryDeleteNotExistingRecordFromDatabaseContext() {
+        // GIVEN
+        fillDatabase();
+        BacktraceReport report = new BacktraceReport(this.testMessage);
+        BacktraceData data = new BacktraceData(this.context, report, null);
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+
+        // WHEN
+        databaseContext.delete(record);
+
+        // THEN
+        assertEquals(3, databaseContext.count());
+    }
+
     private List<BacktraceDatabaseRecord> fillDatabase()
     {
         List<BacktraceDatabaseRecord> result = new ArrayList<>();
