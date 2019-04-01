@@ -3,13 +3,11 @@ package backtraceio.library.services;
 import android.content.Context;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.models.BacktraceData;
@@ -172,7 +170,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
 
         for (int key : BatchRetry.keySet()) {
             for (BacktraceDatabaseRecord databaseRecord : BatchRetry.get(key)) {
-                if (databaseRecord == null || record.Id != databaseRecord.Id) {
+                if (databaseRecord == null || record.id != databaseRecord.id) {
                     continue;
                 }
 
@@ -200,7 +198,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
             List<BacktraceDatabaseRecord> records = entry.getValue();
 
             for (BacktraceDatabaseRecord databaseRecord : records) {
-                if (databaseRecord != null && databaseRecord.Id == record.Id) {
+                if (databaseRecord != null && databaseRecord.id == record.id) {
                     return true;
                 }
             }

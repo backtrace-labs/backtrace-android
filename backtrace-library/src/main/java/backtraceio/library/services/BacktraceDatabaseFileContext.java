@@ -88,7 +88,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
         List<String> recordStringIds = new ArrayList<>();
 
         for (BacktraceDatabaseRecord record : existingRecords) {
-            recordStringIds.add(record.Id.toString());
+            recordStringIds.add(record.id.toString());
         }
 
         Iterable<File> files = this.getAll();

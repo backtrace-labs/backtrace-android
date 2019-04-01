@@ -20,7 +20,7 @@ public class BacktraceDatabaseRecord {
      * Id
      */
     @SerializedName("Id")
-    public UUID Id = UUID.randomUUID();
+    public UUID id = UUID.randomUUID();
 
     /**
      * Check if current record is in use
@@ -31,38 +31,39 @@ public class BacktraceDatabaseRecord {
      * Path to json stored all information about current record
      */
     @SerializedName("RecordName")
-    String RecordPath;
+    private String recordPath;
 
     /**
      * Path to a diagnostic data json
      */
     @SerializedName("DataPath")
-    String DiagnosticDataPath;
+    private String diagnosticDataPath;
 
     /**
      * Path to Backtrace Report json
      */
     @SerializedName("ReportPath")
-    String ReportPath;
+    private String reportPath;
 
-    public long getSize() {
-        return Size;
-    }
-
-    public void setSize(long size) {
-        Size = size;
-    }
 
     /**
      * Total size of record
      */
     @SerializedName("Size")
-    long Size;
+    private long size;
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
 
     /**
      * Stored record
      */
-    transient BacktraceData Record;
+    private transient BacktraceData record;
 
     /**
      * Path to database directory
@@ -70,19 +71,21 @@ public class BacktraceDatabaseRecord {
     private transient final String _path;
 
     /**
-     * Record writer
+     * record writer
      */
     transient IBacktraceDatabaseRecordWriter RecordWriter;
 
 
     BacktraceDatabaseRecord() {
         this._path = "";
-        this.RecordPath = String.format("%s-record.json", this.Id);
+        this.recordPath = String.format("%s-record.json", this.id);
+        this.diagnosticDataPath = String.format("%s-attachment", this.id);
+        this.recordPath = String.format("%s-record.json", this.id);
     }
 
     public BacktraceDatabaseRecord(BacktraceData data, String path) {
-        this.Id = UUID.fromString(data.uuid);
-        this.Record = data;
+        this.id = UUID.fromString(data.uuid);
+        this.record = data;
         this._path = path;
         RecordWriter = new BacktraceDatabaseRecordWriter(path);
     }
@@ -93,21 +96,21 @@ public class BacktraceDatabaseRecord {
      * @return valid BacktraceData object
      */
     public BacktraceData getBacktraceData() {
-        if (this.Record != null) {
-            return this.Record;
+        if (this.record != null) {
+            return this.record;
         }
 
         if (!this.valid()) {
             return null;
         }
 
-        String jsonData = readJsonString(new File(this.DiagnosticDataPath));
-        String jsonReport = readJsonString(new File(this.ReportPath));
+        String jsonData = readJsonString(new File(this.diagnosticDataPath));
+        String jsonReport = readJsonString(new File(this.reportPath));
 
         // deserialize data - if deserialize fails, we receive invalid entry
         try {
             BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData,
-                    BacktraceData.class); // TODO: Check
+                    BacktraceData.class);
             // add report to diagnostic data
             // we don't store report with diagnostic data in the same json
             // because we have easier way to serialize and deserialize data
@@ -129,16 +132,16 @@ public class BacktraceDatabaseRecord {
      */
     public boolean save() {
         try {
-            this.DiagnosticDataPath = save(Record, String.format("%s-attachment", Id));
-            this.ReportPath = save(Record.report, String.format("%s-report", Id));
+            this.diagnosticDataPath = save(record, String.format("%s-attachment", id));
+            this.reportPath = save(record.report, String.format("%s-report", id));
 
-            this.RecordPath = new File(this._path, String.format("%s-record.json", this.Id))
+            this.recordPath = new File(this._path, String.format("%s-record.json", this.id))
                     .getAbsolutePath();
 
             String json = BacktraceSerializeHelper.toJson(this);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
-            this.Size += file.length;
-            RecordWriter.write(this, String.format("%s-record", this.Id));
+            this.size += file.length;
+            RecordWriter.write(this, String.format("%s-record", this.id));
             return true;
         } catch (Exception ex) {
             Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
@@ -161,7 +164,7 @@ public class BacktraceDatabaseRecord {
             }
             String json = BacktraceSerializeHelper.toJson(data);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
-            this.Size += file.length;
+            this.size += file.length;
             return RecordWriter.write(file, prefix);
         }
         catch (Exception ex) {
@@ -177,17 +180,17 @@ public class BacktraceDatabaseRecord {
      * @return is record valid
      */
     public boolean valid() {
-        return FileHelper.isFileExists(this.DiagnosticDataPath) &&
-                FileHelper.isFileExists(this.ReportPath);
+        return FileHelper.isFileExists(this.diagnosticDataPath) &&
+                FileHelper.isFileExists(this.reportPath);
     }
 
     /**
      * Delete all record files
      */
     public void delete() {
-        delete(this.ReportPath);
-        delete(this.DiagnosticDataPath);
-        delete(this.RecordPath);
+        delete(this.reportPath);
+        delete(this.diagnosticDataPath);
+        delete(this.recordPath);
     }
 
     /**
@@ -209,7 +212,7 @@ public class BacktraceDatabaseRecord {
     public boolean close(){
         try {
             this.Locked = false;
-            this.Record = null;
+            this.record = null;
             return true;
         }
         catch (Exception e)
@@ -225,7 +228,7 @@ public class BacktraceDatabaseRecord {
             StringBuilder sb = new StringBuilder();
 
             while (scanner.hasNext()) {
-                sb.append(scanner.next());
+                sb.append(scanner.nextLine());
             }
 
             scanner.close();
