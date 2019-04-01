@@ -47,7 +47,7 @@ public interface IBacktraceDatabaseContext {
      *
      * @param record Database record
      */
-    void delete(BacktraceDatabaseRecord record);
+    boolean delete(BacktraceDatabaseRecord record);
 
 
     /**

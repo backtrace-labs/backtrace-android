@@ -165,9 +165,9 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      *
      * @param record Database record to delete
      */
-    public void delete(BacktraceDatabaseRecord record) {
+    public boolean delete(BacktraceDatabaseRecord record) {
         if (record == null) {
-            return;
+            return false;
         }
 
         for (int key : BatchRetry.keySet()) {
@@ -180,9 +180,10 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
                 BatchRetry.get(key).remove(databaseRecord);
                 this.TotalRecords--;
                 this.TotalSize -= databaseRecord.getSize();
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -192,6 +193,9 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @return is record passed as argument is in the database
      */
     public boolean contains(BacktraceDatabaseRecord record) {
+        if(record == null){
+            throw new NullPointerException("BacktraceDatabaseRecord");
+        }
         for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.BatchRetry.entrySet()) {
             List<BacktraceDatabaseRecord> records = entry.getValue();
 
@@ -264,11 +268,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         if (record == null) {
             return false;
         }
-
-        record.delete();
-        this.TotalRecords--;
-        this.TotalSize -= record.getSize();
-        return true;
+        return delete(record);
     }
 
     /**

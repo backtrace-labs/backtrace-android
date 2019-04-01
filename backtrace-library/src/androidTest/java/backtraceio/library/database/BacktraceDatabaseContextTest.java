@@ -137,6 +137,16 @@ public class BacktraceDatabaseContextTest {
         assertTrue(result);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void containsNullInDatabaseContext() {
+        // GIVEN
+        fillDatabase();
+
+        // WHEN
+        databaseContext.contains(null);
+    }
+
+
     @Test
     public void notContainsInDatabaseContext() {
         // GIVEN

@@ -20,6 +20,7 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 import static org.junit.Assert.assertEquals;
@@ -112,8 +113,8 @@ public class BacktraceDatabaseTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, this.database);
 
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceReport report3 = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
+        BacktraceReport report3 = new BacktraceReport(testMessage);
 
         BacktraceDatabaseRecord record = database.add(report, null);
         BacktraceDatabaseRecord record2 = database.add(report2, null);
@@ -132,11 +133,36 @@ public class BacktraceDatabaseTest {
         record2.close();
         record3.close();
 
-        // THEN
+        // WHEN
         database.flush();
 
-        // WHEN
+        // THEN
         assertEquals(3, requestsCounter.size());
         assertEquals(0, database.count());
     }
+
+    @Test
+    public void recordLimit() {
+        // GIVEN
+        BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(dbPath);
+        settings.maxRecordCount = 1;
+        this.database = new BacktraceDatabase(this.context, settings);
+        this.database.start();
+        this.database.clear();
+
+        BacktraceReport report = new BacktraceReport("first");
+        BacktraceReport report2 = new BacktraceReport("second");
+
+        // WHEN
+        BacktraceDatabaseRecord record = database.add(report, null);
+        record.close();
+
+        BacktraceDatabaseRecord record2 = database.add(report2, null);
+        record2.close();
+
+        // THEN
+        assertEquals(1, database.count());
+        assertEquals(report2.message, database.get().iterator().next().getBacktraceData().report.message);
+    }
+
 }
