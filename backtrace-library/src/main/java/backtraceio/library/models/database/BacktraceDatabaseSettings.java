@@ -35,12 +35,11 @@ public class BacktraceDatabaseSettings {
     /**
      * Maximum database size in MB. If value is equal to zero, then size is unlimited
      */
-    public long MaxDatabaseSize;
-
 
     public long getMaxDatabaseSize() {
         return _maxDatabaseSize * 1000 * 1000;
     }
+
 
     public void setMaxDatabaseSize(long value) {
         this._maxDatabaseSize = value;
