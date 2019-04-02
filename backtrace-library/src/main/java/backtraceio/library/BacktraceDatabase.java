@@ -6,8 +6,6 @@ import android.util.Log;
 import java.io.File;
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Date;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -16,11 +14,9 @@ import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -82,7 +78,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         this.DatabaseSettings = databaseSettings;
         this.BacktraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext, databaseSettings);
         this.BacktraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
-                this.DatabaseSettings.MaxDatabaseSize, this.DatabaseSettings.maxRecordCount);
+                this.DatabaseSettings.getMaxDatabaseSize(), this.DatabaseSettings.maxRecordCount);
     }
 
     public void start() {
@@ -266,9 +262,9 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         }
 
         if (DatabaseSettings.getMaxDatabaseSize() != 0 && BacktraceDatabaseContext
-                .getDatabaseSize() > DatabaseSettings.MaxDatabaseSize) {
+                .getDatabaseSize() > DatabaseSettings.getMaxDatabaseSize()) {
             int deletePolicyRetry = 5;
-            while (BacktraceDatabaseContext.getDatabaseSize() > DatabaseSettings.MaxDatabaseSize) {
+            while (BacktraceDatabaseContext.getDatabaseSize() > DatabaseSettings.getMaxDatabaseSize()) {
                 BacktraceDatabaseContext.removeLastRecord();
                 deletePolicyRetry--; // avoid infinity loop
                 if (deletePolicyRetry == 0)
