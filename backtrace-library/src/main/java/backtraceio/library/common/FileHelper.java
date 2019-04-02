@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Helper class for access to files
@@ -92,5 +93,24 @@ public class FileHelper {
             return false;
         }
         return path.startsWith(context.getFilesDir().getAbsolutePath());
+    }
+
+    public static String readFile(File file){
+        try {
+            Scanner scanner = new Scanner(file);
+            StringBuilder sb = new StringBuilder();
+
+            while (scanner.hasNext()) {
+                sb.append(scanner.nextLine());
+            }
+
+            scanner.close();
+
+            return sb.toString();
+        }
+        catch (Exception e){
+            Log.e("Backtrace.IO", e.getMessage());
+            return null;
+        }
     }
 }

@@ -115,8 +115,8 @@ public class BacktraceDatabaseRecord {
             return null;
         }
 
-        String jsonData = readJsonString(new File(this.diagnosticDataPath));
-        String jsonReport = readJsonString(new File(this.reportPath));
+        String jsonData = FileHelper.readFile(new File(this.diagnosticDataPath));
+        String jsonReport = FileHelper.readFile(new File(this.reportPath));
 
         // deserialize data - if deserialize fails, we receive invalid entry
         try {
@@ -233,24 +233,25 @@ public class BacktraceDatabaseRecord {
         return false;
     }
 
-    private static String readJsonString(File file){
-        try {
-            Scanner scanner = new Scanner(file);
-            StringBuilder sb = new StringBuilder();
-
-            while (scanner.hasNext()) {
-                sb.append(scanner.nextLine());
-            }
-
-            scanner.close();
-
-            return sb.toString();
-        }
-        catch (Exception e){
-            Log.e("Backtrace.IO", e.getMessage());
-            return null;
-        }
-    }
+    // TODO: REMOVE
+//    private static String readJsonString(File file){
+//        try {
+//            Scanner scanner = new Scanner(file);
+//            StringBuilder sb = new StringBuilder();
+//
+//            while (scanner.hasNext()) {
+//                sb.append(scanner.nextLine());
+//            }
+//
+//            scanner.close();
+//
+//            return sb.toString();
+//        }
+//        catch (Exception e){
+//            Log.e("Backtrace.IO", e.getMessage());
+//            return null;
+//        }
+//    }
 
     /**
      * Read single record from file
@@ -259,7 +260,7 @@ public class BacktraceDatabaseRecord {
      * @return saved database record
      */
     public static BacktraceDatabaseRecord readFromFile(File file) {
-        String json = BacktraceDatabaseRecord.readJsonString(file);
+        String json = FileHelper.readFile(file);
         if(json == null || json.equals("")){
             return null;
         }
