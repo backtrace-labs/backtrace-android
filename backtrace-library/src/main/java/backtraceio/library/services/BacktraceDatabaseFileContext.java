@@ -64,15 +64,15 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
         long totalRecordFiles = 0;
 
         for (File file : files) {
-            if (file.getName().matches(this.recordFilterRegex)) // TODO: CHECK IS IT WORKING
+            if (file.getName().matches(this.recordFilterRegex))
             {
                 totalRecordFiles++;
-                if (_maxRecordNumber > totalRecordFiles) {
+                if (_maxRecordNumber < totalRecordFiles) {
                     return false;
                 }
             }
             size += file.length();
-            if (size > _maxDatabaseSize) {
+            if (_maxDatabaseSize != 0 && size > _maxDatabaseSize) { // if _maxDatabaseSize == 0, size is unlimited
                 return false;
             }
         }
