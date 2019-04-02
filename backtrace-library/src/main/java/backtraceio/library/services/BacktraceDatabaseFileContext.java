@@ -67,7 +67,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
             if (file.getName().matches(this.recordFilterRegex))
             {
                 totalRecordFiles++;
-                if (_maxRecordNumber < totalRecordFiles) {
+                if (_maxRecordNumber != 0 && _maxRecordNumber < totalRecordFiles) {
                     return false;
                 }
             }

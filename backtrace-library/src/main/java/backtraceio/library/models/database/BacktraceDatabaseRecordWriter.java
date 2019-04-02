@@ -20,7 +20,7 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
      *
      * @param path path to destination folder
      */
-    BacktraceDatabaseRecordWriter(String path) {
+    public BacktraceDatabaseRecordWriter(String path) {
         this._destinationPath = path;
     }
 
@@ -47,7 +47,7 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
      * @param data object that will be serialized
      * @return serialized object in JSON string
      */
-    public String toJsonFile(Object data) {
+    private String toJsonFile(Object data) {
         if (data == null) {
             return "";
         }
@@ -61,7 +61,7 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
      * @param destinationPath destination path
      * @throws IOException
      */
-    public void saveValidRecord(String sourcePath, String destinationPath) throws IOException {
+    private void saveValidRecord(String sourcePath, String destinationPath) throws IOException {
         File fromFile = new File(sourcePath);
         File toFile = new File(destinationPath);
         boolean renameResult = fromFile.renameTo(toFile);
@@ -77,7 +77,7 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
      * @param file current file
      * @throws IOException
      */
-    public void saveTemporaryFile(String path, byte[] file) throws IOException {
+    private void saveTemporaryFile(String path, byte[] file) throws IOException {
         FileOutputStream out = new FileOutputStream(path);
         out.write(file);
         out.close();
