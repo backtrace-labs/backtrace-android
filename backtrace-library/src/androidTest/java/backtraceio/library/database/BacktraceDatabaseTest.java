@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +102,8 @@ public class BacktraceDatabaseTest {
         assertEquals(2, database.count());
 
         database.clear();
+        int filesNumber = new File(this.dbPath).listFiles().length;
+        assertEquals(0, filesNumber);
         assertEquals(0, database.getDatabaseSize());
         assertEquals(0, database.count());
     }

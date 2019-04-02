@@ -33,11 +33,19 @@ public class BacktraceDatabaseRecord {
     @SerializedName("RecordName")
     private String recordPath;
 
+    public String getRecordPath() {
+        return recordPath;
+    }
+
     /**
      * Path to a diagnostic data json
      */
     @SerializedName("DataPath")
     private String diagnosticDataPath;
+
+    public String getDiagnosticDataPath() {
+        return diagnosticDataPath;
+    }
 
     /**
      * Path to Backtrace Report json
@@ -45,6 +53,9 @@ public class BacktraceDatabaseRecord {
     @SerializedName("ReportPath")
     private String reportPath;
 
+    public String getReportPath() {
+        return reportPath;
+    }
 
     /**
      * Total size of record
@@ -135,8 +146,8 @@ public class BacktraceDatabaseRecord {
             this.diagnosticDataPath = save(record, String.format("%s-attachment", id));
             this.reportPath = save(record.report, String.format("%s-report", id));
 
-            this.recordPath = new File(this._path, String.format("%s-record.json", this.id))
-                    .getAbsolutePath();
+            this.recordPath = new File(this._path,
+                    String.format("%s-record.json", this.id)).getAbsolutePath();
 
             String json = BacktraceSerializeHelper.toJson(this);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
