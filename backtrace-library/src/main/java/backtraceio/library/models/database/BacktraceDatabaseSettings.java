@@ -1,6 +1,5 @@
 package backtraceio.library.models.database;
 
-import backtraceio.library.enums.database.DeduplicationStrategy;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 
