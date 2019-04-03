@@ -4,8 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
+import java.sql.Date;
 import java.util.Map;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -14,9 +16,11 @@ import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -113,44 +117,42 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     }
 
     private void setupTimer() {
-        return;
-        // TODO: Uncomment
-//        _timer = new Timer();
-//        _timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
-//                if (BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
-//                    Log.d("NULL OR ANOTHER WORKS", new Date(System.currentTimeMillis()).toString());
-//                    return;
-//                }
-//                Log.d("TIMER CONTINUE WORKING", new Date(System.currentTimeMillis()).toString());
-//                _timerBackgroundWork = true;
-//                _timer.cancel();
-//                _timer.purge();
-//                _timer = null;
-//
-//                BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
-//                while (record != null) {
-//                    BacktraceData backtraceData = record.getBacktraceData();
-//                    if (backtraceData == null || backtraceData.report == null) {
-//                        delete(record);
-//                    } else {
-//                        BacktraceResult result = BacktraceApi.send(backtraceData);
-//                        if (result.status == BacktraceResultStatus.Ok) {
-//                            delete(record);
-//                        } else {
-//                            record.close();
-//                            BacktraceDatabaseContext.incrementBatchRetry();
-//                            break;
-//                        }
-//                    }
-//                    record = BacktraceDatabaseContext.first();
-//                }
-//                _timerBackgroundWork = false;
-//                setupTimer();
-//            }
-//        }, DatabaseSettings.retryInterval * 1000, DatabaseSettings.retryInterval * 1000);
+        _timer = new Timer();
+        _timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
+                if (BacktraceDatabaseContext == null || BacktraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
+                    Log.d("NULL OR ANOTHER WORKS", new Date(System.currentTimeMillis()).toString());
+                    return;
+                }
+                Log.d("TIMER CONTINUE WORKING", new Date(System.currentTimeMillis()).toString());
+                _timerBackgroundWork = true;
+                _timer.cancel();
+                _timer.purge();
+                _timer = null;
+
+                BacktraceDatabaseRecord record = BacktraceDatabaseContext.first();
+                while (record != null) {
+                    BacktraceData backtraceData = record.getBacktraceData();
+                    if (backtraceData == null || backtraceData.report == null) {
+                        delete(record);
+                    } else {
+                        BacktraceResult result = BacktraceApi.send(backtraceData);
+                        if (result.status == BacktraceResultStatus.Ok) {
+                            delete(record);
+                        } else {
+                            record.close();
+                            BacktraceDatabaseContext.incrementBatchRetry();
+                            break;
+                        }
+                    }
+                    record = BacktraceDatabaseContext.first();
+                }
+                _timerBackgroundWork = false;
+                setupTimer();
+            }
+        }, DatabaseSettings.retryInterval * 1000, DatabaseSettings.retryInterval * 1000);
     }
 
     public void flush() {

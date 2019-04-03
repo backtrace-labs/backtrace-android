@@ -12,7 +12,9 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
@@ -69,6 +71,23 @@ public class BacktraceDatabaseTest {
         assertEquals(report, database.get().iterator().next().getBacktraceData().report);
         assertEquals(testMessage, database.get().iterator().next().getBacktraceData().report.message);
         assertEquals(1, database.count());
+    }
+
+    @Test
+    public void addWithAttributes(){
+        // GIVEN
+        String key = "Example key";
+        String value = "Example value";
+        BacktraceReport report = new BacktraceReport(testMessage);
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put(key, value);
+
+        // WHEN
+        BacktraceDatabaseRecord record = database.add(report, attributes);
+        BacktraceData dataFromDatabase = record.getBacktraceData();
+
+        // THEN
+        assertEquals(value, dataFromDatabase.attributes.get(key));
     }
 
     @Test

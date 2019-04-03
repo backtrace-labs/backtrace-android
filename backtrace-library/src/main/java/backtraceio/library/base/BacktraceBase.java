@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.events.OnAfterSendEventListener;
@@ -49,6 +52,11 @@ public class BacktraceBase implements IBacktraceClient {
     public IBacktraceDatabase database;
 
     /**
+     * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
+     */
+    public final Map<String, Object> attributes;
+
+    /**
      * Event which will be executed before sending data to Backtrace API
      */
     private OnBeforeSendEventListener beforeSendEventListener = null;
@@ -68,6 +76,19 @@ public class BacktraceBase implements IBacktraceClient {
     /**
      * Initialize new client instance with BacktraceCredentials
      *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param attributes  additional information about current application
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
+        this(context, credentials, (IBacktraceDatabase) null, attributes);
+        this.context = context;
+        this.backtraceApi = new BacktraceApi(credentials);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
      * @param context          context of current state of the application
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
@@ -79,12 +100,37 @@ public class BacktraceBase implements IBacktraceClient {
     /**
      * Initialize new client instance with BacktraceCredentials
      *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
+     * @param attributes       additional information about current application
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
      * @param context     context of current state of the application
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database) {
+        this(context, credentials, database, null);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     * @param attributes  additional information about current application
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database, Map<String, Object> attributes) {
         this.context = context;
+        this.attributes = attributes != null? attributes: new HashMap<String, Object>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
@@ -145,7 +191,7 @@ public class BacktraceBase implements IBacktraceClient {
     public BacktraceResult send(BacktraceReport report) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
 
-        BacktraceDatabaseRecord record = this.database.add(report, null); // TODO: check null attributes
+        BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
 
         if (this.beforeSendEventListener != null) {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);

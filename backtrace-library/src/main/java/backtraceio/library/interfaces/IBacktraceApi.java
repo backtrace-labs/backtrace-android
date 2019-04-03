@@ -38,7 +38,7 @@ public interface IBacktraceApi {
     /**
      * Set an event executed when server return information after sending data to API
      *
-     * @param onServerResponse // TODO:
+     * @param onServerResponse event which will be executed on server response
      */
     void setOnServerResponse(OnServerResponseEventListener onServerResponse);
 
@@ -46,7 +46,7 @@ public interface IBacktraceApi {
     /**
      * Set custom request method to prepare HTTP request to Backtrace API
      *
-     * @param requestHandler // TODO:
+     * @param requestHandler event which will be executed instead of default request to Backtrace API
      */
     void setRequestHandler(RequestHandler requestHandler);
 }
