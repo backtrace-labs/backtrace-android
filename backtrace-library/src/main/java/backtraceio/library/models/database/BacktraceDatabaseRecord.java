@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
@@ -25,7 +24,7 @@ public class BacktraceDatabaseRecord {
     /**
      * Check if current record is in use
      */
-    public transient boolean Locked = false;
+    public transient boolean locked = false;
 
     /**
      * Path to json stored all information about current record
@@ -177,8 +176,7 @@ public class BacktraceDatabaseRecord {
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
             this.size += file.length;
             return RecordWriter.write(file, prefix);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.e("Backtrace.IO", "Received IOException while saving data to database. ");
             Log.d("Backtrace.IO", String.format("Message %s", ex.getMessage()));
             return ""; // TODO: consider a better solution
@@ -220,14 +218,12 @@ public class BacktraceDatabaseRecord {
         }
     }
 
-    public boolean close(){
+    public boolean close() {
         try {
-            this.Locked = false;
+            this.locked = false;
             this.record = null;
             return true;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e("Backtrace.IO", "Can not unlock record");
         }
         return false;
@@ -261,7 +257,7 @@ public class BacktraceDatabaseRecord {
      */
     public static BacktraceDatabaseRecord readFromFile(File file) {
         String json = FileHelper.readFile(file);
-        if(json == null || json.equals("")){
+        if (json == null || json.equals("")) {
             return null;
         }
         return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
