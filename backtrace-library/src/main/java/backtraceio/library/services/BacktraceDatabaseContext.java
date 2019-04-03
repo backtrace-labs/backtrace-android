@@ -261,8 +261,13 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         return this.totalSize;
     }
 
-    public boolean removeLastRecord() {
-        BacktraceDatabaseRecord record = this.last();
+    /**
+     * Delete the oldest file
+     * @return is deletion was successful
+     */
+    public boolean removeOldestRecord() {
+        BacktraceDatabaseRecord record = this.first();
+
         if (record == null) {
             return false;
         }

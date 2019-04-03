@@ -12,13 +12,8 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
-import backtraceio.library.BacktraceClient;
-import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.database.RetryOrder;
-import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -177,18 +172,18 @@ public class BacktraceDatabaseContextTest {
     }
 
     @Test
-    public void removeLastFromDatabaseContext(){
+    public void removeOldestFromDatabaseContext(){
         // GIVEN
         List<BacktraceDatabaseRecord> records = fillDatabase();
 
         // WHEN
-        boolean result = databaseContext.removeLastRecord();
+        boolean result = databaseContext.removeOldestRecord();
 
         // THEN
         assertEquals(2, databaseContext.count());
         assertTrue(result);
-        assertTrue(databaseContext.contains(records.get(0)));
         assertTrue(databaseContext.contains(records.get(1)));
+        assertTrue(databaseContext.contains(records.get(2)));
     }
 
     @Test

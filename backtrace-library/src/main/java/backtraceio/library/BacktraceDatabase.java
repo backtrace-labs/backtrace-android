@@ -257,7 +257,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         // If record count == 0 then we ignore this condition
         if (backtraceDatabaseContext.count() + 1 > databaseSettings.getMaxRecordCount() &&
                 databaseSettings.getMaxRecordCount() != 0) {
-            if (!backtraceDatabaseContext.removeLastRecord()) {
+            if (!backtraceDatabaseContext.removeOldestRecord()) {
                 Log.e("Backtrace.IO", "Can't remove last record. Database size is invalid");
                 return false;
             }
@@ -267,10 +267,9 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                 .getDatabaseSize() > databaseSettings.getMaxDatabaseSize()) {
             int deletePolicyRetry = 5;
             while (backtraceDatabaseContext.getDatabaseSize() > databaseSettings.getMaxDatabaseSize()) {
-                backtraceDatabaseContext.removeLastRecord();
+                backtraceDatabaseContext.removeOldestRecord();
                 deletePolicyRetry--; // avoid infinity loop
-                if (deletePolicyRetry == 0)
-                {
+                if (deletePolicyRetry == 0) {
                     break;
                 }
             }
