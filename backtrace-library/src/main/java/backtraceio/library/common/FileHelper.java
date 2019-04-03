@@ -30,9 +30,11 @@ public class FileHelper {
      * @return filtered list of file paths
      */
     public static ArrayList<String> filterOutFiles(Context context, List<String> paths) {
-        paths = new ArrayList<>(new HashSet<>(paths)); // get only unique elements
-
         ArrayList<String> result = new ArrayList<>();
+        if(paths == null){
+            return result;
+        }
+        paths = new ArrayList<>(new HashSet<>(paths)); // get only unique elements
 
         for (String path : paths) {
             if (isFilePathInvalid(path) || (!isPathToInternalStorage(context, path) &&
