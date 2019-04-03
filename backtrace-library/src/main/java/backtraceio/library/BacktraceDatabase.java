@@ -40,7 +40,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
     private BacktraceDatabaseSettings databaseSettings;
 
     private String getDatabasePath() {
-        return databaseSettings.databasePath;
+        return databaseSettings.getDatabasePath();
     }
 
     private static boolean _timerBackgroundWork = false;
@@ -74,7 +74,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             throw new IllegalArgumentException("Database settings or application context is null");
         }
 
-        if (databaseSettings.databasePath.isEmpty() || !FileHelper.isFileExists(databaseSettings.databasePath)) {
+        if (databaseSettings.getDatabasePath().isEmpty() || !FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
             throw new IllegalArgumentException("Database path is empty or does not exists");
         }
 
@@ -82,7 +82,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         this.databaseSettings = databaseSettings;
         this.backtraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext, databaseSettings);
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
-                this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.maxRecordCount);
+                this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
     }
 
     public void start() {
@@ -99,8 +99,8 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
         this.removeOrphaned();
 
-        if (databaseSettings.retryBehavior == RetryBehavior.ByInterval || databaseSettings
-                .autoSendMode) {
+        if (databaseSettings.getRetryBehavior() == RetryBehavior.ByInterval || databaseSettings
+                .isAutoSendMode()) {
             setupTimer();
         }
 
@@ -152,7 +152,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                 _timerBackgroundWork = false;
                 setupTimer();
             }
-        }, databaseSettings.retryInterval * 1000, databaseSettings.retryInterval * 1000);
+        }, databaseSettings.getRetryInterval() * 1000, databaseSettings.getRetryInterval() * 1000);
     }
 
     public void flush() {
@@ -255,8 +255,8 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         // Check how many records are stored in database
         // Remove in case when we want to store one more than expected number
         // If record count == 0 then we ignore this condition
-        if (backtraceDatabaseContext.count() + 1 > databaseSettings.maxRecordCount &&
-                databaseSettings.maxRecordCount != 0) {
+        if (backtraceDatabaseContext.count() + 1 > databaseSettings.getMaxRecordCount() &&
+                databaseSettings.getMaxRecordCount() != 0) {
             if (!backtraceDatabaseContext.removeLastRecord()) {
                 Log.e("Backtrace.IO", "Can't remove last record. Database size is invalid");
                 return false;

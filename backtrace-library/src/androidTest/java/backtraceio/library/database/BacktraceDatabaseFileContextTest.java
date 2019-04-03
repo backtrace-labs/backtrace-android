@@ -42,7 +42,7 @@ public class BacktraceDatabaseFileContextTest {
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
         this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);
-        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.maxRecordCount);
+        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
         this.databaseContext.clear();
         this.databaseFileContext.clear();
     }
@@ -142,8 +142,8 @@ public class BacktraceDatabaseFileContextTest {
     @Test
     public void forceInconsistencyMaxRecordCount(){
         // GIVEN
-        this.databaseSettings.maxRecordCount = 1;
-        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.maxRecordCount);
+        this.databaseSettings.setMaxRecordCount(1);
+        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
         this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);
 
         BacktraceReport report = new BacktraceReport(testMessage);
@@ -162,7 +162,7 @@ public class BacktraceDatabaseFileContextTest {
     @Test
     public void forceInconsistencyMaxDatabaseSize(){
         // GIVEN
-        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 1, this.databaseSettings.maxRecordCount);
+        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 1, this.databaseSettings.getMaxRecordCount());
 
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
