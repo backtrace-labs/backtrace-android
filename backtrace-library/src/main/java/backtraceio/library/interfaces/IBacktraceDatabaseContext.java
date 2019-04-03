@@ -94,5 +94,5 @@ public interface IBacktraceDatabaseContext {
      *
      * @return If algorithm can remove last record, method return true. Otherwise false
      */
-    boolean removeLastRecord();
+    boolean removeOldestRecord();
 }
