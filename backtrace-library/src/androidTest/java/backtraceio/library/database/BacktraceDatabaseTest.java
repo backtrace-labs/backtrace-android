@@ -167,7 +167,7 @@ public class BacktraceDatabaseTest {
     public void recordLimit() {
         // GIVEN
         BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(dbPath);
-        settings.maxRecordCount = 1;
+        settings.setMaxRecordCount(1);
         this.database = new BacktraceDatabase(this.context, settings);
         this.database.start();
         this.database.clear();

@@ -58,7 +58,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @param settings database settings
      */
     public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
-        this(context, settings.databasePath, settings.retryLimit, settings.retryOrder);
+        this(context, settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
     }
 
     /**

@@ -19,12 +19,12 @@ public class BacktraceDatabaseSettings {
     /**
      * Directory path where reports are stored
      */
-    public String databasePath;
+    private String databasePath;
 
     /**
      * Maximum number of stored reports in Database. If value is equal to zero, then limit not exists
      */
-    public int maxRecordCount = 0;
+    private int maxRecordCount = 0;
 
     /**
      * Database size in MB
@@ -47,23 +47,97 @@ public class BacktraceDatabaseSettings {
     /**
      * Resend report when http client throw exception
      */
-    public boolean autoSendMode = false;
+    private boolean autoSendMode = false;
 
     /**
      * Retry behaviour
      */
-    public RetryBehavior retryBehavior = RetryBehavior.ByInterval;
+    private RetryBehavior retryBehavior = RetryBehavior.ByInterval;
 
     /**
      * How much seconds library should wait before next retry.
      */
-    public int retryInterval = 5; // TODO: prevent negative value
+    private int retryInterval = 5;
 
     /**
      * Maximum number of retries
      */
-    public int retryLimit = 3; // TODO: prevent negative value
+    private int retryLimit = 3;
 
 
-    public RetryOrder retryOrder = RetryOrder.Queue;
+    private RetryOrder retryOrder = RetryOrder.Queue;
+
+    public String getDatabasePath() {
+        return databasePath;
+    }
+
+    public void setDatabasePath(String databasePath) {
+        this.databasePath = databasePath;
+    }
+
+    public int getMaxRecordCount() {
+        return maxRecordCount;
+    }
+
+    public void setMaxRecordCount(int maxRecordCount) {
+        this.maxRecordCount = maxRecordCount;
+    }
+
+    public long get_maxDatabaseSize() {
+        return _maxDatabaseSize;
+    }
+
+    public void set_maxDatabaseSize(long _maxDatabaseSize) {
+        this._maxDatabaseSize = _maxDatabaseSize;
+    }
+
+    public boolean isAutoSendMode() {
+        return autoSendMode;
+    }
+
+    public void setAutoSendMode(boolean autoSendMode) {
+        this.autoSendMode = autoSendMode;
+    }
+
+    public RetryBehavior getRetryBehavior() {
+        return retryBehavior;
+    }
+
+    public void setRetryBehavior(RetryBehavior retryBehavior) {
+        this.retryBehavior = retryBehavior;
+    }
+
+    public int getRetryInterval() {
+        return retryInterval;
+    }
+
+    public void setRetryInterval(int retryInterval) {
+        if(retryInterval <= 0)
+        {
+            throw new IllegalArgumentException("Retry interval value must be grader than zero");
+        }
+        this.retryInterval = retryInterval;
+    }
+
+    public int getRetryLimit() {
+        return retryLimit;
+    }
+
+    public void setRetryLimit(int retryLimit) {
+        if(retryInterval <= 0)
+        {
+            throw new IllegalArgumentException("Retry limit value must be grader than zero");
+        }
+        this.retryLimit = retryLimit;
+    }
+
+    public RetryOrder getRetryOrder() {
+        return retryOrder;
+    }
+
+    public void setRetryOrder(RetryOrder retryOrder) {
+        this.retryOrder = retryOrder;
+    }
+
+
 }
