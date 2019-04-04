@@ -74,8 +74,15 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             throw new IllegalArgumentException("Database settings or application context is null");
         }
 
-        if (databaseSettings.getDatabasePath().isEmpty() || !FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
-            throw new IllegalArgumentException("Database path is empty or does not exists");
+        if (databaseSettings.getDatabasePath() == null || databaseSettings.getDatabasePath().isEmpty()) {
+            throw new IllegalArgumentException("Database path is null or empty");
+        }
+
+        if(!FileHelper.isFileExists(databaseSettings.getDatabasePath())){
+            boolean createDirs = new File(databaseSettings.getDatabasePath()).mkdirs();
+            if(!createDirs || !FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
+                throw new IllegalArgumentException("Incorrect database path or application doesn't have permission to write to this path");
+            }
         }
 
         this._applicationContext = context;
