@@ -16,3 +16,6 @@
 
 ## Version 1.0 - 27.01.2019
 - First release.
+
+## Version 1.2.0 - 07.04.2019
+- `BacktraceDatabase` - offline error report storage and auto re-submission support in the event of network outage and server unavailability,

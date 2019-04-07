@@ -48,14 +48,15 @@ catch (e: Exception) {
 3. [Differences and limitations of the SDKs version](#limitations)
 4. [Installation](#installation)
 5. [Running sample application](#sample-app)
-6. [Documentation](#documentation)
-7. [Architecture](#architecture)
+6. [Using Backtrace library](#using-backtrace)
+7. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
 * Light-weight Java client library that quickly submits exceptions and crashes to your Backtrace dashboard. Can include callstack, system metadata, custom metadata and file attachments if needed.<!--, and file attachments if needed.-->
 * Supports a wide range of Android SDKs.
 * Supports asynchronous Tasks.
+* Supports offline database for error report storage and re-submission in case of network outage
 * Fully customizable and extendable event handlers and base classes for custom implementations.
 
 # Supported SDKs <a name="supported-sdks"></a>
@@ -121,8 +122,8 @@ First start:
 - Select `Run` and then select your emulator or connected device.
 - You should see new errors in your Backtrace instance. Refresh the Project page or Query Builder to see new details in real-time.
 
-# Documentation  <a name="documentation"></a>
-## Initialize a new BacktraceClient <a name="documentation-initialization"></a>
+# Using Backtrace library  <a name="using-backtrace"></a>
+## Initialize a new BacktraceClient <a name="using-backtrace-initialization"></a>
 
 First create a `BacktraceCredential` instance with your `Backtrace endpoint URL` (e.g. https://xxx.sp.backtrace.io:6098) and `submission token`, and supply it as a parameter in the `BacktraceClient` constructor:
 
@@ -138,7 +139,29 @@ val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.i
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
-## Sending an error report <a name="documentation-sending-report"></a>
+## Database initialization <a name="using-backtrace-initialization"></a>
+
+BacktraceClient allows you to customize the initialization of BacktraceDatabase for local storage of error reports by supplying a BacktraceDatabaseSettings parameter, as follows:
+
+Java
+```java
+        BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+
+        Context context = getApplicationContext();
+        String dbPath = context.getFilesDir().getAbsolutePath(); // any path, eg. absolute path to the internal storage
+
+        BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(dbPath);
+        settings.setMaxRecordCount(100);
+        settings.setMaxDatabaseSize(100);
+        settings.setRetryBehavior(RetryBehavior.ByInterval);
+        settings.setAutoSendMode(true);
+        settings.setRetryOrder(RetryOrder.Queue);
+
+        BacktraceDatabase database = new BacktraceDatabase(context, settings);
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
+```
+
+## Sending an error report <a name="using-backtrace-sending-report"></a>
 
 Methods `BacktraceClient.send` and `BacktraceClient.sendAsync` will send an error report to the Backtrace endpoint specified. There `send` method is overloaded, see examples below:
 
@@ -269,23 +292,45 @@ BacktraceExceptionHandler.enable(backtraceClient);
 
 You can extend `BacktraceBase` to create your own Backtrace client and error report implementation. You can refer to `BacktraceClient` for implementation inspirations. 
 
-# Architecture  <a name="architecture"></a>
+# Documentation  <a name="documentation"></a>
 
-## BacktraceReport  <a name="architecture-BacktraceReport"></a>
+## BacktraceReport  <a name="documentation-BacktraceReport"></a>
 **`BacktraceReport`** is a class that describe a single error report.
 
-## BacktraceClient  <a name="architecture-BacktraceClient"></a>
+## BacktraceClient  <a name="documentation-BacktraceClient"></a>
 **`BacktraceClient`** is a class that allows you to instantiate a client instance that interacts with `BacktraceApi`. This class sets up connection to the Backtrace endpoint and manages error reporting behavior. `BacktraceClient` extends `BacktraceBase` class.
 
-## BacktraceData  <a name="architecture-BacktraceData"></a>
+## BacktraceData  <a name="documentation-BacktraceData"></a>
 **`BacktraceData`** is a serializable class that holds the data to create a diagnostic JSON to be sent to the Backtrace endpoint via `BacktraceApi`. You can add additional pre-processors for `BacktraceData` by attaching an event handler to the `BacktraceClient.setOnBeforeSendEventListener(event)` event. `BacktraceData` require `BacktraceReport` and `BacktraceClient` client attributes.
 
-## BacktraceApi  <a name="architecture-BacktraceApi"></a>
+## BacktraceApi  <a name="documentation-BacktraceApi"></a>
 **`BacktraceApi`** is a class that sends diagnostic JSON to the Backtrace endpoint. `BacktraceApi` is instantiated when the `BacktraceClient` constructor is called. You use the following event handlers in `BacktraceApi` to customize how you want to handle JSON data:
 - `RequestHandler` - attach an event handler to this event to override the default `BacktraceApi.send` and `BacktraceApi.sendAsync` methods.
 - `OnServerError` - attach an event handler to be invoked when the server returns with a `400 bad request`, `401 unauthorized` or other HTTP error codes.
 - `OnServerResponse` - attach an event handler to be invoked when the server returns with a valid response.
 
 
-## BacktraceResult  <a name="architecture-BacktraceResult"></a>
+## BacktraceResult  <a name="documentation-BacktraceResult"></a>
 **`BacktraceResult`** is a class that holds response and result from a `send` or `sendAsync` call. The class contains a `Status` property that indicates whether the call was completed (`OK`), the call returned with an error (`ServerError`), . Additionally, the class has a `Message` property that contains details about the status.
+
+## BacktraceDatabase  <a name="documentation-BacktraceDatabase"></a>
+
+**`BacktraceDatabase`** is a class that stores error report data in your local hard drive. If `DatabaseSettings` dones't contain a **valid** `DatabasePath` then `BacktraceDatabase` won't store error report data. 
+
+`BacktraceDatabase` stores error reports that were not sent successfully due to network outage or server unavailability. `BacktraceDatabase` periodically tries to resend reports 
+cached in the database.  In `BacktraceDatabaseSettings` you can set the maximum number of entries (`MaxRecordCount`) to be stored in the database. The database will retry sending 
+stored reports every `RetryInterval` seconds up to `RetryLimit` times, both customizable in the `BacktraceDatabaseSettings`. 
+
+`BacktraceDatabaseSettings` has the following properties:
+- `DatabasePath` - the local directory path where `BacktraceDatabase` stores error report data when reports fail to send
+- `MaxRecordCount` - Maximum number of stored reports in Database. If value is equal to `0`, then there is no limit.
+- `MaxDatabaseSize` - Maximum database size in MB. If value is equal to `0`, there is no limit.
+- `AutoSendMode` - if the value is `true`, `BacktraceDatabase` will automatically try to resend stored reports. Default is `false`.
+- `RetryBehavior` - 
+	- `RetryBehavior.ByInterval` - Default. `BacktraceDatabase` will try to resend the reports every time interval specified by `RetryInterval`.
+	- `RetryBehavior.NoRetry` - Will not attempt to resend reports
+- `RetryInterval` - the time interval between retries, in seconds.
+- `RetryLimit` - the maximum number of times `BacktraceDatabase` will attempt to resend error report before removing it from the database.
+
+
+If you want to clear your database or remove all reports after send method you can use `Clear` or `Flush` methods.
