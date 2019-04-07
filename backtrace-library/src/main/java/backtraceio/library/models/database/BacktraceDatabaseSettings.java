@@ -83,14 +83,6 @@ public class BacktraceDatabaseSettings {
         this.maxRecordCount = maxRecordCount;
     }
 
-    public long get_maxDatabaseSize() {
-        return _maxDatabaseSize;
-    }
-
-    public void set_maxDatabaseSize(long _maxDatabaseSize) {
-        this._maxDatabaseSize = _maxDatabaseSize;
-    }
-
     public boolean isAutoSendMode() {
         return autoSendMode;
     }
