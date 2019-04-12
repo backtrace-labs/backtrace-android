@@ -141,9 +141,11 @@ public class DeviceAttributesHelper {
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             String line = reader.readLine();
+            if (line == null) {
+                return 0.0f;
+            }
             return Float.parseFloat(line) / 1000.0f;
         } catch (Exception e) {
-            e.printStackTrace();
             return 0.0f;
         }
     }

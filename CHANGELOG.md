@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 1.2.1 - 12.04.2019
+- Check is temperature file is empty and remove print stacktrace
+- Change attribute name `app.version_name` to `version`
 
 ## Version 1.2.0 - 07.04.2019
 - `BacktraceDatabase` - offline error report storage and auto re-submission support in the event of network outage and server unavailability,
