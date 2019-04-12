@@ -83,7 +83,7 @@ public class BacktraceAttributes {
                 .getPackageManager()));
 
         try {
-            this.attributes.put("app.version_name", this.context.getPackageManager()
+            this.attributes.put("version", this.context.getPackageManager()
                     .getPackageInfo(this.context.getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
