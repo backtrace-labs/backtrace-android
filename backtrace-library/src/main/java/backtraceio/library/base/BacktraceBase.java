@@ -14,6 +14,7 @@ import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
+import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.interfaces.IBacktraceClient;
 import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.models.BacktraceData;
@@ -32,9 +33,9 @@ public class BacktraceBase implements IBacktraceClient {
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
-    private BacktraceApi backtraceApi;
+    private IBacktraceApi backtraceApi;
 
-    private void setBacktraceApi(BacktraceApi backtraceApi) {
+    private void setBacktraceApi(IBacktraceApi backtraceApi) {
         this.backtraceApi = backtraceApi;
         if (this.database != null) {
             this.database.setApi(this.backtraceApi);
