@@ -12,6 +12,7 @@ import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.IBacktraceApi;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
@@ -21,6 +22,9 @@ import backtraceio.library.wrappers.AsyncTaskRequestHandlerWrapper;
  * Backtrace Api class that allows to send a diagnostic data to server
  */
 public class BacktraceApi implements IBacktraceApi {
+
+    private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
+
     /**
      * URL to server
      */
@@ -58,6 +62,7 @@ public class BacktraceApi implements IBacktraceApi {
      */
     public BacktraceApi(BacktraceCredentials credentials) {
         if (credentials == null) {
+            BacktraceLogger.e(LOG_TAG, "BacktraceCredentials parameter passed to BacktraceApi constructor is null");
             throw new IllegalArgumentException("BacktraceCredentials cannot be null");
         }
         serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
@@ -88,6 +93,7 @@ public class BacktraceApi implements IBacktraceApi {
                     attachments, report);
             result = task.get();
         } catch (Exception e) {
+            BacktraceLogger.e(LOG_TAG, "Error during sending report", e);
             return BacktraceResult.OnError(report, e);
         }
         return result;
@@ -108,8 +114,10 @@ public class BacktraceApi implements IBacktraceApi {
      */
     public BacktraceResult send(BacktraceData data) {
         if (this.requestHandler != null) {
+            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
             return this.requestHandler.onRequest(data);
         }
+        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
         String json = BacktraceSerializeHelper.toJson(data);
         List<String> attachments = data.getAttachments();
         return send(UUID.randomUUID(), json, attachments, data.report);
@@ -124,8 +132,10 @@ public class BacktraceApi implements IBacktraceApi {
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
         if (this.requestHandler != null) {
+            BacktraceLogger.d(LOG_TAG, "Sending report using custom request handler");
             return new AsyncTaskRequestHandlerWrapper(this.requestHandler, data).execute();
         }
+        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
         String json = BacktraceSerializeHelper.toJson(data);
         List<String> attachments = data.getAttachments();
         return sendAsync(UUID.randomUUID(), json, attachments, data.report);

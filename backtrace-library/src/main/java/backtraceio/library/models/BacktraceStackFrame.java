@@ -4,10 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
 
+import backtraceio.library.logger.BacktraceLogger;
+
 /**
  * Backtrace stack frame
  */
 public class BacktraceStackFrame {
+
+    private static transient String LOG_TAG = BacktraceStackFrame.class.getSimpleName();
 
     /**
      * Function where exception occurs
@@ -43,6 +47,7 @@ public class BacktraceStackFrame {
      */
     public BacktraceStackFrame(StackTraceElement frame) {
         if (frame == null || frame.getMethodName() == null) {
+            BacktraceLogger.w(LOG_TAG, "Frame or method name is null");
             return;
         }
         this.functionName = frame.getClassName() + "." + frame.getMethodName();
