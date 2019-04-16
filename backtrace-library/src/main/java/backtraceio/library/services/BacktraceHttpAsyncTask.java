@@ -17,12 +17,16 @@ import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.HttpException;
 
 
 public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResult> {
+
+    private static transient String LOG_TAG = BacktraceHttpAsyncTask.class.getSimpleName();
+
     /**
      * Data which will be send to Backtrace API saved in JSON format
      */
@@ -102,6 +106,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             urlConnection.setRequestProperty("Content-Type",
                     MultiFormRequestHelper.getContentType());
 
+            BacktraceLogger.d(LOG_TAG, "HttpURLConnection successfully initialized");
             DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
 
             MultiFormRequestHelper.addJson(request, json);
@@ -112,6 +117,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             request.close();
 
             int statusCode = urlConnection.getResponseCode();
+            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + Integer.toString(statusCode));
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 result = BacktraceSerializeHelper.backtraceResultFromJson(
@@ -119,6 +125,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
                 );
                 result.setBacktraceReport(report);
                 if (this.onServerResponse != null) {
+                    BacktraceLogger.d(LOG_TAG, "Custom server response handler for response from Backtrace API");
                     this.onServerResponse.onEvent(result);
                 }
             } else {
@@ -131,14 +138,18 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
 
         } catch (Exception e) {
             if (this.onServerError != null) {
+                BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
                 this.onServerError.onEvent(e);
             }
+            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
             return BacktraceResult.OnError(report, e);
         } finally {
             if (urlConnection != null) {
                 try {
                     urlConnection.disconnect();
+                    BacktraceLogger.d(LOG_TAG, "Disconnecting HttpUrlConnection successful");
                 } catch (Exception e) {
+                    BacktraceLogger.e(LOG_TAG, "Disconnecting HttpUrlConnection failed", e);
                     return BacktraceResult.OnError(report, e);
                 }
             }
@@ -149,6 +160,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
     @Override
     public void onPostExecute(BacktraceResult result) {
         if (afterSend != null) {
+            BacktraceLogger.d(LOG_TAG, "Custom handler after send report to Backtrace API");
             afterSend.onEvent(result);
         }
         super.onPostExecute(result);
@@ -162,8 +174,9 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
      * @throws IOException
      */
     private String getResponse(HttpURLConnection urlConnection) throws IOException {
-        InputStream inputStream;
+        BacktraceLogger.d(LOG_TAG, "Reading response from HTTP request");
 
+        InputStream inputStream;
         if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
             inputStream = urlConnection.getInputStream();
         } else {

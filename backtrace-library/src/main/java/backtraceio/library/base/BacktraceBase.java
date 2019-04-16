@@ -30,6 +30,8 @@ import backtraceio.library.services.BacktraceApi;
  */
 public class BacktraceBase implements IBacktraceClient {
 
+    private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
+
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
@@ -219,6 +221,7 @@ public class BacktraceBase implements IBacktraceClient {
      * @return server response
      */
     public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report) {
+        // TODO: Add handle database like in send(..)!
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
         if (this.beforeSendEventListener != null) {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
