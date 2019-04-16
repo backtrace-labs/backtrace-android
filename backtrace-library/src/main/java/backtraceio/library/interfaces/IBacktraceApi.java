@@ -2,6 +2,7 @@ package backtraceio.library.interfaces;
 
 import android.os.AsyncTask;
 
+import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
@@ -49,4 +50,11 @@ public interface IBacktraceApi {
      * @param requestHandler event which will be executed instead of default request to Backtrace API
      */
     void setRequestHandler(RequestHandler requestHandler);
+
+    /**
+     * Set an event executed after sending data to API
+     * @param afterSend event which will be executed after sending data to API
+     */
+    void setAfterSend(OnAfterSendEventListener afterSend);
+
 }
