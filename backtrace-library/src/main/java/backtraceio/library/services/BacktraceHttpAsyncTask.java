@@ -71,6 +71,7 @@ public class BacktraceHttpAsyncTask extends AsyncTask<Void, Void, BacktraceResul
             attachments, BacktraceReport report, OnServerResponseEventListener onServerResponse,
                                   OnServerErrorEventListener onServerError,
                                   OnAfterSendEventListener afterSend) {
+        BacktraceLogger.d(LOG_TAG, "Initializing Http Async Task");
         this.requestId = requestId;
         this.json = json;
         this.attachments = attachments;
