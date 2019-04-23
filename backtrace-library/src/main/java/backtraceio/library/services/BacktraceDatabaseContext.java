@@ -10,11 +10,14 @@ import java.util.Map;
 
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
+
+    private static transient String LOG_TAG = BacktraceDatabaseContext.class.getSimpleName();
 
     /**
      * Application context
@@ -97,7 +100,9 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @throws NullPointerException if backtraceData is null
      */
     public BacktraceDatabaseRecord add(BacktraceData backtraceData) throws NullPointerException {
+        BacktraceLogger.d(LOG_TAG, "Adding new record to database context");
         if (backtraceData == null) {
+            BacktraceLogger.e(LOG_TAG, "BacktraceData is null");
             throw new NullPointerException("BacktraceData");
         }
 
@@ -114,7 +119,9 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @return database record
      */
     public BacktraceDatabaseRecord add(BacktraceDatabaseRecord backtraceDatabaseRecord) {
+        BacktraceLogger.d(LOG_TAG, "Adding new record to database context");
         if (backtraceDatabaseRecord == null) {
+            BacktraceLogger.e(LOG_TAG, "Backtrace database record is null");
             throw new NullPointerException("BacktraceDatabaseRecord");
         }
         backtraceDatabaseRecord.locked = true;
@@ -228,6 +235,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * Delete all records from database
      */
     public void clear() {
+        BacktraceLogger.d(LOG_TAG, "Deleting all records from database context");
         for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
             List<BacktraceDatabaseRecord> records = entry.getValue();
 
@@ -266,9 +274,11 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
      * @return is deletion was successful
      */
     public boolean removeOldestRecord() {
+        BacktraceLogger.d(LOG_TAG, "Removing oldest record from database context");
         BacktraceDatabaseRecord record = this.first();
 
         if (record == null) {
+            BacktraceLogger.w(LOG_TAG, "Oldest record in database is null");
             return false;
         }
         return delete(record);

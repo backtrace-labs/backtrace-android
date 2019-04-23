@@ -16,6 +16,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     private BacktraceClient client;
 
     private BacktraceExceptionHandler(BacktraceClient client) {
+        BacktraceLogger.d(LOG_TAG, "BacktraceExceptionHandler initialization");
         this.client = client;
         rootHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);

@@ -11,6 +11,8 @@ import java.util.Map;
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
@@ -23,6 +25,9 @@ import backtraceio.library.models.json.ThreadInformation;
  * Serializable Backtrace API data object
  */
 public class BacktraceData {
+
+    private static transient String LOG_TAG = BacktraceData.class.getSimpleName();
+
     /**
      * 16 bytes of randomness in human readable UUID format
      * server will reject request if uuid is already found
@@ -138,6 +143,7 @@ public class BacktraceData {
      * @param complexAttributes
      */
     private void setAnnotations(Map<String, Object> complexAttributes) {
+        BacktraceLogger.d(LOG_TAG, "Setting annotations");
         Object exceptionMessage = null;
 
         if (this.attributes != null &&
@@ -153,6 +159,7 @@ public class BacktraceData {
      * @param clientAttributes
      */
     private void setAttributes(Map<String, Object> clientAttributes) {
+        BacktraceLogger.d(LOG_TAG, "Setting attributes");
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(this.context, this.report,
                 clientAttributes);
         this.attributes = backtraceAttributes.attributes;
@@ -167,6 +174,7 @@ public class BacktraceData {
      * Set report information such as report identifier (UUID), timestamp, classifier
      */
     private void setReportInformation() {
+        BacktraceLogger.d(LOG_TAG, "Setting report information");
         uuid = report.uuid.toString();
         timestamp = report.timestamp;
         classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
@@ -178,6 +186,7 @@ public class BacktraceData {
      * Set information about all threads
      */
     private void setThreadsInformation() {
+        BacktraceLogger.d(LOG_TAG, "Setting threads information");
         ThreadData threadData = new ThreadData(report.diagnosticStack);
         this.mainThread = threadData.getMainThread();
         this.threadInformationMap = threadData.threadInformation;
