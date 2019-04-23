@@ -9,9 +9,13 @@ import java.util.regex.Pattern;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
 public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileContext {
+
+    private static transient String LOG_TAG = BacktraceDatabaseFileContext.class.getSimpleName();
 
     private final String _databasePath;
     private final long _maxDatabaseSize;
@@ -20,7 +24,6 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
     private final String recordFilterRegex = ".*-record.json";
 
     public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber) {
-
         _databasePath = databasePath;
         _maxDatabaseSize = maxDatabaseSize;
         _maxRecordNumber = maxRecordNumber;
@@ -42,6 +45,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
      * @return all existing physical records
      */
     public Iterable<File> getRecords() {
+        BacktraceLogger.d(LOG_TAG, "Getting files from file context");
         final Pattern p = Pattern.compile(this.recordFilterRegex);
         File[] pagesTemplates = this._databaseDirectory.listFiles(new FileFilter() {
             @Override
@@ -58,6 +62,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
      * @return is database consistent
      */
     public boolean validFileConsistency() {
+        BacktraceLogger.d(LOG_TAG, "Checking the consistency of files in file context");
         Iterable<File> files = this.getAll();
 
         long size = 0;
@@ -67,11 +72,13 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
             if (file.getName().matches(this.recordFilterRegex)) {
                 totalRecordFiles++;
                 if (_maxRecordNumber != 0 && _maxRecordNumber < totalRecordFiles) {
+                    BacktraceLogger.w(LOG_TAG, "Total number of records is bigger than allowed");
                     return false;
                 }
             }
             size += file.length();
             if (_maxDatabaseSize != 0 && size > _maxDatabaseSize) { // if _maxDatabaseSize == 0, size is unlimited
+                BacktraceLogger.w(LOG_TAG, "Database size is bigger than allowed");
                 return false;
             }
         }
@@ -84,6 +91,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
      * @param existingRecords existing entries in BacktraceDatabaseContext
      */
     public void removeOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords) {
+        BacktraceLogger.d(LOG_TAG, "Removing orphaned files from file context");
         List<String> recordStringIds = new ArrayList<>();
 
         for (BacktraceDatabaseRecord record : existingRecords) {
@@ -94,6 +102,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
         for (File file : files) {
             String extension = FileHelper.getFileExtension(file);
             if (!extension.equals("json")) {
+                BacktraceLogger.d(LOG_TAG, "Deleting file - it is not a JSON file");
                 file.delete();
                 continue;
             }
@@ -101,6 +110,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
             int fileNameIndex = file.getName().lastIndexOf('-');
 
             if (fileNameIndex == -1) {
+                BacktraceLogger.d(LOG_TAG, "Deleting file - name is incorrect");
                 file.delete();
                 continue;
             }
@@ -108,6 +118,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
             String fileUuid = file.getName().substring(0, fileNameIndex);
 
             if (!recordStringIds.contains(fileUuid)) {
+                BacktraceLogger.d(LOG_TAG, "Deleting file - file id is not in existing collection");
                 file.delete();
             }
         }
@@ -117,6 +128,7 @@ public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileConte
      * Remove all files from database directory
      */
     public void clear() {
+        BacktraceLogger.d(LOG_TAG, "Removing all files from database file context");
         Iterable<File> files = this.getAll();
         for (File file : files) {
             file.delete();
