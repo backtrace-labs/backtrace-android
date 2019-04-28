@@ -25,6 +25,8 @@ public class BacktraceApi implements IBacktraceApi {
 
     private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
 
+    private transient  BacktraceHandlerThread threadSender;
+
     /**
      * URL to server
      */
@@ -65,8 +67,10 @@ public class BacktraceApi implements IBacktraceApi {
             BacktraceLogger.e(LOG_TAG, "BacktraceCredentials parameter passed to BacktraceApi constructor is null");
             throw new IllegalArgumentException("BacktraceCredentials cannot be null");
         }
-        serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
+        this.serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
                 this.format, credentials.getSubmissionToken());
+
+        threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(), this.serverUrl);
     }
 
     public void setOnServerResponse(OnServerResponseEventListener onServerResponse) {
@@ -121,6 +125,18 @@ public class BacktraceApi implements IBacktraceApi {
         String json = BacktraceSerializeHelper.toJson(data);
         List<String> attachments = data.getAttachments();
         return send(UUID.randomUUID(), json, attachments, data.report);
+    }
+
+    public void sendWithThreadHandler(BacktraceData data) {
+        if (this.requestHandler != null) {
+            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
+            this.requestHandler.onRequest(data);
+        }
+        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
+        String json = BacktraceSerializeHelper.toJson(data);
+        List<String> attachments = data.getAttachments();
+
+        threadSender.sendReport(UUID.randomUUID(), json, attachments, data.report);
     }
 
 

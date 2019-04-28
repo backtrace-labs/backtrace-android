@@ -185,6 +185,12 @@ public class BacktraceBase implements IBacktraceClient {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
+    public void sendThreadHandler(BacktraceReport report) {
+        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
+
+        this.backtraceApi.sendWithThreadHandler(backtraceData);
+    }
+
     /**
      * Sending an exception to Backtrace API
      *
