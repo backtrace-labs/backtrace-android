@@ -61,6 +61,10 @@ public class BacktraceClient extends BacktraceBase {
         super.sendThreadHandler(new BacktraceReport(message));
     }
 
+    public void sendUncaughted(String message) {
+        super.sendUncaughted(new BacktraceReport(message));
+    }
+
     /**
      * Sending an exception to Backtrace API
      *

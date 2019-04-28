@@ -70,7 +70,7 @@ public class BacktraceApi implements IBacktraceApi {
         this.serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
                 this.format, credentials.getSubmissionToken());
 
-        threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(), this.serverUrl);
+        threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(), this.serverUrl, this.onServerResponse);
     }
 
     public void setOnServerResponse(OnServerResponseEventListener onServerResponse) {
@@ -126,6 +126,14 @@ public class BacktraceApi implements IBacktraceApi {
         List<String> attachments = data.getAttachments();
         return send(UUID.randomUUID(), json, attachments, data.report);
     }
+
+    public void sendUncaughted(BacktraceData data){
+        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
+        String json = BacktraceSerializeHelper.toJson(data);
+        List<String> attachments = data.getAttachments();
+        BacktraceReportSender.sendReport(serverUrl, json, attachments, data.report);
+    }
+
 
     public void sendWithThreadHandler(BacktraceData data) {
         if (this.requestHandler != null) {

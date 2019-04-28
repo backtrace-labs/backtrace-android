@@ -2,33 +2,33 @@ package backtraceio.library.services;
 
 import android.os.HandlerThread;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 
-import backtraceio.library.models.BacktraceData;
+import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceHandlerThread extends HandlerThread {
 
-    BacktraceHandler mHandler;
-    String url;
+    private BacktraceHandler mHandler;
+    private String url;
+    private OnServerResponseEventListener serverResponseEventListener;
 
-    public BacktraceHandlerThread(String name, String url) {
+    public BacktraceHandlerThread(String name, String url, OnServerResponseEventListener serverResponseEventListener) {
         super(name);
         this.url = url;
+        this.serverResponseEventListener = serverResponseEventListener;
         this.start();
     }
 
     @Override
     protected void onLooperPrepared() {
         super.onLooperPrepared();
-        mHandler = new BacktraceHandler(this.getLooper(), this.url);
+        mHandler = new BacktraceHandler(this.getLooper(), this.url, serverResponseEventListener);
     }
 
     public void sendReport(UUID requestId, String json, List<String>
@@ -42,10 +42,12 @@ public class BacktraceHandlerThread extends HandlerThread {
 
     private class BacktraceHandler extends Handler {
         String url;
+        OnServerResponseEventListener serverResponseEventListener;
 
-        private BacktraceHandler(Looper looper, String url) {
+        private BacktraceHandler(Looper looper, String url, OnServerResponseEventListener serverResponseEventListener) {
             super(looper);
             this.url = url;
+            this.serverResponseEventListener = serverResponseEventListener;
         }
 
         @Override
