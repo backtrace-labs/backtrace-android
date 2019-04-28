@@ -158,6 +158,10 @@ public class BacktraceBase implements IBacktraceClient {
         this.backtraceApi.setOnServerResponse(eventListener);
     }
 
+    public void sendUncaughted(BacktraceReport report){
+        this.backtraceApi.sendUncaughted(new BacktraceData(this.context, report, null));
+    };
+
     /**
      * Set an event executed after sending data to Backtrace API
      *

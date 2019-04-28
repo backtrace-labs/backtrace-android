@@ -1,6 +1,7 @@
 package backtraceio.library.models;
 
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -42,10 +43,10 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     public void uncaughtException(final Thread thread, final Throwable throwable) {
         if (throwable instanceof Exception) {
             BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-            this.client.send(new BacktraceReport((Exception) throwable));
-            BacktraceLogger.e(LOG_TAG, "Uncaught exception sent to Backtrace API", throwable);
+            this.client.sendWithThreadHandler("UNCAUGHT"); // TODO:!!!!!
+            BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
         }
         BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
-        rootHandler.uncaughtException(thread, throwable);
+//        rootHandler.uncaughtException(thread, throwable);
     }
 }

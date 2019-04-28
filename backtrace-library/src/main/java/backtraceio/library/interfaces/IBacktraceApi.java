@@ -32,6 +32,8 @@ public interface IBacktraceApi {
      */
     AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data);
 
+    void sendUncaughted(BacktraceData data);
+
     /**
      * Set an event executed when received bad request, unauthorized request or other information
      * from server
