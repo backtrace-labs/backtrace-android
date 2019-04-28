@@ -22,12 +22,13 @@ public class BacktraceHandlerThread extends HandlerThread {
     public BacktraceHandlerThread(String name, String url) {
         super(name);
         this.url = url;
+        this.start();
     }
 
     @Override
     protected void onLooperPrepared() {
         super.onLooperPrepared();
-        mHandler = new BacktraceHandler(getLooper(), this.url);
+        mHandler = new BacktraceHandler(this.getLooper(), this.url);
     }
 
     public void sendReport(UUID requestId, String json, List<String>

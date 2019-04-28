@@ -82,7 +82,7 @@ public class BacktraceReportSender {
 //                this.onServerError.onEvent(e);
 //            }
             BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
-            return BacktraceResult.OnError(report, e);
+            result = BacktraceResult.OnError(report, e);
         } finally {
             if (urlConnection != null) {
                 try {
@@ -90,7 +90,7 @@ public class BacktraceReportSender {
                     BacktraceLogger.d(LOG_TAG, "Disconnecting HttpUrlConnection successful");
                 } catch (Exception e) {
                     BacktraceLogger.e(LOG_TAG, "Disconnecting HttpUrlConnection failed", e);
-                    return BacktraceResult.OnError(report, e);
+                    result = BacktraceResult.OnError(report, e);
                 }
             }
         }

@@ -57,6 +57,10 @@ public class BacktraceClient extends BacktraceBase {
         return super.send(new BacktraceReport(message));
     }
 
+    public void sendWithThreadHandler(String message) {
+        super.sendThreadHandler(new BacktraceReport(message));
+    }
+
     /**
      * Sending an exception to Backtrace API
      *

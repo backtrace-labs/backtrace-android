@@ -22,6 +22,8 @@ public interface IBacktraceApi {
      */
     BacktraceResult send(BacktraceData data);
 
+    void sendWithThreadHandler(BacktraceData data);
+
     /**
      * Send asynchronous Backtrace report to Backtrace API
      *
