@@ -200,7 +200,15 @@ public class BacktraceBase implements IBacktraceClient {
      *
      * @param report current BacktraceReport
      */
-    public void send(BacktraceReport report) {
+    public void send(BacktraceReport report){
+        send(report, null);
+    }
+    /**
+     * Sending an exception to Backtrace API
+     *
+     * @param report current BacktraceReport
+     */
+    public void send(BacktraceReport report, OnServerResponseEventListener callback) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
 
         BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
@@ -209,7 +217,7 @@ public class BacktraceBase implements IBacktraceClient {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
         }
 
-        this.backtraceApi.send(backtraceData);
+        this.backtraceApi.send(backtraceData, callback);
 
     // TODO: UNCOMMENT
     //

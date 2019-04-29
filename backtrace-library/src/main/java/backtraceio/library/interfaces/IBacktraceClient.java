@@ -2,6 +2,7 @@ package backtraceio.library.interfaces;
 
 import android.os.AsyncTask;
 
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 

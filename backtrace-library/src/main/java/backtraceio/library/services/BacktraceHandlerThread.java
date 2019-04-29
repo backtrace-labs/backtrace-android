@@ -30,20 +30,20 @@ public class BacktraceHandlerThread extends HandlerThread {
     }
 
     public void sendReport(String json, List<String>
-            attachments, BacktraceReport report) {
+            attachments, BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
 
         Message message = new Message();
-        message.obj = new BacktraceHandlerInput(json, attachments, report);
+        message.obj = new BacktraceHandlerInput(json, attachments, report, serverResponseEventListener);
         mHandler.sendMessage(message);
     }
 
-    public void setServerResponseEventListener(OnServerResponseEventListener serverResponseEventListener){
-        mHandler.setServerResponseEventListener(serverResponseEventListener);
-    }
+//    public void setServerResponseEventListener(OnServerResponseEventListener serverResponseEventListener){
+//        mHandler.setServerResponseEventListener(serverResponseEventListener);
+//    }
 
     private class BacktraceHandler extends Handler {
         String url;
-        private OnServerResponseEventListener serverResponseEventListener;
+//        private OnServerResponseEventListener serverResponseEventListener;
 
         private BacktraceHandler(Looper looper, String url) {
             super(looper);
@@ -51,19 +51,13 @@ public class BacktraceHandlerThread extends HandlerThread {
 
         }
 
-        public void setServerResponseEventListener(OnServerResponseEventListener serverResponseEventListener){
-            this.serverResponseEventListener = serverResponseEventListener;
-        }
-
         @Override
         public void handleMessage(Message msg) {
             BacktraceHandlerInput mInput = (BacktraceHandlerInput) msg.obj;
             BacktraceResult result = BacktraceReportSender.sendReport(url, mInput.json, mInput.attachments, mInput.report);
 
-            if(!(mInput.report.exception instanceof IllegalArgumentException)) {
-                if (this.serverResponseEventListener != null) {
-                    this.serverResponseEventListener.onEvent(result);
-                }
+            if(mInput.serverResponseEventListener != null) {
+                    mInput.serverResponseEventListener.onEvent(result);
             }
         }
     }

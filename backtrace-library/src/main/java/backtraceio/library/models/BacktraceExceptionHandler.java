@@ -44,13 +44,11 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
      */
     @Override
     public void uncaughtException(final Thread thread, final Throwable throwable) {
-        OnServerResponseEventListener serverResponseEventListener = getCallbackToDefaultHandler(thread, throwable);
-
-        this.client.setOnServerResponseEventListner(serverResponseEventListener);
+        OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
 
         if (throwable instanceof Exception) {
             BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-            this.client.send(new BacktraceReport((Exception) throwable));
+            this.client.send(new BacktraceReport((Exception) throwable), callback);
             BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
         }
         BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
@@ -62,11 +60,11 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         }
     }
 
-    public OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable){
+    private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable){
         return new OnServerResponseEventListener() {
             @Override
             public void onEvent(BacktraceResult backtraceResult) {
-                BacktraceLogger.d(LOG_TAG, "ROOT HANDLER EVENT CALLBACK");
+                BacktraceLogger.d(LOG_TAG, "Root handler event callback");
                 rootHandler.uncaughtException(thread, throwable);
                 signal.countDown();
             }
