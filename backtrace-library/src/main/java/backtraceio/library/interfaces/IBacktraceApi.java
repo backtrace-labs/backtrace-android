@@ -22,7 +22,7 @@ public interface IBacktraceApi {
      */
     BacktraceResult send(BacktraceData data);
 
-    void sendWithThreadHandler(BacktraceData data);
+    void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener);
 
     /**
      * Send asynchronous Backtrace report to Backtrace API

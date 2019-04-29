@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.IBacktraceDatabase;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -57,8 +59,8 @@ public class BacktraceClient extends BacktraceBase {
         return super.send(new BacktraceReport(message));
     }
 
-    public void sendWithThreadHandler(String message) {
-        super.sendThreadHandler(new BacktraceReport(message));
+    public void sendWithThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
+        super.sendThreadHandler(report, serverResponseEventListener);
     }
 
     public void sendUncaughted(String message) {
