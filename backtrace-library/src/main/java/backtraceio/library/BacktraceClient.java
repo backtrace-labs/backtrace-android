@@ -55,7 +55,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param message custom client message
      */
     public void send(String message) {
-        super.send(new BacktraceReport(message));
+        super.send(new BacktraceReport(message), null);
     }
 
 //    public void sendWithThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
@@ -68,7 +68,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param exception current exception
      */
     public void send(Exception exception) {
-        super.send(new BacktraceReport(exception));
+        super.send(new BacktraceReport(exception), null);
     }
 
     /**
@@ -77,6 +77,15 @@ public class BacktraceClient extends BacktraceBase {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report) {
-        super.send(report);
+        send(report, null);
+    }
+
+    /**
+     * Sending a Backtrace report to Backtrace API
+     *
+     * @param report current BacktraceReport
+     */
+    public void send(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
+        super.send(report, serverResponseEventListener);
     }
 }

@@ -74,7 +74,6 @@ public class BacktraceApi implements IBacktraceApi {
 
     public void setOnServerResponse(OnServerResponseEventListener onServerResponse) {
         this.onServerResponse = onServerResponse;
-        this.threadSender.setServerResponseEventListener(this.onServerResponse);
     }
 
     public void setOnServerError(OnServerErrorEventListener onServerError) {
@@ -95,7 +94,7 @@ public class BacktraceApi implements IBacktraceApi {
      *
      * @param data diagnostic data
      */
-    public void send(BacktraceData data) {
+    public void send(BacktraceData data, OnServerResponseEventListener callback) {
         if (this.requestHandler != null) {
             BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
             this.requestHandler.onRequest(data);
@@ -103,7 +102,7 @@ public class BacktraceApi implements IBacktraceApi {
         BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
         String json = BacktraceSerializeHelper.toJson(data);
         List<String> attachments = data.getAttachments();
-        send(json, attachments, data.report);
+        send(json, attachments, data.report, callback);
     }
 
     /**
@@ -114,8 +113,8 @@ public class BacktraceApi implements IBacktraceApi {
      * @param report
      */
     private void send(String json, List<String> attachments,
-                      BacktraceReport report) {
-        threadSender.sendReport(json, attachments, report);
+                      BacktraceReport report, OnServerResponseEventListener callback) {
+        threadSender.sendReport(json, attachments, report, callback);
     }
 
 //    public void sendUncaughted(BacktraceData data){

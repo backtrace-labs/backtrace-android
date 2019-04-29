@@ -19,7 +19,7 @@ public interface IBacktraceApi {
      *
      * @param data diagnostic data
      */
-    void send(BacktraceData data);
+    void send(BacktraceData data, OnServerResponseEventListener callback);
 
 //    void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener);
 //

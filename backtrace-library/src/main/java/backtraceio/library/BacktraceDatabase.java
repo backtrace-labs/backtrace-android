@@ -15,6 +15,7 @@ import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -29,6 +30,8 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  * Backtrace Database
  */
 public class BacktraceDatabase implements IBacktraceDatabase {
+
+    private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
 
     private IBacktraceApi BacktraceApi;
 
@@ -129,12 +132,12 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         _timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Log.d("TIMER", new Date(System.currentTimeMillis()).toString());
+                BacktraceLogger.d(LOG_TAG, "Timer:" + new Date(System.currentTimeMillis()).toString());
                 if (backtraceDatabaseContext == null || backtraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
-                    Log.d("NULL OR ANOTHER WORKS", new Date(System.currentTimeMillis()).toString());
+                    BacktraceLogger.d(LOG_TAG, "Null or another timer works: " +  new Date(System.currentTimeMillis()).toString());
                     return;
                 }
-                Log.d("TIMER CONTINUE WORKING", new Date(System.currentTimeMillis()).toString());
+                BacktraceLogger.d(LOG_TAG, "Timer continue working: " +  new Date(System.currentTimeMillis()).toString());
                 _timerBackgroundWork = true;
                 _timer.cancel();
                 _timer.purge();
@@ -146,7 +149,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                     if (backtraceData == null || backtraceData.report == null) {
                         delete(record);
                     } else {
-                        BacktraceApi.send(backtraceData);
+                        BacktraceApi.send(backtraceData, null);
                         // TODO!!!!
 //                        if (result.status == BacktraceResultStatus.Ok) {
 //                            delete(record);
@@ -175,7 +178,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             BacktraceData backtraceData = record.getBacktraceData();
             this.delete(record);
             if (backtraceData != null) {
-                BacktraceApi.send(backtraceData);
+                BacktraceApi.send(backtraceData, null);
             }
             record = backtraceDatabaseContext.first();
         }
@@ -267,7 +270,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         if (backtraceDatabaseContext.count() + 1 > databaseSettings.getMaxRecordCount() &&
                 databaseSettings.getMaxRecordCount() != 0) {
             if (!backtraceDatabaseContext.removeOldestRecord()) {
-                Log.e("Backtrace.IO", "Can't remove last record. Database size is invalid");
+                BacktraceLogger.e(LOG_TAG, "Can't remove last record. Database size is invalid");
                 return false;
             }
         }
