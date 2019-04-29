@@ -189,10 +189,10 @@ public class BacktraceBase implements IBacktraceClient {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
-    public void sendThreadHandler(BacktraceReport report) {
+    public void sendThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
 
-        this.backtraceApi.sendWithThreadHandler(backtraceData);
+        this.backtraceApi.sendWithThreadHandler(backtraceData, serverResponseEventListener);
     }
 
     /**

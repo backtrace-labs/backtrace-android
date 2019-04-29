@@ -135,7 +135,7 @@ public class BacktraceApi implements IBacktraceApi {
     }
 
 
-    public void sendWithThreadHandler(BacktraceData data) {
+    public void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener) {
         if (this.requestHandler != null) {
             BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
             this.requestHandler.onRequest(data);
@@ -144,7 +144,7 @@ public class BacktraceApi implements IBacktraceApi {
         String json = BacktraceSerializeHelper.toJson(data);
         List<String> attachments = data.getAttachments();
 
-        threadSender.sendReport(UUID.randomUUID(), json, attachments, data.report);
+        threadSender.sendReport(UUID.randomUUID(), json, attachments, data.report, serverResponseEventListener);
     }
 
 
