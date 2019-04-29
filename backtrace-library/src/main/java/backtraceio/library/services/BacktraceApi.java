@@ -116,24 +116,4 @@ public class BacktraceApi implements IBacktraceApi {
                       BacktraceReport report, OnServerResponseEventListener callback) {
         threadSender.sendReport(json, attachments, report, callback);
     }
-
-//    public void sendUncaughted(BacktraceData data){
-//        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
-//        String json = BacktraceSerializeHelper.toJson(data);
-//        List<String> attachments = data.getAttachments();
-//        BacktraceReportSender.sendReport(serverUrl, json, attachments, data.report);
-//    }
-
-
-//    public void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener) {
-//        if (this.requestHandler != null) {
-//            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
-//            this.requestHandler.onRequest(data);
-//        }
-//        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
-//        String json = BacktraceSerializeHelper.toJson(data);
-//        List<String> attachments = data.getAttachments();
-//
-//        threadSender.sendReport(json, attachments, data.report, serverResponseEventListener);
-//    }
 }
