@@ -21,6 +21,7 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.services.BacktraceApi;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -145,14 +146,15 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                     if (backtraceData == null || backtraceData.report == null) {
                         delete(record);
                     } else {
-                        BacktraceResult result = BacktraceApi.send(backtraceData);
-                        if (result.status == BacktraceResultStatus.Ok) {
-                            delete(record);
-                        } else {
-                            record.close();
-                            backtraceDatabaseContext.incrementBatchRetry();
-                            break;
-                        }
+                        BacktraceApi.send(backtraceData);
+                        // TODO!!!!
+//                        if (result.status == BacktraceResultStatus.Ok) {
+//                            delete(record);
+//                        } else {
+//                            record.close();
+//                            backtraceDatabaseContext.incrementBatchRetry();
+//                            break;
+//                        }
                     }
                     record = backtraceDatabaseContext.first();
                 }
