@@ -53,67 +53,30 @@ public class BacktraceClient extends BacktraceBase {
      * Sending a message to Backtrace API
      *
      * @param message custom client message
-     * @return server response
      */
-    public BacktraceResult send(String message) {
-        return super.send(new BacktraceReport(message));
+    public void send(String message) {
+        super.send(new BacktraceReport(message));
     }
 
-    public void sendWithThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
-        super.sendThreadHandler(report, serverResponseEventListener);
-    }
-
-    public void sendUncaughted(String message) {
-        super.sendUncaughted(new BacktraceReport(message));
-    }
+//    public void sendWithThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
+//        super.sendThreadHandler(report, serverResponseEventListener);
+//    }
 
     /**
      * Sending an exception to Backtrace API
      *
      * @param exception current exception
-     * @return server response
      */
-    public BacktraceResult send(Exception exception) {
-        return super.send(new BacktraceReport(exception));
+    public void send(Exception exception) {
+        super.send(new BacktraceReport(exception));
     }
 
     /**
      * Sending a Backtrace report to Backtrace API
      *
      * @param report current BacktraceReport
-     * @return server response
      */
-    public BacktraceResult send(BacktraceReport report) {
-        return super.send(report);
-    }
-
-    /**
-     * Sending asynchronously a message to Backtrace API
-     *
-     * @param message custom client message
-     * @return async task which send data to Backtrace API and return server response
-     */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message) {
-        return super.sendAsync(new BacktraceReport(message));
-    }
-
-    /**
-     * Sending asynchronously an Exception to Backtrace API
-     *
-     * @param exception current exception
-     * @return async task which send data to Backtrace API and return server response
-     */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception) {
-        return super.sendAsync(new BacktraceReport(exception));
-    }
-
-    /**
-     * Sending asynchronously a Backtrace report to Backtrace API
-     *
-     * @param report current BacktraceReport
-     * @return async task which send data to Backtrace API and return server response
-     */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report) {
-        return super.sendAsync(report);
+    public void send(BacktraceReport report) {
+        super.send(report);
     }
 }

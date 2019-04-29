@@ -16,12 +16,10 @@ public class BacktraceHandlerThread extends HandlerThread {
 
     private BacktraceHandler mHandler;
     private String url;
-    private OnServerResponseEventListener serverResponseEventListener;
 
     public BacktraceHandlerThread(String name, String url, OnServerResponseEventListener serverResponseEventListener) {
         super(name);
         this.url = url;
-        this.serverResponseEventListener = serverResponseEventListener;
         this.start();
     }
 
@@ -31,14 +29,16 @@ public class BacktraceHandlerThread extends HandlerThread {
         mHandler = new BacktraceHandler(this.getLooper(), this.url);
     }
 
-    public void sendReport(UUID requestId, String json, List<String>
-            attachments, BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
+    public void sendReport(String json, List<String>
+            attachments, BacktraceReport report) {
 
-        BacktraceHandlerInput mInput = new BacktraceHandlerInput(requestId, json, attachments, report);
         Message message = new Message();
-        message.obj = mInput;
-        mHandler.setEvent(serverResponseEventListener);
+        message.obj = new BacktraceHandlerInput(json, attachments, report);
         mHandler.sendMessage(message);
+    }
+
+    public void setServerResponseEventListener(OnServerResponseEventListener serverResponseEventListener){
+        mHandler.setServerResponseEventListener(serverResponseEventListener);
     }
 
     private class BacktraceHandler extends Handler {
@@ -51,7 +51,7 @@ public class BacktraceHandlerThread extends HandlerThread {
 
         }
 
-        public void setEvent(OnServerResponseEventListener serverResponseEventListener){
+        public void setServerResponseEventListener(OnServerResponseEventListener serverResponseEventListener){
             this.serverResponseEventListener = serverResponseEventListener;
         }
 

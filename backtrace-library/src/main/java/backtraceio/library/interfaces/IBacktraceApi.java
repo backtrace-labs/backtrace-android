@@ -18,21 +18,12 @@ public interface IBacktraceApi {
      * Send a Backtrace report to Backtrace API
      *
      * @param data diagnostic data
-     * @return server response
      */
-    BacktraceResult send(BacktraceData data);
+    void send(BacktraceData data);
 
-    void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener);
-
-    /**
-     * Send asynchronous Backtrace report to Backtrace API
-     *
-     * @param data diagnostic data
-     * @return AsyncTask which returns server response after execution
-     */
-    AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data);
-
-    void sendUncaughted(BacktraceData data);
+//    void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener);
+//
+//    void sendUncaughted(BacktraceData data);
 
     /**
      * Set an event executed when received bad request, unauthorized request or other information

@@ -16,7 +16,6 @@ import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.wrappers.AsyncTaskRequestHandlerWrapper;
 
 /**
  * Backtrace Api class that allows to send a diagnostic data to server
@@ -25,7 +24,7 @@ public class BacktraceApi implements IBacktraceApi {
 
     private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
 
-    private transient  BacktraceHandlerThread threadSender;
+    private transient BacktraceHandlerThread threadSender;
 
     /**
      * URL to server
@@ -75,6 +74,7 @@ public class BacktraceApi implements IBacktraceApi {
 
     public void setOnServerResponse(OnServerResponseEventListener onServerResponse) {
         this.onServerResponse = onServerResponse;
+        this.threadSender.setServerResponseEventListener(this.onServerResponse);
     }
 
     public void setOnServerError(OnServerErrorEventListener onServerError) {
@@ -89,53 +89,13 @@ public class BacktraceApi implements IBacktraceApi {
         this.requestHandler = requestHandler;
     }
 
-    private BacktraceResult send(UUID requestId, String json, List<String> attachments,
-                                 BacktraceReport report) {
-        BacktraceResult result;
-        try {
-            AsyncTask<Void, Void, BacktraceResult> task = sendAsync(requestId, json,
-                    attachments, report);
-            result = task.get();
-        } catch (Exception e) {
-            BacktraceLogger.e(LOG_TAG, "Error during sending report", e);
-            return BacktraceResult.OnError(report, e);
-        }
-        return result;
-    }
-
-    private AsyncTask<Void, Void, BacktraceResult> sendAsync(UUID requestId, String json,
-                                                             List<String> attachments,
-                                                             BacktraceReport report) {
-        return new BacktraceHttpAsyncTask(serverUrl, requestId, json, attachments, report,
-                this.onServerResponse, this.onServerError, this.afterSend).execute();
-    }
 
     /**
      * Sending synchronously a diagnostic report data to Backtrace server API.
      *
      * @param data diagnostic data
-     * @return server response
      */
-    public BacktraceResult send(BacktraceData data) {
-        if (this.requestHandler != null) {
-            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
-            return this.requestHandler.onRequest(data);
-        }
-        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
-        String json = BacktraceSerializeHelper.toJson(data);
-        List<String> attachments = data.getAttachments();
-        return send(UUID.randomUUID(), json, attachments, data.report);
-    }
-
-    public void sendUncaughted(BacktraceData data){
-        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
-        String json = BacktraceSerializeHelper.toJson(data);
-        List<String> attachments = data.getAttachments();
-        BacktraceReportSender.sendReport(serverUrl, json, attachments, data.report);
-    }
-
-
-    public void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener) {
+    public void send(BacktraceData data) {
         if (this.requestHandler != null) {
             BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
             this.requestHandler.onRequest(data);
@@ -143,25 +103,38 @@ public class BacktraceApi implements IBacktraceApi {
         BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
         String json = BacktraceSerializeHelper.toJson(data);
         List<String> attachments = data.getAttachments();
-
-        threadSender.sendReport(UUID.randomUUID(), json, attachments, data.report, serverResponseEventListener);
+        send(json, attachments, data.report);
     }
-
 
     /**
-     * Sending asynchronously a diagnostic report data to Backtrace server API.
+     * Sending synchronously a diagnostic report data to Backtrace server API.
      *
-     * @param data diagnostic data
-     * @return AsyncTask which returns server response after execution
+     * @param json
+     * @param attachments
+     * @param report
      */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceData data) {
-        if (this.requestHandler != null) {
-            BacktraceLogger.d(LOG_TAG, "Sending report using custom request handler");
-            return new AsyncTaskRequestHandlerWrapper(this.requestHandler, data).execute();
-        }
-        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
-        String json = BacktraceSerializeHelper.toJson(data);
-        List<String> attachments = data.getAttachments();
-        return sendAsync(UUID.randomUUID(), json, attachments, data.report);
+    private void send(String json, List<String> attachments,
+                      BacktraceReport report) {
+        threadSender.sendReport(json, attachments, report);
     }
+
+//    public void sendUncaughted(BacktraceData data){
+//        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
+//        String json = BacktraceSerializeHelper.toJson(data);
+//        List<String> attachments = data.getAttachments();
+//        BacktraceReportSender.sendReport(serverUrl, json, attachments, data.report);
+//    }
+
+
+//    public void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener) {
+//        if (this.requestHandler != null) {
+//            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
+//            this.requestHandler.onRequest(data);
+//        }
+//        BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
+//        String json = BacktraceSerializeHelper.toJson(data);
+//        List<String> attachments = data.getAttachments();
+//
+//        threadSender.sendReport(json, attachments, data.report, serverResponseEventListener);
+//    }
 }

@@ -157,10 +157,10 @@ public class BacktraceBase implements IBacktraceClient {
     public void setOnServerResponseEventListner(OnServerResponseEventListener eventListener) {
         this.backtraceApi.setOnServerResponse(eventListener);
     }
-
-    public void sendUncaughted(BacktraceReport report){
-        this.backtraceApi.sendUncaughted(new BacktraceData(this.context, report, null));
-    };
+//
+//    public void sendUncaughted(BacktraceReport report){
+//        this.backtraceApi.sendUncaughted(new BacktraceData(this.context, report, null));
+//    };
 
     /**
      * Set an event executed after sending data to Backtrace API
@@ -189,19 +189,18 @@ public class BacktraceBase implements IBacktraceClient {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
-    public void sendThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
-        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
-
-        this.backtraceApi.sendWithThreadHandler(backtraceData, serverResponseEventListener);
-    }
+//    public void sendThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
+//        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
+//
+//        this.backtraceApi.sendWithThreadHandler(backtraceData, serverResponseEventListener);
+//    }
 
     /**
      * Sending an exception to Backtrace API
      *
      * @param report current BacktraceReport
-     * @return server response
      */
-    public BacktraceResult send(BacktraceReport report) {
+    public void send(BacktraceReport report) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
 
         BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
@@ -210,32 +209,17 @@ public class BacktraceBase implements IBacktraceClient {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
         }
 
-        BacktraceResult result = this.backtraceApi.send(backtraceData);
+        this.backtraceApi.send(backtraceData);
 
-        if(record != null)
-        {
-            record.close();
-        }
-        if(result != null && result.status == BacktraceResultStatus.Ok)
-        {
-            this.database.delete(record);
-        }
-
-        return result;
-    }
-
-    /**
-     * Sending asynchronously an exception to Backtrace API
-     *
-     * @param report current BacktraceReport
-     * @return server response
-     */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report) {
-        // TODO: Add handle database like in send(..)!
-        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
-        if (this.beforeSendEventListener != null) {
-            backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
-        }
-        return this.backtraceApi.sendAsync(backtraceData);
+    // TODO: UNCOMMENT
+    //
+    //        if(record != null)
+    //        {
+    //            record.close();
+    //        }
+    //        if(result != null && result.status == BacktraceResultStatus.Ok)
+    //        {
+    //            this.database.delete(record);
+    //        }
     }
 }
