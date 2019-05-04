@@ -1,7 +1,6 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -11,17 +10,17 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -46,18 +45,22 @@ public class BacktraceClientEventsTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new RequestHandler() {
             @Override
-            public void onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(null, resultMessage, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        BacktraceResult result = backtraceClient.send("test");
+        backtraceClient.send("test", new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+            }
+        });
 
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(BacktraceResultStatus.Ok, result.status);
     }
 
     @Test
@@ -84,11 +87,15 @@ public class BacktraceClientEventsTest {
         });
 
         // WHEN
-        BacktraceResult result = backtraceClient.send("test");
-
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(BacktraceResultStatus.Ok, result.status);
+        backtraceClient.send("test", new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertTrue(false); // TODO: remove
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+            }
+        });
     }
 
     @Test
@@ -104,9 +111,12 @@ public class BacktraceClientEventsTest {
         });
 
         // WHEN
-        backtraceClient.send(new Exception("test"));
-
-        // THEN
-        assertEquals(1, exceptions.size());
+        backtraceClient.send(new Exception("test"), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(1, exceptions.size());
+            }
+        });
     }
 }

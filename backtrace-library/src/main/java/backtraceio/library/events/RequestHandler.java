@@ -12,5 +12,5 @@ public interface RequestHandler {
      * @param data which should be send to Backtrace API
      * @return response on request
      */
-    void onRequest(BacktraceData data);
+    BacktraceResult onRequest(BacktraceData data);
 }

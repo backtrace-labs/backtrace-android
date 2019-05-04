@@ -1,13 +1,10 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.IBacktraceDatabase;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -33,8 +30,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings)
-    {
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           BacktraceDatabaseSettings databaseSettings) {
         super(context, credentials, databaseSettings);
     }
 
@@ -45,7 +42,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, IBacktraceDatabase database) {
+    public BacktraceClient(Context context, BacktraceCredentials credentials, IBacktraceDatabase
+            database) {
         super(context, credentials, database);
     }
 
@@ -55,12 +53,18 @@ public class BacktraceClient extends BacktraceBase {
      * @param message custom client message
      */
     public void send(String message) {
-        super.send(new BacktraceReport(message), null);
+        this.send(message, null);
     }
 
-//    public void sendWithThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
-//        super.sendThreadHandler(report, serverResponseEventListener);
-//    }
+    /**
+     * Sending a message to Backtrace API
+     *
+     * @param message                     custom client message
+     * @param serverResponseEventListener
+     */
+    public void send(String message, OnServerResponseEventListener serverResponseEventListener) {
+        super.send(new BacktraceReport(message), serverResponseEventListener);
+    }
 
     /**
      * Sending an exception to Backtrace API
@@ -68,7 +72,18 @@ public class BacktraceClient extends BacktraceBase {
      * @param exception current exception
      */
     public void send(Exception exception) {
-        super.send(new BacktraceReport(exception), null);
+        this.send(exception, null);
+    }
+
+    /**
+     * Sending an exception to Backtrace API
+     *
+     * @param exception current exception
+     * @param serverResponseEventListener
+     */
+    public void send(Exception exception, OnServerResponseEventListener
+            serverResponseEventListener) {
+        super.send(new BacktraceReport(exception), serverResponseEventListener);
     }
 
     /**
@@ -83,9 +98,11 @@ public class BacktraceClient extends BacktraceBase {
     /**
      * Sending a Backtrace report to Backtrace API
      *
-     * @param report current BacktraceReport
+     * @param report                      current BacktraceReport
+     * @param serverResponseEventListener
      */
-    public void send(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
+    public void send(BacktraceReport report, OnServerResponseEventListener
+            serverResponseEventListener) {
         super.send(report, serverResponseEventListener);
     }
 }
