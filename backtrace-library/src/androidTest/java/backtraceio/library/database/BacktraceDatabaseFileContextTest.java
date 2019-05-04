@@ -202,7 +202,7 @@ public class BacktraceDatabaseFileContextTest {
 
     private int countRecords(){
         int files = 0;
-        for(File _ : this.databaseFileContext.getRecords())
+        for(File f : this.databaseFileContext.getRecords())
         {
             files++;
         }

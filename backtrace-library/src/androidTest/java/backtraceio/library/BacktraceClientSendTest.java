@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
@@ -50,11 +51,14 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        BacktraceResult result = backtraceClient.send(new Exception(this.resultMessage));
-
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(BacktraceResultStatus.ServerError, result.status);
+        backtraceClient.send(new Exception(this.resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.ServerError, backtraceResult.status);
+            }
+        });
     }
 
     @Test
@@ -71,13 +75,16 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        BacktraceResult result = backtraceClient.send(new BacktraceReport(this.resultMessage));
-
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(BacktraceResultStatus.Ok, result.status);
-        assertNotNull(result.getBacktraceReport());
-        assertNull(result.getBacktraceReport().exception);
+        backtraceClient.send(new BacktraceReport(this.resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNull(backtraceResult.getBacktraceReport().exception);
+            }
+        });
     }
 
     @Test
@@ -94,17 +101,22 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        BacktraceResult result = backtraceClient.send(new BacktraceReport(this.resultMessage,
-                this.attributes));
+        backtraceClient.send(new BacktraceReport(this.resultMessage, this.attributes),
+                new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
 
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(this.attributes.get("test"),
-                result.getBacktraceReport().attributes.get("test")
-        );
-        assertEquals(BacktraceResultStatus.Ok, result.status);
-        assertNotNull(result.getBacktraceReport());
-        assertNull(result.getBacktraceReport().exception);
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(attributes.get("test"),
+                        backtraceResult.getBacktraceReport().attributes.get("test")
+                );
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNull(backtraceResult.getBacktraceReport().exception);
+            }
+        });
+
     }
 
     @Test
@@ -121,14 +133,17 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        BacktraceResult result = backtraceClient.send(new BacktraceReport(new Exception(this
-                .resultMessage)));
-
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(BacktraceResultStatus.Ok, result.status);
-        assertNotNull(result.getBacktraceReport());
-        assertNotNull(result.getBacktraceReport().exception);
+        backtraceClient.send(new BacktraceReport(new Exception(this
+                .resultMessage)), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
+            }
+        });
     }
 
     @Test
@@ -145,17 +160,22 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        BacktraceResult result = backtraceClient.send(new BacktraceReport(
-                new Exception(this.resultMessage), this.attributes)
+        backtraceClient.send(new BacktraceReport(
+                        new Exception(this.resultMessage), this.attributes), new OnServerResponseEventListener() {
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+
+                        // THEN
+                        assertEquals(resultMessage, backtraceResult.message);
+                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                        assertEquals(attributes.get("test"),
+                                backtraceResult.getBacktraceReport().attributes.get("test")
+                        );
+                        assertNotNull(backtraceResult.getBacktraceReport());
+                        assertNotNull(backtraceResult.getBacktraceReport().exception);
+                    }
+                }
         );
 
-        // THEN
-        assertEquals(resultMessage, result.message);
-        assertEquals(BacktraceResultStatus.Ok, result.status);
-        assertEquals(this.attributes.get("test"),
-                result.getBacktraceReport().attributes.get("test")
-        );
-        assertNotNull(result.getBacktraceReport());
-        assertNotNull(result.getBacktraceReport().exception);
     }
 }
