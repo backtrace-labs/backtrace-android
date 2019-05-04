@@ -13,6 +13,7 @@ import java.util.List;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
+import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
@@ -23,7 +24,7 @@ public class BacktraceReportSender {
     private static final String LOG_TAG = BacktraceReportSender.class.getSimpleName();
 
 
-    public static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report) {
+    public static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report, OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
         BacktraceResult result;
 
@@ -62,11 +63,6 @@ public class BacktraceReportSender {
                         getResponse(urlConnection)
                 );
                 result.setBacktraceReport(report);
-//                TODO: uncomment
-//                if (this.onServerResponse != null) {
-//                    BacktraceLogger.d(LOG_TAG, "Custom server response handler for response from Backtrace API");
-//                    this.onServerResponse.onEvent(result);
-//                }
             } else {
                 String message = getResponse(urlConnection);
                 message = (message == null || message.equals("")) ?
@@ -76,11 +72,10 @@ public class BacktraceReportSender {
             }
 
         } catch (Exception e) {
-//            TODO: UNCOMMENT
-//            if (this.onServerError != null) {
-//                BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
-//                this.onServerError.onEvent(e);
-//            }
+            if (errorCallback != null) {
+                BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
+                errorCallback.onEvent(e);
+            }
             BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
             result = BacktraceResult.OnError(report, e);
         } finally {

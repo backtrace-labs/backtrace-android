@@ -21,9 +21,6 @@ public interface IBacktraceApi {
      */
     void send(BacktraceData data, OnServerResponseEventListener callback);
 
-//    void sendWithThreadHandler(BacktraceData data, OnServerResponseEventListener serverResponseEventListener);
-//
-//    void sendUncaughted(BacktraceData data);
 
     /**
      * Set an event executed when received bad request, unauthorized request or other information
@@ -32,24 +29,9 @@ public interface IBacktraceApi {
     void setOnServerError(OnServerErrorEventListener onServerError);
 
     /**
-     * Set an event executed when server return information after sending data to API
-     *
-     * @param onServerResponse event which will be executed on server response
-     */
-    void setOnServerResponse(OnServerResponseEventListener onServerResponse);
-
-
-    /**
      * Set custom request method to prepare HTTP request to Backtrace API
      *
      * @param requestHandler event which will be executed instead of default request to Backtrace API
      */
     void setRequestHandler(RequestHandler requestHandler);
-
-    /**
-     * Set an event executed after sending data to API
-     * @param afterSend event which will be executed after sending data to API
-     */
-    void setAfterSend(OnAfterSendEventListener afterSend);
-
 }
