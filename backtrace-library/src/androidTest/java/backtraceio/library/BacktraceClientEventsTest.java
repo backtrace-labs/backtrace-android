@@ -46,7 +46,7 @@ public class BacktraceClientEventsTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public void onRequest(BacktraceData data) {
                 return new BacktraceResult(null, resultMessage, BacktraceResultStatus.Ok);
             }
         };

@@ -1,20 +1,15 @@
 package backtraceio.library.services;
 
-import android.os.AsyncTask;
-
 import java.util.List;
-import java.util.UUID;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.BacktraceSerializeHelper;
-import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 
 /**
@@ -37,19 +32,9 @@ public class BacktraceApi implements IBacktraceApi {
     private final String format = "json";
 
     /**
-     * Event triggered when server respond to diagnostic data
-     */
-    private OnServerResponseEventListener onServerResponse = null;
-
-    /**
      * Event triggered when server respond with error
      */
     private OnServerErrorEventListener onServerError = null;
-
-    /**
-     * Event triggered after sending diagnostic data to server
-     */
-    private OnAfterSendEventListener afterSend = null;
 
     /**
      * User custom request method
@@ -69,25 +54,16 @@ public class BacktraceApi implements IBacktraceApi {
         this.serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
                 this.format, credentials.getSubmissionToken());
 
-        threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(), this.serverUrl, this.onServerResponse);
-    }
-
-    public void setOnServerResponse(OnServerResponseEventListener onServerResponse) {
-        this.onServerResponse = onServerResponse;
+        threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(), this.serverUrl);
     }
 
     public void setOnServerError(OnServerErrorEventListener onServerError) {
         this.onServerError = onServerError;
     }
 
-    public void setAfterSend(OnAfterSendEventListener afterSend) {
-        this.afterSend = afterSend;
-    }
-
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
     }
-
 
     /**
      * Sending synchronously a diagnostic report data to Backtrace server API.
@@ -114,6 +90,6 @@ public class BacktraceApi implements IBacktraceApi {
      */
     private void send(String json, List<String> attachments,
                       BacktraceReport report, OnServerResponseEventListener callback) {
-        threadSender.sendReport(json, attachments, report, callback);
+        threadSender.sendReport(json, attachments, report, callback, this.onServerError);
     }
 }

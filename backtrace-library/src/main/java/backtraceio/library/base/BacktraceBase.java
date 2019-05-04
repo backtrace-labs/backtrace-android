@@ -52,7 +52,7 @@ public class BacktraceBase implements IBacktraceClient {
     /**
      * Backtrace database instance
      */
-    public IBacktraceDatabase database;
+    public final IBacktraceDatabase database;
 
     /**
      * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
@@ -150,28 +150,6 @@ public class BacktraceBase implements IBacktraceClient {
     }
 
     /**
-     * Set an event executed when Backtrace API return information about send report
-     *
-     * @param eventListener object with method which will be executed
-     */
-    public void setOnServerResponseEventListner(OnServerResponseEventListener eventListener) {
-        this.backtraceApi.setOnServerResponse(eventListener);
-    }
-//
-//    public void sendUncaughted(BacktraceReport report){
-//        this.backtraceApi.sendUncaughted(new BacktraceData(this.context, report, null));
-//    };
-
-    /**
-     * Set an event executed after sending data to Backtrace API
-     *
-     * @param eventListener object with method which will be executed
-     */
-    public void setOnAfterSendEventListener(OnAfterSendEventListener eventListener) {
-        this.backtraceApi.setAfterSend(eventListener);
-    }
-
-    /**
      * Set an event executed when received bad request, unauthorize request or other information from server
      *
      * @param eventListener object with method which will be executed
@@ -189,12 +167,6 @@ public class BacktraceBase implements IBacktraceClient {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
-//    public void sendThreadHandler(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
-//        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
-//
-//        this.backtraceApi.sendWithThreadHandler(backtraceData, serverResponseEventListener);
-//    }
-
     /**
      * Sending an exception to Backtrace API
      *
@@ -208,26 +180,32 @@ public class BacktraceBase implements IBacktraceClient {
      *
      * @param report current BacktraceReport
      */
-    public void send(BacktraceReport report, OnServerResponseEventListener callback) {
+    public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
 
-        BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
+        final BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
 
         if (this.beforeSendEventListener != null) {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
         }
 
-        this.backtraceApi.send(backtraceData, callback);
+        this.backtraceApi.send(backtraceData, this.getDatabaseCallback(record, callback));
+    }
 
-    // TODO: UNCOMMENT
-    //
-    //        if(record != null)
-    //        {
-    //            record.close();
-    //        }
-    //        if(result != null && result.status == BacktraceResultStatus.Ok)
-    //        {
-    //            this.database.delete(record);
-    //        }
+    private OnServerResponseEventListener getDatabaseCallback(final BacktraceDatabaseRecord record, final OnServerResponseEventListener customCallback) {
+        return new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                if (customCallback != null) {
+                    customCallback.onEvent(backtraceResult);
+                }
+                if (record != null) {
+                    record.close();
+                }
+                if (backtraceResult != null && backtraceResult.status == BacktraceResultStatus.Ok) {
+                    database.delete(record);
+                }
+            }
+        };
     }
 }
