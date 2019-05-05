@@ -1,7 +1,5 @@
 package backtraceio.library.services;
 
-import android.support.annotation.NonNull;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
