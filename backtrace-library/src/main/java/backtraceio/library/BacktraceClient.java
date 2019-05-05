@@ -60,7 +60,7 @@ public class BacktraceClient extends BacktraceBase {
      * Sending a message to Backtrace API
      *
      * @param message                     custom client message
-     * @param serverResponseEventListener
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
     public void send(String message, OnServerResponseEventListener serverResponseEventListener) {
         super.send(new BacktraceReport(message), serverResponseEventListener);
@@ -79,7 +79,7 @@ public class BacktraceClient extends BacktraceBase {
      * Sending an exception to Backtrace API
      *
      * @param exception                   current exception
-     * @param serverResponseEventListener
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
     public void send(Exception exception, OnServerResponseEventListener
             serverResponseEventListener) {
@@ -99,7 +99,7 @@ public class BacktraceClient extends BacktraceBase {
      * Sending a Backtrace report to Backtrace API
      *
      * @param report                      current BacktraceReport
-     * @param serverResponseEventListener
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
     public void send(BacktraceReport report, OnServerResponseEventListener
             serverResponseEventListener) {
