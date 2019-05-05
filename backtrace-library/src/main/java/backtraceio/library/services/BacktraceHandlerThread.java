@@ -28,7 +28,7 @@ public class BacktraceHandlerThread extends HandlerThread {
         mHandler = new BacktraceHandler(this.getLooper(), this.url);
     }
 
-    public void sendReport(BacktraceHandlerInput data) {
+    void sendReport(BacktraceHandlerInput data) {
 
         Message message = new Message();
         message.obj = data;
