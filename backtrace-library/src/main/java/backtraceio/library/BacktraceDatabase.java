@@ -32,26 +32,14 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
 public class BacktraceDatabase implements IBacktraceDatabase {
 
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
-
-    private IBacktraceApi BacktraceApi;
-
-    private Context _applicationContext;
-
-    private IBacktraceDatabaseContext backtraceDatabaseContext;
-
-    private IBacktraceDatabaseFileContext backtraceDatabaseFileContext;
-
-    private BacktraceDatabaseSettings databaseSettings;
-
-    private String getDatabasePath() {
-        return databaseSettings.getDatabasePath();
-    }
-
     private static boolean _timerBackgroundWork = false;
-
-    private boolean _enable = false;
-
     private static Timer _timer;
+    private IBacktraceApi BacktraceApi;
+    private Context _applicationContext;
+    private IBacktraceDatabaseContext backtraceDatabaseContext;
+    private IBacktraceDatabaseFileContext backtraceDatabaseFileContext;
+    private BacktraceDatabaseSettings databaseSettings;
+    private boolean _enable = false;
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -98,6 +86,10 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
+    }
+
+    private String getDatabasePath() {
+        return databaseSettings.getDatabasePath();
     }
 
     public void start() {
@@ -174,7 +166,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
                                 } else {
                                     BacktraceLogger.d(LOG_TAG, "Timer - closing record");
                                     currentRecord.close();
-                                    backtraceDatabaseContext.incrementBatchRetry();
+                                    // backtraceDatabaseContext.incrementBatchRetry(); TODO: consider another way to remove some records after few retries
                                 }
                                 threadWaiter.countDown();
                             }
