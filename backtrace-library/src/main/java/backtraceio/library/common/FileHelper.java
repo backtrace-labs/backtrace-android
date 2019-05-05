@@ -69,7 +69,7 @@ public class FileHelper {
 
     /***
      * Check does file path is invalid, null, empty or file not exists
-     * @param filePath
+     * @param filePath path to the file to be checked
      * @return true if path is invalid
      */
     private static boolean isFilePathInvalid(String filePath) {
@@ -78,7 +78,7 @@ public class FileHelper {
 
     /***
      * Check does file exist
-     * @param absoluteFilePath
+     * @param absoluteFilePath absolute path to the file to be checked
      * @return true if file exists
      */
     public static boolean isFileExists(String absoluteFilePath) {
