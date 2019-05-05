@@ -1,7 +1,5 @@
 package backtraceio.library.interfaces;
 
-import android.content.Context;
-
 import java.util.Map;
 
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -20,7 +18,6 @@ public interface IBacktraceDatabase {
     void flush();
 
     /**
-     *
      * @param backtraceApi
      */
     void setApi(IBacktraceApi backtraceApi);
@@ -32,12 +29,14 @@ public interface IBacktraceDatabase {
 
     /**
      * Check all database consistency requirements
+     *
      * @return is database has valid consistency requirements
      */
     boolean validConsistency();
 
     /**
      * Add new report to Database
+     *
      * @param backtraceReport
      * @param attributes
      * @return
@@ -45,25 +44,25 @@ public interface IBacktraceDatabase {
     BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object> attributes);
 
     /**
-     *
      * @return
      */
     Iterable<BacktraceDatabaseRecord> get();
 
     /**
-     *
      * @param record
      */
     void delete(BacktraceDatabaseRecord record);
 
     /**
      * Get database settings
+     *
      * @return
      */
     BacktraceDatabaseSettings getSettings();
 
     /**
      * Get database size
+     *
      * @return
      */
     long getDatabaseSize();

@@ -1,15 +1,12 @@
 package backtraceio.library.base;
 
 import android.content.Context;
-import android.os.AsyncTask;
-
 
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -133,7 +130,7 @@ public class BacktraceBase implements IBacktraceClient {
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database, Map<String, Object> attributes) {
         this.context = context;
-        this.attributes = attributes != null? attributes: new HashMap<String, Object>();
+        this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
@@ -172,9 +169,10 @@ public class BacktraceBase implements IBacktraceClient {
      *
      * @param report current BacktraceReport
      */
-    public void send(BacktraceReport report){
+    public void send(BacktraceReport report) {
         send(report, null);
     }
+
     /**
      * Sending an exception to Backtrace API
      *

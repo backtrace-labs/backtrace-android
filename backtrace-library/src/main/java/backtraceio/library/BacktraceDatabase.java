@@ -31,9 +31,9 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  */
 public class BacktraceDatabase implements IBacktraceDatabase {
 
-    private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
+    private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
     private IBacktraceApi BacktraceApi;
     private Context _applicationContext;
     private IBacktraceDatabaseContext backtraceDatabaseContext;

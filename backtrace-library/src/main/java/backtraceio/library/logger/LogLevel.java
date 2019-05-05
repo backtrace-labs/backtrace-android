@@ -1,4 +1,5 @@
 package backtraceio.library.logger;
+
 /**
  * The class is intended to determine the available levels of login messages
  */

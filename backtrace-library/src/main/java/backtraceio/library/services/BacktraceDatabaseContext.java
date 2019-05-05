@@ -271,6 +271,7 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
 
     /**
      * Delete the oldest file
+     *
      * @return is deletion was successful
      */
     public boolean removeOldestRecord() {

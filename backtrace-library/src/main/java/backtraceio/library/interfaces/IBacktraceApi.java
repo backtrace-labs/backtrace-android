@@ -1,13 +1,9 @@
 package backtraceio.library.interfaces;
 
-import android.os.AsyncTask;
-
-import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
 
 /**
  * Backtrace API sender interface
