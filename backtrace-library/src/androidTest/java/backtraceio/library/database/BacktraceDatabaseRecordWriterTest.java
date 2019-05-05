@@ -15,7 +15,6 @@ import java.util.List;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecordWriter;
-
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
 import static junit.framework.TestCase.assertEquals;

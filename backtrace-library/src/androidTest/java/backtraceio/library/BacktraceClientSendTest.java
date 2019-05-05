@@ -91,16 +91,16 @@ public class BacktraceClientSendTest {
         // WHEN
         backtraceClient.send(new BacktraceReport(this.resultMessage), new
                 OnServerResponseEventListener() {
-            @Override
-            public void onEvent(BacktraceResult backtraceResult) {
-                // THEN
-                assertEquals(resultMessage, backtraceResult.message);
-                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                assertNotNull(backtraceResult.getBacktraceReport());
-                assertNull(backtraceResult.getBacktraceReport().exception);
-                waiter.resume();
-            }
-        });
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        // THEN
+                        assertEquals(resultMessage, backtraceResult.message);
+                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                        assertNotNull(backtraceResult.getBacktraceReport());
+                        assertNull(backtraceResult.getBacktraceReport().exception);
+                        waiter.resume();
+                    }
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -198,7 +198,7 @@ public class BacktraceClientSendTest {
 
         // WHEN
         backtraceClient.send(new BacktraceReport(
-                        new Exception(this.resultMessage), this.attributes), new
+                new Exception(this.resultMessage), this.attributes), new
                 OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
@@ -224,7 +224,7 @@ public class BacktraceClientSendTest {
     }
 
     @Test
-    public void sendMultipleReports(){
+    public void sendMultipleReports() {
         // GIVEN
         final Waiter waiter = new Waiter();
         final String[] messages = {"1", "2", "3"};
@@ -241,7 +241,7 @@ public class BacktraceClientSendTest {
 
 
         //WHEN
-        for (final String message : messages){
+        for (final String message : messages) {
             backtraceClient.send(new Exception(message), new OnServerResponseEventListener() {
                 @Override
                 public void onEvent(BacktraceResult backtraceResult) {

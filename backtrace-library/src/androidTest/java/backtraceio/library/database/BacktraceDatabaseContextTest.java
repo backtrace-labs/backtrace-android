@@ -114,8 +114,7 @@ public class BacktraceDatabaseContextTest {
 
         // THEN
         assertEquals(3, databaseContext.count());
-        for(BacktraceDatabaseRecord record : contextRecords)
-        {
+        for (BacktraceDatabaseRecord record : contextRecords) {
             assertTrue(records.contains(record));
         }
     }
@@ -172,7 +171,7 @@ public class BacktraceDatabaseContextTest {
     }
 
     @Test
-    public void removeOldestFromDatabaseContext(){
+    public void removeOldestFromDatabaseContext() {
         // GIVEN
         List<BacktraceDatabaseRecord> records = fillDatabase();
 
@@ -215,8 +214,7 @@ public class BacktraceDatabaseContextTest {
         assertEquals(3, databaseContext.count());
     }
 
-    private List<BacktraceDatabaseRecord> fillDatabase()
-    {
+    private List<BacktraceDatabaseRecord> fillDatabase() {
         List<BacktraceDatabaseRecord> result = new ArrayList<>();
         BacktraceReport report = new BacktraceReport(this.testMessage);
         BacktraceReport report2 = new BacktraceReport(this.testMessage);
@@ -229,7 +227,7 @@ public class BacktraceDatabaseContextTest {
         result.add(databaseContext.add(data3));
 
         // Dispose all records
-        for(BacktraceDatabaseRecord record : result){
+        for (BacktraceDatabaseRecord record : result) {
             record.close();
         }
 

@@ -4,10 +4,11 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import net.jodah.concurrentunit.Waiter;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import net.jodah.concurrentunit.Waiter;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -22,7 +23,6 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -69,8 +69,7 @@ public class BacktraceClientEventsTest {
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -113,8 +112,7 @@ public class BacktraceClientEventsTest {
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -145,8 +143,7 @@ public class BacktraceClientEventsTest {
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
