@@ -16,7 +16,7 @@ public class BacktraceHandlerThread extends HandlerThread {
     private BacktraceHandler mHandler;
     private String url;
 
-    public BacktraceHandlerThread(String name, String url) {
+    BacktraceHandlerThread(String name, String url) {
         super(name);
         this.url = url;
         this.start();
