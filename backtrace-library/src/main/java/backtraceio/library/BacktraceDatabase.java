@@ -1,16 +1,17 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
-import java.sql.Date;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.interfaces.IBacktraceDatabaseContext;
@@ -22,7 +23,6 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
-import backtraceio.library.services.BacktraceApi;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -78,22 +78,26 @@ public class BacktraceDatabase implements IBacktraceDatabase {
             throw new IllegalArgumentException("Database settings or application context is null");
         }
 
-        if (databaseSettings.getDatabasePath() == null || databaseSettings.getDatabasePath().isEmpty()) {
+        if (databaseSettings.getDatabasePath() == null || databaseSettings.getDatabasePath()
+                .isEmpty()) {
             throw new IllegalArgumentException("Database path is null or empty");
         }
 
-        if(!FileHelper.isFileExists(databaseSettings.getDatabasePath())){
+        if (!FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
             boolean createDirs = new File(databaseSettings.getDatabasePath()).mkdirs();
-            if(!createDirs || !FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
-                throw new IllegalArgumentException("Incorrect database path or application doesn't have permission to write to this path");
+            if (!createDirs || !FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
+                throw new IllegalArgumentException("Incorrect database path or application " +
+                        "doesn't have permission to write to this path");
             }
         }
 
         this._applicationContext = context;
         this.databaseSettings = databaseSettings;
-        this.backtraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext, databaseSettings);
+        this.backtraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext,
+                databaseSettings);
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
-                this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
+                this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
+                .getMaxRecordCount());
     }
 
     public void start() {
@@ -132,12 +136,20 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         _timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                BacktraceLogger.d(LOG_TAG, "Timer:" + new Date(System.currentTimeMillis()).toString());
-                if (backtraceDatabaseContext == null || backtraceDatabaseContext.isEmpty() || _timerBackgroundWork) {
-                    BacktraceLogger.d(LOG_TAG, "Null or another timer works: " +  new Date(System.currentTimeMillis()).toString());
+                String dateTimeNow = Calendar.getInstance().getTime().toString();
+                BacktraceLogger.d(LOG_TAG, "Timer - " + dateTimeNow);
+                if (backtraceDatabaseContext == null || backtraceDatabaseContext.isEmpty()) {
+                    BacktraceLogger.d(LOG_TAG, "Timer - Database context is null or empty: " +
+                            dateTimeNow);
                     return;
                 }
-                BacktraceLogger.d(LOG_TAG, "Timer continue working: " +  new Date(System.currentTimeMillis()).toString());
+
+                if (_timerBackgroundWork) {
+                    BacktraceLogger.d(LOG_TAG, "Timer - another timer works now: " + dateTimeNow);
+                    return;
+                }
+
+                BacktraceLogger.d(LOG_TAG, "Timer - continue working: " + dateTimeNow);
                 _timerBackgroundWork = true;
                 _timer.cancel();
                 _timer.purge();
@@ -145,22 +157,43 @@ public class BacktraceDatabase implements IBacktraceDatabase {
 
                 BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
                 while (record != null) {
+                    final CountDownLatch threadWaiter = new CountDownLatch(1);
                     BacktraceData backtraceData = record.getBacktraceData();
                     if (backtraceData == null || backtraceData.report == null) {
+                        BacktraceLogger.d(LOG_TAG, "Timer - backtrace data or report is null - " +
+                                "deleting record");
                         delete(record);
                     } else {
-                        BacktraceApi.send(backtraceData, null);
-                        // TODO!!!!
-//                        if (result.status == BacktraceResultStatus.Ok) {
-//                            delete(record);
-//                        } else {
-//                            record.close();
-//                            backtraceDatabaseContext.incrementBatchRetry();
-//                            break;
-//                        }
+                        final BacktraceDatabaseRecord currentRecord = record;
+                        BacktraceApi.send(backtraceData, new OnServerResponseEventListener() {
+                            @Override
+                            public void onEvent(BacktraceResult backtraceResult) {
+                                if (backtraceResult.status == BacktraceResultStatus.Ok) {
+                                    BacktraceLogger.d(LOG_TAG, "Timer - deleting record");
+                                    delete(currentRecord);
+                                } else {
+                                    BacktraceLogger.d(LOG_TAG, "Timer - closing record");
+                                    currentRecord.close();
+                                    backtraceDatabaseContext.incrementBatchRetry();
+                                }
+                                threadWaiter.countDown();
+                            }
+                        });
+                        try {
+                            threadWaiter.await();
+                        } catch (Exception ex) {
+                            BacktraceLogger.e(LOG_TAG,
+                                    "Error during waiting for result in Timer", ex
+                            );
+                        }
+                        if (currentRecord.valid() && !currentRecord.locked) {
+                            BacktraceLogger.d(LOG_TAG, "Timer - record is valid and unlocked");
+                            break;
+                        }
                     }
                     record = backtraceDatabaseContext.first();
                 }
+                BacktraceLogger.d(LOG_TAG, "Setup new timer");
                 _timerBackgroundWork = false;
                 setupTimer();
             }
@@ -278,7 +311,8 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         if (databaseSettings.getMaxDatabaseSize() != 0 && backtraceDatabaseContext
                 .getDatabaseSize() > databaseSettings.getMaxDatabaseSize()) {
             int deletePolicyRetry = 5;
-            while (backtraceDatabaseContext.getDatabaseSize() > databaseSettings.getMaxDatabaseSize()) {
+            while (backtraceDatabaseContext.getDatabaseSize() > databaseSettings
+                    .getMaxDatabaseSize()) {
                 backtraceDatabaseContext.removeOldestRecord();
                 deletePolicyRetry--; // avoid infinity loop
                 if (deletePolicyRetry == 0) {
