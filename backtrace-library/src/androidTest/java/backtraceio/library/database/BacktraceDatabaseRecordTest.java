@@ -30,7 +30,6 @@ import static junit.framework.TestCase.assertTrue;
 public class BacktraceDatabaseRecordTest {
     private Context context;
     private String dbPath;
-    private BacktraceDatabaseContext databaseContext;
     private BacktraceDatabaseSettings databaseSettings;
     private BacktraceDatabase database;
     private String testMessage = "Example test string";
@@ -40,7 +39,6 @@ public class BacktraceDatabaseRecordTest {
         this.context = InstrumentationRegistry.getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
-        this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);
         this.database = new BacktraceDatabase(this.context, dbPath);
     }
 

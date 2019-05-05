@@ -5,6 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import net.jodah.concurrentunit.Waiter;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,6 +21,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -28,6 +31,7 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -56,6 +60,7 @@ public class BacktraceFileAttachments {
     @Test
     public void streamFileAttachment() {
         // GIVEN
+        final Waiter waiter = new Waiter();
         createTestFile();
         final List<String> attachments = new ArrayList<String>() {{
             add(absolutePath);
@@ -88,13 +93,22 @@ public class BacktraceFileAttachments {
                 assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
                 assertEquals(1, fileContents.size());
                 assertEquals(fileContent, new String(fileContents.get(0)));
+                waiter.resume();
             }
         });
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        }
+        catch (Exception ex){
+            fail(ex.getMessage());
+        }
     }
 
     @Test
     public void streamNotExistFiles() {
         // GIVEN
+        final Waiter waiter = new Waiter();
         final List<String> attachments = new ArrayList<String>() {{
             add(null);
             add("");
@@ -128,8 +142,16 @@ public class BacktraceFileAttachments {
                 assertNotNull(backtraceResult);
                 assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
                 assertEquals(0, fileContents.size());
+                waiter.resume();
             }
         });
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(1005, TimeUnit.SECONDS);
+        }
+        catch (Exception ex){
+            fail(ex.getMessage());
+        }
     }
 
     @After

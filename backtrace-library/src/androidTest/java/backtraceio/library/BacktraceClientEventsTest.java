@@ -7,9 +7,11 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import net.jodah.concurrentunit.Waiter;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
@@ -21,6 +23,7 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -42,6 +45,7 @@ public class BacktraceClientEventsTest {
     @Test
     public void useRequestHandler() {
         // GIVEN
+        final Waiter waiter = new Waiter();
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new RequestHandler() {
             @Override
@@ -58,15 +62,24 @@ public class BacktraceClientEventsTest {
                 // THEN
                 assertEquals(resultMessage, backtraceResult.message);
                 assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                waiter.resume();
             }
         });
 
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        }
+        catch (Exception ex){
+            fail(ex.getMessage());
+        }
     }
 
     @Test
     public void useBeforeSendAndRequestHandler() {
         // GIVEN
         final String attributeKey = UUID.randomUUID().toString();
+        final Waiter waiter = new Waiter();
 
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new RequestHandler() {
@@ -91,16 +104,25 @@ public class BacktraceClientEventsTest {
             @Override
             public void onEvent(BacktraceResult backtraceResult) {
                 // THEN
-                assertTrue(false); // TODO: remove
-                assertEquals(resultMessage, backtraceResult.message);
-                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                waiter.assertEquals(resultMessage, backtraceResult.message);
+                waiter.assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                waiter.resume();
             }
         });
+
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        }
+        catch (Exception ex){
+            fail(ex.getMessage());
+        }
     }
 
     @Test
     public void useOnServerError() {
         // GIVEN
+        final Waiter waiter = new Waiter();
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final ArrayList<Exception> exceptions = new ArrayList<>();
         backtraceClient.setOnServerErrorEventListener(new OnServerErrorEventListener() {
@@ -116,7 +138,16 @@ public class BacktraceClientEventsTest {
             public void onEvent(BacktraceResult backtraceResult) {
                 // THEN
                 assertEquals(1, exceptions.size());
+                waiter.resume();
             }
         });
+
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        }
+        catch (Exception ex){
+            fail(ex.getMessage());
+        }
     }
 }
