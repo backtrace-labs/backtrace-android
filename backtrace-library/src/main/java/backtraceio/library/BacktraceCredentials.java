@@ -10,8 +10,8 @@ public class BacktraceCredentials {
     /**
      * Initialize Backtrace credentials
      *
-     * @param endpointUrl
-     * @param submissionToken
+     * @param endpointUrl endpoint url address
+     * @param submissionToken server access token
      */
     public BacktraceCredentials(String endpointUrl, String submissionToken) {
         this.endpointUrl = endpointUrl;
