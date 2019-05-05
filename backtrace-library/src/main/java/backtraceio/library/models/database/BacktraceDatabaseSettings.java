@@ -64,8 +64,7 @@ public class BacktraceDatabaseSettings {
      */
     private int retryLimit = 3;
 
-
-    private RetryOrder retryOrder = RetryOrder.Queue;
+    private RetryOrder retryOrder = RetryOrder.Stack;
 
     public String getDatabasePath() {
         return databasePath;
