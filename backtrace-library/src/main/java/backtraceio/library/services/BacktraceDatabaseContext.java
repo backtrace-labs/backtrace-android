@@ -353,10 +353,4 @@ public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
         }
         return null;
     }
-
-    private String getAbsolutePath(String path) {
-        String appPath = this._applicationContext.getFilesDir().getAbsolutePath();
-        throw new UnsupportedOperationException();
-    }
-
 }
