@@ -17,12 +17,24 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.HttpException;
 
-public class BacktraceReportSender {
+/**
+ * Class for sending and processing HTTP request
+ */
+class BacktraceReportSender {
 
     private static final String LOG_TAG = BacktraceReportSender.class.getSimpleName();
 
-
-    public static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report, OnServerErrorEventListener errorCallback) {
+    /**
+     * Send HTTP request for certain url server with information about device, error, attachments
+     *
+     * @param serverUrl     server http address to which the request will be sent
+     * @param json          message with information about device and error
+     * @param attachments   list of paths to files that should be sent
+     * @param report        information about error
+     * @param errorCallback event that will be executed after receiving an error from the server
+     * @return
+     */
+    static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report, OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
         BacktraceResult result;
 
