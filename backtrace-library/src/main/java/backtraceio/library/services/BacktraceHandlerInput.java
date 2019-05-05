@@ -15,11 +15,11 @@ public class BacktraceHandlerInput {
      */
     public BacktraceData data;
     /**
-     * Event that will be started after receiving a response from the server
+     * Event that will be executed after receiving a response from the server
      */
     OnServerResponseEventListener serverResponseEventListener;
     /**
-     * Event that will be started after receiving an error from the server
+     * Event that will be executed after receiving an error from the server
      */
     OnServerErrorEventListener serverErrorEventListener;
     /**
@@ -31,8 +31,8 @@ public class BacktraceHandlerInput {
      * Initialize new instance of BacktraceHandlerInput
      *
      * @param data                        a message containing information about the error and the device
-     * @param serverResponseEventListener event callback that will be started after receiving a response from the server
-     * @param serverErrorEventListener    event callback that will be started after receiving an error from the server
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
+     * @param serverErrorEventListener    event callback that will be executed after receiving an error from the server
      * @param requestHandler              event callback which will be executed instead of default sending report to Backtrace server
      */
     BacktraceHandlerInput(BacktraceData data,
