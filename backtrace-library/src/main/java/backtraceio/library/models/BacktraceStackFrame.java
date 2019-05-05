@@ -39,10 +39,12 @@ public class BacktraceStackFrame {
      * Create new instance of BacktraceStackFrame
      */
     @SuppressWarnings({"UnusedDeclaration"})
-    public BacktraceStackFrame() {}
+    public BacktraceStackFrame() {
+    }
 
     /**
      * Create new instance of BacktraceStackFrame
+     *
      * @param frame single stacktrace element
      */
     public BacktraceStackFrame(StackTraceElement frame) {

@@ -18,19 +18,15 @@ public class SourceCodeData {
      */
     public Map<String, SourceCode> data = new HashMap<>();
 
-    public SourceCodeData(ArrayList<BacktraceStackFrame> exceptionStack)
-    {
+    public SourceCodeData(ArrayList<BacktraceStackFrame> exceptionStack) {
         BacktraceLogger.d(LOG_TAG, "Initialization source code data");
-        if (exceptionStack == null || exceptionStack.size() == 0)
-        {
+        if (exceptionStack == null || exceptionStack.size() == 0) {
             BacktraceLogger.w(LOG_TAG, "Exception stack is null or empty");
             return;
         }
 
-        for(BacktraceStackFrame backtraceStackFrame : exceptionStack)
-        {
-            if (backtraceStackFrame == null || backtraceStackFrame.sourceCode.equals(""))
-            {
+        for (BacktraceStackFrame backtraceStackFrame : exceptionStack) {
+            if (backtraceStackFrame == null || backtraceStackFrame.sourceCode.equals("")) {
                 BacktraceLogger.w(LOG_TAG, "Stack frame is null or sourceCode is empty");
                 continue;
             }

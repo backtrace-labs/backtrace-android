@@ -41,9 +41,10 @@ public class BacktraceResult {
 
     /**
      * Create new instance of BacktraceResult
-     * @param report executed report
+     *
+     * @param report  executed report
      * @param message message
-     * @param status result status eg. ok, server error
+     * @param status  result status eg. ok, server error
      */
     public BacktraceResult(BacktraceReport report, String message, BacktraceResultStatus status) {
         setBacktraceReport(report);
@@ -62,7 +63,8 @@ public class BacktraceResult {
 
     /**
      * Set result when error occurs while sending data to API
-     * @param report executed report
+     *
+     * @param report    executed report
      * @param exception current exception
      * @return BacktraceResult with exception information
      */

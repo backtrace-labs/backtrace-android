@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;

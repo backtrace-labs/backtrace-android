@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
 public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileContext {

@@ -54,13 +54,12 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
         try {
             signal.await();
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
     }
 
-    private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable){
+    private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
         return new OnServerResponseEventListener() {
             @Override
             public void onEvent(BacktraceResult backtraceResult) {

@@ -8,6 +8,17 @@ public class BacktraceCredentials {
     private String submissionToken;
 
     /**
+     * Initialize Backtrace credentials
+     *
+     * @param endpointUrl
+     * @param submissionToken
+     */
+    public BacktraceCredentials(String endpointUrl, String submissionToken) {
+        this.endpointUrl = endpointUrl;
+        this.submissionToken = submissionToken;
+    }
+
+    /**
      * Get URL to Backtrace server API
      *
      * @return endpoint url
@@ -23,16 +34,5 @@ public class BacktraceCredentials {
      */
     public String getSubmissionToken() {
         return submissionToken;
-    }
-
-    /**
-     * Initialize Backtrace credentials
-     *
-     * @param endpointUrl
-     * @param submissionToken
-     */
-    public BacktraceCredentials(String endpointUrl, String submissionToken) {
-        this.endpointUrl = endpointUrl;
-        this.submissionToken = submissionToken;
     }
 }

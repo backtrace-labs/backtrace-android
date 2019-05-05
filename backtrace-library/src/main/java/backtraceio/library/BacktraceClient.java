@@ -78,7 +78,7 @@ public class BacktraceClient extends BacktraceBase {
     /**
      * Sending an exception to Backtrace API
      *
-     * @param exception current exception
+     * @param exception                   current exception
      * @param serverResponseEventListener
      */
     public void send(Exception exception, OnServerResponseEventListener
