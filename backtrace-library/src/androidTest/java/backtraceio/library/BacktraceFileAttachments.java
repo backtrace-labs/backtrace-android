@@ -86,21 +86,20 @@ public class BacktraceFileAttachments {
         });
         client.send(new BacktraceReport("test", null, attachments), new
                 OnServerResponseEventListener() {
-            @Override
-            public void onEvent(BacktraceResult backtraceResult) {
-                // THEN
-                assertNotNull(backtraceResult);
-                assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
-                assertEquals(1, fileContents.size());
-                assertEquals(fileContent, new String(fileContents.get(0)));
-                waiter.resume();
-            }
-        });
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        // THEN
+                        assertNotNull(backtraceResult);
+                        assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
+                        assertEquals(1, fileContents.size());
+                        assertEquals(fileContent, new String(fileContents.get(0)));
+                        waiter.resume();
+                    }
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -136,20 +135,19 @@ public class BacktraceFileAttachments {
         });
         client.send(new BacktraceReport("test", null, attachments), new
                 OnServerResponseEventListener() {
-            @Override
-            public void onEvent(BacktraceResult backtraceResult) {
-                // THEN
-                assertNotNull(backtraceResult);
-                assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
-                assertEquals(0, fileContents.size());
-                waiter.resume();
-            }
-        });
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        // THEN
+                        assertNotNull(backtraceResult);
+                        assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
+                        assertEquals(0, fileContents.size());
+                        waiter.resume();
+                    }
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(1005, TimeUnit.SECONDS);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }

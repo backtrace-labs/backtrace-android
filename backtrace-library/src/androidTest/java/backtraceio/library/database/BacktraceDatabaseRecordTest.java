@@ -17,12 +17,9 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.services.BacktraceDatabaseContext;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotSame;
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 
 
@@ -51,7 +48,7 @@ public class BacktraceDatabaseRecordTest {
     public void saveAndGetRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data  = new BacktraceData(this.context, report, null);
+        BacktraceData data = new BacktraceData(this.context, report, null);
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -71,7 +68,7 @@ public class BacktraceDatabaseRecordTest {
     public void deleteFileDiagnosticPathToCorruptRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data  = new BacktraceData(this.context, report, null);
+        BacktraceData data = new BacktraceData(this.context, report, null);
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -89,7 +86,7 @@ public class BacktraceDatabaseRecordTest {
     public void deleteFileReportPathToCorruptRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data  = new BacktraceData(this.context, report, null);
+        BacktraceData data = new BacktraceData(this.context, report, null);
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -107,7 +104,7 @@ public class BacktraceDatabaseRecordTest {
     public void createAndDeleteRecordFiles() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data  = new BacktraceData(this.context, report, null);
+        BacktraceData data = new BacktraceData(this.context, report, null);
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -127,7 +124,7 @@ public class BacktraceDatabaseRecordTest {
     public void readFileAndDeserialize() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data  = new BacktraceData(this.context, report, null);
+        BacktraceData data = new BacktraceData(this.context, report, null);
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
         record.save();
 
