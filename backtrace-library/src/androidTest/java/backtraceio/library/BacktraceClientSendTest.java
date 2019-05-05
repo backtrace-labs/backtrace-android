@@ -222,4 +222,42 @@ public class BacktraceClientSendTest {
             fail(ex.getMessage());
         }
     }
+
+    @Test
+    public void sendMultipleReports(){
+        // GIVEN
+        final Waiter waiter = new Waiter();
+        final String[] messages = {"1", "2", "3"};
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+
+        RequestHandler rh = new RequestHandler() {
+            @Override
+            public BacktraceResult onRequest(BacktraceData data) {
+                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                        BacktraceResultStatus.Ok);
+            }
+        };
+        backtraceClient.setOnRequestHandler(rh);
+
+
+        //WHEN
+        for (final String message : messages){
+            backtraceClient.send(new Exception(message), new OnServerResponseEventListener() {
+                @Override
+                public void onEvent(BacktraceResult backtraceResult) {
+                    // THEN
+                    assertEquals(message, backtraceResult.message);
+                    assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                    waiter.resume();
+                }
+            });
+        }
+
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS, 3);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
 }
