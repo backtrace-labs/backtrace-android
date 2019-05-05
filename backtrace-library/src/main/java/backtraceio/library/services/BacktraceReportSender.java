@@ -32,7 +32,7 @@ class BacktraceReportSender {
      * @param attachments   list of paths to files that should be sent
      * @param report        information about error
      * @param errorCallback event that will be executed after receiving an error from the server
-     * @return
+     * @return information from the server about the result of processing the request
      */
     static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report, OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
