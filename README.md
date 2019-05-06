@@ -84,6 +84,20 @@ dependencies {
 </dependency>
 ```
 
+## Installation pre-release version <a name="prerelease-version"></a>
+### Prelease version of `v.2.0.0` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1009/
+Add the above url in `build.gradle` file to `repositories` section as below to allow downloading the library from our staging repository:
+```
+maven {
+    url "https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1009/"
+}
+```
+Then you can download this library by adding to the dependencies in `build.gradle` file to `dependencies` section:
+
+```
+implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.0.0'
+```
+
 ## Permissions
 ### Internet permission
 * To send errors to the server instance you need to add permissions for Internet connection into `AndroidManifest.xml` file in your application.
