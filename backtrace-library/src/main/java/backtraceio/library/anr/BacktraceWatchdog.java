@@ -10,10 +10,17 @@ public class BacktraceWatchdog {
 
     private final static transient String LOG_TAG = BacktraceWatchdog.class.getSimpleName();
     private final BacktraceClient backtraceClient;
+    private final boolean sendException;
     private Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
 
-    public BacktraceWatchdog(BacktraceClient client) {
+    public BacktraceWatchdog(BacktraceClient client, boolean sendException) {
         this.backtraceClient = client;
+        this.sendException = sendException;
+    }
+
+    public BacktraceWatchdog(BacktraceClient client)
+    {
+        this(client, true);
     }
 
     public boolean checkWatchdog() {
@@ -66,7 +73,9 @@ public class BacktraceWatchdog {
         BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();
         exception.setStackTrace(thread.getStackTrace());
         BacktraceLogger.e(LOG_TAG, "Blocked thread detected, sending a report", exception);
-        backtraceClient.send(exception);
+        if(backtraceClient != null) {
+            backtraceClient.send(exception);
+        }
     }
 
 
