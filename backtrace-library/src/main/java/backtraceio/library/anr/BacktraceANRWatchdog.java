@@ -3,7 +3,6 @@ package backtraceio.library.anr;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -20,6 +19,13 @@ public class BacktraceANRWatchdog extends Thread {
     private final boolean debug;
     private int timeout = 5000;
 
+    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
+                                                           onApplicationNotRespondingEvent) {
+        this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
+    }
+
+    private OnApplicationNotRespondingEvent onApplicationNotRespondingEvent;
+
     public BacktraceANRWatchdog(BacktraceClient client) {
         this(client, DEFAULT_ANR_TIMEOUT);
     }
@@ -28,7 +34,7 @@ public class BacktraceANRWatchdog extends Thread {
         this(client, timeout, false);
     }
 
-    public BacktraceANRWatchdog(BacktraceClient client, int timeout, boolean debug){
+    public BacktraceANRWatchdog(BacktraceClient client, int timeout, boolean debug) {
         this.backtraceClient = client;
         this.timeout = timeout;
         this.debug = debug;
@@ -39,7 +45,7 @@ public class BacktraceANRWatchdog extends Thread {
 
     @Override
     public void run() {
-        while(!isInterrupted()){
+        while (!isInterrupted()) {
             String dateTimeNow = Calendar.getInstance().getTime().toString();
             BacktraceLogger.d(LOG_TAG, "ANR WATCHDOG - " + dateTimeNow);
             final BacktraceThreadWatcher threadWatcher = new BacktraceThreadWatcher(0, 0);
@@ -57,16 +63,16 @@ public class BacktraceANRWatchdog extends Thread {
             }
             threadWatcher.tickPrivateCounter();
 
-            if(threadWatcher.getCounter() == threadWatcher.getPrivateCounter()){
+            if (threadWatcher.getCounter() == threadWatcher.getPrivateCounter()) {
                 BacktraceLogger.d(LOG_TAG, "ANR is not detected");
                 continue;
             }
 
-            if(debug && (Debug.isDebuggerConnected() || Debug.waitingForDebugger())){
-                BacktraceLogger.w(LOG_TAG, "ANR detected but will be ignored because debug mode is on and connected debugger");
+            if (debug && (Debug.isDebuggerConnected() || Debug.waitingForDebugger())) {
+                BacktraceLogger.w(LOG_TAG, "ANR detected but will be ignored because debug mode " +
+                        "is on and connected debugger");
                 continue;
             }
-
             sendReportCauseBlockedThread(Looper.getMainLooper().getThread());
         }
     }
@@ -77,7 +83,10 @@ public class BacktraceANRWatchdog extends Thread {
         BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();
         exception.setStackTrace(thread.getStackTrace());
         BacktraceLogger.e(LOG_TAG, "Blocked thread detected, sending a report", exception);
-        if(backtraceClient != null) {
+        if(this.onApplicationNotRespondingEvent != null){
+            this.onApplicationNotRespondingEvent.onEvent(exception);
+        }
+        else if (backtraceClient != null) {
             backtraceClient.send(exception);
         }
     }
