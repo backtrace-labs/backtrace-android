@@ -10,39 +10,82 @@ import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
 
 
+/**
+ * This is the class that is responsible for monitoring the
+ * user interface thread and sending an error if it is blocked
+ */
 public class BacktraceANRWatchdog extends Thread {
 
     private final static transient String LOG_TAG = BacktraceANRWatchdog.class.getSimpleName();
+
+    /**
+     * Default timeout value in milliseconds
+     */
     private final static transient int DEFAULT_ANR_TIMEOUT = 5000;
 
+    /**
+     * Current Backtrace client instance which will be used to send information about exception
+     */
     private final BacktraceClient backtraceClient;
+
+    /**
+     * Enable debug mode - errors will not be sent if the debugger is connected
+     */
     private final boolean debug;
-    private int timeout = 5000;
-
-    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
-                                                           onApplicationNotRespondingEvent) {
-        this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
-    }
-
+    /**
+     * Handler for UI Thread - used to check if the thread is not blocked
+     */
+    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    /**
+     * Maximum time in milliseconds after which should check if the main thread is not hanged
+     */
+    private int timeout;
+    /**
+     * Event which will be executed instead of default handling ANR error
+     */
     private OnApplicationNotRespondingEvent onApplicationNotRespondingEvent;
 
+    /**
+     * Initialize new instance of BacktraceANRWatchdog with default timeout
+     *
+     * @param client current Backtrace client instance which will be used to send information about exception
+     */
     public BacktraceANRWatchdog(BacktraceClient client) {
         this(client, DEFAULT_ANR_TIMEOUT);
     }
 
+    /**
+     * Initialize new instance of BacktraceANRWatchdog without debugging
+     *
+     * @param client  current Backtrace client instance which will be used to send information about exception
+     * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
+     */
     public BacktraceANRWatchdog(BacktraceClient client, int timeout) {
         this(client, timeout, false);
     }
 
+
+    /**
+     * Initialize new instance of BacktraceANRWatchdog
+     *
+     * @param client  current Backtrace client instance which will be used to send information about exception
+     * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param debug   enable debug mode - errors will not be sent if the debugger is connected
+     */
     public BacktraceANRWatchdog(BacktraceClient client, int timeout, boolean debug) {
         this.backtraceClient = client;
         this.timeout = timeout;
         this.debug = debug;
     }
 
-    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
+                                                           onApplicationNotRespondingEvent) {
+        this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
+    }
 
-
+    /**
+     * Method which is using to check if the user interface thread has been blocked
+     */
     @Override
     public void run() {
         while (!isInterrupted()) {
@@ -83,10 +126,9 @@ public class BacktraceANRWatchdog extends Thread {
         BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();
         exception.setStackTrace(thread.getStackTrace());
         BacktraceLogger.e(LOG_TAG, "Blocked thread detected, sending a report", exception);
-        if(this.onApplicationNotRespondingEvent != null){
+        if (this.onApplicationNotRespondingEvent != null) {
             this.onApplicationNotRespondingEvent.onEvent(exception);
-        }
-        else if (backtraceClient != null) {
+        } else if (backtraceClient != null) {
             backtraceClient.send(exception);
         }
     }
