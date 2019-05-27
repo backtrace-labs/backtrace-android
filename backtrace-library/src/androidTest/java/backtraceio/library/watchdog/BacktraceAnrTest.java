@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
@@ -22,6 +23,8 @@ import backtraceio.library.anr.OnApplicationNotRespondingEvent;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
@@ -43,7 +46,7 @@ public class BacktraceAnrTest {
 
     @Test
     @UiThreadTest
-    public void detectingAnr() {
+    public void checkIfANRIsDetectedCorrectly() {
         // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceLogger.setLevel(LogLevel.DEBUG);
@@ -66,6 +69,41 @@ public class BacktraceAnrTest {
         // THEN
         try {
             waiter.await(5, TimeUnit.SECONDS); // Check if anr is detected and event was emitted
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    @UiThreadTest
+    public void checkIfANRIsNotDetected(){
+        // GIVEN
+        final int numberOfIterations = 5;
+        final Waiter waiter = new Waiter();
+        BacktraceLogger.setLevel(LogLevel.DEBUG);
+        BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 5000);
+        watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
+            @Override
+            public void onEvent(BacktraceWatchdogTimeoutException exception) {
+                waiter.fail();
+            }
+        });
+        watchdog.start();
+
+        // WHEN
+        try {
+            for (int i = 0; i < numberOfIterations; i++) {
+                BacktraceLogger.d("BACKTRACE TEST", Integer.toString(i));
+                Thread.sleep(800);
+                waiter.resume();
+            }
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+
+        // THEN
+        try {
+            waiter.await(5, TimeUnit.SECONDS, numberOfIterations);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
