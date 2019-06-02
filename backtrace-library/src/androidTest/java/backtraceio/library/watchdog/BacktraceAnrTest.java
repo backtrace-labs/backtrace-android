@@ -7,12 +7,10 @@ import android.support.test.runner.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
@@ -23,8 +21,6 @@ import backtraceio.library.anr.OnApplicationNotRespondingEvent;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
@@ -39,10 +35,6 @@ public class BacktraceAnrTest {
         this.backtraceClient = new BacktraceClient(this.context, credentials);
     }
 
-    @After
-    public void after() {
-
-    }
 
     @Test
     @UiThreadTest
@@ -76,7 +68,7 @@ public class BacktraceAnrTest {
 
     @Test
     @UiThreadTest
-    public void checkIfANRIsNotDetected(){
+    public void checkIfANRIsNotDetected() {
         // GIVEN
         final int numberOfIterations = 5;
         final Waiter waiter = new Waiter();

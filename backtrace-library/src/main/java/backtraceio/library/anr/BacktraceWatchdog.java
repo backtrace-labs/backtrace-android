@@ -12,10 +12,19 @@ public class BacktraceWatchdog {
     private final BacktraceClient backtraceClient;
     private final boolean sendException;
     private Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
+    /**
+     * Event which will be executed instead of default handling ANR error
+     */
+    private OnApplicationNotRespondingEvent onApplicationNotRespondingEvent;
 
-    public BacktraceWatchdog(BacktraceClient client, boolean sendException) {
-        this.backtraceClient = client;
+    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
+                                                           onApplicationNotRespondingEvent) {
+        this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
+    }
+    public BacktraceWatchdog(BacktraceClient client, boolean sendException)
+    {
         this.sendException = sendException;
+        this.backtraceClient = client;
     }
 
     public BacktraceWatchdog(BacktraceClient client)
@@ -23,7 +32,7 @@ public class BacktraceWatchdog {
         this(client, true);
     }
 
-    public boolean checkWatchdog() {
+    public boolean checkIsAnyThreadIsBlocked() {
         final long now = System.currentTimeMillis();
         final String now_str = Long.toString(now);
 
@@ -37,18 +46,14 @@ public class BacktraceWatchdog {
                 continue;
             }
 
-            if (!currentThread.isAlive() || currentWatcher.isActive()) {
-                continue;
-            }
-
-            // Thread is in an idle state, we can ignore.
-            if (currentWatcher.getPrivateCounter() == currentWatcher.getCounter()) {
+            if (!currentThread.isAlive() || !currentWatcher.isActive()) {
                 continue;
             }
 
             if (currentWatcher.getCounter() != currentWatcher.getPrivateCounter()) {
                 currentWatcher.setPrivateCounter(currentWatcher.getCounter());
                 currentWatcher.setLastTimestamp(now);
+                continue;
             }
 
             BacktraceLogger.w(LOG_TAG, String.format("Thread %s %s  might be hung, timestamp: %s",
@@ -61,19 +66,23 @@ public class BacktraceWatchdog {
                     currentWatcher.getTimeout() + currentWatcher.getDelay();
 
             if (now - timestamp > timeout) {
-                sendReportCauseBlockedThread(currentThread);
-                return false;
+                if(this.sendException) {
+                    sendReportCauseBlockedThread(currentThread);
+                }
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     private void sendReportCauseBlockedThread(Thread thread) {
         BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();
         exception.setStackTrace(thread.getStackTrace());
         BacktraceLogger.e(LOG_TAG, "Blocked thread detected, sending a report", exception);
-        if(backtraceClient != null) {
+        if (this.onApplicationNotRespondingEvent != null) {
+            this.onApplicationNotRespondingEvent.onEvent(exception);
+        } else if (backtraceClient != null) {
             backtraceClient.send(exception);
         }
     }
@@ -88,8 +97,7 @@ public class BacktraceWatchdog {
     }
 
     public void tick(Thread thread) {
-
-        threadsIdWatcher.get(thread).tickPrivateCounter();
+        threadsIdWatcher.get(thread).tickCounter();
     }
 
     public void activateWatcher(Thread thread) {
