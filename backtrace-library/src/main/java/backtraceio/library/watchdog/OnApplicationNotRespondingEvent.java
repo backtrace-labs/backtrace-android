@@ -1,6 +1,4 @@
-package backtraceio.library.anr;
-
-import backtraceio.library.anr.BacktraceWatchdogTimeoutException;
+package backtraceio.library.watchdog;
 
 public interface OnApplicationNotRespondingEvent {
     void onEvent(BacktraceWatchdogTimeoutException exception);

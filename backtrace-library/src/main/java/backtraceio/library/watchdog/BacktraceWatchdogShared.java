@@ -1,4 +1,4 @@
-package backtraceio.library.anr;
+package backtraceio.library.watchdog;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
