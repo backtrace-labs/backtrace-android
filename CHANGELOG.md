@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 2.1.0 - 16.06.2019
+- Add support for detecting ANR (Application Not Responding)
+- Add methods and structures to detecting blocked custom threads
+
 ## Version 2.0.0 - 06.05.2019
 - Removed `sendAsync` method
 - Removed event `OnAfterSendEventListener`
