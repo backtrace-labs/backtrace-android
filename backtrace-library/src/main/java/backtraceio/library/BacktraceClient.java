@@ -2,6 +2,8 @@ package backtraceio.library;
 
 import android.content.Context;
 
+import backtraceio.library.anr.BacktraceANRWatchdog;
+import backtraceio.library.anr.OnApplicationNotRespondingEvent;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.IBacktraceDatabase;
@@ -12,6 +14,11 @@ import backtraceio.library.models.json.BacktraceReport;
  * Backtrace Java Android Client
  */
 public class BacktraceClient extends BacktraceBase {
+
+    /**
+     *
+     */
+    private BacktraceANRWatchdog anrWatchdog;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -104,5 +111,63 @@ public class BacktraceClient extends BacktraceBase {
     public void send(BacktraceReport report, OnServerResponseEventListener
             serverResponseEventListener) {
         super.send(report, serverResponseEventListener);
+    }
+
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     */
+    public void enableAnr() {
+        this.anrWatchdog = new BacktraceANRWatchdog(this);
+    }
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     *
+     * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
+     */
+    public void enableAnr(int timeout) {
+        this.enableAnr(timeout, null);
+    }
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     *
+     * @param timeout                         maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
+     */
+    public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {
+        this.enableAnr(timeout, onApplicationNotRespondingEvent, false);
+    }
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     *
+     * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param debug   enable debug mode - errors will not be sent if the debugger is connected
+     */
+    public void enableAnr(int timeout, boolean debug) {
+        this.enableAnr(timeout, null, debug);
+    }
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     *
+     * @param timeout                         maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
+     * @param debug                           enable debug mode - errors will not be sent if the debugger is connected
+     */
+    public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
+        this.anrWatchdog = new BacktraceANRWatchdog(this, timeout, debug);
+        this.anrWatchdog.setOnApplicationNotRespondingEvent(onApplicationNotRespondingEvent);
+    }
+
+    /**
+     * Stop monitoring if the main thread has been blocked
+     */
+    public void disableAnr() {
+        if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
+            this.anrWatchdog.stopMonitoringAnr();
+        }
     }
 }

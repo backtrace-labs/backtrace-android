@@ -49,7 +49,34 @@ public class BacktraceAnrTest {
                 waiter.resume();
             }
         });
-        watchdog.start();
+
+        // WHEN
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+
+        // THEN
+        try {
+            waiter.await(5, TimeUnit.SECONDS); // Check if anr is detected and event was emitted
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    @UiThreadTest
+    public void checkIfANRIsDetectedCorrectlyWithBacktraceClient() {
+        // GIVEN
+        final Waiter waiter = new Waiter();
+        BacktraceLogger.setLevel(LogLevel.DEBUG);
+        this.backtraceClient.enableAnr(500, new OnApplicationNotRespondingEvent() {
+            @Override
+            public void onEvent(BacktraceWatchdogTimeoutException exception) {
+                waiter.resume();
+            }
+        });
 
         // WHEN
         try {
@@ -80,12 +107,10 @@ public class BacktraceAnrTest {
                 waiter.fail();
             }
         });
-        watchdog.start();
 
         // WHEN
         try {
             for (int i = 0; i < numberOfIterations; i++) {
-                BacktraceLogger.d("BACKTRACE TEST", Integer.toString(i));
                 Thread.sleep(800);
                 waiter.resume();
             }
@@ -98,6 +123,29 @@ public class BacktraceAnrTest {
             waiter.await(5, TimeUnit.SECONDS, numberOfIterations);
         } catch (Exception ex) {
             fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    @UiThreadTest
+    public void checkIsDisableWorks(){
+        final Waiter waiter = new Waiter();
+        BacktraceLogger.setLevel(LogLevel.DEBUG);
+
+        backtraceClient.enableAnr(1000, new OnApplicationNotRespondingEvent() {
+            @Override
+            public void onEvent(BacktraceWatchdogTimeoutException exception) {
+                waiter.fail();
+            }
+        });
+
+        backtraceClient.disableAnr();
+
+        // WHEN
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
         }
     }
 }
