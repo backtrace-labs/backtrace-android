@@ -8,10 +8,10 @@ import java.util.Map;
  */
 public class Annotations {
 
-    public static Map<String, Object> getAnnotations(Object exceptionMessage, Map<String, Object> complexAttributes){
+    public static Map<String, Object> getAnnotations(Object exceptionMessage, Map<String, Object> complexAttributes) {
         Map<String, Object> result = new HashMap<>();
         result.put("Environment Variables", System.getenv());
-        if(complexAttributes != null) {
+        if (complexAttributes != null) {
             result.putAll(complexAttributes);
         }
 
@@ -20,10 +20,14 @@ public class Annotations {
     }
 }
 
-class AnnotationException{
+class AnnotationException {
     private Object message;
 
-    AnnotationException(Object message){ setMessage(message); }
+    AnnotationException(Object message) {
+        setMessage(message);
+    }
 
-    void setMessage(Object message){ this.message = message; }
+    void setMessage(Object message) {
+        this.message = message;
+    }
 }

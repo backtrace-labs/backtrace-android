@@ -1,11 +1,12 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
+import backtraceio.library.watchdog.BacktraceANRWatchdog;
+import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.IBacktraceDatabase;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -13,6 +14,11 @@ import backtraceio.library.models.json.BacktraceReport;
  * Backtrace Java Android Client
  */
 public class BacktraceClient extends BacktraceBase {
+
+    /**
+     *
+     */
+    private BacktraceANRWatchdog anrWatchdog;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -31,8 +37,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings)
-    {
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           BacktraceDatabaseSettings databaseSettings) {
         super(context, credentials, databaseSettings);
     }
 
@@ -43,7 +49,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, IBacktraceDatabase database) {
+    public BacktraceClient(Context context, BacktraceCredentials credentials, IBacktraceDatabase
+            database) {
         super(context, credentials, database);
     }
 
@@ -51,59 +58,116 @@ public class BacktraceClient extends BacktraceBase {
      * Sending a message to Backtrace API
      *
      * @param message custom client message
-     * @return server response
      */
-    public BacktraceResult send(String message) {
-        return super.send(new BacktraceReport(message));
+    public void send(String message) {
+        this.send(message, null);
+    }
+
+    /**
+     * Sending a message to Backtrace API
+     *
+     * @param message                     custom client message
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
+     */
+    public void send(String message, OnServerResponseEventListener serverResponseEventListener) {
+        super.send(new BacktraceReport(message), serverResponseEventListener);
     }
 
     /**
      * Sending an exception to Backtrace API
      *
      * @param exception current exception
-     * @return server response
      */
-    public BacktraceResult send(Exception exception) {
-        return super.send(new BacktraceReport(exception));
+    public void send(Exception exception) {
+        this.send(exception, null);
+    }
+
+    /**
+     * Sending an exception to Backtrace API
+     *
+     * @param exception                   current exception
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
+     */
+    public void send(Exception exception, OnServerResponseEventListener
+            serverResponseEventListener) {
+        super.send(new BacktraceReport(exception), serverResponseEventListener);
     }
 
     /**
      * Sending a Backtrace report to Backtrace API
      *
      * @param report current BacktraceReport
-     * @return server response
      */
-    public BacktraceResult send(BacktraceReport report) {
-        return super.send(report);
+    public void send(BacktraceReport report) {
+        send(report, null);
     }
 
     /**
-     * Sending asynchronously a message to Backtrace API
+     * Sending a Backtrace report to Backtrace API
      *
-     * @param message custom client message
-     * @return async task which send data to Backtrace API and return server response
+     * @param report                      current BacktraceReport
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(String message) {
-        return super.sendAsync(new BacktraceReport(message));
+    public void send(BacktraceReport report, OnServerResponseEventListener
+            serverResponseEventListener) {
+        super.send(report, serverResponseEventListener);
+    }
+
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     */
+    public void enableAnr() {
+        this.anrWatchdog = new BacktraceANRWatchdog(this);
     }
 
     /**
-     * Sending asynchronously an Exception to Backtrace API
+     * Start monitoring if the main thread has been blocked
      *
-     * @param exception current exception
-     * @return async task which send data to Backtrace API and return server response
+     * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
      */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(Exception exception) {
-        return super.sendAsync(new BacktraceReport(exception));
+    public void enableAnr(int timeout) {
+        this.enableAnr(timeout, null);
     }
 
     /**
-     * Sending asynchronously a Backtrace report to Backtrace API
+     * Start monitoring if the main thread has been blocked
      *
-     * @param report current BacktraceReport
-     * @return async task which send data to Backtrace API and return server response
+     * @param timeout                         maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
      */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report) {
-        return super.sendAsync(report);
+    public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {
+        this.enableAnr(timeout, onApplicationNotRespondingEvent, false);
+    }
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     *
+     * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param debug   enable debug mode - errors will not be sent if the debugger is connected
+     */
+    public void enableAnr(int timeout, boolean debug) {
+        this.enableAnr(timeout, null, debug);
+    }
+
+    /**
+     * Start monitoring if the main thread has been blocked
+     *
+     * @param timeout                         maximum time in milliseconds after which should check if the main thread is not hanged
+     * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
+     * @param debug                           enable debug mode - errors will not be sent if the debugger is connected
+     */
+    public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
+        this.anrWatchdog = new BacktraceANRWatchdog(this, timeout, debug);
+        this.anrWatchdog.setOnApplicationNotRespondingEvent(onApplicationNotRespondingEvent);
+    }
+
+    /**
+     * Stop monitoring if the main thread has been blocked
+     */
+    public void disableAnr() {
+        if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
+            this.anrWatchdog.stopMonitoringAnr();
+        }
     }
 }

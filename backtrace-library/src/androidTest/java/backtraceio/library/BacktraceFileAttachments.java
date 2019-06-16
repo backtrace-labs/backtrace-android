@@ -4,7 +4,8 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.app.ActivityCompat;
+
+import net.jodah.concurrentunit.Waiter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -14,21 +15,23 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.MultiFormRequestHelper;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -46,7 +49,7 @@ public class BacktraceFileAttachments {
     public void setUp() {
         context = InstrumentationRegistry.getContext();
         absolutePath = context.getFilesDir().getAbsolutePath() + "/" + fileName;
-        credentials = new BacktraceCredentials("","");
+        credentials = new BacktraceCredentials("", "");
         client = new BacktraceClient(context, credentials);
     }
 
@@ -57,8 +60,11 @@ public class BacktraceFileAttachments {
     @Test
     public void streamFileAttachment() {
         // GIVEN
+        final Waiter waiter = new Waiter();
         createTestFile();
-        final List<String> attachments = new ArrayList<String>(){{ add(absolutePath); }};
+        final List<String> attachments = new ArrayList<String>() {{
+            add(absolutePath);
+        }};
 
         // WHEN
         final List<byte[]> fileContents = new ArrayList<>();
@@ -67,33 +73,42 @@ public class BacktraceFileAttachments {
             public BacktraceResult onRequest(BacktraceData data) {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 try {
-                    for(String path : attachments) {
+                    for (String path : attachments) {
                         MultiFormRequestHelper.streamFile(bos, path);
                         fileContents.add(bos.toByteArray());
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
                 return new BacktraceResult();
             }
         });
-        BacktraceResult backtraceResult = client.send(new BacktraceReport("test", null, attachments));
-
-        // THEN
-        assertNotNull(backtraceResult);
-        assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
-        assertEquals(1, fileContents.size());
-        assertEquals(fileContent, new String(fileContents.get(0)));
+        client.send(new BacktraceReport("test", null, attachments), new
+                OnServerResponseEventListener() {
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        // THEN
+                        assertNotNull(backtraceResult);
+                        assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
+                        assertEquals(1, fileContents.size());
+                        assertEquals(fileContent, new String(fileContents.get(0)));
+                        waiter.resume();
+                    }
+                });
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
     }
 
     @Test
-    public void streamNotExistFiles()
-    {
+    public void streamNotExistFiles() {
         // GIVEN
-        final List<String> attachments = new ArrayList<String>(){{
+        final Waiter waiter = new Waiter();
+        final List<String> attachments = new ArrayList<String>() {{
             add(null);
             add("");
             add("broken path");
@@ -108,22 +123,33 @@ public class BacktraceFileAttachments {
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     MultiFormRequestHelper.addFiles(bos, attachments);
-                    if(bos.size() != 0)
-                    {
+                    if (bos.size() != 0) {
                         fileContents.add(bos.toByteArray());
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
                 return new BacktraceResult();
             }
         });
-        BacktraceResult backtraceResult = client.send(new BacktraceReport("test", null, attachments));
-        assertNotNull(backtraceResult);
-        assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
-        assertEquals(0, fileContents.size());
+        client.send(new BacktraceReport("test", null, attachments), new
+                OnServerResponseEventListener() {
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        // THEN
+                        assertNotNull(backtraceResult);
+                        assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
+                        assertEquals(0, fileContents.size());
+                        waiter.resume();
+                    }
+                });
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(1005, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
     }
 
     @After

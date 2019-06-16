@@ -12,6 +12,7 @@ public class HttpException extends Exception {
 
     /**
      * Create new instance with message
+     *
      * @param message received exception message
      */
     @SuppressWarnings("unused")
@@ -21,6 +22,7 @@ public class HttpException extends Exception {
 
     /**
      * Create new instance with HTTP status
+     *
      * @param httpStatus received HTTP status code
      */
     @SuppressWarnings("unused")
@@ -30,8 +32,9 @@ public class HttpException extends Exception {
 
     /**
      * Create new instance with HTTP status and without message
+     *
      * @param httpStatus received HTTP status code
-     * @param message received exception message
+     * @param message    received exception message
      */
     public HttpException(Integer httpStatus, String message) {
         super(message);
@@ -40,6 +43,7 @@ public class HttpException extends Exception {
 
     /**
      * Set HTTP status code
+     *
      * @param httpStatus received HTTP status code
      */
     private void setHttpStatus(int httpStatus) {
@@ -48,6 +52,7 @@ public class HttpException extends Exception {
 
     /**
      * Return HTTP status code
+     *
      * @return HTTP status code
      */
     @SuppressWarnings("unused")

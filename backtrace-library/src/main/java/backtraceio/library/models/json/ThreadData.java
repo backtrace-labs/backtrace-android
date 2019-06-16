@@ -14,8 +14,7 @@ public class ThreadData {
     /**
      * All collected application threads information
      */
-    public HashMap<String, ThreadInformation> threadInformation = new HashMap<String,
-            ThreadInformation>();
+    public HashMap<String, ThreadInformation> threadInformation = new HashMap<>();
 
     /**
      * Get main thread id

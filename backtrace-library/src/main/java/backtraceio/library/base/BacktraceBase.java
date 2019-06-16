@@ -1,19 +1,17 @@
 package backtraceio.library.base;
 
 import android.content.Context;
-import android.os.AsyncTask;
-
 
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.events.OnAfterSendEventListener;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
+import backtraceio.library.interfaces.IBacktraceApi;
 import backtraceio.library.interfaces.IBacktraceClient;
 import backtraceio.library.interfaces.IBacktraceDatabase;
 import backtraceio.library.models.BacktraceData;
@@ -29,12 +27,14 @@ import backtraceio.library.services.BacktraceApi;
  */
 public class BacktraceBase implements IBacktraceClient {
 
+    private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
+
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
-    private BacktraceApi backtraceApi;
+    private IBacktraceApi backtraceApi;
 
-    private void setBacktraceApi(BacktraceApi backtraceApi) {
+    private void setBacktraceApi(IBacktraceApi backtraceApi) {
         this.backtraceApi = backtraceApi;
         if (this.database != null) {
             this.database.setApi(this.backtraceApi);
@@ -49,7 +49,7 @@ public class BacktraceBase implements IBacktraceClient {
     /**
      * Backtrace database instance
      */
-    public IBacktraceDatabase database;
+    public final IBacktraceDatabase database;
 
     /**
      * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
@@ -130,7 +130,7 @@ public class BacktraceBase implements IBacktraceClient {
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database, Map<String, Object> attributes) {
         this.context = context;
-        this.attributes = attributes != null? attributes: new HashMap<String, Object>();
+        this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
@@ -144,24 +144,6 @@ public class BacktraceBase implements IBacktraceClient {
      */
     public void setOnBeforeSendEventListener(OnBeforeSendEventListener eventListener) {
         this.beforeSendEventListener = eventListener;
-    }
-
-    /**
-     * Set an event executed when Backtrace API return information about send report
-     *
-     * @param eventListener object with method which will be executed
-     */
-    public void setOnServerResponseEventListner(OnServerResponseEventListener eventListener) {
-        this.backtraceApi.setOnServerResponse(eventListener);
-    }
-
-    /**
-     * Set an event executed after sending data to Backtrace API
-     *
-     * @param eventListener object with method which will be executed
-     */
-    public void setOnAfterSendEventListener(OnAfterSendEventListener eventListener) {
-        this.backtraceApi.setAfterSend(eventListener);
     }
 
     /**
@@ -186,42 +168,42 @@ public class BacktraceBase implements IBacktraceClient {
      * Sending an exception to Backtrace API
      *
      * @param report current BacktraceReport
-     * @return server response
      */
-    public BacktraceResult send(BacktraceReport report) {
-        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
-
-        BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
-
-        if (this.beforeSendEventListener != null) {
-            backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
-        }
-
-        BacktraceResult result = this.backtraceApi.send(backtraceData);
-
-        if(record != null)
-        {
-            record.close();
-        }
-        if(result != null && result.status == BacktraceResultStatus.Ok)
-        {
-            this.database.delete(record);
-        }
-
-        return result;
+    public void send(BacktraceReport report) {
+        send(report, null);
     }
 
     /**
-     * Sending asynchronously an exception to Backtrace API
+     * Sending an exception to Backtrace API
      *
      * @param report current BacktraceReport
-     * @return server response
      */
-    public AsyncTask<Void, Void, BacktraceResult> sendAsync(BacktraceReport report) {
+    public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, null);
+
+        final BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
+
         if (this.beforeSendEventListener != null) {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
         }
-        return this.backtraceApi.sendAsync(backtraceData);
+
+        this.backtraceApi.send(backtraceData, this.getDatabaseCallback(record, callback));
+    }
+
+    private OnServerResponseEventListener getDatabaseCallback(final BacktraceDatabaseRecord record, final OnServerResponseEventListener customCallback) {
+        return new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                if (customCallback != null) {
+                    customCallback.onEvent(backtraceResult);
+                }
+                if (record != null) {
+                    record.close();
+                }
+                if (backtraceResult != null && backtraceResult.status == BacktraceResultStatus.Ok) {
+                    database.delete(record);
+                }
+            }
+        };
     }
 }

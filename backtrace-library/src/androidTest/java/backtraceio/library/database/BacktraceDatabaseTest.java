@@ -3,7 +3,6 @@ package backtraceio.library.database;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import org.junit.After;
 import org.junit.Before;
@@ -74,7 +73,7 @@ public class BacktraceDatabaseTest {
     }
 
     @Test
-    public void addWithAttributes(){
+    public void addWithAttributes() {
         // GIVEN
         String key = "Example key";
         String value = "Example value";

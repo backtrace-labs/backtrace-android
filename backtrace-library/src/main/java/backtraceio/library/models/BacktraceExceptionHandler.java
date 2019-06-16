@@ -1,6 +1,10 @@
 package backtraceio.library.models;
 
+import java.util.concurrent.CountDownLatch;
+
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.BacktraceReport;
 
 /**
@@ -8,10 +12,15 @@ import backtraceio.library.models.json.BacktraceReport;
  * to an uncaught exception
  */
 public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+    private static transient String LOG_TAG = BacktraceExceptionHandler.class.getSimpleName();
+
     private final Thread.UncaughtExceptionHandler rootHandler;
+    private final CountDownLatch signal = new CountDownLatch(1);
     private BacktraceClient client;
 
     private BacktraceExceptionHandler(BacktraceClient client) {
+        BacktraceLogger.d(LOG_TAG, "BacktraceExceptionHandler initialization");
         this.client = client;
         rootHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
@@ -35,9 +44,29 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
      */
     @Override
     public void uncaughtException(final Thread thread, final Throwable throwable) {
+        OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
+
         if (throwable instanceof Exception) {
-            this.client.send(new BacktraceReport((Exception) throwable));
+            BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
+            this.client.send(new BacktraceReport((Exception) throwable), callback);
+            BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
         }
-        rootHandler.uncaughtException(thread, throwable);
+        BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
+        try {
+            signal.await();
+        } catch (Exception ex) {
+            BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
+        }
+    }
+
+    private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
+        return new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                BacktraceLogger.d(LOG_TAG, "Root handler event callback");
+                rootHandler.uncaughtException(thread, throwable);
+                signal.countDown();
+            }
+        };
     }
 }
