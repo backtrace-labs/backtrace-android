@@ -6,6 +6,9 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
 
+/**
+ * Watchdog to monitor that any thread has blocked
+ */
 public class BacktraceWatchdog {
 
     private final static transient String LOG_TAG = BacktraceWatchdog.class.getSimpleName();
@@ -22,7 +25,7 @@ public class BacktraceWatchdog {
      * Initialize new instance of BacktraceWatchdog
      *
      * @param client        current Backtrace client instance which will be used to send information about exception
-     * @param sendException
+     * @param sendException whether to make a request to the server with information about the error
      */
     public BacktraceWatchdog(BacktraceClient client, boolean sendException) {
         this.sendException = sendException;
@@ -33,6 +36,10 @@ public class BacktraceWatchdog {
         this(client, true);
     }
 
+    /**
+     * Set event that will be executed instead of the default sending of the error information to the Backtrace console
+     * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
+     */
     public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
                                                            onApplicationNotRespondingEvent) {
         this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
@@ -78,7 +85,8 @@ public class BacktraceWatchdog {
 
             if (now - timestamp > timeout) {
                 if (this.sendException) {
-                    sendReportCauseBlockedThread(currentThread);
+                    BacktraceWatchdogShared.sendReportCauseBlockedThread(backtraceClient,
+                            currentThread, onApplicationNotRespondingEvent, LOG_TAG);
                 }
                 return true;
             }
@@ -87,24 +95,12 @@ public class BacktraceWatchdog {
         return false;
     }
 
-    private void sendReportCauseBlockedThread(Thread thread) {
-        BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();
-        exception.setStackTrace(thread.getStackTrace());
-        BacktraceLogger.e(LOG_TAG, "Blocked thread detected, sending a report", exception);
-        if (this.onApplicationNotRespondingEvent != null) {
-            this.onApplicationNotRespondingEvent.onEvent(exception);
-        } else if (backtraceClient != null) {
-            backtraceClient.send(exception);
-        }
-    }
-
-
     /**
      * Register a thread to monitor it
      *
      * @param thread  thread which should be monitored
      * @param timeout time in milliseconds after which we consider the thread to be blocked
-     * @param delay
+     * @param delay time delay in milliseconds after which the thread should be monitored
      */
     public void registerThread(Thread thread, int timeout, int delay) {
         threadsIdWatcher.put(thread, new BacktraceThreadWatcher(timeout, delay));

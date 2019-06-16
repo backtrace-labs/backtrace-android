@@ -46,6 +46,11 @@ public class BacktraceANRWatchdog extends Thread {
     private OnApplicationNotRespondingEvent onApplicationNotRespondingEvent;
 
     /**
+     * Check if thread should stop
+     */
+    private volatile boolean shouldStop = false;
+
+    /**
      * Initialize new instance of BacktraceANRWatchdog with default timeout
      *
      * @param client current Backtrace client instance which will be used to send information about exception
@@ -64,7 +69,6 @@ public class BacktraceANRWatchdog extends Thread {
         this(client, timeout, false);
     }
 
-
     /**
      * Initialize new instance of BacktraceANRWatchdog
      *
@@ -73,9 +77,11 @@ public class BacktraceANRWatchdog extends Thread {
      * @param debug   enable debug mode - errors will not be sent if the debugger is connected
      */
     public BacktraceANRWatchdog(BacktraceClient client, int timeout, boolean debug) {
+        BacktraceLogger.d(LOG_TAG, "Start monitoring ANR");
         this.backtraceClient = client;
         this.timeout = timeout;
         this.debug = debug;
+        this.start();
     }
 
     public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
@@ -88,7 +94,7 @@ public class BacktraceANRWatchdog extends Thread {
      */
     @Override
     public void run() {
-        while (!isInterrupted()) {
+        while (!shouldStop && !isInterrupted()) {
             String dateTimeNow = Calendar.getInstance().getTime().toString();
             BacktraceLogger.d(LOG_TAG, "ANR WATCHDOG - " + dateTimeNow);
             final BacktraceThreadWatcher threadWatcher = new BacktraceThreadWatcher(0, 0);
@@ -116,20 +122,13 @@ public class BacktraceANRWatchdog extends Thread {
                         "is on and connected debugger");
                 continue;
             }
-            sendReportCauseBlockedThread(Looper.getMainLooper().getThread());
+            BacktraceWatchdogShared.sendReportCauseBlockedThread(backtraceClient,
+                    Looper.getMainLooper().getThread(), onApplicationNotRespondingEvent, LOG_TAG);
         }
     }
 
-
-    //TODO: remove duplicate code
-    private void sendReportCauseBlockedThread(Thread thread) {
-        BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();
-        exception.setStackTrace(thread.getStackTrace());
-        BacktraceLogger.e(LOG_TAG, "Blocked thread detected, sending a report", exception);
-        if (this.onApplicationNotRespondingEvent != null) {
-            this.onApplicationNotRespondingEvent.onEvent(exception);
-        } else if (backtraceClient != null) {
-            backtraceClient.send(exception);
-        }
+    public void stopMonitoringAnr() {
+        BacktraceLogger.d(LOG_TAG, "Stop monitoring ANR");
+        shouldStop = true;
     }
 }
