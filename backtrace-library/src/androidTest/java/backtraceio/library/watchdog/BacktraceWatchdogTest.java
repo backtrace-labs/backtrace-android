@@ -14,9 +14,6 @@ import org.junit.runner.RunWith;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.anr.BacktraceWatchdog;
-import backtraceio.library.anr.BacktraceWatchdogTimeoutException;
-import backtraceio.library.anr.OnApplicationNotRespondingEvent;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceWatchdogTest {

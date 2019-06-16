@@ -1,4 +1,4 @@
-package backtraceio.library.anr;
+package backtraceio.library.watchdog;
 
 import java.util.HashMap;
 import java.util.Map;

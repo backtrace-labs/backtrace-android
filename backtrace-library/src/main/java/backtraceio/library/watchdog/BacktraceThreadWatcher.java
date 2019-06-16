@@ -1,4 +1,4 @@
-package backtraceio.library.anr;
+package backtraceio.library.watchdog;
 
 /**
  * This class is a representation of the state of the thread,

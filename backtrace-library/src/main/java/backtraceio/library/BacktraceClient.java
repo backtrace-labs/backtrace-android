@@ -2,8 +2,8 @@ package backtraceio.library;
 
 import android.content.Context;
 
-import backtraceio.library.anr.BacktraceANRWatchdog;
-import backtraceio.library.anr.OnApplicationNotRespondingEvent;
+import backtraceio.library.watchdog.BacktraceANRWatchdog;
+import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.IBacktraceDatabase;

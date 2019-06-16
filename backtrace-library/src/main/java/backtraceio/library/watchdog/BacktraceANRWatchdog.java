@@ -1,4 +1,4 @@
-package backtraceio.library.anr;
+package backtraceio.library.watchdog;
 
 import android.os.Debug;
 import android.os.Handler;

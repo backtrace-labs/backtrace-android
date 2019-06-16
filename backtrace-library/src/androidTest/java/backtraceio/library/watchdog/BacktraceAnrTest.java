@@ -15,9 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.anr.BacktraceANRWatchdog;
-import backtraceio.library.anr.BacktraceWatchdogTimeoutException;
-import backtraceio.library.anr.OnApplicationNotRespondingEvent;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 

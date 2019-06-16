@@ -155,7 +155,7 @@ val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
 ## Enabling ANR
-Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5s.
+Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5 seconds.
 
 ```
 backtraceClient.enableAnr(timeout, event, debug);
@@ -326,6 +326,21 @@ BacktraceLogger.setLevel(LogLevel.DEBUG);
 ## Custom client and report classes <a name="documentation-customization"></a>
 
 You can extend `BacktraceBase` to create your own Backtrace client and error report implementation. You can refer to `BacktraceClient` for implementation inspirations. 
+
+## Monitoring custom threads
+Library provides structures and methods to monitor the blocking of your own threads. It is the responsibility of the library user to check whether the thread is blocked and the user's thread should increment the counter.
+
+Java
+```
+BacktraceWatchdog watchdog = BacktraceWatchdog(backtraceClient); // Initialize BacktraceWatchdog
+watchdog.registerThread(customThread, timeout, delay); // Register custom thread
+
+watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the time, by default an error will be sent to the Backtrace console
+
+
+// The following code should be executed inside the thread you want to monitor
+watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
+```
 
 # Documentation  <a name="documentation"></a>
 
