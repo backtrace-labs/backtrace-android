@@ -129,6 +129,7 @@ public class BacktraceAnrTest {
     @Test
     @UiThreadTest
     public void checkIsDisableWorks(){
+        // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceLogger.setLevel(LogLevel.DEBUG);
 
@@ -139,9 +140,10 @@ public class BacktraceAnrTest {
             }
         });
 
+        // WHEN
         backtraceClient.disableAnr();
 
-        // WHEN
+        // THEN
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
