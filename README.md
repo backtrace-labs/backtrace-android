@@ -57,6 +57,8 @@ catch (e: Exception) {
 * Supports a wide range of Android SDKs.
 * Supports offline database for error report storage and re-submission in case of network outage.
 * Fully customizable and extendable event handlers and base classes for custom implementations.
+* Supports detection of blocking the application's main thread (Application Not Responding).
+* Supports monitoring the blocking of manually created threads by providing watchdog.
 
 # Supported SDKs <a name="supported-sdks"></a>
 * Minimal SDK version 19 (Android 4.4)
@@ -70,7 +72,7 @@ catch (e: Exception) {
 * Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.2.1'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.1.0'
 }
 ```
 
@@ -79,12 +81,12 @@ dependencies {
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>1.2.1</version>
+  <version>2.1.0</version>
   <type>aar</type>
 </dependency>
 ```
 
-## Installation pre-release version <a name="prerelease-version"></a>
+<!-- ## Installation pre-release version <a name="prerelease-version"></a>
 ### Prelease version of `v.2.0.0` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1009/
 Add the above url in `build.gradle` file to `repositories` section as below to allow downloading the library from our staging repository:
 ```
@@ -96,7 +98,7 @@ Then you can download this library by adding to the dependencies in `build.gradl
 
 ```
 implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.0.0'
-```
+``` -->
 
 ## Permissions
 ### Internet permission
@@ -152,6 +154,12 @@ val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.i
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
+## Enabling ANR
+Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5s.
+
+```
+backtraceClient.enableAnr(timeout, event, debug);
+```
 ## Database initialization <a name="using-backtrace-initialization"></a>
 
 BacktraceClient allows you to customize the initialization of BacktraceDatabase for local storage of error reports by supplying a BacktraceDatabaseSettings parameter, as follows:
