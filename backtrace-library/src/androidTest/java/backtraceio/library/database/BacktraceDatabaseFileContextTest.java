@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -54,7 +53,7 @@ public class BacktraceDatabaseFileContextTest {
 
 
     @Test
-    public void getFilesAfterAddOne(){
+    public void getFilesAfterAddOne() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         this.databaseContext.add(new BacktraceData(this.context, report, null));
@@ -67,7 +66,7 @@ public class BacktraceDatabaseFileContextTest {
     }
 
     @Test
-    public void getFilesAfterAddThree(){
+    public void getFilesAfterAddThree() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
@@ -104,7 +103,7 @@ public class BacktraceDatabaseFileContextTest {
 
 
     @Test
-    public void clear(){
+    public void clear() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
@@ -140,7 +139,7 @@ public class BacktraceDatabaseFileContextTest {
     }
 
     @Test
-    public void forceInconsistencyMaxRecordCount(){
+    public void forceInconsistencyMaxRecordCount() {
         // GIVEN
         this.databaseSettings.setMaxRecordCount(1);
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
@@ -160,7 +159,7 @@ public class BacktraceDatabaseFileContextTest {
     }
 
     @Test
-    public void forceInconsistencyMaxDatabaseSize(){
+    public void forceInconsistencyMaxDatabaseSize() {
         // GIVEN
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 1, this.databaseSettings.getMaxRecordCount());
 
@@ -188,7 +187,9 @@ public class BacktraceDatabaseFileContextTest {
 
         // WHEN
         int countRecords = countRecords();
-        List<BacktraceDatabaseRecord> records = new ArrayList<BacktraceDatabaseRecord>(){{add(record);}};
+        List<BacktraceDatabaseRecord> records = new ArrayList<BacktraceDatabaseRecord>() {{
+            add(record);
+        }};
         this.databaseFileContext.removeOrphaned(records);
 
         int countRecordAfterRemoveOrphaned = countRecords();
@@ -200,19 +201,17 @@ public class BacktraceDatabaseFileContextTest {
         assertEquals(3, countFilesAfterRemoveOrphaned);
     }
 
-    private int countRecords(){
+    private int countRecords() {
         int files = 0;
-        for(File _ : this.databaseFileContext.getRecords())
-        {
+        for (File ignored : this.databaseFileContext.getRecords()) {
             files++;
         }
         return files;
     }
 
-    private int countAllFiles(){
+    private int countAllFiles() {
         int files = 0;
-        for(File _ : this.databaseFileContext.getAll())
-        {
+        for (File ignored : this.databaseFileContext.getAll()) {
             files++;
         }
         return files;

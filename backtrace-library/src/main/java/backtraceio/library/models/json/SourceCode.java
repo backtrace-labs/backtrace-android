@@ -7,7 +7,7 @@ import backtraceio.library.models.BacktraceStackFrame;
 /**
  * Single instance of source data frame
  */
-public class SourceCode{
+public class SourceCode {
     /**
      * Line number in source code where exception occurs
      */
@@ -21,8 +21,7 @@ public class SourceCode{
     public String sourceCodeFileName;
 
 
-    public SourceCode(BacktraceStackFrame stackFrame)
-    {
+    public SourceCode(BacktraceStackFrame stackFrame) {
         this.sourceCodeFileName = stackFrame.sourceCodeFileName;
         this.startLine = stackFrame.line;
     }

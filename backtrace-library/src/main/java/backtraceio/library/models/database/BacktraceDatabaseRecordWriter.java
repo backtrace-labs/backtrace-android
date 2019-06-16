@@ -7,8 +7,11 @@ import java.nio.charset.StandardCharsets;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.interfaces.IBacktraceDatabaseRecordWriter;
+import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWriter {
+
+    private static transient final String LOG_TAG = BacktraceDatabaseRecordWriter.class.getSimpleName();
 
     /**
      * Path to destination directory
@@ -49,6 +52,7 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
      */
     private String toJsonFile(Object data) {
         if (data == null) {
+            BacktraceLogger.w(LOG_TAG, "Passed object to serialization is null");
             return "";
         }
         return BacktraceSerializeHelper.toJson(data);
@@ -66,18 +70,20 @@ public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWr
         File toFile = new File(destinationPath);
         boolean renameResult = fromFile.renameTo(toFile);
         if (!renameResult) {
+            BacktraceLogger.e(LOG_TAG, "Can not rename file");
             throw new IOException(String.format("Can not rename file. Source path: %s, destination path: %s", sourcePath, destinationPath));
         }
     }
 
     /**
-     * Save temporary file to hard drive
+     * Save temporary file to storage
      *
      * @param path path to temporary file
      * @param file current file
      * @throws IOException
      */
     private void saveTemporaryFile(String path, byte[] file) throws IOException {
+        BacktraceLogger.d(LOG_TAG, "Saving temporary file");
         FileOutputStream out = new FileOutputStream(path);
         out.write(file);
         out.close();

@@ -2,8 +2,6 @@ package backtraceio.library.models.json;
 
 import android.content.Context;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,8 +79,8 @@ public class BacktraceReport {
      * Create new instance of Backtrace report to sending a report
      * with custom client message and attributes
      *
-     * @param message         custom client message
-     * @param attributes      additional information about application state
+     * @param message    custom client message
+     * @param attributes additional information about application state
      */
     public BacktraceReport(
             String message,
@@ -139,8 +137,8 @@ public class BacktraceReport {
      * Create new instance of Backtrace report to sending a report
      * with application exception and attributes
      *
-     * @param exception       current exception
-     * @param attributes      additional information about application state
+     * @param exception  current exception
+     * @param attributes additional information about application state
      */
     public BacktraceReport(
             Exception exception,
@@ -186,8 +184,7 @@ public class BacktraceReport {
         }
     }
 
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes)
-    {
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
         return new BacktraceData(context, this, clientAttributes);
     }
 

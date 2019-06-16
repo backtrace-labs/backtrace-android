@@ -31,7 +31,7 @@ public class FileHelper {
      */
     public static ArrayList<String> filterOutFiles(Context context, List<String> paths) {
         ArrayList<String> result = new ArrayList<>();
-        if(paths == null){
+        if (paths == null) {
             return result;
         }
         paths = new ArrayList<>(new HashSet<>(paths)); // get only unique elements
@@ -51,6 +51,7 @@ public class FileHelper {
 
     /**
      * Get file extension
+     *
      * @param file file whose extension will be returned
      * @return file extension
      */
@@ -68,7 +69,7 @@ public class FileHelper {
 
     /***
      * Check does file path is invalid, null, empty or file not exists
-     * @param filePath
+     * @param filePath path to the file to be checked
      * @return true if path is invalid
      */
     private static boolean isFilePathInvalid(String filePath) {
@@ -77,7 +78,7 @@ public class FileHelper {
 
     /***
      * Check does file exist
-     * @param absoluteFilePath
+     * @param absoluteFilePath absolute path to the file to be checked
      * @return true if file exists
      */
     public static boolean isFileExists(String absoluteFilePath) {
@@ -97,7 +98,7 @@ public class FileHelper {
         return path.startsWith(context.getFilesDir().getAbsolutePath());
     }
 
-    public static String readFile(File file){
+    public static String readFile(File file) {
         try {
             Scanner scanner = new Scanner(file);
             StringBuilder sb = new StringBuilder();
@@ -109,8 +110,7 @@ public class FileHelper {
             scanner.close();
 
             return sb.toString();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             Log.e("Backtrace.IO", e.getMessage());
             return null;
         }

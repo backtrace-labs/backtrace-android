@@ -64,8 +64,7 @@ public class BacktraceDatabaseSettings {
      */
     private int retryLimit = 3;
 
-
-    private RetryOrder retryOrder = RetryOrder.Queue;
+    private RetryOrder retryOrder = RetryOrder.Stack;
 
     public String getDatabasePath() {
         return databasePath;
@@ -104,8 +103,7 @@ public class BacktraceDatabaseSettings {
     }
 
     public void setRetryInterval(int retryInterval) {
-        if(retryInterval <= 0)
-        {
+        if (retryInterval <= 0) {
             throw new IllegalArgumentException("Retry interval value must be grader than zero");
         }
         this.retryInterval = retryInterval;
@@ -116,8 +114,7 @@ public class BacktraceDatabaseSettings {
     }
 
     public void setRetryLimit(int retryLimit) {
-        if(retryInterval <= 0)
-        {
+        if (retryInterval <= 0) {
             throw new IllegalArgumentException("Retry limit value must be grader than zero");
         }
         this.retryLimit = retryLimit;

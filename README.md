@@ -53,11 +53,12 @@ catch (e: Exception) {
 
 
 # Features Summary <a name="features-summary"></a>
-* Light-weight Java client library that quickly submits exceptions and crashes to your Backtrace dashboard. Can include callstack, system metadata, custom metadata and file attachments if needed.<!--, and file attachments if needed.-->
+* Light-weight Java client library that quickly submits exceptions and crashes to your Backtrace dashboard. Can include callstack, system metadata, custom metadata and file attachments if needed.
 * Supports a wide range of Android SDKs.
-* Supports asynchronous Tasks.
-* Supports offline database for error report storage and re-submission in case of network outage
+* Supports offline database for error report storage and re-submission in case of network outage.
 * Fully customizable and extendable event handlers and base classes for custom implementations.
+* Supports detection of blocking the application's main thread (Application Not Responding).
+* Supports monitoring the blocking of manually created threads by providing watchdog.
 
 # Supported SDKs <a name="supported-sdks"></a>
 * Minimal SDK version 19 (Android 4.4)
@@ -71,7 +72,7 @@ catch (e: Exception) {
 * Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:1.2.1'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.1.0'
 }
 ```
 
@@ -80,10 +81,24 @@ dependencies {
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>1.2.1</version>
+  <version>2.1.0</version>
   <type>aar</type>
 </dependency>
 ```
+
+<!-- ## Installation pre-release version <a name="prerelease-version"></a>
+### Prelease version of `v.2.0.0` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1009/
+Add the above url in `build.gradle` file to `repositories` section as below to allow downloading the library from our staging repository:
+```
+maven {
+    url "https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1009/"
+}
+```
+Then you can download this library by adding to the dependencies in `build.gradle` file to `dependencies` section:
+
+```
+implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.0.0'
+``` -->
 
 ## Permissions
 ### Internet permission
@@ -139,6 +154,12 @@ val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.i
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
+## Enabling ANR
+Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5 seconds.
+
+```
+backtraceClient.enableAnr(timeout, event, debug);
+```
 ## Database initialization <a name="using-backtrace-initialization"></a>
 
 BacktraceClient allows you to customize the initialization of BacktraceDatabase for local storage of error reports by supplying a BacktraceDatabaseSettings parameter, as follows:
@@ -163,8 +184,7 @@ Java
 
 ## Sending an error report <a name="using-backtrace-sending-report"></a>
 
-Methods `BacktraceClient.send` and `BacktraceClient.sendAsync` will send an error report to the Backtrace endpoint specified. There `send` method is overloaded, see examples below:
-
+Method `BacktraceClient.send` will send an error report to the Backtrace endpoint specified. There `send` method is overloaded, see examples below:
 
 ### Using BacktraceReport
 
@@ -174,7 +194,7 @@ Java
 ```java
 try {
     // throw exception here
-} catch (Exception exception) {
+} catch (Exception e) {
     BacktraceReport report = new BacktraceReport(e, 
     new HashMap<String, Object>() {{
         put("key", "value");
@@ -199,26 +219,29 @@ catch (e: Exception) {
 
 ### Asynchronous Send support
 
-Method `send` behind the mask use `AsyncTask` and wait until method `doInBackground` is not completed. Library gives you the option of not blocking code execution by using method `sendAsync` which returning the `AsyncTask<Void, Void, BacktraceResult>` object. Additionally, it is possible to specify the method that should be performed after completion `AsyncTask` by using events described in [events](#events). 
+Method `send` behind the mask use dedicated thread which sending report to server. You can specify the method that should be performed after completion.
 
 
 Java
 ```java
-AsyncTask<Void, Void, BacktraceResult> sendAsyncTask = backtraceClient.sendAsync(report);
-// another code
-BacktraceResult result = sendAsyncTask.get();
+client.send(report, new OnServerResponseEventListener() {
+    @Override
+    public void onEvent(BacktraceResult backtraceResult) {
+        // process result here
+    }
+});
 ```
 
 Kotlin
 ```kotlin
-val sendAsyncTask = backtraceClient.sendAsync(report)
-// another code
-val result = asynctask.get()
+client.send(report) { backtraceResult ->
+    // process result here
+}
 ```
 
 ### Other BacktraceReport overloads
 
-`BacktraceClient` can also automatically create `BacktraceReport` given an exception or a custom message using the following overloads of the `BacktraceClient.send` or `BacktraceClient.sendAsync` methods:
+`BacktraceClient` can also automatically create `BacktraceReport` given an exception or a custom message using the following overloads of the `BacktraceClient.send` method:
 
 Java
 ```java
@@ -228,11 +251,11 @@ try {
 
   backtraceClient.send(new BacktraceReport(exception));
   
-  // pass exception to Send method
+  // pass exception to send method
   backtraceClient.send(exception);
   
-  // pass your custom message to Send method
-  backtraceClient.sendAsync("Message");
+  // pass your custom message to send method
+  backtraceClient.send("Message");
 }
 ```
 Kotlin
@@ -242,11 +265,11 @@ try {
 } catch (exception: Exception) {
   backtraceClient.send(BacktraceReport(exception));
   
-  // pass exception to Send method
+  // pass exception to send method
   backtraceClient.send(exception);
   
-  // pass your custom message to Send method
-  backtraceClient.sendAsync("Message");
+  // pass your custom message to send method
+  backtraceClient.send("Message");
 }
 ```
 
@@ -276,9 +299,7 @@ backtraceClient.setOnBeforeSendEventListener { data ->
 
 `BacktraceClient` currently supports the following events:
 - `BeforeSend`
-- `AfterSend`
 - `RequestHandler`
-- `OnServerResponse`
 - `OnServerError`
 
 
@@ -288,9 +309,38 @@ backtraceClient.setOnBeforeSendEventListener { data ->
 BacktraceExceptionHandler.enable(backtraceClient);
 ``` 
 
+
+## Enable library logger - debug mode
+`BacktraceLogger` is a class which helps with debugging and analysis code flow execution inside the library. Logger is a wrapper on Android `Log` class. `BacktraceLogger` supports 4 logging levels:
+- `DEBUG`
+- `WARN`
+- `ERROR`
+- `OFF`
+
+In order to enable displaying logs from inside the library, one should set the level from which information should be logged:
+
+```java
+BacktraceLogger.setLevel(LogLevel.DEBUG);
+```
+
 ## Custom client and report classes <a name="documentation-customization"></a>
 
 You can extend `BacktraceBase` to create your own Backtrace client and error report implementation. You can refer to `BacktraceClient` for implementation inspirations. 
+
+## Monitoring custom threads
+Library provides structures and methods to monitor the blocking of your own threads. It is the responsibility of the library user to check whether the thread is blocked and the user's thread should increment the counter.
+
+Java
+```
+BacktraceWatchdog watchdog = BacktraceWatchdog(backtraceClient); // Initialize BacktraceWatchdog
+watchdog.registerThread(customThread, timeout, delay); // Register custom thread
+
+watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the time, by default an error will be sent to the Backtrace console
+
+
+// The following code should be executed inside the thread you want to monitor
+watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
+```
 
 # Documentation  <a name="documentation"></a>
 
@@ -305,13 +355,12 @@ You can extend `BacktraceBase` to create your own Backtrace client and error rep
 
 ## BacktraceApi  <a name="documentation-BacktraceApi"></a>
 **`BacktraceApi`** is a class that sends diagnostic JSON to the Backtrace endpoint. `BacktraceApi` is instantiated when the `BacktraceClient` constructor is called. You use the following event handlers in `BacktraceApi` to customize how you want to handle JSON data:
-- `RequestHandler` - attach an event handler to this event to override the default `BacktraceApi.send` and `BacktraceApi.sendAsync` methods.
+- `RequestHandler` - attach an event handler to this event to override the default `BacktraceApi.send` method.
 - `OnServerError` - attach an event handler to be invoked when the server returns with a `400 bad request`, `401 unauthorized` or other HTTP error codes.
-- `OnServerResponse` - attach an event handler to be invoked when the server returns with a valid response.
 
 
 ## BacktraceResult  <a name="documentation-BacktraceResult"></a>
-**`BacktraceResult`** is a class that holds response and result from a `send` or `sendAsync` call. The class contains a `Status` property that indicates whether the call was completed (`OK`), the call returned with an error (`ServerError`), . Additionally, the class has a `Message` property that contains details about the status.
+**`BacktraceResult`** is a class that holds response and result from a `send` method call. The class contains a `status` property that indicates whether the call was completed (`OK`), the call returned with an error (`ServerError`), . Additionally, the class has a `message` property that contains details about the status.
 
 ## BacktraceDatabase  <a name="documentation-BacktraceDatabase"></a>
 
@@ -333,4 +382,4 @@ stored reports every `RetryInterval` seconds up to `RetryLimit` times, both cust
 - `RetryLimit` - the maximum number of times `BacktraceDatabase` will attempt to resend error report before removing it from the database.
 
 
-If you want to clear your database or remove all reports after send method you can use `Clear` or `Flush` methods.
+If you want to clear your database or remove all reports after send method you can use `clear` or `flush` methods.

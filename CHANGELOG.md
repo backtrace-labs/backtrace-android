@@ -1,5 +1,17 @@
 # Backtrace Android Release Notes
 
+## Version 2.1.0 - 16.06.2019
+- Add support for detecting ANR (Application Not Responding)
+- Add methods and structures to detecting blocked custom threads
+
+## Version 2.0.0 - 06.05.2019
+- Removed `sendAsync` method
+- Removed event `OnAfterSendEventListener`
+- Moved event `OnServerResponseEventListener` to parameter of `send` method
+- Created dedicated thread to sending HTTP requests to server what caused the removal of AsyncTasks, speeding up the library and fixing errors related to creating threads when closing the application
+- Added `BacktraceLogger` to debug the flow of library code execution
+- Removed deprecated and unused code 
+
 ## Version 1.2.1 - 12.04.2019
 - Check is temperature file is empty and remove print stacktrace
 - Change attribute name `app.version_name` to `version`
