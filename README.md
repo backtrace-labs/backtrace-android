@@ -44,7 +44,7 @@ catch (e: Exception) {
 
 # Table of contents
 1. [Features Summary](#features-summary)
-2. [Supported SKDs](#supported-sdks)
+2. [Supported SDKs](#supported-sdks)
 3. [Differences and limitations of the SDKs version](#limitations)
 4. [Installation](#installation)
 5. [Running sample application](#sample-app)
@@ -154,7 +154,7 @@ val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.i
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
-## Enabling ANR
+## Enabling ANR detection
 Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5 seconds.
 
 ```
