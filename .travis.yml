@@ -28,6 +28,7 @@ android:
     - addon-google_apis-google-$ANDROID_API_LEVEL
 
 before_install:
+ - yes | sudo sdkmanager --licenses
  # Prepare pre-accepted licenses to not be promted at installation
  - chmod +x gradlew
 
