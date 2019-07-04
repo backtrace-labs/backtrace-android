@@ -23,4 +23,6 @@ install:
   - echo y | sdkmanager "platforms;android-26"
 
 before_script:
+  - chmod +x gradlew
+script:
   - ./gradlew assembleDebug
