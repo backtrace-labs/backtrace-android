@@ -1,30 +1,66 @@
 language: android
-sudo: true
-git:
-  depth: 3
+sudo: false
+jdk: oraclejdk7
+env:
+  matrix:
+    - ANDROID_TARGET=android-21 ANDROID_ABI=armeabi-v7a
+  global:
+    # wait up to 10 minutes for adb to connect to emulator
+    - ADB_INSTALL_TIMEOUT=10
+
 android:
   components:
-    - tools
-    - tools
-    - platform-tools
-    - build-tools-26.0.3
-    # The SDK version used to compile your project
-    - android-26
-    # Additional components
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
+  - platform-tools
+  - tools
+  - build-tools-23.0.2
+  - android-23
 
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-x86-android-26
-install:
-  # - echo y | sdkmanager "ndk-bundle"
-  - echo y | sdkmanager "platforms;android-26"
+  # Additional components
+  - extra-google-m2repository
+  - extra-android-m2repository
+  - extra-android-support
+
+  # Emulator for the tests
+  - sys-img-armeabi-v7a-android-21
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/2.8
+    - $HOME/.gradle/caches/jars-1
+    - $HOME/.gradle/daemon
+    - $HOME/.gradle/native
+    - $HOME/.gradle/wrapper
+
+addons:
+  apt_packages:
+    - pandoc
+  artifacts:
+    paths:
+      - $(git ls-files -o | grep build/outputs | tr "\n" ":")
+
+before_install:
+  - pip install --user codecov
 
 before_script:
-  - android list targets
-  - echo no | android create avd --force -n test -t android-26 --abi x86
+  - echo no | android create avd --force --name test --target $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
+
+script:
+  - ./gradlew check -PdisablePreDex --continue --stacktrace
   - android-wait-for-emulator
+  - adb devices
   - adb shell input keyevent 82 &
+  - ./gradlew connectedAndroidTest -PdisablePreDex --continue --stacktrace
+  - rm /home/travis/.gradle/caches/2.8/plugin-resolution/cache.properties.lock
+
+after_success:
+  - ./gradlew jacocoFullReport
+  - codecov
+
+after_failure:
+  - pandoc builder/build/reports/tests/index.html -t plain | sed -n '/^Failed tests/,/default-package/p'
+
+after_script:
+  # print lint results details
+  - for f in app/build/outputs/lint-results.html; do pandoc $f -t plain; done
+  - for f in data/build/outputs/lint-results.html; do pandoc $f -t plain; done
