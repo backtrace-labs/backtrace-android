@@ -12,9 +12,6 @@ android:
     - extra-android-m2repository
     - addon-google_apis-google-19
 before_install:
-  
-- yes 
- sdkmanager "platforms;android-27"
+  - yes | sdkmanager "platforms;android-27"
 script:
-    
-- ./gradlew assembleDebug
+  - ./gradlew assembleDebug
