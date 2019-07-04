@@ -1,17 +1,26 @@
 language: android
-jdk: oraclejdk8
+sudo: true
+git:
+  depth: 3
 android:
   components:
-    
-- platform-tools
     - tools
-    - build-tools-27.0.3
-    - android-27
+    - tools
+    - platform-tools
+    - build-tools-26.0.3
+    # The SDK version used to compile your project
+    - android-26
+    # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - addon-google_apis-google-19
-before_install:
-  - yes | sdkmanager "platforms;android-27"
-script:
+
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    - sys-img-x86-android-26
+install:
+  # - echo y | sdkmanager "ndk-bundle"
+  - echo y | sdkmanager "platforms;android-26"
+
+before_script:
   - ./gradlew assembleDebug
