@@ -23,9 +23,15 @@ install:
   - echo y | sdkmanager "platforms;android-28"
 
 before_script:
-  - yes | sdkmanager "platforms;android-28"
   - chmod +x gradlew
+  - yes | sdkmanager "platforms;android-28"
+  - echo no | android create avd --force --name test --target android-28 --abi google_apis/armeabi-v7a    #Create AVD for given api
+  - emulator -avd test -no-skin -no-audio -no-window &    #Start emulator
+
 script:
   - ./gradlew assembleDebug
   - ./gradlew test --info
+  - android-wait-for-emulator
+  - adb devices   #Display list of devices
+  - adb shell input keyevent 82 &
   - ./gradlew connectedAndroidTest -PdisablePreDex --stacktrace   
