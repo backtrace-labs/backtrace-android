@@ -24,7 +24,7 @@ public class BacktraceStackTraceTest {
         BacktraceStackTrace backtraceStackTrace = new BacktraceStackTrace(e);
 
         // THEN
-        assertEquals(backtraceStackTrace.getStackFrames().size(), 200000);
+        assertEquals(backtraceStackTrace.getStackFrames().size(), 2);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class BacktraceStackTraceTest {
         BacktraceStackTrace backtraceStackTrace = new BacktraceStackTrace(e);
 
         // THEN
-        assertEquals(backtraceStackTrace.getStackFrames().size(), 10000);
+        assertEquals(backtraceStackTrace.getStackFrames().size(), 1);
     }
 
     @Test
@@ -67,8 +67,8 @@ public class BacktraceStackTraceTest {
         BacktraceStackTrace backtraceStackTrace = new BacktraceStackTrace(e);
 
         // THEN
-        assertNotNull(null);
-        assertEquals(backtraceStackTrace.getStackFrames().size(), 100000);
+        assertNotNull(backtraceStackTrace);
+        assertEquals(backtraceStackTrace.getStackFrames().size(), 1);
         assertNull(backtraceStackTrace.getStackFrames().get(0).sourceCodeFileName);
     }
 }
