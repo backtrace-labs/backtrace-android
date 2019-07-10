@@ -52,7 +52,7 @@ public class BacktraceStackTraceTest {
 
         // THEN
         assertNotNull(backtraceStackTrace);
-        ghjassertNull(backtraceStackTrace.getException());
+        assertNull(backtraceStackTrace.getException());
     }
 
     @Test
