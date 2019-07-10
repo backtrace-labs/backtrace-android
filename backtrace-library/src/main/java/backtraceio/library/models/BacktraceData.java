@@ -37,8 +37,7 @@ public class BacktraceData {
      * UTC timestamp in seconds
      */
     @SerializedName("timestamp")
-    public long tim
-        estamp;
+    public long timestamp;
 
     /**
      * Name of programming language/environment this error comes from.
