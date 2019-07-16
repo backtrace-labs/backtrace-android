@@ -1,4 +1,10 @@
 language: android
+env:
+  matrix:
+    - ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
+    - ANDROID_TARGET=android-21 ANDROID_ABI=armeabi-v7a
+  global:   #Optional 
+    - ADB_INSTALL_TIMEOUT=10    #Time out to 10 mins
 sudo: true
 git:
   depth: 3
@@ -17,16 +23,19 @@ android:
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-x86-android-28
+      - sys-img-armeabi-v7a-android-19
+      - sys-img-armeabi-v7a-android-21
 install:
   # - echo y | sdkmanager "ndk-bundle"
   - echo y | sdkmanager "platforms;android-28"
 
 before_script:
   - chmod +x gradlew
-  - echo no | android create avd --force -n test -t android-28
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - android-wait-for-emulator
+  - android list targets
+  - echo no | android create avd --force --name test --target $ANDROID_TARGET --abi $ANDROID_ABI    #Create AVD for given api
+  - emulator -avd test -no-skin -no-audio -no-window &    #Start emulator
+  - android-wait-for-emulator             #Run wait for the emulator script.
+  - adb devices                           #Display list of devices
   - adb shell input keyevent 82 &
 
 script:
