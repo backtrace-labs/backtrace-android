@@ -5,7 +5,7 @@ language: android
 
 env:
   global:
-    - ANDROID_API_LEVEL=27
+    - ANDROID_API_LEVEL=25
     - ANDROID_EMULATOR_LEVEL=21
     - ANDROID_BUILD_TOOLS_VERSION=27.0.3
     - ANDROID_ABI=armeabi-v7a
@@ -42,7 +42,7 @@ before_script:
   - chmod +x gradlew
   - pip install --user codecov    #Install codecov
   - android list targets
-  - echo no | android create avd --force -n test -t android-27 -c 100M
+  - echo no | android create avd --force -n test -t android-25 -c 100M
   - emulator -avd test -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
