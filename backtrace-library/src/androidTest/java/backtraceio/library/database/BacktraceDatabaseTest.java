@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import net.jodah.concurrentunit.Waiter;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -130,6 +132,7 @@ public class BacktraceDatabaseTest {
     public void flushDatabase() {
 
         // GIVEN
+        final Waiter waiter = new Waiter();
         BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, this.database);
 
@@ -146,6 +149,7 @@ public class BacktraceDatabaseTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 requestsCounter.add(1);
+                waiter.resume();
                 return null;
             }
         });
@@ -158,6 +162,12 @@ public class BacktraceDatabaseTest {
         database.flush();
 
         // THEN
+        try {
+            waiter.await(2000, 3);
+        } catch (Exception e) {
+            e.printStackTrace();
+            waiter.fail(e);
+        }
         assertEquals(3, requestsCounter.size());
         assertEquals(0, database.count());
     }
