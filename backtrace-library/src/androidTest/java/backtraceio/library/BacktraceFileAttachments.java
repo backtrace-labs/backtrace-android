@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import backtraceio.library.common.FileHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
@@ -117,12 +119,14 @@ public class BacktraceFileAttachments {
 
         // WHEN
         final List<byte[]> fileContents = new ArrayList<>();
+        final List<String> filteredAttachments = FileHelper.filterOutFiles(context, attachments);
         client.setOnRequestHandler(new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 try {
+
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    MultiFormRequestHelper.addFiles(bos, attachments);
+                    MultiFormRequestHelper.addFiles(bos, filteredAttachments);
                     if (bos.size() != 0) {
                         fileContents.add(bos.toByteArray());
                     }
