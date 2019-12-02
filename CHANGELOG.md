@@ -1,5 +1,16 @@
 # Backtrace Android Release Notes
 
+## Version 3.0.0 - 02.12.2019
+- Added support for `submit.backtrace.io` urls
+- Moved generating a server url from BacktraceApi to BacktraceCredentials
+- Refactored name of below libraries interfaces:
+    * IBacktraceApi -> Api
+    * IBacktraceClient -> Client
+    * IBacktraceDatabase -> Database
+    * IBacktraceDatabaseRecordWriter -> DatabaseRecordWriter
+    * IBacktraceDatabaseFileContext -> DatabaseFileContext
+    * IBacktraceDatabaseContext -> DatabaseContext
+
 ## Version 2.1.0 - 16.06.2019
 - Add support for detecting ANR (Application Not Responding)
 - Add methods and structures to detecting blocked custom threads
