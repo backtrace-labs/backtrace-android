@@ -157,7 +157,7 @@ val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.i
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
-Another option for creating an object is using the URL to which the report is to be sent, pass URL string as parameter to `BacktraceCredentials` constructor:
+Another option for creating a BacktraceCredentials object is using the URL to which the report is to be sent, pass URL string as parameter to `BacktraceCredentials` constructor:
 
 Java
 ```java
