@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import backtraceio.library.common.FileHelper;
-import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
+import backtraceio.library.interfaces.DatabaseFileContext;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
-public class BacktraceDatabaseFileContext implements IBacktraceDatabaseFileContext {
+public class BacktraceDatabaseFileContext implements DatabaseFileContext {
 
     private static transient String LOG_TAG = BacktraceDatabaseFileContext.class.getSimpleName();
 

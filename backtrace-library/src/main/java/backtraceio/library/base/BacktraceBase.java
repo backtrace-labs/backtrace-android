@@ -11,9 +11,9 @@ import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
-import backtraceio.library.interfaces.IBacktraceApi;
-import backtraceio.library.interfaces.IBacktraceClient;
-import backtraceio.library.interfaces.IBacktraceDatabase;
+import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Client;
+import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -25,16 +25,16 @@ import backtraceio.library.services.BacktraceApi;
 /**
  * Base Backtrace Android client
  */
-public class BacktraceBase implements IBacktraceClient {
+public class BacktraceBase implements Client {
 
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
-    private IBacktraceApi backtraceApi;
+    private Api backtraceApi;
 
-    private void setBacktraceApi(IBacktraceApi backtraceApi) {
+    private void setBacktraceApi(Api backtraceApi) {
         this.backtraceApi = backtraceApi;
         if (this.database != null) {
             this.database.setApi(this.backtraceApi);
@@ -49,7 +49,7 @@ public class BacktraceBase implements IBacktraceClient {
     /**
      * Backtrace database instance
      */
-    public final IBacktraceDatabase database;
+    public final Database database;
 
     /**
      * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
@@ -68,7 +68,7 @@ public class BacktraceBase implements IBacktraceClient {
      * @param credentials Backtrace credentials to access Backtrace API
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials) {
-        this(context, credentials, (IBacktraceDatabase) null);
+        this(context, credentials, (Database) null);
         this.context = context;
         this.backtraceApi = new BacktraceApi(credentials);
     }
@@ -81,7 +81,7 @@ public class BacktraceBase implements IBacktraceClient {
      * @param attributes  additional information about current application
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
-        this(context, credentials, (IBacktraceDatabase) null, attributes);
+        this(context, credentials, (Database) null, attributes);
         this.context = context;
         this.backtraceApi = new BacktraceApi(credentials);
     }
@@ -116,7 +116,7 @@ public class BacktraceBase implements IBacktraceClient {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database) {
         this(context, credentials, database, null);
     }
 
@@ -128,7 +128,7 @@ public class BacktraceBase implements IBacktraceClient {
      * @param database    Backtrace database
      * @param attributes  additional information about current application
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, IBacktraceDatabase database, Map<String, Object> attributes) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes) {
         this.context = context;
         this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
         this.database = database != null ? database : new BacktraceDatabase();

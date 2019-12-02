@@ -4,14 +4,14 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
-import backtraceio.library.interfaces.IBacktraceApi;
+import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 
 /**
  * Backtrace Api class that allows to send a diagnostic data to server
  */
-public class BacktraceApi implements IBacktraceApi {
+public class BacktraceApi implements Api {
 
     private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
 
@@ -22,10 +22,7 @@ public class BacktraceApi implements IBacktraceApi {
      */
     private String serverUrl;
 
-    /**
-     * Data format
-     */
-    private final String format = "json";
+
 
     /**
      * Event triggered when server respond with error
@@ -48,8 +45,7 @@ public class BacktraceApi implements IBacktraceApi {
                     "constructor is null");
             throw new IllegalArgumentException("BacktraceCredentials cannot be null");
         }
-        this.serverUrl = String.format("%spost?format=%s&token=%s", credentials.getEndpointUrl(),
-                this.format, credentials.getSubmissionToken());
+        this.serverUrl = credentials.getSubmissionUrl().toString();
 
         threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(),
                 this.serverUrl);

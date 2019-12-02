@@ -3,13 +3,13 @@ package backtraceio.library.interfaces;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
-public interface IBacktraceDatabaseContext {
+public interface DatabaseContext {
 
     /**
      * Add new record to Database
      *
      * @param backtraceData Diagnostic data
-     * @return
+     * @return current database record
      */
     BacktraceDatabaseRecord add(BacktraceData backtraceData);
 
@@ -17,7 +17,7 @@ public interface IBacktraceDatabaseContext {
      * Add new data to database
      *
      * @param backtraceDatabaseRecord Database record
-     * @return
+     * @return current database record
      */
     BacktraceDatabaseRecord add(BacktraceDatabaseRecord backtraceDatabaseRecord);
 
