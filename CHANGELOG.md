@@ -1,6 +1,6 @@
 # Backtrace Android Release Notes
 
-## Version 3.0.0 - 02.12.2019
+## Version 3.0.0 - 03.12.2019
 - Added support for `submit.backtrace.io` urls
 - Moved generating a server url from BacktraceApi to BacktraceCredentials
 - Refactored name of below libraries interfaces:
