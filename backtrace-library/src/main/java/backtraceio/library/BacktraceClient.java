@@ -6,7 +6,7 @@ import backtraceio.library.watchdog.BacktraceANRWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
-import backtraceio.library.interfaces.IBacktraceDatabase;
+import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -49,7 +49,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, IBacktraceDatabase
+    public BacktraceClient(Context context, BacktraceCredentials credentials, Database
             database) {
         super(context, credentials, database);
     }

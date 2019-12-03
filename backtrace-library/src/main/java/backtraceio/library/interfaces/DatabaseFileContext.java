@@ -4,7 +4,7 @@ import java.io.File;
 
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
-public interface IBacktraceDatabaseFileContext {
+public interface DatabaseFileContext {
 
     /**
      * Get all valid physical records stored in database directory

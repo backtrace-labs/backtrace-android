@@ -6,7 +6,7 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
-public interface IBacktraceDatabase {
+public interface Database {
     /**
      * Start all database tasks - data storage, timers, file loading
      */
@@ -20,7 +20,7 @@ public interface IBacktraceDatabase {
     /**
      * @param backtraceApi
      */
-    void setApi(IBacktraceApi backtraceApi);
+    void setApi(Api backtraceApi);
 
     /**
      * Remove all existing reports in BacktraceDatabase

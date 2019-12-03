@@ -1,11 +1,22 @@
 package backtraceio.library;
 
+import android.net.Uri;
+
+import java.net.URI;
+
 /**
  * Backtrace credentials information
  */
 public class BacktraceCredentials {
+    /**
+     * Data format
+     */
+    @SuppressWarnings("FieldCanBeLocal")
+    private final String format = "json";
+
     private String endpointUrl;
     private String submissionToken;
+    private Uri backtraceHostUri;
 
     /**
      * Initialize Backtrace credentials
@@ -18,12 +29,20 @@ public class BacktraceCredentials {
         this.submissionToken = submissionToken;
     }
 
+    public BacktraceCredentials(String backtraceHostUri){
+        this(Uri.parse(backtraceHostUri));
+    }
+
+    public BacktraceCredentials(Uri backtraceHostUri){
+        this.backtraceHostUri = backtraceHostUri;
+    }
+
     /**
      * Get URL to Backtrace server API
      *
      * @return endpoint url
      */
-    public String getEndpointUrl() {
+    private String getEndpointUrl() {
         return endpointUrl;
     }
 
@@ -32,7 +51,29 @@ public class BacktraceCredentials {
      *
      * @return access token
      */
-    public String getSubmissionToken() {
+    private String getSubmissionToken() {
         return submissionToken;
+    }
+
+    private Uri getBacktraceHostUri() {
+        return backtraceHostUri;
+    }
+
+    private Uri getServerUrl(){
+        String url = String.format("%spost?format=%s&token=%s", this.getEndpointUrl(),
+                this.format, this.getSubmissionToken());
+        return Uri.parse(url);
+    }
+
+    /**
+     * Get submission URL to Backtrace API
+     * @return URL to Backtrace API
+     */
+    public Uri getSubmissionUrl(){
+        Uri backtraceUri = getBacktraceHostUri();
+        if (backtraceUri != null){
+            return backtraceUri;
+        }
+        return getServerUrl();
     }
 }

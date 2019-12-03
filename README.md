@@ -75,7 +75,7 @@ catch (e: Exception) {
 * Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.1.0'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.0.0'
 }
 ```
 
@@ -84,7 +84,7 @@ dependencies {
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>2.1.0</version>
+  <version>3.0.0</version>
   <type>aar</type>
 </dependency>
 ```
@@ -157,6 +157,17 @@ val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.i
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
+Another option for creating a BacktraceCredentials object is using the URL to which the report is to be sent, pass URL string as parameter to `BacktraceCredentials` constructor:
+
+Java
+```java
+BacktraceCredentials credentials = new BacktraceCredentials("https://submit.backtrace.io/{universe}/{token}/json");
+```
+
+Kotlin
+```kotlin
+val backtraceCredentials = BacktraceCredentials("https://submit.backtrace.io/{universe}/{token}/json")
+```
 ## Enabling ANR detection
 Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5 seconds.
 
