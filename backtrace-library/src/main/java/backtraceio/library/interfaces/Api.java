@@ -6,9 +6,9 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 
 /**
- * Backtrace API sender interface
+ * API sender interface
  */
-public interface IBacktraceApi {
+public interface Api {
 
     /**
      * Send a Backtrace report to Backtrace API

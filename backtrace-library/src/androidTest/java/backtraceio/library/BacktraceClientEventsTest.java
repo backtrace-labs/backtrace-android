@@ -1,6 +1,7 @@
 package backtraceio.library;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -32,14 +33,14 @@ import static org.junit.Assert.fail;
  */
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientEventsTest {
+    private final String resultMessage = "From request handler";
     private Context context;
     private BacktraceCredentials credentials;
-    private final String resultMessage = "From request handler";
 
     @Before
     public void setUp() {
         context = InstrumentationRegistry.getContext();
-        credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+        credentials = new BacktraceCredentials(Uri.parse("https://submit.backtrace.io/backtrace/123/json"));
     }
 
     @Test

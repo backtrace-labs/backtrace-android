@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.FileHelper;
-import backtraceio.library.interfaces.IBacktraceDatabaseRecordWriter;
+import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
@@ -85,7 +85,7 @@ public class BacktraceDatabaseRecord {
     /**
      * record writer
      */
-    transient IBacktraceDatabaseRecordWriter RecordWriter;
+    transient DatabaseRecordWriter RecordWriter;
 
 
     BacktraceDatabaseRecord() {

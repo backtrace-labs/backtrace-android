@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.enums.database.RetryOrder;
-import backtraceio.library.interfaces.IBacktraceDatabaseContext;
+import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
-public class BacktraceDatabaseContext implements IBacktraceDatabaseContext {
+public class BacktraceDatabaseContext implements DatabaseContext {
 
     private static transient String LOG_TAG = BacktraceDatabaseContext.class.getSimpleName();
 

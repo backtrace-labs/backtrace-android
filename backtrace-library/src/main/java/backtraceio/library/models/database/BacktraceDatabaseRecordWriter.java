@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
-import backtraceio.library.interfaces.IBacktraceDatabaseRecordWriter;
+import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
 
-public class BacktraceDatabaseRecordWriter implements IBacktraceDatabaseRecordWriter {
+public class BacktraceDatabaseRecordWriter implements DatabaseRecordWriter {
 
     private static transient final String LOG_TAG = BacktraceDatabaseRecordWriter.class.getSimpleName();
 

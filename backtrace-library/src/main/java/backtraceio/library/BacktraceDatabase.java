@@ -12,10 +12,10 @@ import java.util.concurrent.CountDownLatch;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
-import backtraceio.library.interfaces.IBacktraceApi;
-import backtraceio.library.interfaces.IBacktraceDatabase;
-import backtraceio.library.interfaces.IBacktraceDatabaseContext;
-import backtraceio.library.interfaces.IBacktraceDatabaseFileContext;
+import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Database;
+import backtraceio.library.interfaces.DatabaseContext;
+import backtraceio.library.interfaces.DatabaseFileContext;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
@@ -29,15 +29,15 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
 /**
  * Backtrace Database
  */
-public class BacktraceDatabase implements IBacktraceDatabase {
+public class BacktraceDatabase implements Database {
 
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
-    private IBacktraceApi BacktraceApi;
+    private Api BacktraceApi;
     private Context _applicationContext;
-    private IBacktraceDatabaseContext backtraceDatabaseContext;
-    private IBacktraceDatabaseFileContext backtraceDatabaseFileContext;
+    private DatabaseContext backtraceDatabaseContext;
+    private DatabaseFileContext backtraceDatabaseFileContext;
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
 
@@ -209,7 +209,7 @@ public class BacktraceDatabase implements IBacktraceDatabase {
         }
     }
 
-    public void setApi(IBacktraceApi backtraceApi) {
+    public void setApi(Api backtraceApi) {
         this.BacktraceApi = backtraceApi;
     }
 

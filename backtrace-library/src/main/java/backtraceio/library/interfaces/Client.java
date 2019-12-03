@@ -3,9 +3,9 @@ package backtraceio.library.interfaces;
 import backtraceio.library.models.json.BacktraceReport;
 
 /**
- * Backtrace client interface.
+ * Client interface.
  */
-public interface IBacktraceClient {
+public interface Client {
     /**
      * Send new report to a Backtrace API
      *
