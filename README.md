@@ -168,6 +168,25 @@ Kotlin
 ```kotlin
 val backtraceCredentials = BacktraceCredentials("https://submit.backtrace.io/{universe}/{token}/json")
 ```
+
+## Setting global custom attributes
+
+It is possible to add your global custom attributes to BacktraceClient and send them with each of report. To do it you should pass map with custom attributes to BacktraceClient constructor method.
+
+Java
+```java
+Map<String, Object> attributes = new HashMap<String, Object>(){{
+    put("custom-attribute-key", "custom-attribute-value");
+}};
+BacktraceClient backtraceClient = new BacktraceClient(context, credentials, attributes);
+```
+
+Kotlin
+```kotlin
+val attributes: HashMap<String, Any> = hashMapOf("custom-attribute-key" to "custom-attribute-value")
+val backtraceClient = BacktraceClient(context, credentials, attributes)
+```
+
 ## Enabling ANR detection
 Backtrace client allows you to detect that main thread is blocked, you can pass `timeout` as argument and `event` which should be executed instead of sending the error information to the Backtrace console by default. You can also provide information that the application is working in the debug mode by providing `debug` parameter, then if the debugger is connected errors will not be reported. Default value of `timeout` is 5 seconds.
 
@@ -180,20 +199,20 @@ BacktraceClient allows you to customize the initialization of BacktraceDatabase 
 
 Java
 ```java
-        BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
 
-        Context context = getApplicationContext();
-        String dbPath = context.getFilesDir().getAbsolutePath(); // any path, eg. absolute path to the internal storage
+Context context = getApplicationContext();
+String dbPath = context.getFilesDir().getAbsolutePath(); // any path, eg. absolute path to the internal storage
 
-        BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(dbPath);
-        settings.setMaxRecordCount(100);
-        settings.setMaxDatabaseSize(100);
-        settings.setRetryBehavior(RetryBehavior.ByInterval);
-        settings.setAutoSendMode(true);
-        settings.setRetryOrder(RetryOrder.Queue);
+BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(dbPath);
+settings.setMaxRecordCount(100);
+settings.setMaxDatabaseSize(100);
+settings.setRetryBehavior(RetryBehavior.ByInterval);
+settings.setAutoSendMode(true);
+settings.setRetryOrder(RetryOrder.Queue);
 
-        BacktraceDatabase database = new BacktraceDatabase(context, settings);
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
+BacktraceDatabase database = new BacktraceDatabase(context, settings);
+BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
 ```
 
 ## Sending an error report <a name="using-backtrace-sending-report"></a>
@@ -295,12 +314,12 @@ All events are written in *listener* pattern. `BacktraceClient` allows you to at
  Java
 ```java
 backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
-            @Override
-            public BacktraceData onEvent(BacktraceData data) {
-                // another code
-                return data;
-            }
-        });
+    @Override
+    public BacktraceData onEvent(BacktraceData data) {
+        // another code
+        return data;
+    }
+});
 ```
 
 Kotlin
