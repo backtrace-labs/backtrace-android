@@ -126,12 +126,12 @@ implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:2.
 
 Java
 ```java
-BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+BacktraceCredentials credentials = new BacktraceCredentials("https://<yourInstance>.sp.backtrace.io:6098/", "<submissionToken>");
 ```
 
 Kotlin
 ```kotlin
-val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0")
+val backtraceCredentials = BacktraceCredentials("https://<yourInstance>.sp.backtrace.io:6098/", "<submissionToken>")
 ```
 
 First start:
@@ -147,13 +147,13 @@ First create a `BacktraceCredential` instance with your `Backtrace endpoint URL`
 
 Java
 ```java
-BacktraceCredentials credentials = new BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0");
+BacktraceCredentials credentials = new BacktraceCredentials("https://<yourInstance>.sp.backtrace.io:6098/", "<submissionToken>");
 BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
 ```
 
 Kotlin
 ```kotlin
-val backtraceCredentials = BacktraceCredentials("https://myserver.sp.backtrace.io:6097/", "4dca18e8769d0f5d10db0d1b665e64b3d716f76bf182fbcdad5d1d8070c12db0")
+val backtraceCredentials = BacktraceCredentials("https://<yourInstance>.sp.backtrace.io:6098/", "<submissionToken>")
 val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
 ```
 
