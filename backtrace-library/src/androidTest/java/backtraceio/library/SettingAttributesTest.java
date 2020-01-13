@@ -163,5 +163,4 @@ public class SettingAttributesTest {
             fail(ex.getMessage());
         }
     }
-
 }
