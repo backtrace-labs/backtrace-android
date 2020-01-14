@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.types.BacktraceResultStatus;
@@ -161,6 +163,50 @@ public class SettingAttributesTest {
             waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception ex) {
             fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void checkIfAttributesAreSettingWellInUnhandledExceptionHandler(){
+//      GIVEN
+        final Waiter waiter = new Waiter();
+        final String exceptionMessage = "expected!";
+        Thread customThread = new Thread(new Runnable() {
+            public void run() {
+                final BacktraceClient backtraceClient = new BacktraceClient(context, backtraceCredentials);
+                backtraceClient.setOnRequestHandler(new RequestHandler() {
+                    @Override
+                    public BacktraceResult onRequest(BacktraceData data) {
+                        // THEN
+                        waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
+                        waiter.assertEquals(customClientAttributeValue, data.report.attributes.get(customClientAttributeKey));
+                        waiter.assertEquals(exceptionMessage, data.report.exception.getMessage());
+                        waiter.resume();
+                        return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
+                    }
+                });
+                BacktraceExceptionHandler.enable(backtraceClient);
+                BacktraceExceptionHandler.setCustomAttributes(clientAttributes);
+                throw new ArithmeticException(exceptionMessage);
+            }
+        });
+
+        customThread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                return;
+            }
+        });
+
+        // WHEN
+        customThread.start();
+
+        // THEN
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+            customThread.interrupt();
+        } catch (Exception exception) {
+            Assert.fail(exception.getMessage());
         }
     }
 }
