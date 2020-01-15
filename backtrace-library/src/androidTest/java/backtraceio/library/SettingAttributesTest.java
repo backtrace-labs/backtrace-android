@@ -191,7 +191,7 @@ public class SettingAttributesTest {
             }
         });
 
-        customThread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 return;
