@@ -1,6 +1,6 @@
 # Backtrace Android Release Notes
 
-## Version 3.0.1 - 03.12.2019
+## Version 3.0.1 - 15.01.2020
 - Fixed setting custom global attributes on BacktraceClient
 - Added support for custom attributes to BacktraceExceptionHandler 
 
