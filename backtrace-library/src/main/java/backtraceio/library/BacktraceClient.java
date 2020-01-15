@@ -1,6 +1,10 @@
 package backtraceio.library;
 
 import android.content.Context;
+import android.provider.ContactsContract;
+
+
+import java.util.Map;
 
 import backtraceio.library.watchdog.BacktraceANRWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
@@ -20,6 +24,7 @@ public class BacktraceClient extends BacktraceBase {
      */
     private BacktraceANRWatchdog anrWatchdog;
 
+
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
      *
@@ -27,7 +32,17 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials credentials to Backtrace API server
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials) {
-        super(context, credentials);
+        this(context, credentials, (BacktraceDatabase)null, null);
+    }
+
+    /**
+     * Initializing Backtrace client instance with BacktraceCredentials
+     *
+     * @param context     application context
+     * @param credentials credentials to Backtrace API server
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
+        this(context, credentials, (BacktraceDatabase)null, attributes);
     }
 
     /**
@@ -39,7 +54,19 @@ public class BacktraceClient extends BacktraceBase {
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            BacktraceDatabaseSettings databaseSettings) {
-        super(context, credentials, databaseSettings);
+        this(context, credentials,  new BacktraceDatabase(context, databaseSettings));
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
+        this(context, credentials,  new BacktraceDatabase(context, databaseSettings), attributes);
     }
 
     /**
@@ -49,10 +76,23 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, Database
-            database) {
-        super(context, credentials, database);
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           Database database) {
+        this(context, credentials, database, null);
     }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           Database database, Map<String, Object> attributes) {
+        super(context, credentials, database, attributes);
+    }
+
 
     /**
      * Sending a message to Backtrace API

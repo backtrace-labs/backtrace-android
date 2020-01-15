@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.0.1 - 15.01.2020
+- Fixed setting custom global attributes on BacktraceClient
+- Added support for custom attributes to BacktraceExceptionHandler 
+
 ## Version 3.0.0 - 03.12.2019
 - Added support for `submit.backtrace.io` urls
 - Moved generating a server url from BacktraceApi to BacktraceCredentials
@@ -12,8 +16,8 @@
     * IBacktraceDatabaseContext -> DatabaseContext
 
 ## Version 2.1.0 - 16.06.2019
-- Add support for detecting ANR (Application Not Responding)
-- Add methods and structures to detecting blocked custom threads
+- Added support for detecting ANR (Application Not Responding)
+- Added methods and structures to detecting blocked custom threads
 
 ## Version 2.0.0 - 06.05.2019
 - Removed `sendAsync` method
@@ -24,8 +28,8 @@
 - Removed deprecated and unused code 
 
 ## Version 1.2.1 - 12.04.2019
-- Check is temperature file is empty and remove print stacktrace
-- Change attribute name `app.version_name` to `version`
+- Added check is temperature file is empty and remove print stacktrace
+- Changed attribute name `app.version_name` to `version`
 
 ## Version 1.2.0 - 07.04.2019
 - `BacktraceDatabase` - offline error report storage and auto re-submission support in the event of network outage and server unavailability,
