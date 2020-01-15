@@ -342,6 +342,13 @@ backtraceClient.setOnBeforeSendEventListener { data ->
 BacktraceExceptionHandler.enable(backtraceClient);
 ``` 
 
+You can add custom map of attributes to `BacktraceExceptionHandler` which will be sent with each unhandled exception:
+
+
+```java
+BacktraceExceptionHandler.setCustomAttributes(customAttributes);
+```
+
 
 ## Enable library logger - debug mode
 `BacktraceLogger` is a class which helps with debugging and analysis code flow execution inside the library. Logger is a wrapper on Android `Log` class. `BacktraceLogger` supports 4 logging levels:
