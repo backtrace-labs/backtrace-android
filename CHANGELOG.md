@@ -2,6 +2,7 @@
 
 ## Version 3.0.1 - 03.12.2019
 - Fixed setting custom global attributes on BacktraceClient
+- Added support for custom attributes to BacktraceExceptionHandler 
 
 ## Version 3.0.0 - 03.12.2019
 - Added support for `submit.backtrace.io` urls
