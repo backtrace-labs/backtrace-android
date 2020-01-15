@@ -1,5 +1,7 @@
 package backtraceio.library.models;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.BacktraceClient;
@@ -18,12 +20,17 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     private final Thread.UncaughtExceptionHandler rootHandler;
     private final CountDownLatch signal = new CountDownLatch(1);
     private BacktraceClient client;
+    private static Map<String, Object> customAttributes;
 
     private BacktraceExceptionHandler(BacktraceClient client) {
         BacktraceLogger.d(LOG_TAG, "BacktraceExceptionHandler initialization");
         this.client = client;
         rootHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
+    }
+
+    public static void setCustomAttributes(Map<String, Object> attributes){
+        BacktraceExceptionHandler.customAttributes = attributes;
     }
 
     /**
@@ -48,7 +55,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
 
         if (throwable instanceof Exception) {
             BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-            this.client.send(new BacktraceReport((Exception) throwable), callback);
+            this.client.send(new BacktraceReport((Exception) throwable, BacktraceExceptionHandler.customAttributes), callback);
             BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
         }
         BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");

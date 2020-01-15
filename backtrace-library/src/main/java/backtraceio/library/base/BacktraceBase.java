@@ -69,8 +69,6 @@ public class BacktraceBase implements Client {
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials) {
         this(context, credentials, (Database) null);
-        this.context = context;
-        this.backtraceApi = new BacktraceApi(credentials);
     }
 
     /**
@@ -82,8 +80,6 @@ public class BacktraceBase implements Client {
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
         this(context, credentials, (Database) null, attributes);
-        this.context = context;
-        this.backtraceApi = new BacktraceApi(credentials);
     }
 
     /**
@@ -136,6 +132,14 @@ public class BacktraceBase implements Client {
         this.database.start();
     }
 
+    /**
+     * Get custom attributes
+     * @return map with custom attributes
+     */
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
 
     /**
      * Set event executed before sending data to Backtrace API
@@ -179,7 +183,7 @@ public class BacktraceBase implements Client {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
-        BacktraceData backtraceData = new BacktraceData(this.context, report, null);
+        BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
 
         final BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
 
