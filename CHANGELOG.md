@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 3.0.2 - 23.01.2020
+- Fixed checking internal path during filtering attachments 
+
 ## Version 3.0.1 - 15.01.2020
 - Fixed setting custom global attributes on BacktraceClient
 - Added support for custom attributes to BacktraceExceptionHandler 

@@ -9,10 +9,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 
+import backtraceio.library.logger.BacktraceLogger;
+
+
 /**
  * Helper class for access to files
  */
 public class FileHelper {
+
+    private static final String LOG_TAG = FileHelper.class.getSimpleName();
 
     /***
      * Get file name with extension from file path
@@ -37,13 +42,19 @@ public class FileHelper {
         paths = new ArrayList<>(new HashSet<>(paths)); // get only unique elements
 
         for (String path : paths) {
-            if (isFilePathInvalid(path) || (!isPathToInternalStorage(context, path) &&
-                    !PermissionHelper.isPermissionForReadExternalStorageGranted(context))) {
-                Log.e("Backtrace.io", String.format("Path for file '%s' is incorrect or " +
-                        "permission READ_EXTERNAL_STORAGE is not granted.", path));
+            if (isFilePathInvalid(path)) {
+                Log.e(LOG_TAG, String.format("Path for file %s is invalid", path));
                 continue;
             }
 
+            if (!isPathToInternalStorage(context, path))
+            {
+                Log.d(LOG_TAG, String.format("Passed path is path to external storage %s", path));
+                if(!PermissionHelper.isPermissionForReadExternalStorageGranted(context)){
+                    Log.e(LOG_TAG, "Permission READ_EXTERNAL_STORAGE is not granted.");
+                    continue;
+                }
+            }
             result.add(path);
         }
         return result;
@@ -92,10 +103,16 @@ public class FileHelper {
      * @return true if path is internal storage
      */
     private static boolean isPathToInternalStorage(Context context, String path) {
-        if (context == null) {
+        if (context == null || path == null) {
             return false;
         }
-        return path.startsWith(context.getFilesDir().getAbsolutePath());
+
+        String dataDir = context.getApplicationInfo().dataDir;
+        String cacheDir = context.getCacheDir().getAbsolutePath();
+        String filesDir = context.getFilesDir().getPath();
+        BacktraceLogger.d(LOG_TAG, String.format("Passed path %s, Internal paths %s, %s, %s", path, dataDir, cacheDir, filesDir));
+
+        return path.startsWith(dataDir) || path.startsWith(cacheDir) || path.startsWith(filesDir);
     }
 
     public static String readFile(File file) {
@@ -111,7 +128,7 @@ public class FileHelper {
 
             return sb.toString();
         } catch (Exception e) {
-            Log.e("Backtrace.IO", e.getMessage());
+            Log.e(LOG_TAG, e.getMessage());
             return null;
         }
     }
