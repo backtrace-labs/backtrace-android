@@ -89,8 +89,7 @@ dependencies {
 </dependency>
 ```
 
-<!--
-## Installation pre-release version <a name="prerelease-version"></a>
+<!-- ## Installation pre-release version <a name="prerelease-version"></a>
 ### Pre-release version of `v.3.0.2` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1018/
 Add the above url in `build.gradle` file to `repositories` section as below to allow downloading the library from our staging repository:
 ```
@@ -102,9 +101,7 @@ Then you can download this library by adding to the dependencies in `build.gradl
 
 ```
 implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.0.2'
-```
-
--->
+```-->
 
 ## Permissions
 ### Internet permission
