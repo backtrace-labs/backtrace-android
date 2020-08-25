@@ -24,7 +24,7 @@ public class BacktraceAttributes {
     /**
      * Get built-in primitive attributes
      */
-    public Map<String, Object> attributes = new HashMap<>();
+    public Map<String, String> attributes = new HashMap<>();
 
     /**
      * Get built-in complex attributes
@@ -69,7 +69,7 @@ public class BacktraceAttributes {
         this.attributes.put("device.model", Build.MODEL);
         this.attributes.put("device.brand", Build.BRAND);
         this.attributes.put("device.product", Build.PRODUCT);
-        this.attributes.put("device.sdk", Build.VERSION.SDK_INT);
+        this.attributes.put("device.sdk", String.valueOf(Build.VERSION.SDK_INT));
         this.attributes.put("device.manufacturer", Build.MANUFACTURER);
 
         this.attributes.put("device.os_version", System.getProperty("os.version"));
@@ -80,7 +80,7 @@ public class BacktraceAttributes {
                 .getPackageName());
 
         this.attributes.put("application", this.context.getApplicationInfo().loadLabel(this.context
-                .getPackageManager()));
+                .getPackageManager()).toString());
 
         try {
             this.attributes.put("version", this.context.getPackageManager()
@@ -98,11 +98,11 @@ public class BacktraceAttributes {
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-        this.attributes.put("screen.width", metrics.widthPixels);
-        this.attributes.put("screen.height", metrics.heightPixels);
-        this.attributes.put("screen.dpi", metrics.densityDpi);
+        this.attributes.put("screen.width", String.valueOf(metrics.widthPixels));
+        this.attributes.put("screen.height", String.valueOf(metrics.heightPixels));
+        this.attributes.put("screen.dpi", String.valueOf(metrics.densityDpi));
         this.attributes.put("screen.orientation", getScreenOrientation().toString());
-        this.attributes.put("screen.brightness", getScreenBrightness());
+        this.attributes.put("screen.brightness", String.valueOf(getScreenBrightness()));
     }
 
     /**
@@ -160,9 +160,12 @@ public class BacktraceAttributes {
         Map<String, Object> attributes = BacktraceReport.concatAttributes(report, clientAttributes);
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             Object value = entry.getValue();
+            if(value == null) {
+                continue;
+            }
             Class type = value.getClass();
             if (type.isPrimitive() || value instanceof String || type.isEnum()) {
-                this.attributes.put(entry.getKey(), value);
+                this.attributes.put(entry.getKey(), value.toString());
             } else {
                 this.complexAttributes.put(entry.getKey(), value);
             }

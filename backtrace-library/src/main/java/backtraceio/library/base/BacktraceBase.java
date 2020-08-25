@@ -1,8 +1,16 @@
 package backtraceio.library.base;
 
 import android.content.Context;
+import android.provider.ContactsContract;
+import android.system.Os;
+import android.util.Log;
 
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
@@ -14,10 +22,12 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
+import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
@@ -27,8 +37,14 @@ import backtraceio.library.services.BacktraceApi;
  */
 public class BacktraceBase implements Client {
 
+    static {
+        System.loadLibrary("backtrace-crashpad");
+    }
+
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
+
+    private native void Crash();
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
@@ -130,6 +146,7 @@ public class BacktraceBase implements Client {
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
+        this.database.setupNativeIntegration(this, credentials);
     }
 
     /**
@@ -166,6 +183,10 @@ public class BacktraceBase implements Client {
      */
     public void setOnRequestHandler(RequestHandler requestHandler) {
         this.backtraceApi.setRequestHandler(requestHandler);
+    }
+
+    public void nativeCrash(){
+        Crash();
     }
 
     /**

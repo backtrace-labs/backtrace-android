@@ -1,18 +1,23 @@
 package backtraceio.library;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.interfaces.DatabaseFileContext;
@@ -21,6 +26,7 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
+import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceDatabaseContext;
@@ -40,6 +46,25 @@ public class BacktraceDatabase implements Database {
     private DatabaseFileContext backtraceDatabaseFileContext;
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
+
+    /**
+     * Add Crashpad attribute to Crashpad native reports
+     * @param name attribute name
+     * @param value attribute value
+     */
+    public native void AddCrashpadAttribute(String name, String value);
+
+    /**
+     * Initialize Backtrace Crashpad integration
+     * @param url url to Backtrace
+     * @param databasePath path to Crashpad database
+     * @param handlerPath path to crashpad error handler
+     * @param attributeKeys array of attribute keys
+     * @param attributeValues array of attribute values
+     * @return true - if Crashpad was able to initialize correctly, otherwise false.
+     */
+    private native boolean InitializeCrashpad(String url,  String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
+
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -90,6 +115,30 @@ public class BacktraceDatabase implements Database {
 
     private String getDatabasePath() {
         return databaseSettings.getDatabasePath();
+    }
+
+    /**
+     * Setup native crash handler
+     * @param client  Backtrace client
+     * @param credentials Backtrace credentials
+     */
+    public void setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
+        // avoid initialization when database doesn't exist
+        if(getSettings() == null) {
+            return;
+        }
+        // path to crashpad native handler
+        String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + "/libcrashpad_handler.so";
+
+        BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
+        List<String> result = new ArrayList(crashpadAttributes.attributes.keySet());
+        List<String> values = new ArrayList(crashpadAttributes.attributes.values());
+        InitializeCrashpad(
+                credentials.getSubmissionUrl().toString(),
+                getSettings().getDatabasePath() + "/crashpad",
+                handlerPath,
+                result.toArray(new String[0]),
+                values.toArray(new String[0]));
     }
 
     public void start() {
