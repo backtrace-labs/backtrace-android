@@ -38,7 +38,7 @@ import backtraceio.library.services.BacktraceApi;
 public class BacktraceBase implements Client {
 
     static {
-        System.loadLibrary("backtrace-crashpad");
+        System.loadLibrary("backtrace-native");
     }
 
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();

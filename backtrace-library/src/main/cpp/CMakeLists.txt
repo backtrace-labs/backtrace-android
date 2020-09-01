@@ -11,13 +11,13 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             backtrace-crashpad
+             backtrace-native
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
-            backtrace-crashpad.cpp )
+        backtrace-native.cpp)
 
 # Crashpad Libraries
 add_library(crashpad_client STATIC IMPORTED)
@@ -53,7 +53,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                        backtrace-crashpad
+                        backtrace-native
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}

@@ -52,7 +52,7 @@ public class BacktraceDatabase implements Database {
      * @param name attribute name
      * @param value attribute value
      */
-    public native void AddCrashpadAttribute(String name, String value);
+    public native void AddAttribute(String name, String value);
 
     /**
      * Initialize Backtrace Crashpad integration
@@ -63,7 +63,7 @@ public class BacktraceDatabase implements Database {
      * @param attributeValues array of attribute values
      * @return true - if Crashpad was able to initialize correctly, otherwise false.
      */
-    private native boolean InitializeCrashpad(String url,  String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
+    private native boolean Initialize(String url,  String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
 
 
     /**
@@ -133,8 +133,8 @@ public class BacktraceDatabase implements Database {
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         List<String> result = new ArrayList(crashpadAttributes.attributes.keySet());
         List<String> values = new ArrayList(crashpadAttributes.attributes.values());
-        InitializeCrashpad(
-                credentials.getSubmissionUrl().toString(),
+        Initialize(
+                credentials.getMinidumpSubmissionUrl().toString(),
                 getSettings().getDatabasePath() + "/crashpad",
                 handlerPath,
                 result.toArray(new String[0]),

@@ -76,4 +76,15 @@ public class BacktraceCredentials {
         }
         return getServerUrl();
     }
+
+    public Uri getMinidumpSubmissionUrl() {
+        Uri backtraceJsonUri = getSubmissionUrl();
+        String jsonUrl = backtraceJsonUri.toString();
+        if(jsonUrl.contains("format=json")) {
+            jsonUrl = jsonUrl.replace("format=json", "format=minidump");
+        } else if (jsonUrl.contains(("/json"))) {
+            jsonUrl = jsonUrl.replace("/json", "/minidump");
+        }
+        return Uri.parse(jsonUrl);
+    }
 }

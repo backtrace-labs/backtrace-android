@@ -9,46 +9,44 @@
 #include "base/logging.h"
 #include <android/log.h>
 #include <unistd.h>
+#include <atomic>
 #include <vector>
 #include <map>
+#include <mutex>
 
 using namespace base;
 
+// supported JNI version
 static jint JNI_VERSION = JNI_VERSION_1_6;
 
-JNIEnv *env;
+// JNI environment reference
+static JNIEnv *env;
 
-crashpad::CrashpadClient *client;
+// crashpad client
+static crashpad::CrashpadClient *client;
 
-bool initialized = false;
+// check if crashpad client is already initialized
+static std::atomic_bool initialized;
+static std::mutex synchronize;
+
 JNIEXPORT jint JNI_OnLoad(JavaVM* jvm, void* reserved)
 {
     if (jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION) != JNI_OK) {
 
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s",
-                            "Cannot load JNI env");
+                            "Cannot load the JNI env");
         return JNI_ERR;
     }
     return JNI_VERSION_1_4;
 }
 
-
-extern "C" {
-    void Crash() {
-        *(volatile int *) 0 = 0;
-    }
-
-    JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_Crash(
-            JNIEnv *env,
-            jobject /* this */) {
-        Crash();
-    }
-
-    bool InitializeCrashpad(jstring url,
-                            jstring crashpad_database_path,
-                            jstring crashpad_handler_path,
-                            jobjectArray attributeKeys,
-                            jobjectArray attributeValues) {
+namespace /* anonymous */
+{
+        bool InitializeImpl(jstring url,
+                                jstring database_path,
+                                jstring handler_path,
+                                jobjectArray attributeKeys,
+                                jobjectArray attributeValues) {
         using namespace crashpad;
         // avoid multi initialization
         if(initialized) {
@@ -69,6 +67,10 @@ extern "C" {
                 jstring stringValue = (jstring) env->GetObjectArrayElement(attributeValues,
                                                                            attributeIndex);
                 const char *convertedValue = (env)->GetStringUTFChars(stringValue, &isCopy);
+
+                if(!convertedKey || !convertedValue)
+                    continue;
+
                 attributes[convertedKey] = convertedValue;
 
                 env->ReleaseStringUTFChars(jstringKey, convertedKey);
@@ -85,11 +87,11 @@ extern "C" {
         const char *backtraceUrl = env->GetStringUTFChars(url, 0);
 
         // path to crash handler executable
-        const char *handlerPath  = env->GetStringUTFChars(crashpad_handler_path, 0);
+        const char *handlerPath  = env->GetStringUTFChars(handler_path, 0);
         FilePath handler(handlerPath);
 
         // path to crashpad database
-        const char *filePath = env->GetStringUTFChars(crashpad_database_path, 0);
+        const char *filePath = env->GetStringUTFChars(database_path, 0);
         FilePath db(filePath);
 
         std::unique_ptr<CrashReportDatabase> database = CrashReportDatabase::Initialize(db);
@@ -106,27 +108,54 @@ extern "C" {
         initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes, arguments);
 
         env->ReleaseStringUTFChars(url, backtraceUrl);
-        env->ReleaseStringUTFChars(crashpad_handler_path, handlerPath);
-        env->ReleaseStringUTFChars(crashpad_database_path, filePath);
+        env->ReleaseStringUTFChars(handler_path, handlerPath);
+        env->ReleaseStringUTFChars(database_path, filePath);
+        return initialized;
+    }
+}
+
+extern "C" {
+    void Crash() {
+        *(volatile int *) 0 = 0;
+    }
+
+    JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_Crash(
+            JNIEnv *env,
+            jobject /* this */) {
+        Crash();
+    }
+
+    bool Initialize(jstring url,
+                            jstring database_path,
+                            jstring handler_path,
+                            jobjectArray attributeKeys,
+                            jobjectArray attributeValues) {
+        static std::once_flag initialize_flag;
+
+        std::call_once(initialize_flag, [&]{
+            initialized = InitializeImpl(url,
+                database_path, handler_path,
+                attributeKeys, attributeValues);
+        });
         return initialized;
     }
 
-
     JNIEXPORT jboolean JNICALL
-    Java_backtraceio_library_BacktraceDatabase_InitializeCrashpad(JNIEnv *env,
+    Java_backtraceio_library_BacktraceDatabase_Initialize(JNIEnv *env,
             jobject thiz,
             jstring url,
-            jstring crashpad_database_path,
-            jstring crashpad_handler_path,
+            jstring database_path,
+            jstring handler_path,
             jobjectArray attributeKeys,
             jobjectArray attributeValues) {
-        return InitializeCrashpad(url, crashpad_database_path, crashpad_handler_path, attributeKeys, attributeValues);
+        return Initialize(url, database_path, handler_path, attributeKeys, attributeValues);
     }
 
 
-    void AddCrashpadAttribute(jstring key, jstring value) {
+    void AddAttribute(jstring key, jstring value) {
+        const std::lock_guard<std::mutex> lock(synchronize);
         if(initialized == false) {
-            __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android", "Crashpad integration isn't available. Please initialize Crashpad integration first.");
+            __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android", "Crashpad integration isn't available. Please initialize the Crashpad integration first.");
             return;
         }
         crashpad::CrashpadInfo* info = crashpad::CrashpadInfo::GetCrashpadInfo();
@@ -139,16 +168,16 @@ extern "C" {
         jboolean isCopy;
         const char* crashpadKey = env->GetStringUTFChars(key, &isCopy);
         const char* crashpadValue = env->GetStringUTFChars(value, &isCopy);
-        annotations->SetKeyValue(crashpadKey, crashpadValue);
+        if (crashpadKey && crashpadValue)
+            annotations->SetKeyValue(crashpadKey, crashpadValue);
 
         env->ReleaseStringUTFChars(key, crashpadKey);
         env->ReleaseStringUTFChars(value, crashpadValue);
     }
 
     JNIEXPORT void JNICALL
-    Java_backtraceio_library_BacktraceDatabase_AddCrashpadAttribute(JNIEnv *env, jobject thiz,
+    Java_backtraceio_library_BacktraceDatabase_AddAttribute(JNIEnv *env, jobject thiz,
                                                                      jstring name, jstring value) {
-        AddCrashpadAttribute(name, value);
+        AddAttribute(name, value);
     }
-
 }
