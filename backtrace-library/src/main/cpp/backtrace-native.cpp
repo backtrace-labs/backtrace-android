@@ -1,18 +1,19 @@
+#include <atomic>
+#include <map>
+#include <mutex>
+#include <string>
+#include <unistd.h>
+#include <vector>
+
 #include <jni.h>
 #include <string>
 #include <android/log.h>
 
+#include "base/logging.h"
 #include "client/crashpad_client.h"
+#include "client/crashpad_info.h"
 #include "client/crash_report_database.h"
 #include "client/settings.h"
-#include "client/crashpad_info.h"
-#include "base/logging.h"
-#include <android/log.h>
-#include <unistd.h>
-#include <atomic>
-#include <vector>
-#include <map>
-#include <mutex>
 
 using namespace base;
 
@@ -27,7 +28,7 @@ static crashpad::CrashpadClient *client;
 
 // check if crashpad client is already initialized
 static std::atomic_bool initialized;
-static std::mutex synchronize;
+static std::mutex attribute_synchronization;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* jvm, void* reserved)
 {
@@ -49,7 +50,7 @@ namespace /* anonymous */
                                 jobjectArray attributeValues) {
         using namespace crashpad;
         // avoid multi initialization
-        if(initialized) {
+        if (initialized) {
             return true;
         }
         std::map<std::string, std::string> attributes;
@@ -57,7 +58,7 @@ namespace /* anonymous */
 
         jint keyLength = env->GetArrayLength(attributeKeys);
         jint valueLength = env->GetArrayLength(attributeValues);
-        if(keyLength == valueLength) {
+        if (keyLength == valueLength) {
             for (int attributeIndex = 0; attributeIndex < keyLength; ++attributeIndex) {
                 jstring jstringKey = (jstring) env->GetObjectArrayElement(attributeKeys,
                                                                           attributeIndex);
@@ -68,7 +69,7 @@ namespace /* anonymous */
                                                                            attributeIndex);
                 const char *convertedValue = (env)->GetStringUTFChars(stringValue, &isCopy);
 
-                if(!convertedKey || !convertedValue)
+                if (!convertedKey || !convertedValue)
                     continue;
 
                 attributes[convertedKey] = convertedValue;
@@ -126,10 +127,10 @@ extern "C" {
     }
 
     bool Initialize(jstring url,
-                            jstring database_path,
-                            jstring handler_path,
-                            jobjectArray attributeKeys,
-                            jobjectArray attributeValues) {
+                    jstring database_path,
+                    jstring handler_path,
+                    jobjectArray attributeKeys,
+                    jobjectArray attributeValues) {
         static std::once_flag initialize_flag;
 
         std::call_once(initialize_flag, [&]{
@@ -142,22 +143,22 @@ extern "C" {
 
     JNIEXPORT jboolean JNICALL
     Java_backtraceio_library_BacktraceDatabase_Initialize(JNIEnv *env,
-            jobject thiz,
-            jstring url,
-            jstring database_path,
-            jstring handler_path,
-            jobjectArray attributeKeys,
-            jobjectArray attributeValues) {
+                                                          jobject thiz,
+                                                          jstring url,
+                                                          jstring database_path,
+                                                          jstring handler_path,
+                                                          jobjectArray attributeKeys,
+                                                          jobjectArray attributeValues) {
         return Initialize(url, database_path, handler_path, attributeKeys, attributeValues);
     }
 
 
     void AddAttribute(jstring key, jstring value) {
-        const std::lock_guard<std::mutex> lock(synchronize);
-        if(initialized == false) {
+        if (initialized == false) {
             __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android", "Crashpad integration isn't available. Please initialize the Crashpad integration first.");
             return;
         }
+        const std::lock_guard<std::mutex> lock(attribute_synchronization);
         crashpad::CrashpadInfo* info = crashpad::CrashpadInfo::GetCrashpadInfo();
         crashpad::SimpleStringDictionary* annotations = info->simple_annotations();
         if (!annotations)
