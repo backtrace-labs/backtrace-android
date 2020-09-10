@@ -48,20 +48,20 @@ public class BacktraceDatabase implements Database {
     private boolean _enable = false;
 
     /**
-     * Add Crashpad attribute to Crashpad native reports
+     * Add attributes to native reports
      * @param name attribute name
      * @param value attribute value
      */
     public native void AddAttribute(String name, String value);
 
     /**
-     * Initialize Backtrace Crashpad integration
+     * Initialize Backtrace-native integration
      * @param url url to Backtrace
-     * @param databasePath path to Crashpad database
-     * @param handlerPath path to crashpad error handler
+     * @param databasePath path to Backtrace-native database
+     * @param handlerPath path to error handler
      * @param attributeKeys array of attribute keys
      * @param attributeValues array of attribute values
-     * @return true - if Crashpad was able to initialize correctly, otherwise false.
+     * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
     private native boolean Initialize(String url,  String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
 

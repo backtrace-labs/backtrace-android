@@ -44,7 +44,7 @@ public class BacktraceBase implements Client {
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
 
-    private native void Crash();
+    public native void Crash();
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
@@ -57,6 +57,7 @@ public class BacktraceBase implements Client {
         }
     }
 
+    private final BacktraceCredentials credentials;
     /**
      * Application context
      */
@@ -142,11 +143,18 @@ public class BacktraceBase implements Client {
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes) {
         this.context = context;
+        this.credentials = credentials;
         this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
-        this.database.setupNativeIntegration(this, credentials);
+    }
+
+    /**
+     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     */
+    public void enableNativeIntegration() {
+        this.database.setupNativeIntegration(this, this.credentials);
     }
 
     /**

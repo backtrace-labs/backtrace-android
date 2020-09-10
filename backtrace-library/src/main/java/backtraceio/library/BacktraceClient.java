@@ -20,7 +20,7 @@ import backtraceio.library.models.json.BacktraceReport;
 public class BacktraceClient extends BacktraceBase {
 
     /**
-     *
+     * Backtrace ANR watchdog instance
      */
     private BacktraceANRWatchdog anrWatchdog;
 
