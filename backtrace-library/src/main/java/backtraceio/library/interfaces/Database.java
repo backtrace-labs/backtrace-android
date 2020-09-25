@@ -72,7 +72,8 @@ public interface Database {
 
     /**
      * Setup database NDK integration
-     * @param client Backtrace client
+     *
+     * @param client      Backtrace client
      * @param credentials Backtrace credentials
      */
     void setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);

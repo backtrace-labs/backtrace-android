@@ -21,7 +21,7 @@ public class BacktraceCredentials {
     /**
      * Initialize Backtrace credentials
      *
-     * @param endpointUrl endpoint url address
+     * @param endpointUrl     endpoint url address
      * @param submissionToken server access token
      */
     public BacktraceCredentials(String endpointUrl, String submissionToken) {
@@ -29,11 +29,11 @@ public class BacktraceCredentials {
         this.submissionToken = submissionToken;
     }
 
-    public BacktraceCredentials(String backtraceHostUri){
+    public BacktraceCredentials(String backtraceHostUri) {
         this(Uri.parse(backtraceHostUri));
     }
 
-    public BacktraceCredentials(Uri backtraceHostUri){
+    public BacktraceCredentials(Uri backtraceHostUri) {
         this.backtraceHostUri = backtraceHostUri;
     }
 
@@ -59,7 +59,7 @@ public class BacktraceCredentials {
         return backtraceHostUri;
     }
 
-    private Uri getServerUrl(){
+    private Uri getServerUrl() {
         String url = String.format("%spost?format=%s&token=%s", this.getEndpointUrl(),
                 this.format, this.getSubmissionToken());
         return Uri.parse(url);
@@ -67,11 +67,12 @@ public class BacktraceCredentials {
 
     /**
      * Get submission URL to Backtrace API
+     *
      * @return URL to Backtrace API
      */
-    public Uri getSubmissionUrl(){
+    public Uri getSubmissionUrl() {
         Uri backtraceUri = getBacktraceHostUri();
-        if (backtraceUri != null){
+        if (backtraceUri != null) {
             return backtraceUri;
         }
         return getServerUrl();
@@ -80,7 +81,7 @@ public class BacktraceCredentials {
     public Uri getMinidumpSubmissionUrl() {
         Uri backtraceJsonUri = getSubmissionUrl();
         String jsonUrl = backtraceJsonUri.toString();
-        if(jsonUrl.contains("format=json")) {
+        if (jsonUrl.contains("format=json")) {
             jsonUrl = jsonUrl.replace("format=json", "format=minidump");
         } else if (jsonUrl.contains(("/json"))) {
             jsonUrl = jsonUrl.replace("/json", "/minidump");

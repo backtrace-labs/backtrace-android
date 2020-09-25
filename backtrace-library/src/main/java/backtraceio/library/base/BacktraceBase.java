@@ -1,16 +1,8 @@
 package backtraceio.library.base;
 
 import android.content.Context;
-import android.provider.ContactsContract;
-import android.system.Os;
-import android.util.Log;
 
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
@@ -27,7 +19,6 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
-import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
@@ -44,7 +35,8 @@ public class BacktraceBase implements Client {
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
 
-    public native void Crash();
+    public native void crash();
+
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
@@ -159,6 +151,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Get custom attributes
+     *
      * @return map with custom attributes
      */
     public Map<String, Object> getAttributes() {
@@ -193,8 +186,8 @@ public class BacktraceBase implements Client {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
-    public void nativeCrash(){
-        Crash();
+    public void nativeCrash() {
+        crash();
     }
 
     /**

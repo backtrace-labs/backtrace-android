@@ -64,7 +64,7 @@ catch (e: Exception) {
 * Supports monitoring the blocking of manually created threads by providing watchdog.
 
 # Supported SDKs <a name="supported-sdks"></a>
-* Minimal SDK version 19 (Android 4.4)
+* Minimal SDK version 21 (Android 5.0)
 * Target SDK version 28 (Android 9.0)
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>

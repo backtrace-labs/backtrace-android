@@ -160,7 +160,7 @@ public class BacktraceAttributes {
         Map<String, Object> attributes = BacktraceReport.concatAttributes(report, clientAttributes);
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             Object value = entry.getValue();
-            if(value == null) {
+            if (value == null) {
                 continue;
             }
             Class type = value.getClass();

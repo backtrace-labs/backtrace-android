@@ -1,7 +1,6 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Api;
-import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.interfaces.DatabaseFileContext;
@@ -49,21 +47,23 @@ public class BacktraceDatabase implements Database {
 
     /**
      * Add attributes to native reports
-     * @param name attribute name
+     *
+     * @param name  attribute name
      * @param value attribute value
      */
-    public native void AddAttribute(String name, String value);
+    public native void addAttribute(String name, String value);
 
     /**
      * Initialize Backtrace-native integration
-     * @param url url to Backtrace
-     * @param databasePath path to Backtrace-native database
-     * @param handlerPath path to error handler
-     * @param attributeKeys array of attribute keys
+     *
+     * @param url             url to Backtrace
+     * @param databasePath    path to Backtrace-native database
+     * @param handlerPath     path to error handler
+     * @param attributeKeys   array of attribute keys
      * @param attributeValues array of attribute values
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
-    private native boolean Initialize(String url,  String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
+    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
 
 
     /**
@@ -119,12 +119,13 @@ public class BacktraceDatabase implements Database {
 
     /**
      * Setup native crash handler
-     * @param client  Backtrace client
+     *
+     * @param client      Backtrace client
      * @param credentials Backtrace credentials
      */
     public void setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
         // avoid initialization when database doesn't exist
-        if(getSettings() == null) {
+        if (getSettings() == null) {
             return;
         }
         // path to crashpad native handler
@@ -133,7 +134,7 @@ public class BacktraceDatabase implements Database {
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         List<String> result = new ArrayList(crashpadAttributes.attributes.keySet());
         List<String> values = new ArrayList(crashpadAttributes.attributes.values());
-        Initialize(
+        initialize(
                 credentials.getMinidumpSubmissionUrl().toString(),
                 getSettings().getDatabasePath() + "/crashpad",
                 handlerPath,

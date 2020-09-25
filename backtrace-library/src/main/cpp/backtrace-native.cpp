@@ -120,7 +120,7 @@ extern "C" {
         *(volatile int *) 0 = 0;
     }
 
-    JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_Crash(
+    JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
             JNIEnv *env,
             jobject /* this */) {
         Crash();
@@ -142,7 +142,7 @@ extern "C" {
     }
 
     JNIEXPORT jboolean JNICALL
-    Java_backtraceio_library_BacktraceDatabase_Initialize(JNIEnv *env,
+    Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                           jobject thiz,
                                                           jstring url,
                                                           jstring database_path,
@@ -177,8 +177,8 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
-    Java_backtraceio_library_BacktraceDatabase_AddAttribute(JNIEnv *env, jobject thiz,
-                                                                     jstring name, jstring value) {
+    Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thiz,
+                                                            jstring name, jstring value) {
         AddAttribute(name, value);
     }
 }
