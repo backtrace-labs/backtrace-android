@@ -35,6 +35,9 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  */
 public class BacktraceDatabase implements Database {
 
+    private final String _crashpadHandlerName = "/libcrashpad_handler.so";
+    private final String _crashpadDatabasePathPrefix = "/crashpad";
+
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
@@ -128,15 +131,19 @@ public class BacktraceDatabase implements Database {
         if (getSettings() == null) {
             return;
         }
+        String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
+        if (minidumpSubmissionUrl == null) {
+            return;
+        }
         // path to crashpad native handler
-        String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + "/libcrashpad_handler.so";
+        String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
 
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         List<String> result = new ArrayList(crashpadAttributes.attributes.keySet());
         List<String> values = new ArrayList(crashpadAttributes.attributes.values());
         initialize(
-                credentials.getMinidumpSubmissionUrl().toString(),
-                getSettings().getDatabasePath() + "/crashpad",
+                minidumpSubmissionUrl,
+                getSettings().getDatabasePath() + _crashpadDatabasePathPrefix,
                 handlerPath,
                 result.toArray(new String[0]),
                 values.toArray(new String[0]));

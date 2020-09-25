@@ -85,6 +85,8 @@ public class BacktraceCredentials {
             jsonUrl = jsonUrl.replace("format=json", "format=minidump");
         } else if (jsonUrl.contains(("/json"))) {
             jsonUrl = jsonUrl.replace("/json", "/minidump");
+        } else {
+            return null;
         }
         return Uri.parse(jsonUrl);
     }
