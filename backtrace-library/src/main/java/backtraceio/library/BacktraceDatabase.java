@@ -126,27 +126,30 @@ public class BacktraceDatabase implements Database {
      * @param client      Backtrace client
      * @param credentials Backtrace credentials
      */
-    public void setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
         // avoid initialization when database doesn't exist
         if (getSettings() == null) {
-            return;
+            return false;
         }
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
         if (minidumpSubmissionUrl == null) {
-            return;
+            return false;
         }
         // path to crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
 
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
-        List<String> result = new ArrayList(crashpadAttributes.attributes.keySet());
-        List<String> values = new ArrayList(crashpadAttributes.attributes.values());
-        initialize(
+        String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
+        String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
+        String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
+        Boolean initialized = initialize(
                 minidumpSubmissionUrl,
-                getSettings().getDatabasePath() + _crashpadDatabasePathPrefix,
+                databasePath,
                 handlerPath,
-                result.toArray(new String[0]),
-                values.toArray(new String[0]));
+                keys,
+                values
+        );
+        return initialized;
     }
 
     public void start() {

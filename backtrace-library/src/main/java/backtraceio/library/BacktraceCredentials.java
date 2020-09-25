@@ -60,7 +60,9 @@ public class BacktraceCredentials {
     }
 
     private Uri getServerUrl() {
-        String url = String.format("%spost?format=%s&token=%s", this.getEndpointUrl(),
+        String serverUrl = this.getEndpointUrl();
+        String prefix = serverUrl.endsWith("/") ? "" : "/";
+        String url = String.format("%s%spost?format=%s&token=%s", serverUrl, prefix,
                 this.format, this.getSubmissionToken());
         return Uri.parse(url);
     }

@@ -76,5 +76,5 @@ public interface Database {
      * @param client      Backtrace client
      * @param credentials Backtrace credentials
      */
-    void setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);
+    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);
 }
