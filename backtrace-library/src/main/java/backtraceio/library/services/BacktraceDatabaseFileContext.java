@@ -38,7 +38,7 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
      */
     public Iterable<File> getAll() {
         File[] files = this._databaseDirectory.listFiles();
-        if(files == null)  {
+        if (files == null) {
             return Collections.emptyList();
         }
         return Arrays.asList(files);
@@ -58,7 +58,7 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
                 return p.matcher(f.getName()).matches();
             }
         });
-        if(pagesTemplates == null)  {
+        if (pagesTemplates == null) {
             return Collections.emptyList();
         }
         return Arrays.asList(pagesTemplates);
@@ -108,7 +108,7 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
 
         Iterable<File> files = this.getAll();
         for (File file : files) {
-            if(file.isDirectory() && file.getName().endsWith(this._crashpadDatabasePathPrefix)) {
+            if (file.isDirectory() && file.getName().endsWith(this._crashpadDatabasePathPrefix)) {
                 continue;
             }
             String extension = FileHelper.getFileExtension(file);
