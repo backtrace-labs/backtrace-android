@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,11 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
      * @return all existing physical files
      */
     public Iterable<File> getAll() {
-        return Arrays.asList(this._databaseDirectory.listFiles());
+        File[] files = this._databaseDirectory.listFiles();
+        if(files == null)  {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(files);
     }
 
     /**
@@ -52,6 +57,9 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
                 return p.matcher(f.getName()).matches();
             }
         });
+        if(pagesTemplates == null)  {
+            return Collections.emptyList();
+        }
         return Arrays.asList(pagesTemplates);
     }
 
