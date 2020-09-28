@@ -22,6 +22,7 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
     private final int _maxRecordNumber;
     private final File _databaseDirectory;
     private final String recordFilterRegex = ".*-record.json";
+    private final String _crashpadDatabasePathPrefix = "crashpad";
 
     public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber) {
         _databasePath = databasePath;
@@ -107,6 +108,9 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
 
         Iterable<File> files = this.getAll();
         for (File file : files) {
+            if(file.isDirectory() && file.getName().endsWith(this._crashpadDatabasePathPrefix)) {
+                continue;
+            }
             String extension = FileHelper.getFileExtension(file);
             if (!extension.equals("json")) {
                 BacktraceLogger.d(LOG_TAG, "Deleting file - it is not a JSON file");
