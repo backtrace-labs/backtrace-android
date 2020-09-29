@@ -213,6 +213,8 @@ settings.setRetryOrder(RetryOrder.Queue);
 
 BacktraceDatabase database = new BacktraceDatabase(context, settings);
 BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
+// start capturing NDK crashes
+database.setupNativeIntegration(backtraceClient, credentials);
 ```
 
 ## Sending an error report <a name="using-backtrace-sending-report"></a>
@@ -347,6 +349,12 @@ You can add custom map of attributes to `BacktraceExceptionHandler` which will b
 
 ```java
 BacktraceExceptionHandler.setCustomAttributes(customAttributes);
+```
+
+If you would like to capture NDK Crashes you can use `BacktraceDatabase` `setupNativeIntegration` method.
+
+```java
+        database.setupNativeIntegration(backtraceClient, credentials);
 ```
 
 
