@@ -38,8 +38,6 @@ cache:
 install:
   # - echo y | sdkmanager "platforms;android-23"
   - echo y | sdkmanager "platforms;android-28"
-  - echo y | sdkmanager --channel=3 --channel=1 "cmake;3.10.2.4988404"
-  - echo y | sdkmanager "lldb;3.1"
   - echo y | sdkmanager 'ndk-bundle'
 
 before_script:
