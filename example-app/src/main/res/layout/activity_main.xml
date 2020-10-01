@@ -15,13 +15,4 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Crash Application"
-        tools:layout_editor_absoluteX="124dp"
-        tools:layout_editor_absoluteY="279dp" />
-
 </android.support.constraint.ConstraintLayout>
