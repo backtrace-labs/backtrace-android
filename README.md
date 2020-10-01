@@ -390,6 +390,9 @@ watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the ti
 watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
 ```
 
+## Uploading symbols to Backtrace
+If you're developing a NDK application, to have better debugging experience in Backtrace, we recommend to upload application symbols to Backtrace. You can find application symbols in the "%application_dir%/build/intermediates/symbols/%release_type%/". To learn more about symbolification please check the article: https://help.backtrace.io/product-guide/symbolification
+
 # Documentation  <a name="documentation"></a>
 
 ## BacktraceReport  <a name="documentation-BacktraceReport"></a>
