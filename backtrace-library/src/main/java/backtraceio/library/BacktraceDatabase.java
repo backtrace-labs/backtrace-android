@@ -3,12 +3,15 @@ package backtraceio.library;
 import android.content.Context;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -21,6 +24,7 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
+import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceDatabaseContext;
@@ -31,6 +35,9 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  */
 public class BacktraceDatabase implements Database {
 
+    private final String _crashpadHandlerName = "/libcrashpad_handler.so";
+    private final String _crashpadDatabasePathPrefix = "/crashpad";
+
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
@@ -40,6 +47,27 @@ public class BacktraceDatabase implements Database {
     private DatabaseFileContext backtraceDatabaseFileContext;
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
+
+    /**
+     * Add attributes to native reports
+     *
+     * @param name  attribute name
+     * @param value attribute value
+     */
+    public native void addAttribute(String name, String value);
+
+    /**
+     * Initialize Backtrace-native integration
+     *
+     * @param url             url to Backtrace
+     * @param databasePath    path to Backtrace-native database
+     * @param handlerPath     path to error handler
+     * @param attributeKeys   array of attribute keys
+     * @param attributeValues array of attribute values
+     * @return true - if backtrace-native was able to initialize correctly, otherwise false.
+     */
+    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
+
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -90,6 +118,38 @@ public class BacktraceDatabase implements Database {
 
     private String getDatabasePath() {
         return databaseSettings.getDatabasePath();
+    }
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client      Backtrace client
+     * @param credentials Backtrace credentials
+     */
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
+        // avoid initialization when database doesn't exist
+        if (getSettings() == null) {
+            return false;
+        }
+        String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
+        if (minidumpSubmissionUrl == null) {
+            return false;
+        }
+        // path to crashpad native handler
+        String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
+
+        BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
+        String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
+        String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
+        String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
+        Boolean initialized = initialize(
+                minidumpSubmissionUrl,
+                databasePath,
+                handlerPath,
+                keys,
+                values
+        );
+        return initialized;
     }
 
     public void start() {

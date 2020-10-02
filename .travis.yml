@@ -38,18 +38,20 @@ cache:
 install:
   # - echo y | sdkmanager "platforms;android-23"
   - echo y | sdkmanager "platforms;android-28"
-
+  - echo y | sdkmanager 'ndk-bundle'
+  - echo y | sdkmanager "cmake;3.10.2.4988404"
 before_script:
   - chmod +x gradlew
-  - pip install --user codecov    #Install codecov
+  - pip install --user codecov #Install codecov
   - android list targets
   - echo no | android create avd --force -n test -t android-23 --tag "google_apis"
   - emulator -avd test -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+  - export PATH="$ANDROID_HOME/cmake/3.10.2.4988404/bin:$PATH"
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)                      #Run codecov
+  - bash <(curl -s https://codecov.io/bash) #Run codecov
 
 script:
   - ./gradlew assembleDebug

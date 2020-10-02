@@ -23,7 +23,6 @@ public class BacktraceApi implements Api {
     private String serverUrl;
 
 
-
     /**
      * Event triggered when server respond with error
      */

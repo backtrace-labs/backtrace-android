@@ -64,7 +64,7 @@ catch (e: Exception) {
 * Supports monitoring the blocking of manually created threads by providing watchdog.
 
 # Supported SDKs <a name="supported-sdks"></a>
-* Minimal SDK version 19 (Android 4.4)
+* Minimal SDK version 21 (Android 5.0)
 * Target SDK version 28 (Android 9.0)
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>
@@ -75,7 +75,7 @@ catch (e: Exception) {
 * Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.0.2'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.1.0'
 }
 ```
 
@@ -84,13 +84,13 @@ dependencies {
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>3.0.2</version>
+  <version>3.1.0</version>
   <type>aar</type>
 </dependency>
 ```
 
 <!-- ## Installation pre-release version <a name="prerelease-version"></a>
-### Pre-release version of `v.3.0.2` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1018/
+### Pre-release version of `v.3.1.0` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1018/
 Add the above url in `build.gradle` file to `repositories` section as below to allow downloading the library from our staging repository:
 ```
 maven {
@@ -100,7 +100,7 @@ maven {
 Then you can download this library by adding to the dependencies in `build.gradle` file to `dependencies` section:
 
 ```
-implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.0.2'
+implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.1.0'
 ```-->
 
 ## Permissions
@@ -213,6 +213,8 @@ settings.setRetryOrder(RetryOrder.Queue);
 
 BacktraceDatabase database = new BacktraceDatabase(context, settings);
 BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
+// start capturing NDK crashes
+database.setupNativeIntegration(backtraceClient, credentials);
 ```
 
 ## Sending an error report <a name="using-backtrace-sending-report"></a>
@@ -349,6 +351,12 @@ You can add custom map of attributes to `BacktraceExceptionHandler` which will b
 BacktraceExceptionHandler.setCustomAttributes(customAttributes);
 ```
 
+If you would like to capture NDK Crashes you can use `BacktraceDatabase` `setupNativeIntegration` method.
+
+```java
+        database.setupNativeIntegration(backtraceClient, credentials);
+```
+
 
 ## Enable library logger - debug mode
 `BacktraceLogger` is a class which helps with debugging and analysis code flow execution inside the library. Logger is a wrapper on Android `Log` class. `BacktraceLogger` supports 4 logging levels:
@@ -381,6 +389,9 @@ watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the ti
 // The following code should be executed inside the thread you want to monitor
 watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
 ```
+
+## Uploading symbols to Backtrace
+If you're developing a NDK application, to have better debugging experience in Backtrace, we recommend to upload application symbols to Backtrace. You can find application symbols in the "%application_dir%/build/intermediates/symbols/%release_type%/". To learn more about symbolification please check the article: https://help.backtrace.io/product-guide/symbolification
 
 # Documentation  <a name="documentation"></a>
 

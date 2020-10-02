@@ -14,6 +14,7 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -27,7 +28,14 @@ import backtraceio.library.services.BacktraceApi;
  */
 public class BacktraceBase implements Client {
 
+    static {
+        System.loadLibrary("backtrace-native");
+    }
+
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
+
+
+    public native void crash();
 
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
@@ -41,6 +49,7 @@ public class BacktraceBase implements Client {
         }
     }
 
+    private final BacktraceCredentials credentials;
     /**
      * Application context
      */
@@ -126,6 +135,7 @@ public class BacktraceBase implements Client {
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes) {
         this.context = context;
+        this.credentials = credentials;
         this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
@@ -133,7 +143,15 @@ public class BacktraceBase implements Client {
     }
 
     /**
+     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     */
+    public void enableNativeIntegration() {
+        this.database.setupNativeIntegration(this, this.credentials);
+    }
+
+    /**
      * Get custom attributes
+     *
      * @return map with custom attributes
      */
     public Map<String, Object> getAttributes() {
@@ -166,6 +184,10 @@ public class BacktraceBase implements Client {
      */
     public void setOnRequestHandler(RequestHandler requestHandler) {
         this.backtraceApi.setRequestHandler(requestHandler);
+    }
+
+    public void nativeCrash() {
+        crash();
     }
 
     /**
