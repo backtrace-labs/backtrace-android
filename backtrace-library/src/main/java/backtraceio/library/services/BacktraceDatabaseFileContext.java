@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,7 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
     private final int _maxRecordNumber;
     private final File _databaseDirectory;
     private final String recordFilterRegex = ".*-record.json";
+    private final String _crashpadDatabasePathPrefix = "crashpad";
 
     public BacktraceDatabaseFileContext(String databasePath, long maxDatabaseSize, int maxRecordNumber) {
         _databasePath = databasePath;
@@ -35,7 +37,11 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
      * @return all existing physical files
      */
     public Iterable<File> getAll() {
-        return Arrays.asList(this._databaseDirectory.listFiles());
+        File[] files = this._databaseDirectory.listFiles();
+        if (files == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(files);
     }
 
     /**
@@ -52,6 +58,9 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
                 return p.matcher(f.getName()).matches();
             }
         });
+        if (pagesTemplates == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(pagesTemplates);
     }
 
@@ -99,6 +108,9 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
 
         Iterable<File> files = this.getAll();
         for (File file : files) {
+            if (file.isDirectory() && file.getName().endsWith(this._crashpadDatabasePathPrefix)) {
+                continue;
+            }
             String extension = FileHelper.getFileExtension(file);
             if (!extension.equals("json")) {
                 BacktraceLogger.d(LOG_TAG, "Deleting file - it is not a JSON file");

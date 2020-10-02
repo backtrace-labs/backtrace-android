@@ -67,7 +67,7 @@ public class BacktraceData {
      * Get built-in attributes
      */
     @SerializedName("attributes")
-    public Map<String, Object> attributes;
+    public Map<String, String> attributes;
 
     /**
      * Application thread details

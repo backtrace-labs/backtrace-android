@@ -20,7 +20,7 @@ import backtraceio.library.models.json.BacktraceReport;
 public class BacktraceClient extends BacktraceBase {
 
     /**
-     *
+     * Backtrace ANR watchdog instance
      */
     private BacktraceANRWatchdog anrWatchdog;
 
@@ -32,7 +32,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials credentials to Backtrace API server
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials) {
-        this(context, credentials, (BacktraceDatabase)null, null);
+        this(context, credentials, (BacktraceDatabase) null, null);
     }
 
     /**
@@ -42,7 +42,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials credentials to Backtrace API server
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
-        this(context, credentials, (BacktraceDatabase)null, attributes);
+        this(context, credentials, (BacktraceDatabase) null, attributes);
     }
 
     /**
@@ -54,7 +54,7 @@ public class BacktraceClient extends BacktraceBase {
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            BacktraceDatabaseSettings databaseSettings) {
-        this(context, credentials,  new BacktraceDatabase(context, databaseSettings));
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings));
     }
 
     /**
@@ -66,7 +66,7 @@ public class BacktraceClient extends BacktraceBase {
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
-        this(context, credentials,  new BacktraceDatabase(context, databaseSettings), attributes);
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes);
     }
 
     /**

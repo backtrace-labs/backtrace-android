@@ -1,4 +1,10 @@
 # Backtrace Android Release Notes
+## Version 3.1.0 - 29.09.2020
+- Backtrace Android allows to capture native crashes from Android NDK code. To enable NDK crashes exception handler use `setupNativeIntegration` method and pass backtraceClient with credentials.
+
+```java
+        database.setupNativeIntegration(backtraceClient, credentials);
+```
 
 ## Version 3.0.2 - 23.01.2020
 - Fixed checking internal path during filtering attachments 

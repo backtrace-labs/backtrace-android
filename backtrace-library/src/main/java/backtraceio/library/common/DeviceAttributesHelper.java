@@ -44,26 +44,26 @@ public class DeviceAttributesHelper {
      *
      * @return device attributes
      */
-    public HashMap<String, Object> getDeviceAttributes() {
-        HashMap<String, Object> result = new HashMap<>();
+    public HashMap<String, String> getDeviceAttributes() {
+        HashMap<String, String> result = new HashMap<>();
         result.put("guid", this.generateDeviceId());
         result.put("uname.sysname", "Android");
         result.put("uname.machine", System.getProperty("os.arch"));
-        result.put("cpu.boottime", java.lang.System.currentTimeMillis() - android.os.SystemClock
-                .elapsedRealtime());
-        result.put("device.airplane_mode", isAirplaneModeOn());
+        result.put("cpu.boottime", String.valueOf(java.lang.System.currentTimeMillis() - android.os.SystemClock
+                .elapsedRealtime()));
+        result.put("device.airplane_mode", String.valueOf(isAirplaneModeOn()));
         result.put("device.location", getLocationServiceStatus().toString());
         result.put("device.nfc.status", getNfcStatus().toString());
         result.put("device.gps.enabled", getGpsStatus().toString());
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
-        result.put("device.cpu.temperature", getCpuTemperature());
-        result.put("device.is_power_saving_mode", isPowerSavingMode());
+        result.put("device.cpu.temperature", String.valueOf(getCpuTemperature()));
+        result.put("device.is_power_saving_mode", String.valueOf(isPowerSavingMode()));
         result.put("device.wifi.status", getWifiStatus().toString());
         result.put("system.memory.total", getMaxRamSize());
         result.put("system.memory.free", getDeviceFreeRam());
         result.put("system.memory.active", getDeviceActiveRam());
         result.put("app.storage_used", getAppUsedStorageSize());
-        result.put("battery.level", getBatteryLevel());
+        result.put("battery.level", String.valueOf(getBatteryLevel()));
         result.put("battery.state", getBatteryState().toString());
         return result;
     }
