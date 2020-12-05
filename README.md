@@ -14,7 +14,7 @@
 
 
 
-[Backtrace](http://backtrace.io/)'s integration with Android applications written in Java or Kotlin which allows customers to capture and report handled and unhandled java exceptions to their Backtrace instance, instantly offering the ability to prioritize and debug software errors.
+[Backtrace](http://backtrace.io/)'s integration with Android applications written in Java or Kotlin which allows customers to capture and report handled and unhandled java exceptions to their Backtrace instance, instantly offering the ability to prioritize and debug software errors. Backtrace also captures and reports native (JNI/NDK) handled and unhandled exceptions if [native integration is enabled](#working_with_ndk).
 
 
 ## Usage
@@ -52,7 +52,8 @@ catch (e: Exception) {
 4. [Installation](#installation)
 5. [Running sample application](#sample-app)
 6. [Using Backtrace library](#using-backtrace)
-7. [Documentation](#documentation)
+7. [Working with NDK applications](#working_with_ndk)
+8. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
@@ -62,10 +63,12 @@ catch (e: Exception) {
 * Fully customizable and extendable event handlers and base classes for custom implementations.
 * Supports detection of blocking the application's main thread (Application Not Responding).
 * Supports monitoring the blocking of manually created threads by providing watchdog.
+* Supports native (JNI/NDK) exceptions and crashes.
 
 # Supported SDKs <a name="supported-sdks"></a>
 * Minimal SDK version 21 (Android 5.0)
 * Target SDK version 28 (Android 9.0)
+* Minimal NDK version 21
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>
 * Getting the status that the device is in power saving mode is available from API 21.
@@ -351,13 +354,6 @@ You can add custom map of attributes to `BacktraceExceptionHandler` which will b
 BacktraceExceptionHandler.setCustomAttributes(customAttributes);
 ```
 
-If you would like to capture NDK Crashes you can use `BacktraceDatabase` `setupNativeIntegration` method.
-
-```java
-        database.setupNativeIntegration(backtraceClient, credentials);
-```
-
-
 ## Enable library logger - debug mode
 `BacktraceLogger` is a class which helps with debugging and analysis code flow execution inside the library. Logger is a wrapper on Android `Log` class. `BacktraceLogger` supports 4 logging levels:
 - `DEBUG`
@@ -390,8 +386,27 @@ watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the ti
 watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
 ```
 
+# Working with NDK applications <a name="working_with_ndk"></a>
+
+## Enabling native integration
+
+If you would like to capture NDK Crashes you can use the `BacktraceDatabase` `setupNativeIntegration` method.
+
+```java
+database.setupNativeIntegration(backtraceClient, credentials);
+```
+
+In addition, you may need to add the [extractNativeLibs](https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs) option to your AndroidManifest.xml:
+```xml
+<application
+        android:extractNativeLibs="true">
+        ...
+</application>
+```
+More details about [extractNativeLibs](https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs) are available from the Android documentation
+
 ## Uploading symbols to Backtrace
-If you're developing a NDK application, to have better debugging experience in Backtrace, we recommend to upload application symbols to Backtrace. You can find application symbols in the "%application_dir%/build/intermediates/symbols/%release_type%/". To learn more about symbolification please check the article: https://help.backtrace.io/product-guide/symbolification
+For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
 
 # Documentation  <a name="documentation"></a>
 
