@@ -404,7 +404,7 @@ In addition, you may need to add the [extractNativeLibs](https://developer.andro
 More details about [extractNativeLibs](https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs) are available from the Android documentation
 
 ## Uploading symbols to Backtrace
-For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://help.backtrace.io/product-guide/symbolification)
+For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
 
 # Documentation  <a name="documentation"></a>
 
