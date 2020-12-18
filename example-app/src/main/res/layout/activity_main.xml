@@ -6,13 +6,51 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/handledException"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello Backtrace.io!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:onClick="handledException"
+        android:text="Handled Exception"
+        app:layout_constraintBottom_toTopOf="@+id/unhandledException"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/unhandledException"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unhandled Exception"
+        android:onClick="unhandledException"
+        app:layout_constraintBottom_toTopOf="@+id/nativeCrash"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/handledException" />
+
+    <Button
+        android:id="@+id/nativeCrash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Native Crash"
+        android:onClick="nativeCrash"
+        app:layout_constraintBottom_toTopOf="@+id/anr"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/unhandledException" />
+
+    <Button
+        android:id="@+id/anr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ANR"
+        android:onClick="anr"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
 
 </android.support.constraint.ConstraintLayout>
