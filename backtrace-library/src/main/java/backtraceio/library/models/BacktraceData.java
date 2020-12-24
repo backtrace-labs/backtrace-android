@@ -27,6 +27,13 @@ public class BacktraceData {
     private static transient String LOG_TAG = BacktraceData.class.getSimpleName();
 
     /**
+     * If sending a Proguard obfuscated callstack, we need
+     * to set this field to "proguard" so the backend knows
+     */
+    @SerializedName("symbolication")
+    public String symbolication;
+
+    /**
      * 16 bytes of randomness in human readable UUID format
      * server will reject request if uuid is already found
      */
