@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+#These are needed since Proguard breaks some Backtrace libraries
+-keep class com.google.gson.**.* { *; }
+-keep class backtraceio.library.**.* { *; }

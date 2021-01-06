@@ -53,7 +53,8 @@ catch (e: Exception) {
 5. [Running sample application](#sample-app)
 6. [Using Backtrace library](#using-backtrace)
 7. [Working with NDK applications](#working_with_ndk)
-8. [Documentation](#documentation)
+8. [Working with Proguard](#working_with_proguard)
+9. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
@@ -407,6 +408,39 @@ More details about [extractNativeLibs](https://developer.android.com/guide/topic
 
 ## Uploading symbols to Backtrace
 For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
+
+# Working with Proguard <a name="working_with_proguard"></a>
+
+##### 1. Add the following to the `proguard_rules.pro` for your app
+These are needed since Proguard breaks some Backtrace libraries
+```
+-keep class com.google.gson.**.* { *; }
+-keep class backtraceio.library.**.* { *; }
+```
+##### 2. Enable Proguard mode in the [BacktraceClient](#documentation-BacktraceClient)
+```java
+backtraceClient.enableProguard();
+```
+
+##### 3. Create a UUID of your choice and set it as the value for the attribute `symbolication_id`, you will upload your Proguard mapping file with this same UUID later
+```java
+final UUID proguardMappingUUID = UUID.fromString("f6c3e8d4-8626-4051-94ec-53e6daccce25");
+final Map<String, Object> attributes = new HashMap<String, Object>() {{
+    put("symbolication_id", proguardMappingUUID.toString());
+}};
+```
+
+##### 4. Upload your Proguard mapping file with the UUID from the above step to Backtrace
+
+Currently we don't have a way to upload the Proguard mapping file from the UI. You will need to use a tool such as `curl` or Postman to upload the Proguard mapping file to Backtrace.
+To do so, please construct an HTTP POST request with the following parameters, and submit the mapping file as the request body: 
+`https://<Universe Name>.sp.backtrace.io:6098/post?format=proguard&token=<Symbol Upload Token>&universe=<Universe Name>&project=<Project Name>&symbolication_id=<symbolication_id from above>`
+
+##### 5. Start sending Proguard obfuscated crashes! 
+If the symbolication_id from the submitted crash matches a symbolication_id of a submitted Proguard mapping file, it will attempt to use that mapping file to deobfuscate the symbols from the submitted crash.
+
+#### Important Note for Windows users: 
+Please ensure your Proguard mapping file has Unix line endings before submitting to Backtrace!
 
 # Documentation  <a name="documentation"></a>
 

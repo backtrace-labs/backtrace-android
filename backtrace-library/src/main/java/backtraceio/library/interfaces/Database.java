@@ -47,6 +47,16 @@ public interface Database {
     BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object> attributes);
 
     /**
+     * Add new report to Database
+     *
+     * @param backtraceReport
+     * @param attributes
+     * @param isProguardEnabled
+     * @return
+     */
+    BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object> attributes, boolean isProguardEnabled);
+
+    /**
      * @return
      */
     Iterable<BacktraceDatabaseRecord> get();

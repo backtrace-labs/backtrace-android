@@ -24,7 +24,6 @@ public class BacktraceClient extends BacktraceBase {
      */
     private BacktraceANRWatchdog anrWatchdog;
 
-
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
      *
@@ -93,7 +92,6 @@ public class BacktraceClient extends BacktraceBase {
         super(context, credentials, database, attributes);
     }
 
-
     /**
      * Sending a message to Backtrace API
      *
@@ -152,7 +150,6 @@ public class BacktraceClient extends BacktraceBase {
             serverResponseEventListener) {
         super.send(report, serverResponseEventListener);
     }
-
 
     /**
      * Start monitoring if the main thread has been blocked

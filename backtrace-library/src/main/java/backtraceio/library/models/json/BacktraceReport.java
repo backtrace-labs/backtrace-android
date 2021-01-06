@@ -64,7 +64,7 @@ public class BacktraceReport {
     public ArrayList<BacktraceStackFrame> diagnosticStack;
 
     /**
-     * Create new instance of Backtrace report to sending a report with custom client message
+     * Create new instance of Backtrace report to send a report with custom client message
      *
      * @param message custom client message
      */
@@ -76,7 +76,7 @@ public class BacktraceReport {
     }
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with custom client message and attributes
      *
      * @param message    custom client message
@@ -91,7 +91,7 @@ public class BacktraceReport {
     }
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with custom client message, attributes and attachments
      *
      * @param message         custom client message
@@ -106,7 +106,7 @@ public class BacktraceReport {
 
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with custom client message, attributes and attachments
      *
      * @param message         custom client message
@@ -123,7 +123,7 @@ public class BacktraceReport {
     }
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with application exception
      *
      * @param exception current exception
@@ -134,7 +134,7 @@ public class BacktraceReport {
     }
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with application exception and attributes
      *
      * @param exception  current exception
@@ -147,7 +147,7 @@ public class BacktraceReport {
     }
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with application exception, attributes and attachments
      *
      * @param exception       current exception
@@ -160,7 +160,7 @@ public class BacktraceReport {
     }
 
     /**
-     * Create new instance of Backtrace report to sending a report
+     * Create new instance of Backtrace report to send a report
      * with application exception, attributes and attachments
      *
      * @param exception       current exception
@@ -185,7 +185,13 @@ public class BacktraceReport {
     }
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-        return new BacktraceData(context, this, clientAttributes);
+        return toBacktraceData(context, clientAttributes, false);
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
+        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
+        return backtraceData;
     }
 
     /**
