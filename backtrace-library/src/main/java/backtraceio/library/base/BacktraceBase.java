@@ -71,6 +71,11 @@ public class BacktraceBase implements Client {
     private OnBeforeSendEventListener beforeSendEventListener = null;
 
     /**
+     * Is Proguard symbolication enabled? We have to inform the Backtrace API
+     */
+    private boolean isProguardEnabled = false;
+
+    /**
      * Initialize new client instance with BacktraceCredentials
      *
      * @param context     context of current state of the application
@@ -150,6 +155,13 @@ public class BacktraceBase implements Client {
     }
 
     /**
+     * Inform Backtrace API that we are using Proguard symbolication
+     */
+    public void enableProguard() {
+        this.isProguardEnabled = true;
+    }
+
+    /**
      * Get custom attributes
      *
      * @return map with custom attributes
@@ -206,8 +218,9 @@ public class BacktraceBase implements Client {
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
+        backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
 
-        final BacktraceDatabaseRecord record = this.database.add(report, this.attributes);
+        final BacktraceDatabaseRecord record = this.database.add(report, this.attributes, this.isProguardEnabled);
 
         if (this.beforeSendEventListener != null) {
             backtraceData = this.beforeSendEventListener.onEvent(backtraceData);

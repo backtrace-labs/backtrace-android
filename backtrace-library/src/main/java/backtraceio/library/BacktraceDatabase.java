@@ -293,6 +293,11 @@ public class BacktraceDatabase implements Database {
 
     public BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object>
             attributes) {
+        return add(backtraceReport, attributes, false);
+    }
+
+    public BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object>
+            attributes, boolean isProguardEnabled) {
         if (!this._enable || backtraceReport == null) {
             return null;
         }
@@ -302,7 +307,7 @@ public class BacktraceDatabase implements Database {
             return null;
         }
 
-        BacktraceData data = backtraceReport.toBacktraceData(this._applicationContext, attributes);
+        BacktraceData data = backtraceReport.toBacktraceData(this._applicationContext, attributes, isProguardEnabled);
         return backtraceDatabaseContext.add(data);
     }
 
