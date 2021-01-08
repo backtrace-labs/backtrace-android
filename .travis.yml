@@ -38,7 +38,7 @@ cache:
 install:
   # - echo y | sdkmanager "platforms;android-23"
   - echo y | sdkmanager "platforms;android-28"
-  - echo y | sdkmanager 'ndk-bundle'
+  - echo y | sdkmanager 'ndk;20.0.5594570'
   - echo y | sdkmanager "cmake;3.10.2.4988404"
 before_script:
   - chmod +x gradlew
@@ -49,6 +49,8 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
   - export PATH="$ANDROID_HOME/cmake/3.10.2.4988404/bin:$PATH"
+  - export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/20.0.5594570"
+  - export PATH=$PATH:$ANDROID_NDK_HOME
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) #Run codecov
