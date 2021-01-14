@@ -120,6 +120,12 @@ extern "C" {
         *(volatile int *) 0 = 0;
     }
 
+    void DumpWithoutCrash() {
+        crashpad::NativeCPUContext context;
+        crashpad::CaptureContext(&context);
+        client->DumpWithoutCrash(&context);
+    }
+
     JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
             JNIEnv *env,
             jobject /* this */) {
@@ -180,5 +186,10 @@ extern "C" {
     Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thiz,
                                                             jstring name, jstring value) {
         AddAttribute(name, value);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash(JNIEnv *env, jobject thiz) {
+        DumpWithoutCrash();
     }
 }

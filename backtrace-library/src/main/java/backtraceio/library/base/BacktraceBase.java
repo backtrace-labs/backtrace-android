@@ -202,6 +202,8 @@ public class BacktraceBase implements Client {
         crash();
     }
 
+    public native void dumpWithoutCrash();
+
     /**
      * Sending an exception to Backtrace API
      *
