@@ -202,7 +202,7 @@ public class BacktraceBase implements Client {
         crash();
     }
 
-    public native void dumpWithoutCrash();
+    public native void dumpWithoutCrash(String message);
 
     /**
      * Sending an exception to Backtrace API

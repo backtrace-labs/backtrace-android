@@ -20,8 +20,8 @@ using namespace base;
 // supported JNI version
 static jint JNI_VERSION = JNI_VERSION_1_6;
 
-// JNI environment reference
-static JNIEnv *env;
+// Java VM
+static JavaVM *javaVm;
 
 // crashpad client
 static crashpad::CrashpadClient *client;
@@ -30,29 +30,69 @@ static crashpad::CrashpadClient *client;
 static std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
 
-JNIEXPORT jint JNI_OnLoad(JavaVM* jvm, void* reserved)
-{
+JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
+    JNIEnv *env;
     if (jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION) != JNI_OK) {
 
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s",
                             "Cannot load the JNI env");
         return JNI_ERR;
     }
+    javaVm = jvm;
+
     return JNI_VERSION_1_4;
 }
 
 namespace /* anonymous */
 {
-        bool InitializeImpl(jstring url,
-                                jstring database_path,
-                                jstring handler_path,
-                                jobjectArray attributeKeys,
-                                jobjectArray attributeValues) {
+    /**
+     * Get JNI Environment pointer
+     * Executing JNIEnv methods on background thread might cause a crash - by default we attached
+     * JNIEnv to main thread - background thread wasn't available. This method allows to return
+     * safety JNIEnv and detach it once we done with all native operations.
+     */
+    JNIEnv *GetJniEnv() {
+        JNIEnv *m_pJniEnv;
+        int nEnvStat = javaVm->GetEnv(reinterpret_cast<void **>(&m_pJniEnv), JNI_VERSION_1_6);
+
+        if (nEnvStat == JNI_EDETACHED) {
+            JavaVMAttachArgs args;
+            args.version = JNI_VERSION_1_6;
+
+            if (javaVm->AttachCurrentThread(&m_pJniEnv, &args) != 0) {
+                return nullptr;
+            }
+
+            thread_local struct DetachJniOnExit {
+                ~DetachJniOnExit() {
+                    javaVm->DetachCurrentThread();
+                }
+            };
+        } else if (nEnvStat == JNI_EVERSION) {
+            return nullptr;
+        }
+        return m_pJniEnv;
+    }
+
+
+    bool InitializeImpl(jstring url,
+                        jstring database_path,
+                        jstring handler_path,
+                        jobjectArray attributeKeys,
+                        jobjectArray attributeValues) {
         using namespace crashpad;
         // avoid multi initialization
         if (initialized) {
             return true;
         }
+
+
+        JNIEnv *env = GetJniEnv();
+        if (env == nullptr) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
+            return false;
+        }
+
         std::map<std::string, std::string> attributes;
         attributes["format"] = "minidump";
 
@@ -78,7 +118,8 @@ namespace /* anonymous */
                 env->ReleaseStringUTFChars(stringValue, convertedValue);
             }
         } else {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Attribute array length doesn't match. Attributes won't be available in the Crashpad integration");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Attribute array length doesn't match. Attributes won't be available in the Crashpad integration");
         }
 
         std::vector<std::string> arguments;
@@ -88,7 +129,7 @@ namespace /* anonymous */
         const char *backtraceUrl = env->GetStringUTFChars(url, 0);
 
         // path to crash handler executable
-        const char *handlerPath  = env->GetStringUTFChars(handler_path, 0);
+        const char *handlerPath = env->GetStringUTFChars(handler_path, 0);
         FilePath handler(handlerPath);
 
         // path to crashpad database
@@ -106,7 +147,8 @@ namespace /* anonymous */
         // Start crash handler
         client = new CrashpadClient();
 
-        initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes, arguments);
+        initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
+                                                  arguments);
 
         env->ReleaseStringUTFChars(url, backtraceUrl);
         env->ReleaseStringUTFChars(handler_path, handlerPath);
@@ -116,80 +158,119 @@ namespace /* anonymous */
 }
 
 extern "C" {
-    void Crash() {
-        *(volatile int *) 0 = 0;
-    }
+void Crash() {
+    *(volatile int *) 0 = 0;
+}
 
-    void DumpWithoutCrash() {
-        crashpad::NativeCPUContext context;
-        crashpad::CaptureContext(&context);
-        client->DumpWithoutCrash(&context);
-    }
+void DumpWithoutCrash(jstring message) {
+    crashpad::NativeCPUContext context;
+    crashpad::CaptureContext(&context);
 
-    JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
-            JNIEnv *env,
-            jobject /* this */) {
-        Crash();
-    }
+    // set dump message for single report
+    crashpad::SimpleStringDictionary *annotations = NULL;
+    bool did_attach = false;
 
-    bool Initialize(jstring url,
-                    jstring database_path,
-                    jstring handler_path,
-                    jobjectArray attributeKeys,
-                    jobjectArray attributeValues) {
-        static std::once_flag initialize_flag;
-
-        std::call_once(initialize_flag, [&]{
-            initialized = InitializeImpl(url,
-                database_path, handler_path,
-                attributeKeys, attributeValues);
-        });
-        return initialized;
-    }
-
-    JNIEXPORT jboolean JNICALL
-    Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
-                                                          jobject thiz,
-                                                          jstring url,
-                                                          jstring database_path,
-                                                          jstring handler_path,
-                                                          jobjectArray attributeKeys,
-                                                          jobjectArray attributeValues) {
-        return Initialize(url, database_path, handler_path, attributeKeys, attributeValues);
-    }
-
-
-    void AddAttribute(jstring key, jstring value) {
-        if (initialized == false) {
-            __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android", "Crashpad integration isn't available. Please initialize the Crashpad integration first.");
+    if (message != NULL) {
+        JNIEnv *env = GetJniEnv();
+        if (env == nullptr) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
             return;
         }
         const std::lock_guard<std::mutex> lock(attribute_synchronization);
-        crashpad::CrashpadInfo* info = crashpad::CrashpadInfo::GetCrashpadInfo();
-        crashpad::SimpleStringDictionary* annotations = info->simple_annotations();
-        if (!annotations)
-        {
+        crashpad::CrashpadInfo *info = crashpad::CrashpadInfo::GetCrashpadInfo();
+        annotations = info->simple_annotations();
+        if (!annotations) {
             annotations = new crashpad::SimpleStringDictionary();
             info->set_simple_annotations(annotations);
         }
+
+        // user can't override error.message - exception message that Crashpad/crash-reporting tool
+        // will set to tell user about error message. This code will set error.message only for single
+        // report and after creating a dump, method will clean up this attribute.
         jboolean isCopy;
-        const char* crashpadKey = env->GetStringUTFChars(key, &isCopy);
-        const char* crashpadValue = env->GetStringUTFChars(value, &isCopy);
-        if (crashpadKey && crashpadValue)
-            annotations->SetKeyValue(crashpadKey, crashpadValue);
+        const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
+        annotations->SetKeyValue("error.message", rawMessage);
+        env->ReleaseStringUTFChars(message, rawMessage);
+    }
+    client->DumpWithoutCrash(&context);
 
-        env->ReleaseStringUTFChars(key, crashpadKey);
-        env->ReleaseStringUTFChars(value, crashpadValue);
+    if (annotations != NULL) {
+        annotations->RemoveKey("error.message");
+    }
+}
+
+JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
+        JNIEnv *env,
+        jobject /* this */) {
+    Crash();
+}
+
+bool Initialize(jstring url,
+                jstring database_path,
+                jstring handler_path,
+                jobjectArray attributeKeys,
+                jobjectArray attributeValues) {
+    static std::once_flag initialize_flag;
+
+    std::call_once(initialize_flag, [&] {
+        initialized = InitializeImpl(url,
+                                     database_path, handler_path,
+                                     attributeKeys, attributeValues);
+    });
+    return initialized;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
+                                                      jobject thiz,
+                                                      jstring url,
+                                                      jstring database_path,
+                                                      jstring handler_path,
+                                                      jobjectArray attributeKeys,
+                                                      jobjectArray attributeValues) {
+    return Initialize(url, database_path, handler_path, attributeKeys, attributeValues);
+}
+
+
+void AddAttribute(jstring key, jstring value) {
+    if (initialized == false) {
+        __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android",
+                            "Crashpad integration isn't available. Please initialize the Crashpad integration first.");
+        return;
+    }
+    JNIEnv *env = GetJniEnv();
+    if (env == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
+        return;
     }
 
-    JNIEXPORT void JNICALL
-    Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thiz,
-                                                            jstring name, jstring value) {
-        AddAttribute(name, value);
+    const std::lock_guard<std::mutex> lock(attribute_synchronization);
+    crashpad::CrashpadInfo *info = crashpad::CrashpadInfo::GetCrashpadInfo();
+    crashpad::SimpleStringDictionary *annotations = info->simple_annotations();
+    if (!annotations) {
+        annotations = new crashpad::SimpleStringDictionary();
+        info->set_simple_annotations(annotations);
     }
 
-    JNIEXPORT void JNICALL
-    Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash(JNIEnv *env, jobject thiz) {
-        DumpWithoutCrash();
-    }
+    jboolean isCopy;
+    const char *crashpadKey = env->GetStringUTFChars(key, &isCopy);
+    const char *crashpadValue = env->GetStringUTFChars(value, &isCopy);
+    if (crashpadKey && crashpadValue)
+        annotations->SetKeyValue(crashpadKey, crashpadValue);
+
+    env->ReleaseStringUTFChars(key, crashpadKey);
+    env->ReleaseStringUTFChars(value, crashpadValue);
+}
+
+JNIEXPORT void JNICALL
+Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thiz,
+                                                        jstring name, jstring value) {
+    AddAttribute(name, value);
+}
+
+JNIEXPORT void JNICALL
+Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash(JNIEnv *env, jobject thiz,
+                                                             jstring message) {
+    DumpWithoutCrash(message);
+}
 }
