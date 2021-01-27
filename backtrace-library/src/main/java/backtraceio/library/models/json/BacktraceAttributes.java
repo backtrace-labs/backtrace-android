@@ -165,7 +165,7 @@ public class BacktraceAttributes {
                 continue;
             }
             Class type = value.getClass();
-            if (TypeHelper.isPrimitiveOrPrimitiveWrapperOrString(type) || value instanceof String || type.isEnum()) {
+            if (TypeHelper.isPrimitiveOrPrimitiveWrapperOrString(type)) {
                 this.attributes.put(entry.getKey(), value.toString());
             } else {
                 this.complexAttributes.put(entry.getKey(), value);
