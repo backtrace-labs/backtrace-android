@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import backtraceio.library.BuildConfig;
+import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
 
 /**
@@ -164,7 +165,7 @@ public class BacktraceAttributes {
                 continue;
             }
             Class type = value.getClass();
-            if (type.isPrimitive() || value instanceof String || type.isEnum()) {
+            if (TypeHelper.isPrimitiveOrPrimitiveWrapperOrString(type) || value instanceof String || type.isEnum()) {
                 this.attributes.put(entry.getKey(), value.toString());
             } else {
                 this.complexAttributes.put(entry.getKey(), value);
