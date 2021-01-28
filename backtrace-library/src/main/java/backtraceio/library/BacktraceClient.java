@@ -1,18 +1,16 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.provider.ContactsContract;
-
 
 import java.util.Map;
 
-import backtraceio.library.watchdog.BacktraceANRWatchdog;
-import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.watchdog.BacktraceANRWatchdog;
+import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
 /**
  * Backtrace Java Android Client
@@ -90,6 +88,7 @@ public class BacktraceClient extends BacktraceBase {
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            Database database, Map<String, Object> attributes) {
         super(context, credentials, database, attributes);
+
     }
 
     /**

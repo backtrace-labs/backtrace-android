@@ -2,11 +2,13 @@ package backtraceio.library.base;
 
 import android.content.Context;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -14,12 +16,13 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.BacktraceBreadcrumbLevel;
+import backtraceio.library.models.types.BacktraceBreadcrumbType;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 
@@ -74,6 +77,11 @@ public class BacktraceBase implements Client {
      * Is Proguard symbolication enabled? We have to inform the Backtrace API
      */
     private boolean isProguardEnabled = false;
+
+    /**
+     * Backtrace Breadcrumbs instance
+     */
+    private BacktraceBreadcrumbs backtraceBreadcrumbs;
 
     /**
      * Initialize new client instance with BacktraceCredentials
@@ -198,10 +206,134 @@ public class BacktraceBase implements Client {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context   context of current state of the application
+     */
+    public void enableBreadcrumbs(Context context) {
+        backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+        backtraceBreadcrumbs.enableBreadcrumbs(context);
+    }
+
+    /**
+     * Disable logging of breadcrumbs and submission with crash reports
+     * @param context   context of current state of the application
+     */
+    public void disableBreadcrumbs(Context context) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.disableBreadcrumbs(context);
+    }
+
+    /**
+     * Is Breadcrumbs logging enabled?
+     * @return      true if Breadcrumbs is enabled, false otherwise
+     */
+    public boolean isBreadcrumbsEnabled() {
+        if (backtraceBreadcrumbs != null)
+            return backtraceBreadcrumbs.isBreadcrumbsEnabled();
+        return false;
+    }
+
+    /**
+     * Clear breadcrumb logs
+     */
+    public void clearBreadcrumbs() {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.clearBreadcrumbs();
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
+     * @param message       a brief message which describes this breadcrumb
+     */
+    public void addBreadcrumb(String message) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message);
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and the desired level with the provided message string
+     * @param message       a brief message which describes this breadcrumb
+     * @param level         the severity level of this breadcrumb
+     */
+    public void addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, level);
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
+     * @param message       a brief message which describes this breadcrumb
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     */
+    public void addBreadcrumb(String message, Map<String, Object> attributes) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, attributes);
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and the desired level with the provided message string and attributes
+     * @param message       a brief message which describes this breadcrumb
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param level         the severity level of this breadcrumb
+     */
+    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, attributes, level);
+    }
+
+    /**
+     * Add a breadcrumb of the desired type and level "Info" with the provided message string
+     * @param message       a brief message which describes this breadcrumb
+     * @param type          broadly describes the category of this breadcrumb
+     */
+    public void addBreadcrumb(String message, BacktraceBreadcrumbType type) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, type);
+    }
+
+    /**
+     * Add a breadcrumb of the desired level and type with the provided message string
+     * @param message       a brief message which describes this breadcrumb
+     * @param type          broadly describes the category of this breadcrumb
+     * @param level         the severity level of this breadcrumb
+     */
+    public void addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, type, level);
+    }
+
+    /**
+     * Add a breadcrumb of the desired type and level "Info" with the provided message string and attributes
+     * @param message       a brief message which describes this breadcrumb
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param type          broadly describes the category of this breadcrumb
+     */
+    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, attributes, type);
+    }
+
+    /**
+     * Add a breadcrumb of the desired level and type with the provided message string and attributes
+     * @param message       a brief message which describes this breadcrumb
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param type          broadly describes the category of this breadcrumb
+     * @param level         the severity level of this breadcrumb
+     */
+    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null)
+            backtraceBreadcrumbs.addBreadcrumb(message, attributes, type, level);
+    }
+
     public void nativeCrash() {
         crash();
     }
 
+    /**
+     * Force a Crashpad report and minidump submission
+     * @param message
+     */
     public native void dumpWithoutCrash(String message);
 
     /**
@@ -219,6 +351,18 @@ public class BacktraceBase implements Client {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
+        if (backtraceBreadcrumbs != null && backtraceBreadcrumbs.isBreadcrumbsEnabled()) {
+            File breadcrumbLogFilesDir = new File(backtraceBreadcrumbs.getBreadcrumbLogDirectory());
+
+            File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
+            for (File breadcrumbLogFile : breadcrumbLogFiles) {
+                report.attachmentPaths.add(breadcrumbLogFile.getAbsolutePath());
+            }
+
+            int lastBreadcrumbId = backtraceBreadcrumbs.prepareToSendBreadcrumbsLog();
+            report.attributes.put("breadcrumbs.lastId", lastBreadcrumbId);
+        }
+
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
         backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
 

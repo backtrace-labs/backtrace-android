@@ -3,15 +3,11 @@ package backtraceio.backtraceio;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -121,5 +117,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void anr(View view) throws InterruptedException {
         Thread.sleep(anrTimeout + 2000);
+    }
+
+    public void enableBreadcrumbs(View view) {
+        backtraceClient.enableBreadcrumbs(view.getContext());
+    }
+
+    public void disableBreadcrumbs(View view) {
+        backtraceClient.disableBreadcrumbs(view.getContext());
+    }
+
+    public void sendReport(View view) {
+        backtraceClient.addBreadcrumb("Sending Backtrace Report");
+
+        BacktraceReport report = new BacktraceReport("Test");
+        backtraceClient.send(report);
     }
 }
