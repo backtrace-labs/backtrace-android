@@ -1,0 +1,99 @@
+package backtraceio.library.breadcrumbs;
+
+import android.content.ComponentCallbacks2;
+import android.content.res.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import backtraceio.library.models.types.BacktraceBreadcrumbLevel;
+import backtraceio.library.models.types.BacktraceBreadcrumbType;
+
+public class BacktraceComponentListener implements ComponentCallbacks2 {
+
+    private BacktraceBreadcrumbs backtraceBreadcrumbs;
+
+    public BacktraceComponentListener(BacktraceBreadcrumbs backtraceBreadcrumbs)
+    {
+        this.backtraceBreadcrumbs = backtraceBreadcrumbs;
+    }
+
+    private String getMemoryWarningString(final int level)
+    {
+        switch (level)
+        {
+            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
+                return "TRIM_MEMORY_UI_HIDDEN";
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
+                return "TRIM_MEMORY_RUNNING_MODERATE";
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
+                return "TRIM_MEMORY_RUNNING_LOW";
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
+                return "TRIM_MEMORY_RUNNING_CRITICAL";
+            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
+                return "TRIM_MEMORY_BACKGROUND";
+            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
+                return "TRIM_MEMORY_MODERATE";
+            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
+                return "TRIM_MEMORY_COMPLETE";
+            default:
+                return "Generic memory warning";
+        }
+    }
+
+    private BacktraceBreadcrumbLevel getMemoryWarningLevel(final int level)
+    {
+        switch (level)
+        {
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
+                return BacktraceBreadcrumbLevel.ERROR;
+            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
+            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
+                return BacktraceBreadcrumbLevel.FATAL;
+            default:
+                return BacktraceBreadcrumbLevel.WARNING;
+        }
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        String messageString = getMemoryWarningString(level);
+        BacktraceBreadcrumbLevel breadcrumbLevel = getMemoryWarningLevel(level);
+        backtraceBreadcrumbs.addBreadcrumb(messageString,
+                                        BacktraceBreadcrumbType.SYSTEM,
+                                        breadcrumbLevel);
+    }
+
+    private String stringifyOrientation(final int orientation)
+    {
+        switch (orientation)
+        {
+            case Configuration.ORIENTATION_LANDSCAPE:
+                return "landscape";
+            case Configuration.ORIENTATION_PORTRAIT:
+                return "portrait";
+            default:
+                return "unknown orientation";
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        Map<String, Object> attributes = new HashMap<String, Object>();
+        String orientation = stringifyOrientation(newConfig.orientation);
+        attributes.put("orientation", orientation);
+        backtraceBreadcrumbs.addBreadcrumb("Configuration changed",
+                                        attributes,
+                                        BacktraceBreadcrumbLevel.INFO);
+    }
+
+    @Override
+    public void onLowMemory() {
+        backtraceBreadcrumbs.addBreadcrumb("Critical low memory warning!",
+                                        BacktraceBreadcrumbType.SYSTEM,
+                                        BacktraceBreadcrumbLevel.FATAL);
+    }
+}
