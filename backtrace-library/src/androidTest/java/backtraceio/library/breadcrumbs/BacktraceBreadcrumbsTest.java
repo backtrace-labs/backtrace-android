@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,6 +37,12 @@ public class BacktraceBreadcrumbsTest {
         this.context = InstrumentationRegistry.getContext();
     }
 
+    @After
+    public void cleanUp() {
+        File dir = new File(context.getFilesDir().getAbsolutePath() + "/breadcrumbs");
+        deleteRecursive(dir);
+    }
+
     @Test
     public void testEnable() {
 
@@ -50,5 +58,16 @@ public class BacktraceBreadcrumbsTest {
         } catch(Exception e) {
             fail(e.getMessage());
         }
+    }
+
+    public void deleteRecursive(File fileOrDirectory) {
+
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+
+        fileOrDirectory.delete();
     }
 }

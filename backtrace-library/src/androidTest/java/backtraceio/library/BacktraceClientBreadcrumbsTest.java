@@ -6,10 +6,12 @@ import android.support.test.runner.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -39,6 +41,12 @@ public class BacktraceClientBreadcrumbsTest {
     public void setUp() {
         context = InstrumentationRegistry.getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+    }
+
+    @After
+    public void cleanUp() {
+        File dir = new File(context.getFilesDir().getAbsolutePath() + "/breadcrumbs");
+        deleteRecursive(dir);
     }
 
     @Test
@@ -166,6 +174,17 @@ public class BacktraceClientBreadcrumbsTest {
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
+    }
+
+    public void deleteRecursive(File fileOrDirectory) {
+
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+
+        fileOrDirectory.delete();
     }
 
 }
