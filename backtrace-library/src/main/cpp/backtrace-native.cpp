@@ -312,7 +312,8 @@ Java_backtraceio_library_breadcrumbs_BacktraceBreadcrumbs_addBreadcrumb(JNIEnv *
 JNIEXPORT jint JNICALL
 Java_backtraceio_library_breadcrumbs_BacktraceBreadcrumbs_prepareToSendBreadcrumbsLog(JNIEnv *env,
                                                                                         jobject thiz) {
+    int lastBreadcrumbId = breadcrumbs->getNumBreadcrumbs();
     breadcrumbs->flushLog();
-    return breadcrumbs->getNumBreadcrumbs();
+    return lastBreadcrumbId;
 }
 }
