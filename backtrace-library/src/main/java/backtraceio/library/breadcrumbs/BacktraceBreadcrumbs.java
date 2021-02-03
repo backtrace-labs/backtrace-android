@@ -233,7 +233,7 @@ public class BacktraceBreadcrumbs {
         if (attributes != null) {
             for (Map.Entry<String, Object> entry : attributes.entrySet())
             {
-                serializedAttributes += entry.getKey() + " " + entry.getValue() + " ";
+                serializedAttributes += " attr " + entry.getKey() + " " + entry.getValue() + " ";
             }
         }
 

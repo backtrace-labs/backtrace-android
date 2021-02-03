@@ -28,7 +28,7 @@ namespace Backtrace {
 
             std::string filePath = this->directory + "/" + baseFileName + std::to_string(numFiles);
             __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Opening breadcrumb log file at directory %s", filePath.c_str());
-            activeFile = open(filePath.c_str(), O_APPEND | O_CREAT);
+            activeFile = open(filePath.c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0666);
 
             if (activeFile == -1) {
                 __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Received error %d when trying to open the file", errno);
@@ -53,7 +53,7 @@ namespace Backtrace {
 
         off_t GetPosition()
         {
-            return lseek(activeFile, 0, SEEK_CUR);;
+            return lseek(activeFile, 0, SEEK_CUR);
         }
 
         void SetPosition(off_t pos)
