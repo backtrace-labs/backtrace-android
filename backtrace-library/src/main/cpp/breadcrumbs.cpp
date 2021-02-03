@@ -6,13 +6,6 @@ namespace Backtrace {
     {
         // Creating a RotatingLogger can throw
         logger = std::make_unique<RotatingLogger>(directory, 64000, 2);
-        // Initialize the breadcrumb log JSON
-        logger->Write("[");
-        // Initialize the file position tracker
-        filePosition = logger->GetPosition();
-        // This is the line we will rewrite in the subsequent lines. Subsequent logged breadcrumbs
-        // will erase the closing bracket of the previous line and write over it.
-        logger->Write("\n");
     }
 
     // We use this function to add breadcrumbs coming from the managed layer
@@ -66,27 +59,20 @@ namespace Backtrace {
         }();
 
         std::string breadcrumb;
-        if (myId != 0)
-            breadcrumb += ",";
-        breadcrumb += "{\"timestamp\":";
+        breadcrumb += "timestamp ";
         breadcrumb += std::to_string(timestamp);
-        breadcrumb += ",\"id\":";
+        breadcrumb += " id ";
         breadcrumb += std::to_string(myId);
-        breadcrumb += ",\"level\":\"";
+        breadcrumb += " level ";
         breadcrumb += levelString;
-        breadcrumb += "\",\"type\":\"";
+        breadcrumb += " type ";
         breadcrumb += typeString;
-        breadcrumb += "\",\"message\":\"";
-        breadcrumb += message;
-        breadcrumb += "\",\"attributes\":";
+        breadcrumb += " attributes ";
         breadcrumb += serializedAttributes;
-        breadcrumb += "}";
+        breadcrumb += " message ";
+        breadcrumb += message;
 
-        // Rewrite the previous log (we need to keep valid JSON as we go)
-        logger->SetPosition(filePosition);
         logger->Write(breadcrumb.c_str());
-        filePosition = logger->GetPosition();
-        logger->Write("]");
     }
 
     // Prefer to add breadcrumbs with this function from NDK
@@ -99,12 +85,10 @@ namespace Backtrace {
         std::string serializedAttributes = "{";
         for (const auto& elem : attributes)
         {
-            if (breadcrumbId != 0)
-                serializedAttributes += "\",";
-            serializedAttributes += "\"";
             serializedAttributes += elem.first;
-            serializedAttributes += "\":\"";
+            serializedAttributes += " ";
             serializedAttributes += elem.second;
+            serializedAttributes += " ";
         }
         addBreadcrumb(timestamp, type, level, message, serializedAttributes.c_str());
     }
