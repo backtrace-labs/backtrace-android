@@ -229,11 +229,12 @@ public class BacktraceBreadcrumbs {
         // we will use it here.
         long time = System.currentTimeMillis();
 
-        String serializedAttributes = "{}";
+        String serializedAttributes = "";
         if (attributes != null) {
-            Gson gson = new Gson();
-            Type gsonType = new TypeToken<HashMap>(){}.getType();
-            serializedAttributes = gson.toJson(attributes,gsonType);
+            for (Map.Entry<String, Object> entry : attributes.entrySet())
+            {
+                serializedAttributes += entry.getKey() + " " + entry.getValue() + " ";
+            }
         }
 
         addBreadcrumb(time,
