@@ -54,8 +54,7 @@ namespace Backtrace {
         // Track the breadcrumb ID number
         int breadcrumbId = 0;
         // Track the current file position so we can rewind to always maintain valid JSON
-        long int filePosition = -1;
-
+        off_t filePosition = -1;
     };
 }
 }

@@ -71,8 +71,9 @@ namespace Backtrace {
         breadcrumb += serializedAttributes;
         breadcrumb += " message ";
         breadcrumb += message;
+        breadcrumb += "\n";
 
-        logger->Write(breadcrumb.c_str());
+        logger->Write(breadcrumb.c_str(), breadcrumb.size());
     }
 
     // Prefer to add breadcrumbs with this function from NDK

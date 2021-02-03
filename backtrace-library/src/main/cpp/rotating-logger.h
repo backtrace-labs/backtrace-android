@@ -1,12 +1,15 @@
 #ifndef BACKTRACE_ANDROID_ROTATING_LOGGER_H
 #define BACKTRACE_ANDROID_ROTATING_LOGGER_H
 
-#include <stdio.h>
 #include <stdexcept>
 #include <string>
 #include <stdlib.h>
 #include <android/log.h>
 #include <memory>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <errno.h>
 
 namespace Backtrace {
 
@@ -25,36 +28,37 @@ namespace Backtrace {
 
             std::string filePath = this->directory + "/" + baseFileName + std::to_string(numFiles);
             __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Opening breadcrumb log file at directory %s", filePath.c_str());
-            activeFile = fopen(filePath.c_str(), "w");
+            activeFile = open(filePath.c_str(), O_APPEND | O_CREAT);
 
-            if (activeFile == nullptr) {
+            if (activeFile == -1) {
+                __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Received error %d when trying to open the file", errno);
                 throw std::runtime_error(std::string("Could not open a log file at directory ") + filePath);
             }
         }
 
         ~RotatingLogger() {
-            fclose(activeFile);
-            activeFile = nullptr;
+            close(activeFile);
+            activeFile = -1;
         }
 
-        void Write(const char* str)
+        void Write(const char* str, const unsigned int bytes)
         {
-            fprintf(activeFile, "%s\n", str);
+            write(activeFile, str, bytes);
         }
 
         void Flush()
         {
-            fflush(activeFile);
+            fdatasync(activeFile);
         }
 
-        long int GetPosition()
+        off_t GetPosition()
         {
-            return ftell(activeFile);
+            return lseek(activeFile, 0, SEEK_CUR);;
         }
 
-        void SetPosition(long int pos)
+        void SetPosition(off_t pos)
         {
-            fseek(activeFile, pos, SEEK_SET);
+            lseek(activeFile, pos, SEEK_SET);
         }
 
         void RotateLogs()
@@ -73,8 +77,8 @@ namespace Backtrace {
         int bytesWritten = 0;
 
         std::string directory;
-        FILE** files = nullptr;
-        FILE* activeFile = nullptr;
+        int* files = nullptr;
+        int activeFile = -1;
 
         const char* baseFileName = "bt-breadcrumbs-";
     };
