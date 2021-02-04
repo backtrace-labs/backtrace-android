@@ -76,16 +76,17 @@ public class BacktraceBreadcrumbs {
         this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
     }
 
-    public void enableBreadcrumbs(Context context, Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes)
+    public boolean enableBreadcrumbs(Context context, Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes)
     {
-        initializeBreadcrumbs(breadcrumbLogDirectory);
+        boolean success = initializeBreadcrumbs(breadcrumbLogDirectory);
         setEnabledBreadcrumbTypes(context, enabledBreadcrumbTypes);
 
         // We should log all breadcrumb configuration changes in the breadcrumbs
         addConfigurationBreadcrumb();
+        return success;
     }
 
-    public void enableBreadcrumbs(Context context) {
+    public boolean enableBreadcrumbs(Context context) {
         final Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes = new HashSet<BacktraceBreadcrumbType>(){{
             add(BacktraceBreadcrumbType.CONFIGURATION);
             add(BacktraceBreadcrumbType.HTTP);
@@ -95,7 +96,7 @@ public class BacktraceBreadcrumbs {
             add(BacktraceBreadcrumbType.SYSTEM);
             add(BacktraceBreadcrumbType.USER);
         }};
-        enableBreadcrumbs(context, enabledBreadcrumbTypes);
+        return enableBreadcrumbs(context, enabledBreadcrumbTypes);
     }
 
     private void disableSystemBreadcrumbs(Context context) {
@@ -155,27 +156,30 @@ public class BacktraceBreadcrumbs {
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
      * @param message
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message) {
-        addBreadcrumb(message, null, BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO);
+    public boolean addBreadcrumb(String message) {
+        return addBreadcrumb(message, null, BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO);
     }
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
      * @param message
      * @param level
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
-        addBreadcrumb(message, null, BacktraceBreadcrumbType.MANUAL, level);
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
+        return addBreadcrumb(message, null, BacktraceBreadcrumbType.MANUAL, level);
     }
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
      * @param message
      * @param attributes
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes) {
-        addBreadcrumb(message, attributes, BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
+        return addBreadcrumb(message, attributes, BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO);
     }
 
     /**
@@ -183,18 +187,20 @@ public class BacktraceBreadcrumbs {
      * @param message
      * @param attributes
      * @param level
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
-        addBreadcrumb(message, attributes, BacktraceBreadcrumbType.MANUAL, level);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
+        return addBreadcrumb(message, attributes, BacktraceBreadcrumbType.MANUAL, level);
     }
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string
      * @param message
      * @param type
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, BacktraceBreadcrumbType type) {
-        addBreadcrumb(message, null, type, BacktraceBreadcrumbLevel.INFO);
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
+        return addBreadcrumb(message, null, type, BacktraceBreadcrumbLevel.INFO);
     }
 
     /**
@@ -202,9 +208,10 @@ public class BacktraceBreadcrumbs {
      * @param message
      * @param type
      * @param level
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        addBreadcrumb(message, null, type, level);
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        return addBreadcrumb(message, null, type, level);
     }
 
     /**
@@ -212,9 +219,10 @@ public class BacktraceBreadcrumbs {
      * @param message
      * @param attributes
      * @param type
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
-        addBreadcrumb(message, attributes, type, BacktraceBreadcrumbLevel.INFO);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
+        return addBreadcrumb(message, attributes, type, BacktraceBreadcrumbLevel.INFO);
     }
 
     /**
@@ -223,8 +231,9 @@ public class BacktraceBreadcrumbs {
      * @param attributes
      * @param type
      * @param level
+     * @return true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         // We use currentTimeMillis in the BacktraceReport too, so for consistency
         // we will use it here.
         long time = System.currentTimeMillis();
@@ -241,15 +250,18 @@ public class BacktraceBreadcrumbs {
             }
         }
 
-        addBreadcrumb(time,
+        return addBreadcrumb(time,
                 type.ordinal(),
                 level.ordinal(),
                 message,
                 serializedAttributes);
     }
 
-    // Create a breadcrumb which reflects the current breadcrumb configuration
-    private void addConfigurationBreadcrumb()
+    /**
+     * Create a breadcrumb which reflects the current breadcrumb configuration
+     * @return true if the breadcrumb was successfully added
+     */
+    private boolean addConfigurationBreadcrumb()
     {
         Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -266,7 +278,7 @@ public class BacktraceBreadcrumbs {
             }
         }
 
-        addBreadcrumb("Breadcrumbs configuration", attributes, BacktraceBreadcrumbType.CONFIGURATION);
+        return addBreadcrumb("Breadcrumbs configuration", attributes, BacktraceBreadcrumbType.CONFIGURATION);
     }
 
     /**
@@ -275,6 +287,6 @@ public class BacktraceBreadcrumbs {
      */
     public native int prepareToSendBreadcrumbsLog();
 
-    private native void initializeBreadcrumbs(String directory);
-    private native void addBreadcrumb(long timestamp, int type, int level, String message, String serializedAttributes);
+    private native boolean initializeBreadcrumbs(String directory);
+    private native boolean addBreadcrumb(long timestamp, int type, int level, String message, String serializedAttributes);
 }

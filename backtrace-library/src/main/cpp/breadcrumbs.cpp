@@ -8,8 +8,14 @@ namespace Backtrace {
         logger = std::make_unique<RotatingLogger>(directory, 64000, 2);
     }
 
+    Breadcrumbs::Breadcrumbs(const char* directory, const unsigned int capacityInBytes)
+    {
+        // Creating a RotatingLogger can throw
+        logger = std::make_unique<RotatingLogger>(directory, capacityInBytes, 2);
+    }
+
     // We use this function to add breadcrumbs coming from the managed layer
-    void Breadcrumbs::addBreadcrumb(const long long int timestamp,
+    bool Breadcrumbs::addBreadcrumb(const long long int timestamp,
                                     const BreadcrumbType type,
                                     const BreadcrumbLevel level,
                                     const char* message,
@@ -76,11 +82,11 @@ namespace Backtrace {
         breadcrumb += messageStr;
         breadcrumb += "\n";
 
-        logger->Write(breadcrumb.c_str(), breadcrumb.size());
+        return logger->Write(breadcrumb.c_str(), breadcrumb.size());
     }
 
     // Prefer to add breadcrumbs with this function from NDK
-    void Breadcrumbs::addBreadcrumb(const long long int timestamp,
+    bool Breadcrumbs::addBreadcrumb(const long long int timestamp,
                                     const BreadcrumbType type,
                                     const BreadcrumbLevel level,
                                     const char* message,
@@ -94,7 +100,7 @@ namespace Backtrace {
             serializedAttributes += elem.second;
             serializedAttributes += " ";
         }
-        addBreadcrumb(timestamp, type, level, message, serializedAttributes.c_str());
+        return addBreadcrumb(timestamp, type, level, message, serializedAttributes.c_str());
     }
 
     void Breadcrumbs::flushLog()

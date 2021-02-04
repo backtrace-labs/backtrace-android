@@ -6,18 +6,12 @@ import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +49,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
 
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            assertTrue(backtraceBreadcrumbs.enableBreadcrumbs(context));
             assertTrue(backtraceBreadcrumbs.isBreadcrumbsEnabled());
 
             backtraceBreadcrumbs.disableBreadcrumbs(context);
@@ -73,7 +67,7 @@ public class BacktraceBreadcrumbsTest {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs(context);
 
-            backtraceBreadcrumbs.addBreadcrumb("Test");
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
 
