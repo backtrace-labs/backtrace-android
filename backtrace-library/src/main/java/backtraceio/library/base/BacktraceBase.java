@@ -209,10 +209,11 @@ public class BacktraceBase implements Client {
     /**
      * Enable logging of breadcrumbs and submission with crash reports
      * @param context   context of current state of the application
+     * @return true if we successfully enabled breadcrumbs
      */
-    public void enableBreadcrumbs(Context context) {
+    public boolean enableBreadcrumbs(Context context) {
         backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-        backtraceBreadcrumbs.enableBreadcrumbs(context);
+        return backtraceBreadcrumbs.enableBreadcrumbs(context);
     }
 
     /**
@@ -220,8 +221,9 @@ public class BacktraceBase implements Client {
      * @param context   context of current state of the application
      */
     public void disableBreadcrumbs(Context context) {
-        if (backtraceBreadcrumbs != null)
+        if (backtraceBreadcrumbs != null) {
             backtraceBreadcrumbs.disableBreadcrumbs(context);
+        }
     }
 
     /**
@@ -229,8 +231,9 @@ public class BacktraceBase implements Client {
      * @return      true if Breadcrumbs is enabled, false otherwise
      */
     public boolean isBreadcrumbsEnabled() {
-        if (backtraceBreadcrumbs != null)
+        if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.isBreadcrumbsEnabled();
+        }
         return false;
     }
 
@@ -245,30 +248,39 @@ public class BacktraceBase implements Client {
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
      * @param message       a brief message which describes this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message);
+    public boolean addBreadcrumb(String message) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message);
+        }
+        return false;
     }
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
      * @param message       a brief message which describes this breadcrumb
      * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, level);
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, level);
+        }
+        return false;
     }
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
      * @param message       a brief message which describes this breadcrumb
      * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, attributes);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes);
+        }
+        return false;
     }
 
     /**
@@ -276,20 +288,26 @@ public class BacktraceBase implements Client {
      * @param message       a brief message which describes this breadcrumb
      * @param attributes    key-value pairs to provide additional information about this breadcrumb
      * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, attributes, level);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, level);
+        }
+        return false;
     }
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string
      * @param message       a brief message which describes this breadcrumb
      * @param type          broadly describes the category of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, BacktraceBreadcrumbType type) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, type);
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, type);
+        }
+        return false;
     }
 
     /**
@@ -297,10 +315,13 @@ public class BacktraceBase implements Client {
      * @param message       a brief message which describes this breadcrumb
      * @param type          broadly describes the category of this breadcrumb
      * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, type, level);
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, type, level);
+        }
+        return false;
     }
 
     /**
@@ -308,10 +329,13 @@ public class BacktraceBase implements Client {
      * @param message       a brief message which describes this breadcrumb
      * @param attributes    key-value pairs to provide additional information about this breadcrumb
      * @param type          broadly describes the category of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, attributes, type);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type);
+        }
+        return false;
     }
 
     /**
@@ -320,10 +344,13 @@ public class BacktraceBase implements Client {
      * @param attributes    key-value pairs to provide additional information about this breadcrumb
      * @param type          broadly describes the category of this breadcrumb
      * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
      */
-    public void addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null)
-            backtraceBreadcrumbs.addBreadcrumb(message, attributes, type, level);
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type, level);
+        }
+        return false;
     }
 
     public void nativeCrash() {

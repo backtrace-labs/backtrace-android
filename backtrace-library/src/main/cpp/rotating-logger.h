@@ -17,7 +17,7 @@ namespace Backtrace {
     public:
         // Store a max of numFiles rotating log files of capacityInBytes bytes each
         // in the specified directory
-        RotatingLogger(const char* directory, const int capacityInBytes, const int maxNumFiles)
+        RotatingLogger(const char* directory, const unsigned int capacityInBytes, const unsigned int maxNumFiles)
                 : directory(directory),
                   capacityInBytes(capacityInBytes),
                   maxNumFiles(maxNumFiles) {
@@ -37,13 +37,18 @@ namespace Backtrace {
         }
 
         ~RotatingLogger() {
-            close(activeFile);
+            fsync(activeFile);
+            if (close(activeFile) == -1)
+            {
+                __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Received error %d when trying to close the file", errno);
+            }
             activeFile = -1;
         }
 
-        void Write(const char* str, const unsigned int bytes)
+        bool Write(const char* str, const unsigned int bytes)
         {
             write(activeFile, str, bytes);
+            return true;
         }
 
         void Flush()

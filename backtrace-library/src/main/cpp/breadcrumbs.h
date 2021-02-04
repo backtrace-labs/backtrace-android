@@ -30,8 +30,11 @@ namespace Backtrace {
     public:
         Breadcrumbs(const char *directory);
 
+        // NOTE: Capacity should be a power of 2
+        Breadcrumbs(const char *directory, const unsigned int capacityInBytes);
+
         // Prefer to add breadcrumbs with this function from NDK
-        void addBreadcrumb(const long long int timestamp,
+        bool addBreadcrumb(const long long int timestamp,
                            const BreadcrumbType type,
                            const BreadcrumbLevel level,
                            const char *message,
@@ -39,7 +42,7 @@ namespace Backtrace {
 
         // NOTE: serializedAttributes must be well-formed
         // We use this function to add breadcrumbs coming from the managed layer
-        void addBreadcrumb(const long long int timestamp,
+        bool addBreadcrumb(const long long int timestamp,
                            const BreadcrumbType type,
                            const BreadcrumbLevel level,
                            const char *message,
