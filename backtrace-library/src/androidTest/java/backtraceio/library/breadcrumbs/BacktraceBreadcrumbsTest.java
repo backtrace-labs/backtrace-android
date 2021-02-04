@@ -140,6 +140,61 @@ public class BacktraceBreadcrumbsTest {
         }
     }
 
+    // We should remove \n in the message string
+    @Test
+    public void testNewlineInMessage() {
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs(context);
+
+            backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            // First breadcrumb is configuration breadcrumb
+            // We start from the second breadcrumb
+            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+
+            assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
+
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    // We should NOT preserve spaces or newlines for any non-message field
+    @Test
+    public void testInvalidCharsInAttribute() {
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs(context);
+
+            Map<String, Object> attributes = new HashMap<String, Object>() {{
+               put(" flo opy","do o py ");
+               put("fl\nim","fl\nam\n");
+               put(" foo ","b\na r ");
+            }};
+
+            backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            // First breadcrumb is configuration breadcrumb
+            // We start from the second breadcrumb
+            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+
+            assertEquals("Test", parsedBreadcrumb.get("message"));
+            assertEquals("do_o_py_", parsedBreadcrumb.get("_flo_opy"));
+            assertEquals("flam", parsedBreadcrumb.get("flim"));
+            assertEquals("ba_r_", parsedBreadcrumb.get("_foo_"));
+
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
     public void deleteRecursive(File fileOrDirectory) {
 
         if (fileOrDirectory.isDirectory()) {

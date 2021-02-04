@@ -16,6 +16,9 @@ namespace Backtrace {
                                     const char* serializedAttributes) {
         int myId = this->breadcrumbId++;
 
+        std::string messageStr = message;
+        sanitizeString(messageStr);
+
         const char* typeString = [&] {
             switch (type)
             {
@@ -70,7 +73,7 @@ namespace Backtrace {
         breadcrumb += " attributes ";
         breadcrumb += serializedAttributes;
         breadcrumb += " message ";
-        breadcrumb += message;
+        breadcrumb += messageStr;
         breadcrumb += "\n";
 
         logger->Write(breadcrumb.c_str(), breadcrumb.size());
@@ -103,4 +106,13 @@ namespace Backtrace {
         return breadcrumbId;
     }
 
+    void Breadcrumbs::sanitizeString(std::string& message)
+    {
+        for (int i = 0; i < message.size(); i++) {
+            if (message[i] == '\n') {
+                message.erase(i, 1);
+                i--;
+            }
+        }
+    }
 }

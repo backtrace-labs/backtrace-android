@@ -37,6 +37,7 @@ namespace Backtrace {
                            const char *message,
                            std::__ndk1::unordered_map<std::string, std::string> &attributes);
 
+        // NOTE: serializedAttributes must be well-formed
         // We use this function to add breadcrumbs coming from the managed layer
         void addBreadcrumb(const long long int timestamp,
                            const BreadcrumbType type,
@@ -51,10 +52,14 @@ namespace Backtrace {
 
     private:
         std::unique_ptr<RotatingLogger> logger;
+
         // Track the breadcrumb ID number
         int breadcrumbId = 0;
-        // Track the current file position so we can rewind to always maintain valid JSON
+
+        // Track the current file position
         off_t filePosition = -1;
+
+        void sanitizeString(std::string &message);
     };
 }
 }
