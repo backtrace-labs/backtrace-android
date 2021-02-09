@@ -255,7 +255,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
-     * @param message       a brief message which describes this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message) {
@@ -267,7 +267,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
-     * @param message       a brief message which describes this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
      * @param level         the severity level of this breadcrumb
      * @return              true if the breadcrumb was successfully added
      */
@@ -280,8 +280,8 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
-     * @param message       a brief message which describes this breadcrumb
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
@@ -293,8 +293,8 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string and attributes
-     * @param message       a brief message which describes this breadcrumb
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
      * @param level         the severity level of this breadcrumb
      * @return              true if the breadcrumb was successfully added
      */
@@ -307,7 +307,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string
-     * @param message       a brief message which describes this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
      * @param type          broadly describes the category of this breadcrumb
      * @return              true if the breadcrumb was successfully added
      */
@@ -320,7 +320,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired level and type with the provided message string
-     * @param message       a brief message which describes this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
      * @param type          broadly describes the category of this breadcrumb
      * @param level         the severity level of this breadcrumb
      * @return              true if the breadcrumb was successfully added
@@ -334,8 +334,8 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string and attributes
-     * @param message       a brief message which describes this breadcrumb
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
      * @param type          broadly describes the category of this breadcrumb
      * @return              true if the breadcrumb was successfully added
      */
@@ -348,8 +348,8 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired level and type with the provided message string and attributes
-     * @param message       a brief message which describes this breadcrumb
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
      * @param type          broadly describes the category of this breadcrumb
      * @param level         the severity level of this breadcrumb
      * @return              true if the breadcrumb was successfully added

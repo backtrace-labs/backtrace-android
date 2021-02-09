@@ -2,8 +2,11 @@ package backtraceio.library.breadcrumbs;
 
 import com.squareup.tape.QueueFile;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import backtraceio.library.logger.BacktraceLogger;
@@ -11,68 +14,66 @@ import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceBreadcrumbsLogger {
-    /**
-     * The base directory of the breadcrumb logs
-     */
-    private String breadcrumbLogDirectory;
 
-    /**
-     * The breadcrumb storage file
-     */
-    private QueueFile breadcrumbStore;
-
-    private String logFileName = "bt-breadcrumbs-0";
-
-    private final String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
+    private final String LOG_TAG = BacktraceBreadcrumbsLogger.class.getSimpleName();
 
     private long breadcrumbId = 0;
 
+    private BacktraceQueueFileHelper backtraceQueueFileHelper;
+
+    /**
+     * We truncate messages longer than this
+     */
+    private final int maxMessageSizeBytes = 1024;
+
+    /**
+     * We truncate serialized attribute strings longer than this
+     */
+    private final int maxSerializedAttributeSizeBytes = 1024;
+
     public BacktraceBreadcrumbsLogger(String breadcrumbLogDirectory) throws IOException {
-        this.breadcrumbLogDirectory = breadcrumbLogDirectory;
-        File breadcrumbLogsDir = new File(breadcrumbLogDirectory);
-        breadcrumbLogsDir.mkdir();
-        breadcrumbStore = new QueueFile(new File(breadcrumbLogsDir + "/" + logFileName));
+        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(breadcrumbLogDirectory);
     }
 
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        try {
-            // We use currentTimeMillis in the BacktraceReport too, so for consistency
-            // we will use it here.
-            long time = System.currentTimeMillis();
+        // We use currentTimeMillis in the BacktraceReport too, so for consistency
+        // we will use it here.
+        long time = System.currentTimeMillis();
 
-            String breadcrumb = "\ntimestamp " + Long.toString(time);
-            breadcrumb += " id " + Long.toString(breadcrumbId);
-            breadcrumb += " level " + level.toString();
-            breadcrumb += " type " + type.toString();
-            breadcrumb += " attributes " + serializeAttributes(attributes);
-            breadcrumb += " message " + message.replace("\n", "");
-            breadcrumb += "\n";
+        message = StringUtils.abbreviate(message, maxMessageSizeBytes);
 
-            breadcrumbId++;
+        String breadcrumb = "\ntimestamp " + Long.toString(time);
+        breadcrumb += " id " + Long.toString(breadcrumbId);
+        breadcrumb += " level " + level.toString();
+        breadcrumb += " type " + type.toString();
+        breadcrumb += " attributes " + serializeAttributes(attributes);
+        breadcrumb += " message " + message.replace('\n', '_');
+        breadcrumb += "\n";
 
-            breadcrumbStore.add(breadcrumb.getBytes());
+        breadcrumbId++;
 
-        } catch (Exception ex) {
-            BacktraceLogger.w(LOG_TAG, "Breadcrumb with message " + message +
-                        " could not be added due to " + ex.getMessage());
-            return false;
-        }
-        return true;
+        return backtraceQueueFileHelper.add(breadcrumb.getBytes());
     }
 
     public String getLogDirectory() {
-        return this.breadcrumbLogDirectory;
+        return backtraceQueueFileHelper.getLogDirectory();
     }
 
     private String serializeAttributes(final Map<String, Object> attributes) {
         String serializedAttributes = "";
         if (attributes != null) {
             for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-                serializedAttributes += " attr " +
-                        entry.getKey().replace(' ', '_').replace("\n", "") +
-                        " " +
-                        entry.getValue().toString().replace(' ', '_').replace("\n", "") +
-                        " ";
+                String key = entry.getKey().replace(' ', '_').replace('\n', '_');
+                String value = entry.getValue().toString().replace(' ', '_').replace('\n', '_');
+
+                // We don't want to break the attributes for parsing purposes, so we
+                // stop adding attributes once we are over length.
+                if (serializedAttributes.length() + key.length() + value.length() <= maxSerializedAttributeSizeBytes) {
+                    serializedAttributes += " attr " + key + " " + value + " ";
+                } else {
+                    BacktraceLogger.w(LOG_TAG, "Breadcrumb attributes truncated");
+                    break;
+                }
             }
         }
 
