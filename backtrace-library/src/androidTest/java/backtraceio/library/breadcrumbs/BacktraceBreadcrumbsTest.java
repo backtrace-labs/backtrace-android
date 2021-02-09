@@ -10,9 +10,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,7 @@ import java.util.Scanner;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
@@ -49,14 +53,14 @@ public class BacktraceBreadcrumbsTest {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
 
-            assertTrue(backtraceBreadcrumbs.enableBreadcrumbs(context));
+            backtraceBreadcrumbs.enableBreadcrumbs();
             assertTrue(backtraceBreadcrumbs.isBreadcrumbsEnabled());
 
-            backtraceBreadcrumbs.disableBreadcrumbs(context);
+            backtraceBreadcrumbs.disableBreadcrumbs();
             assertFalse(backtraceBreadcrumbs.isBreadcrumbsEnabled());
 
-        } catch(Exception e) {
-            fail(e.getMessage());
+        } catch(Exception ex) {
+            fail(ex.getMessage());
         }
     }
 
@@ -65,7 +69,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
@@ -73,12 +77,13 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
+            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
-        } catch(Exception e) {
-            fail(e.getMessage());
+        } catch(Exception ex) {
+            fail(ex.getMessage());
         }
     }
 
@@ -87,7 +92,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
 
             Map<String, Object> attributes = new HashMap<String, Object>() {{
                put("floopy","doopy");
@@ -100,14 +105,15 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
+            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
             assertEquals("doopy", parsedBreadcrumb.get("floopy"));
             assertEquals("flam", parsedBreadcrumb.get("flim"));
 
-        } catch(Exception e) {
-            fail(e.getMessage());
+        } catch(Exception ex) {
+            fail(ex.getMessage());
         }
     }
 
@@ -117,7 +123,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
 
             backtraceBreadcrumbs.addBreadcrumb("Testing 1 2 3");
 
@@ -125,12 +131,13 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
+            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
 
-        } catch(Exception e) {
-            fail(e.getMessage());
+        } catch(Exception ex) {
+            fail(ex.getMessage());
         }
     }
 
@@ -140,7 +147,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
 
             backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
 
@@ -148,12 +155,13 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
+            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
 
-        } catch(Exception e) {
-            fail(e.getMessage());
+        } catch(Exception ex) {
+            fail(ex.getMessage());
         }
     }
 
@@ -163,7 +171,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
 
             Map<String, Object> attributes = new HashMap<String, Object>() {{
                put(" flo opy","do o py ");
@@ -177,6 +185,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
+            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
@@ -184,10 +193,64 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("flam", parsedBreadcrumb.get("flim"));
             assertEquals("ba_r_", parsedBreadcrumb.get("_foo_"));
 
-        } catch(Exception e) {
-            fail(e.getMessage());
+        } catch(Exception ex) {
+            fail(ex.getMessage());
         }
     }
+
+    @Test
+    public void breadcrumbsEnduranceTest() {
+        int numIterationsPerThread = 100;
+        int numThreads = 4;
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+
+            for (int i = 0; i < numThreads; i++) {
+                new Thread(new BreadcrumbLogger(backtraceBreadcrumbs, numIterationsPerThread)).start();
+            }
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
+            // First breadcrumb is configuration breadcrumb
+            // We start from the second breadcrumb
+            for (int i = 1; i < breadcrumbLogFileData.size(); i++)
+            {
+                Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumbList.add(parsedBreadcrumb);
+                assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
+                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertEquals("manual", parsedBreadcrumb.get("type"));
+                assertEquals("info", parsedBreadcrumb.get("level"));
+                // Timestamp should be convertible to a number
+                Long.parseLong(parsedBreadcrumb.get("timestamp"));
+                // Id should be convertible to a number
+                Integer.parseInt(parsedBreadcrumb.get("id"));
+            }
+
+            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
+                public int compare(Map<String, String> m1, Map<String, String> m2) {
+                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
+                }
+            };
+
+            Collections.sort(parsedBreadcrumbList, mapComparator);
+            // In this case we expect breadcrumbs with a greater id to never have a
+            // timestamp less than a breadcrumb with a lesser id
+            // It is only possible if the user changes the android system time during runtime
+            for (int i = 0; i < parsedBreadcrumbList.size() - 1; i++)
+            {
+                assertTrue(Long.parseLong(parsedBreadcrumbList.get(i+1).get("timestamp")) >=
+                            Long.parseLong(parsedBreadcrumbList.get(i).get("timestamp")));
+            }
+
+        } catch(Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
 
     public void deleteRecursive(File fileOrDirectory) {
 
@@ -200,17 +263,52 @@ public class BacktraceBreadcrumbsTest {
         fileOrDirectory.delete();
     }
 
+    class BreadcrumbLogger implements Runnable {
+        BacktraceBreadcrumbs backtraceBreadcrumbs;
+        int numIterations;
+
+        BreadcrumbLogger(BacktraceBreadcrumbs backtraceBreadcrumbs, int numIterations) {
+            this.backtraceBreadcrumbs = backtraceBreadcrumbs;
+            this.numIterations = numIterations;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < this.numIterations; i++) {
+                final long threadId = Thread.currentThread().getId();
+                Map<String, Object> attributes = new HashMap<String, Object>() {{
+                    put("From Thread", threadId);
+                }};
+
+                backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
+            }
+        }
+    }
+
     // This assumes we will only have one breadcrumb log file, which we will most of the time
-    public List<String> readBreadcrumbLogFiles(BacktraceBreadcrumbs backtraceBreadcrumbs) throws FileNotFoundException {
+    public List<String> readBreadcrumbLogFiles(BacktraceBreadcrumbs backtraceBreadcrumbs) throws IOException {
         File breadcrumbLogFilesDir = new File(backtraceBreadcrumbs.getBreadcrumbLogDirectory());
         File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
 
         List<String> breadcrumbLogFileData = new ArrayList<String>();
+        FileInputStream inputStream = new FileInputStream(breadcrumbLogFiles[0].getAbsolutePath());
 
-        Scanner scan = new Scanner(new File(breadcrumbLogFiles[0].getAbsolutePath()));
-
-        while(scan.hasNextLine()) {
-            breadcrumbLogFileData.add(scan.nextLine());
+        // The encoding contains headers for the encoded data
+        // We just throw away lines that don't start with "timestamp
+        StringBuilder stringBuilder = new StringBuilder();
+        while(inputStream.available() > 0) {
+            char c = (char) inputStream.read();
+            if (c == '\n')
+            {
+                String line = stringBuilder.toString();
+                if (line.matches(".*timestamp.*"))
+                {
+                    breadcrumbLogFileData.add(line);
+                }
+                stringBuilder = new StringBuilder();
+                continue;
+            }
+            stringBuilder.append(c);
         }
 
         return breadcrumbLogFileData;

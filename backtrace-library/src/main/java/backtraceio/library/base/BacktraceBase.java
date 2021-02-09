@@ -16,13 +16,14 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.models.types.BacktraceBreadcrumbLevel;
-import backtraceio.library.models.types.BacktraceBreadcrumbType;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 
@@ -212,8 +213,15 @@ public class BacktraceBase implements Client {
      * @return true if we successfully enabled breadcrumbs
      */
     public boolean enableBreadcrumbs(Context context) {
-        backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-        return backtraceBreadcrumbs.enableBreadcrumbs(context);
+        try {
+            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+        } catch (Exception ex) {
+            BacktraceLogger.w(LOG_TAG, "Could not enable breadcrumbs due to " + ex.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -222,7 +230,7 @@ public class BacktraceBase implements Client {
      */
     public void disableBreadcrumbs(Context context) {
         if (backtraceBreadcrumbs != null) {
-            backtraceBreadcrumbs.disableBreadcrumbs(context);
+            backtraceBreadcrumbs.disableBreadcrumbs();
         }
     }
 
@@ -386,7 +394,7 @@ public class BacktraceBase implements Client {
                 report.attachmentPaths.add(breadcrumbLogFile.getAbsolutePath());
             }
 
-            int lastBreadcrumbId = backtraceBreadcrumbs.prepareToSendBreadcrumbsLog();
+            long lastBreadcrumbId = backtraceBreadcrumbs.getCurrentBreadcrumbId();
             report.attributes.put("breadcrumbs.lastId", lastBreadcrumbId);
         }
 

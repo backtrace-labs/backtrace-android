@@ -15,8 +15,6 @@
 #include "client/crash_report_database.h"
 #include "client/settings.h"
 
-#include "breadcrumbs.h"
-
 using namespace base;
 
 // supported JNI version
@@ -31,10 +29,6 @@ static crashpad::CrashpadClient *client;
 // check if crashpad client is already initialized
 static std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
-
-using namespace Backtrace;
-// breadcrumbs logger
-static Breadcrumbs* breadcrumbs;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -278,54 +272,5 @@ JNIEXPORT void JNICALL
 Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash(JNIEnv *env, jobject thiz,
                                                              jstring message) {
     DumpWithoutCrash(message);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_backtraceio_library_breadcrumbs_BacktraceBreadcrumbs_initializeBreadcrumbs(JNIEnv *env,
-                                                                                jobject thiz,
-                                                                                jstring directory) {
-    jboolean isCopy;
-    const char *rawDirectory = env->GetStringUTFChars(directory, &isCopy);
-    try {
-        breadcrumbs = new Breadcrumbs(rawDirectory);
-    } catch (std::exception& e) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Exception when trying to initialize breadcrumbs: %s", e.what());
-        return false;
-    }
-    env->ReleaseStringUTFChars(directory, rawDirectory);
-    return true;
-}
-
-JNIEXPORT jboolean JNICALL
-Java_backtraceio_library_breadcrumbs_BacktraceBreadcrumbs_addBreadcrumb(JNIEnv *env, jobject thiz,
-                                                                        jlong timestamp,
-                                                                        jint type,
-                                                                        jint level,
-                                                                        jstring message,
-                                                                        jstring serialized_attributes) {
-    jboolean isCopy;
-    const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
-    const char *rawSerializedAttributes = env->GetStringUTFChars(serialized_attributes, &isCopy);
-    try {
-        breadcrumbs->addBreadcrumb(timestamp,
-                                   static_cast<const BreadcrumbType>(type),
-                                   static_cast<const BreadcrumbLevel>(level),
-                                   rawMessage,
-                                   rawSerializedAttributes);
-    } catch (std::exception& e) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Exception when trying to add breadcrumb: %s", e.what());
-        return false;
-    }
-    env->ReleaseStringUTFChars(serialized_attributes, rawSerializedAttributes);
-    env->ReleaseStringUTFChars(message, rawMessage);
-    return true;
-}
-
-JNIEXPORT jint JNICALL
-Java_backtraceio_library_breadcrumbs_BacktraceBreadcrumbs_prepareToSendBreadcrumbsLog(JNIEnv *env,
-                                                                                        jobject thiz) {
-    int lastBreadcrumbId = breadcrumbs->getNumBreadcrumbs();
-    breadcrumbs->flushLog();
-    return lastBreadcrumbId;
 }
 }
