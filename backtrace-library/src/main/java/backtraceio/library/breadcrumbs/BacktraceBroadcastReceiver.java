@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import backtraceio.library.models.types.BacktraceBreadcrumbType;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceBroadcastReceiver extends BroadcastReceiver {
 

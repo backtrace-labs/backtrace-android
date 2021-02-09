@@ -2,18 +2,14 @@ package backtraceio.library.breadcrumbs;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.File;
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import backtraceio.library.models.types.BacktraceBreadcrumbLevel;
-import backtraceio.library.models.types.BacktraceBreadcrumbType;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceBreadcrumbs {
 
@@ -33,18 +29,20 @@ public class BacktraceBreadcrumbs {
     private BacktraceComponentListener backtraceComponentListener;
 
     /**
-     * The base directory of the breadcrumb logs
+     * The Backtrace Breadcrumbs logger instance
      */
-    private String breadcrumbLogDirectory;
+    private BacktraceBreadcrumbsLogger backtraceBreadcrumbsLogger;
 
-    public BacktraceBreadcrumbs(Context context) {
+    private Context context;
+
+    public BacktraceBreadcrumbs(Context context) throws IOException {
         // Create the breadcrumbs subdirectory for storing the breadcrumb logs
-        breadcrumbLogDirectory = context.getFilesDir().getAbsolutePath() + "/breadcrumbs";
-        File breadcrumbLogsDir = new File(breadcrumbLogDirectory);
-        breadcrumbLogsDir.mkdir();
+        String breadcrumbLogDirectory = context.getFilesDir().getAbsolutePath() + "/breadcrumbs";
+        backtraceBreadcrumbsLogger = new BacktraceBreadcrumbsLogger(breadcrumbLogDirectory);
+        this.context = context;
     }
 
-    private void enableSystemBreadcrumbs(Context context) {
+    private void enableSystemBreadcrumbs() {
         backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
         context.registerReceiver(backtraceBroadcastReceiver, backtraceBroadcastReceiver.getMyIntentFilter());
 
@@ -52,16 +50,16 @@ public class BacktraceBreadcrumbs {
         context.registerComponentCallbacks(backtraceComponentListener);
     }
 
-    private void enableBreadcrumbType(Context context, BacktraceBreadcrumbType type) {
+    private void enableBreadcrumbType(BacktraceBreadcrumbType type) {
         switch (type)
         {
             case SYSTEM:
-                enableSystemBreadcrumbs(context);
+                enableSystemBreadcrumbs();
                 break;
         }
     }
 
-    public void setEnabledBreadcrumbTypes(Context context, Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+    public void setEnabledBreadcrumbTypes(Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         if (breadcrumbTypesToEnable == null)
             return;
 
@@ -69,24 +67,22 @@ public class BacktraceBreadcrumbs {
         for (BacktraceBreadcrumbType enabledType : breadcrumbTypesToEnable) {
             if (this.enabledBreadcrumbTypes == null ||
                     !this.enabledBreadcrumbTypes.contains(enabledType)) {
-                enableBreadcrumbType(context, enabledType);
+                enableBreadcrumbType(enabledType);
             }
         }
 
         this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
     }
 
-    public boolean enableBreadcrumbs(Context context, Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes)
+    public void enableBreadcrumbs(Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes)
     {
-        boolean success = initializeBreadcrumbs(breadcrumbLogDirectory);
-        setEnabledBreadcrumbTypes(context, enabledBreadcrumbTypes);
+        setEnabledBreadcrumbTypes(enabledBreadcrumbTypes);
 
         // We should log all breadcrumb configuration changes in the breadcrumbs
         addConfigurationBreadcrumb();
-        return success;
     }
 
-    public boolean enableBreadcrumbs(Context context) {
+    public void enableBreadcrumbs() {
         final Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes = new HashSet<BacktraceBreadcrumbType>(){{
             add(BacktraceBreadcrumbType.CONFIGURATION);
             add(BacktraceBreadcrumbType.HTTP);
@@ -96,27 +92,27 @@ public class BacktraceBreadcrumbs {
             add(BacktraceBreadcrumbType.SYSTEM);
             add(BacktraceBreadcrumbType.USER);
         }};
-        return enableBreadcrumbs(context, enabledBreadcrumbTypes);
+        enableBreadcrumbs(enabledBreadcrumbTypes);
     }
 
-    private void disableSystemBreadcrumbs(Context context) {
-        context.unregisterReceiver(backtraceBroadcastReceiver);
+    private void disableSystemBreadcrumbs() {
+        this.context.unregisterReceiver(backtraceBroadcastReceiver);
         backtraceBroadcastReceiver = null;
 
-        context.unregisterComponentCallbacks(backtraceComponentListener);
+        this.context.unregisterComponentCallbacks(backtraceComponentListener);
         backtraceComponentListener = null;
     }
 
-    private void disableBreadcrumbType(Context context, BacktraceBreadcrumbType type) {
+    private void disableBreadcrumbType(BacktraceBreadcrumbType type) {
         switch (type)
         {
             case SYSTEM:
-                disableSystemBreadcrumbs(context);
+                disableSystemBreadcrumbs();
                 break;
         }
     }
 
-    public void disableBreadcrumbs(Context context) {
+    public void disableBreadcrumbs() {
         final Set<BacktraceBreadcrumbType> breadcrumbTypesToDisable = new HashSet<BacktraceBreadcrumbType>(){{
             add(BacktraceBreadcrumbType.CONFIGURATION);
             add(BacktraceBreadcrumbType.HTTP);
@@ -129,7 +125,7 @@ public class BacktraceBreadcrumbs {
 
         for (BacktraceBreadcrumbType breadcrumbType : breadcrumbTypesToDisable)
         {
-            disableBreadcrumbType(context, breadcrumbType);
+            disableBreadcrumbType(breadcrumbType);
         }
 
         enabledBreadcrumbTypes = null;
@@ -150,7 +146,11 @@ public class BacktraceBreadcrumbs {
     }
 
     public String getBreadcrumbLogDirectory() {
-        return this.breadcrumbLogDirectory;
+        return backtraceBreadcrumbsLogger.getLogDirectory();
+    }
+
+    public long getCurrentBreadcrumbId() {
+        return backtraceBreadcrumbsLogger.getCurrentBreadcrumbId();
     }
 
     /**
@@ -234,27 +234,7 @@ public class BacktraceBreadcrumbs {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        // We use currentTimeMillis in the BacktraceReport too, so for consistency
-        // we will use it here.
-        long time = System.currentTimeMillis();
-
-        String serializedAttributes = "";
-        if (attributes != null) {
-            for (Map.Entry<String, Object> entry : attributes.entrySet())
-            {
-                serializedAttributes += " attr " +
-                        entry.getKey().replace(' ','_').replace("\n","") +
-                        " " +
-                        entry.getValue().toString().replace(' ','_').replace("\n","") +
-                        " ";
-            }
-        }
-
-        return addBreadcrumb(time,
-                type.ordinal(),
-                level.ordinal(),
-                message,
-                serializedAttributes);
+        return backtraceBreadcrumbsLogger.addBreadcrumb(message, attributes, type, level);
     }
 
     /**
@@ -280,13 +260,4 @@ public class BacktraceBreadcrumbs {
 
         return addBreadcrumb("Breadcrumbs configuration", attributes, BacktraceBreadcrumbType.CONFIGURATION);
     }
-
-    /**
-     * Flushes the breadcrumb log file and returns the current breadcrumb count
-     * This is wrapped into one call to prevent multiple round-trips through the JNI
-     */
-    public native int prepareToSendBreadcrumbsLog();
-
-    private native boolean initializeBreadcrumbs(String directory);
-    private native boolean addBreadcrumb(long timestamp, int type, int level, String message, String serializedAttributes);
 }

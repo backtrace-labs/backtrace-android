@@ -18,9 +18,7 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
         backtrace-native.cpp
-        breadcrumbs.cpp)
-
-include_directories(rotating-logger.h)
+        )
 
 # Crashpad Libraries
 add_library(crashpad_client STATIC IMPORTED)

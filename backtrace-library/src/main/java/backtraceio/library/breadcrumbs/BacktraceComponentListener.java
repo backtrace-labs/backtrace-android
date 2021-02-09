@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import backtraceio.library.models.types.BacktraceBreadcrumbLevel;
-import backtraceio.library.models.types.BacktraceBreadcrumbType;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceComponentListener implements ComponentCallbacks2 {
 
