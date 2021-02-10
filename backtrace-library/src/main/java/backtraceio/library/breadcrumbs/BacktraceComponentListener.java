@@ -48,8 +48,8 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
-                return BacktraceBreadcrumbLevel.ERROR;
             case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
+                return BacktraceBreadcrumbLevel.ERROR;
             case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
             case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
                 return BacktraceBreadcrumbLevel.FATAL;

@@ -13,11 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceBroadcastReceiver extends BroadcastReceiver {
 
     private BacktraceBreadcrumbs backtraceBreadcrumbs;
+
+    private static transient String LOG_TAG = BacktraceBroadcastReceiver.class.getSimpleName();
 
     public BacktraceBroadcastReceiver(@NonNull BacktraceBreadcrumbs backtraceBreadcrumbs)
     {
@@ -30,6 +34,7 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
         if (action == null)
         {
             action = "Null action received. This is a bug";
+            BacktraceLogger.e(LOG_TAG, action);
         }
 
         Map<String, Object> attributes = null;
@@ -48,46 +53,41 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
         backtraceBreadcrumbs.addBreadcrumb(action, attributes, BacktraceBreadcrumbType.SYSTEM);
     }
 
-    public IntentFilter getMyIntentFilter() {
-        List<String> defaultSystemEventsToCapture = new ArrayList<String>();
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_DELETED");
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_DISABLED");
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_ENABLED");
-        defaultSystemEventsToCapture.add("android.intent.action.CAMERA_BUTTON");
-        defaultSystemEventsToCapture.add("android.intent.action.CLOSE_SYSTEM_DIALOGS");
-        defaultSystemEventsToCapture.add("android.intent.action.DOCK_EVENT");
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_HOST_RESTORED");
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_RESTORED");
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_UPDATE");
-        defaultSystemEventsToCapture.add("android.appwidget.action.APPWIDGET_UPDATE_OPTIONS");
-        defaultSystemEventsToCapture.add("android.intent.action.ACTION_POWER_CONNECTED");
-        defaultSystemEventsToCapture.add("android.intent.action.ACTION_POWER_DISCONNECTED");
-        defaultSystemEventsToCapture.add("android.intent.action.ACTION_SHUTDOWN");
-        defaultSystemEventsToCapture.add("android.intent.action.AIRPLANE_MODE");
-        defaultSystemEventsToCapture.add("android.intent.action.BATTERY_LOW");
-        defaultSystemEventsToCapture.add("android.intent.action.BATTERY_OKAY");
-        defaultSystemEventsToCapture.add("android.intent.action.BOOT_COMPLETED");
-        defaultSystemEventsToCapture.add("android.intent.action.CONTENT_CHANGED");
-        defaultSystemEventsToCapture.add("android.intent.action.DATE_CHANGED");
-        defaultSystemEventsToCapture.add("android.intent.action.DEVICE_STORAGE_LOW");
-        defaultSystemEventsToCapture.add("android.intent.action.DEVICE_STORAGE_OK");
-        defaultSystemEventsToCapture.add("android.intent.action.INPUT_METHOD_CHANGED");
-        defaultSystemEventsToCapture.add("android.intent.action.LOCALE_CHANGED");
-        defaultSystemEventsToCapture.add("android.intent.action.REBOOT");
-        defaultSystemEventsToCapture.add("android.intent.action.SCREEN_OFF");
-        defaultSystemEventsToCapture.add("android.intent.action.SCREEN_ON");
-        defaultSystemEventsToCapture.add("android.intent.action.TIMEZONE_CHANGED");
-        defaultSystemEventsToCapture.add("android.intent.action.TIME_SET");
-        defaultSystemEventsToCapture.add("android.os.action.DEVICE_IDLE_MODE_CHANGED");
-        defaultSystemEventsToCapture.add("android.os.action.POWER_SAVE_MODE_CHANGED");
-        defaultSystemEventsToCapture.add("android.intent.action.DREAMING_STARTED");
-        defaultSystemEventsToCapture.add("android.intent.action.DREAMING_STOPPED");
-
+    public IntentFilter getIntentFilter() {
         IntentFilter filter = new IntentFilter();
 
-        for (String event : defaultSystemEventsToCapture) {
-            filter.addAction(event);
-        }
+        filter.addAction("android.appwidget.action.APPWIDGET_DELETED");
+        filter.addAction("android.appwidget.action.APPWIDGET_DISABLED");
+        filter.addAction("android.appwidget.action.APPWIDGET_ENABLED");
+        filter.addAction("android.intent.action.CAMERA_BUTTON");
+        filter.addAction("android.intent.action.CLOSE_SYSTEM_DIALOGS");
+        filter.addAction("android.intent.action.DOCK_EVENT");
+        filter.addAction("android.appwidget.action.APPWIDGET_HOST_RESTORED");
+        filter.addAction("android.appwidget.action.APPWIDGET_RESTORED");
+        filter.addAction("android.appwidget.action.APPWIDGET_UPDATE");
+        filter.addAction("android.appwidget.action.APPWIDGET_UPDATE_OPTIONS");
+        filter.addAction("android.intent.action.ACTION_POWER_CONNECTED");
+        filter.addAction("android.intent.action.ACTION_POWER_DISCONNECTED");
+        filter.addAction("android.intent.action.ACTION_SHUTDOWN");
+        filter.addAction("android.intent.action.AIRPLANE_MODE");
+        filter.addAction("android.intent.action.BATTERY_LOW");
+        filter.addAction("android.intent.action.BATTERY_OKAY");
+        filter.addAction("android.intent.action.BOOT_COMPLETED");
+        filter.addAction("android.intent.action.CONTENT_CHANGED");
+        filter.addAction("android.intent.action.DATE_CHANGED");
+        filter.addAction("android.intent.action.DEVICE_STORAGE_LOW");
+        filter.addAction("android.intent.action.DEVICE_STORAGE_OK");
+        filter.addAction("android.intent.action.INPUT_METHOD_CHANGED");
+        filter.addAction("android.intent.action.LOCALE_CHANGED");
+        filter.addAction("android.intent.action.REBOOT");
+        filter.addAction("android.intent.action.SCREEN_OFF");
+        filter.addAction("android.intent.action.SCREEN_ON");
+        filter.addAction("android.intent.action.TIMEZONE_CHANGED");
+        filter.addAction("android.intent.action.TIME_SET");
+        filter.addAction("android.os.action.DEVICE_IDLE_MODE_CHANGED");
+        filter.addAction("android.os.action.POWER_SAVE_MODE_CHANGED");
+        filter.addAction("android.intent.action.DREAMING_STARTED");
+        filter.addAction("android.intent.action.DREAMING_STOPPED");
 
         return filter;
     }

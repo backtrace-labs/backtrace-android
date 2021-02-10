@@ -48,7 +48,6 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testEnable() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
 
@@ -65,7 +64,6 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testAddBreadcrumb() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -88,7 +86,6 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testAddBreadcrumbWithAttributes() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -119,7 +116,6 @@ public class BacktraceBreadcrumbsTest {
     // We should preserve spaces in the message string
     @Test
     public void testSpaceInMessage() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -143,7 +139,6 @@ public class BacktraceBreadcrumbsTest {
     // We should remove \n in the message string
     @Test
     public void testNewlineInMessage() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -167,7 +162,6 @@ public class BacktraceBreadcrumbsTest {
     // We should NOT preserve spaces or newlines for any non-message field
     @Test
     public void testInvalidCharsInAttribute() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -199,7 +193,6 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testLongMessage() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -222,7 +215,6 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testLongAttributesLongFirst() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -252,7 +244,6 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testLongAttributesShortFirst() {
-
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
@@ -529,7 +520,6 @@ public class BacktraceBreadcrumbsTest {
     }
 
     public void deleteRecursive(File fileOrDirectory) {
-
         if (fileOrDirectory.isDirectory()) {
             for (File child : fileOrDirectory.listFiles()) {
                 deleteRecursive(child);

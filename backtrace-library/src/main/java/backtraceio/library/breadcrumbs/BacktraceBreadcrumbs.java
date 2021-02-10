@@ -50,7 +50,7 @@ public class BacktraceBreadcrumbs {
 
     private void enableSystemBreadcrumbs() {
         backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
-        context.registerReceiver(backtraceBroadcastReceiver, backtraceBroadcastReceiver.getMyIntentFilter());
+        context.registerReceiver(backtraceBroadcastReceiver, backtraceBroadcastReceiver.getIntentFilter());
 
         backtraceComponentListener = new BacktraceComponentListener(this);
         context.registerComponentCallbacks(backtraceComponentListener);
@@ -146,9 +146,7 @@ public class BacktraceBreadcrumbs {
 
     public boolean isBreadcrumbsEnabled()
     {
-        if (enabledBreadcrumbTypes == null || enabledBreadcrumbTypes.isEmpty())
-            return false;
-        return true;
+        return enabledBreadcrumbTypes != null && !enabledBreadcrumbTypes.isEmpty();
     }
 
     public String getBreadcrumbLogDirectory() {
@@ -253,15 +251,10 @@ public class BacktraceBreadcrumbs {
 
         for (BacktraceBreadcrumbType enabledType : BacktraceBreadcrumbType.values())
         {
-            if (enabledBreadcrumbTypes != null &&
-                    enabledBreadcrumbTypes.contains(enabledType))
-            {
-                attributes.put(enabledType.name(), "enabled");
-            }
-            else
-            {
-                attributes.put(enabledType.name(), "disabled");
-            }
+            String state = (enabledBreadcrumbTypes != null &&
+                    enabledBreadcrumbTypes.contains(enabledType)) ? "enabled" : "disabled";
+
+            attributes.put(enabledType.toString(), state);
         }
 
         return addBreadcrumb("Breadcrumbs configuration", attributes, BacktraceBreadcrumbType.CONFIGURATION);
