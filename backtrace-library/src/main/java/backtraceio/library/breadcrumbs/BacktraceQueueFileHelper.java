@@ -48,13 +48,15 @@ public class BacktraceQueueFileHelper {
     public boolean add(byte[] bytes) {
         try {
             int usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
-            int messageLength = bytes.length;
+            int breadcrumbLength = bytes.length;
 
-            if (messageLength > 4096) {
+            if (breadcrumbLength > 4096) {
                 BacktraceLogger.e(LOG_TAG, "We should not have a breadcrumb this big, this is a bug!");
             }
 
-            while (!breadcrumbStore.isEmpty() && (usedBytes + messageLength) > maxQueueFileSizeBytes) {
+            // We clear the space we need from the QueueFile first to prevent
+            // the QueueFile from expanding to accommodate the new breadcrumb
+            while (!breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes) {
                 breadcrumbStore.remove();
                 usedBytes--;
             }
