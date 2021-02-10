@@ -31,8 +31,8 @@ public class BacktraceBreadcrumbsLogger {
      */
     private final int maxSerializedAttributeSizeBytes = 1024;
 
-    public BacktraceBreadcrumbsLogger(String breadcrumbLogDirectory) throws IOException {
-        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(breadcrumbLogDirectory);
+    public BacktraceBreadcrumbsLogger(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
+        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(breadcrumbLogDirectory, maxQueueFileSizeBytes);
     }
 
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
