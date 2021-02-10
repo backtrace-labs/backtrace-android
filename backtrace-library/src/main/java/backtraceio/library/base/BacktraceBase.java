@@ -366,7 +366,7 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Force a Crashpad report and minidump submission
+     * Force a native crash report and minidump submission
      * @param message
      */
     public native void dumpWithoutCrash(String message);
@@ -390,6 +390,11 @@ public class BacktraceBase implements Client {
             File breadcrumbLogFilesDir = new File(backtraceBreadcrumbs.getBreadcrumbLogDirectory());
 
             File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
+
+            if (breadcrumbLogFiles.length != 1) {
+                BacktraceLogger.e(LOG_TAG, "We should only have one file in the breadcrumbs log dir, found " + breadcrumbLogFiles.length);
+            }
+
             for (File breadcrumbLogFile : breadcrumbLogFiles) {
                 report.attachmentPaths.add(breadcrumbLogFile.getAbsolutePath());
             }
