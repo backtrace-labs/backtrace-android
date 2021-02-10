@@ -17,8 +17,7 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-        backtrace-native.cpp
-        )
+        backtrace-native.cpp)
 
 # Crashpad Libraries
 add_library(crashpad_client STATIC IMPORTED)
