@@ -81,7 +81,7 @@ public class BacktraceClientBreadcrumbsTest {
                         assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                         // We log one breadcrumb by default, the breadcrumb configuration
-                        assertEquals(1,
+                        assertEquals((long) 1,
                                 backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                         assertNotNull(backtraceResult.getBacktraceReport());
@@ -115,7 +115,7 @@ public class BacktraceClientBreadcrumbsTest {
                         assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                         // After adding a new breadcrumb, we should have incremented the breadcrumbs.lastId
-                        assertEquals(2,
+                        assertEquals((long) 2,
                                 backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                         assertNotNull(backtraceResult.getBacktraceReport());

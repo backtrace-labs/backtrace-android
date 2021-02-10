@@ -4,11 +4,9 @@ import com.squareup.tape.QueueFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
-import backtraceio.library.enums.BacktraceBreadcrumbLevel;
-import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceQueueFileHelper {
@@ -26,22 +24,48 @@ public class BacktraceQueueFileHelper {
 
     private final String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
 
-    public BacktraceQueueFileHelper(String breadcrumbLogDirectory) throws IOException {
+    private int maxQueueFileSizeBytes;
+
+    private Method usedBytes;
+
+    public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
         File breadcrumbLogsDir = new File(breadcrumbLogDirectory);
         breadcrumbLogsDir.mkdir();
         breadcrumbStore = new QueueFile(new File(breadcrumbLogsDir + "/" + logFileName));
-    }
 
+        usedBytes = QueueFile.class.getDeclaredMethod("usedBytes");
+        usedBytes.setAccessible(true);
+
+        // This minimum file size comes from QueueFile::INITIAL_LENGTH
+        if (maxQueueFileSizeBytes < 4096) {
+            this.maxQueueFileSizeBytes = 4096;
+        } else {
+            this.maxQueueFileSizeBytes = maxQueueFileSizeBytes;
+        }
+    }
 
     public boolean add(byte[] bytes) {
         try {
+            int usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
+            int messageLength = bytes.length;
+
+            if (messageLength > 4096) {
+                BacktraceLogger.e(LOG_TAG, "We should not have a breadcrumb this big, this is a bug!");
+            }
+
+            while (!breadcrumbStore.isEmpty() && (usedBytes + messageLength) > maxQueueFileSizeBytes) {
+                breadcrumbStore.remove();
+                usedBytes--;
+            }
+
             breadcrumbStore.add(bytes);
         } catch (Exception ex) {
-            BacktraceLogger.w(LOG_TAG, "Breadcrumb: " + new String(bytes, StandardCharsets.UTF_8) +
-                    "\nCould not be added due to " + ex.getMessage());
+            BacktraceLogger.w(LOG_TAG, "Exception: " + ex.getMessage() +
+                    "\nWhen adding breadcrumb: "  + new String(bytes, StandardCharsets.UTF_8));
             return false;
         }
+
         return true;
     }
 

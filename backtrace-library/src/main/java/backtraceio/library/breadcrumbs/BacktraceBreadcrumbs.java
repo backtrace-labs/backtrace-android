@@ -35,11 +35,17 @@ public class BacktraceBreadcrumbs {
 
     private Context context;
 
-    public BacktraceBreadcrumbs(Context context) throws IOException {
+    private static final int DEFAULT_MAX_LOG_SIZE_BYTES = 64000;
+
+    public BacktraceBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) throws IOException, NoSuchMethodException {
         // Create the breadcrumbs subdirectory for storing the breadcrumb logs
-        String breadcrumbLogDirectory = context.getFilesDir().getAbsolutePath() + "/breadcrumbs";
-        backtraceBreadcrumbsLogger = new BacktraceBreadcrumbsLogger(breadcrumbLogDirectory);
         this.context = context;
+        String breadcrumbLogDirectory = context.getFilesDir().getAbsolutePath() + "/breadcrumbs";
+        backtraceBreadcrumbsLogger = new BacktraceBreadcrumbsLogger(breadcrumbLogDirectory, maxBreadcrumbLogSizeBytes);
+    }
+
+    public BacktraceBreadcrumbs(Context context) throws IOException, NoSuchMethodException {
+        this(context, DEFAULT_MAX_LOG_SIZE_BYTES);
     }
 
     private void enableSystemBreadcrumbs() {

@@ -268,7 +268,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
@@ -280,11 +279,214 @@ public class BacktraceBreadcrumbsTest {
         }
     }
 
+    @Test
+    public void testQueueFileShouldNotRollover() {
+        int numIterations = 500;
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+
+            for (int i = 0; i < numIterations; i++) {
+                final long threadId = Thread.currentThread().getId();
+                Map<String, Object> attributes = new HashMap<String, Object>() {{
+                    put("From Thread", threadId);
+                }};
+                backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
+            }
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
+
+            // First breadcrumb is configuration breadcrumb, it should be valid
+            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(0));
+            parsedBreadcrumbList.add(parsedBreadcrumb);
+            assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
+            assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) == 0);
+
+
+            // We start from the second breadcrumb
+            for (int i = 1; i < breadcrumbLogFileData.size(); i++)
+            {
+                parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumbList.add(parsedBreadcrumb);
+                assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
+                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertEquals("manual", parsedBreadcrumb.get("type"));
+                assertEquals("info", parsedBreadcrumb.get("level"));
+                // Timestamp should be convertible to a number
+                Long.parseLong(parsedBreadcrumb.get("timestamp"));
+                // Id should be convertible to a number
+                Integer.parseInt(parsedBreadcrumb.get("id"));
+            }
+
+            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
+                public int compare(Map<String, String> m1, Map<String, String> m2) {
+                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
+                }
+            };
+
+            Collections.sort(parsedBreadcrumbList, mapComparator);
+
+        } catch(Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testQueueFileRollover() {
+        int numIterations = 1000;
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+
+            for (int i = 0; i < numIterations; i++) {
+                final long threadId = Thread.currentThread().getId();
+                Map<String, Object> attributes = new HashMap<String, Object>() {{
+                    put("From Thread", threadId);
+                }};
+                backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
+            }
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
+            // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
+            for (int i = 0; i < breadcrumbLogFileData.size(); i++)
+            {
+                Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumbList.add(parsedBreadcrumb);
+                assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
+                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertEquals("manual", parsedBreadcrumb.get("type"));
+                assertEquals("info", parsedBreadcrumb.get("level"));
+                // Timestamp should be convertible to a number
+                Long.parseLong(parsedBreadcrumb.get("timestamp"));
+                // Id should be convertible to a number, and should skew larger (earlier breadcrumbs rolled off)
+                assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) > 450);
+            }
+
+            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
+                public int compare(Map<String, String> m1, Map<String, String> m2) {
+                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
+                }
+            };
+
+            Collections.sort(parsedBreadcrumbList, mapComparator);
+
+        } catch(Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testQueueFileShouldNotRolloverCustomMax() {
+        int numIterations = 50;
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+
+            for (int i = 0; i < numIterations; i++) {
+                final long threadId = Thread.currentThread().getId();
+                Map<String, Object> attributes = new HashMap<String, Object>() {{
+                    put("From Thread", threadId);
+                }};
+                backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
+            }
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
+
+            // First breadcrumb is configuration breadcrumb, it should be valid
+            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(0));
+            parsedBreadcrumbList.add(parsedBreadcrumb);
+            assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
+            assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) == 0);
+
+
+            // We start from the second breadcrumb
+            for (int i = 1; i < breadcrumbLogFileData.size(); i++)
+            {
+                parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumbList.add(parsedBreadcrumb);
+                assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
+                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertEquals("manual", parsedBreadcrumb.get("type"));
+                assertEquals("info", parsedBreadcrumb.get("level"));
+                // Timestamp should be convertible to a number
+                Long.parseLong(parsedBreadcrumb.get("timestamp"));
+                // Id should be convertible to a number
+                Integer.parseInt(parsedBreadcrumb.get("id"));
+            }
+
+            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
+                public int compare(Map<String, String> m1, Map<String, String> m2) {
+                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
+                }
+            };
+
+            Collections.sort(parsedBreadcrumbList, mapComparator);
+
+        } catch(Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testQueueFileRolloverCustomMax() {
+        int numIterations = 100;
+
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+
+            for (int i = 0; i < numIterations; i++) {
+                final long threadId = Thread.currentThread().getId();
+                Map<String, Object> attributes = new HashMap<String, Object>() {{
+                    put("From Thread", threadId);
+                }};
+                backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
+            }
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+
+            List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
+            // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
+            for (int i = 0; i < breadcrumbLogFileData.size(); i++)
+            {
+                Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumbList.add(parsedBreadcrumb);
+                assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
+                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertEquals("manual", parsedBreadcrumb.get("type"));
+                assertEquals("info", parsedBreadcrumb.get("level"));
+                // Timestamp should be convertible to a number
+                Long.parseLong(parsedBreadcrumb.get("timestamp"));
+                // Id should be convertible to a number, and should skew larger (earlier breadcrumbs rolled off)
+                assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) > 45);
+            }
+
+            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
+                public int compare(Map<String, String> m1, Map<String, String> m2) {
+                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
+                }
+            };
+
+            Collections.sort(parsedBreadcrumbList, mapComparator);
+
+        } catch(Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
 
     @Test
     public void breadcrumbsEnduranceTest() {
-        int numIterationsPerThread = 50000;
-        int numThreads = 100;
+        int numIterationsPerThread = 200;
+        int numThreads = 10;
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
@@ -325,7 +527,6 @@ public class BacktraceBreadcrumbsTest {
             fail(ex.getMessage());
         }
     }
-
 
     public void deleteRecursive(File fileOrDirectory) {
 
