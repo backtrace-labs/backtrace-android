@@ -74,7 +74,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
@@ -101,7 +100,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
@@ -126,7 +124,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
@@ -149,7 +146,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing_ 1 2_ 3_", parsedBreadcrumb.get("message"));
@@ -178,7 +174,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
@@ -203,7 +198,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals(expectedLongTestMessage, parsedBreadcrumb.get("message"));
@@ -230,7 +224,6 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            // Also account for the encoding (newlines before and after the breadcrumb string)
             Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
