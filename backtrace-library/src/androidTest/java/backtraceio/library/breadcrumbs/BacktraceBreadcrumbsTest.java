@@ -546,7 +546,7 @@ public class BacktraceBreadcrumbsTest {
 
     // This assumes we will only have one breadcrumb log file, which we will most of the time
     public List<String> readBreadcrumbLogFiles(BacktraceBreadcrumbs backtraceBreadcrumbs) throws IOException {
-        File breadcrumbLogFilesDir = new File(backtraceBreadcrumbs.getBreadcrumbLogDirectory());
+        File breadcrumbLogFilesDir = new File(BacktraceBreadcrumbs.getBreadcrumbLogDirectory(context));
         File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
 
         List<String> breadcrumbLogFileData = new ArrayList<String>();

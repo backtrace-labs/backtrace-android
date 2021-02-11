@@ -2,6 +2,7 @@ package backtraceio.library.breadcrumbs;
 
 import com.squareup.tape.QueueFile;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -20,9 +21,9 @@ public class BacktraceQueueFileHelper {
      */
     private QueueFile breadcrumbStore;
 
-    private String logFileName = "bt-breadcrumbs-0";
+    final private static String logFileName = "bt-breadcrumbs-0";
 
-    private final String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
+    private final String LOG_TAG = BacktraceQueueFileHelper.class.getSimpleName();
 
     private int maxQueueFileSizeBytes;
 
@@ -43,6 +44,14 @@ public class BacktraceQueueFileHelper {
         } else {
             this.maxQueueFileSizeBytes = maxQueueFileSizeBytes;
         }
+
+        Runtime.getRuntime().addShutdownHook(
+            new Thread() {
+                public void run() {
+                    shutdownHook();
+                }
+            }
+        );
     }
 
     public boolean add(byte[] bytes) {
@@ -71,7 +80,28 @@ public class BacktraceQueueFileHelper {
         return true;
     }
 
-    public String getLogDirectory() {
-        return this.breadcrumbLogDirectory;
+    public static String getLogFileName() {
+        return BacktraceQueueFileHelper.logFileName;
+    }
+
+    public void shutdownHook() {
+        try {
+            breadcrumbStore.close();
+
+            File breadcrumbLogFilesDir = new File(this.breadcrumbLogDirectory);
+
+            File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
+
+            for (File breadcrumbLogFile : breadcrumbLogFiles) {
+                System.out.println(breadcrumbLogFile);
+                System.out.println(breadcrumbLogFile.getName());
+                if (breadcrumbLogFile.getName().equals(logFileName)) {
+                    breadcrumbLogFile.delete();
+                }
+            }
+        } catch (Exception ex) {
+            BacktraceLogger.e(LOG_TAG, "Exception: " + ex.getMessage() +
+                    "\nwhen trying to close the Breadcrumbs QueueFile");
+        }
     }
 }

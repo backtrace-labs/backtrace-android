@@ -55,8 +55,8 @@ public class BacktraceBreadcrumbsLogger {
         return backtraceQueueFileHelper.add(breadcrumb.getBytes());
     }
 
-    public String getLogDirectory() {
-        return backtraceQueueFileHelper.getLogDirectory();
+    public static String getLogFileName() {
+        return BacktraceQueueFileHelper.getLogFileName();
     }
 
     private String serializeAttributes(final Map<String, Object> attributes) {

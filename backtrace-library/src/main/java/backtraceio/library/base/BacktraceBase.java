@@ -1,8 +1,14 @@
 package backtraceio.library.base;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -207,6 +213,9 @@ public class BacktraceBase implements Client {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
+
+
+
     /**
      * Enable logging of breadcrumbs and submission with crash reports
      * @param context   context of current state of the application
@@ -214,6 +223,7 @@ public class BacktraceBase implements Client {
      */
     public boolean enableBreadcrumbs(Context context) {
         try {
+            handleExistingBreadcrumbLogFile(context);
             backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs();
         } catch (Exception ex) {
@@ -387,17 +397,10 @@ public class BacktraceBase implements Client {
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
         if (backtraceBreadcrumbs != null && backtraceBreadcrumbs.isBreadcrumbsEnabled()) {
-            File breadcrumbLogFilesDir = new File(backtraceBreadcrumbs.getBreadcrumbLogDirectory());
+            File breadcrumbLogFileDir = new File(BacktraceBreadcrumbs.getBreadcrumbLogDirectory(context) +
+                                                    "/" + BacktraceBreadcrumbs.getBreadcrumbLogFileName());
 
-            File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
-
-            if (breadcrumbLogFiles.length != 1) {
-                BacktraceLogger.e(LOG_TAG, "We should only have one file in the breadcrumbs log dir, found " + breadcrumbLogFiles.length);
-            }
-
-            for (File breadcrumbLogFile : breadcrumbLogFiles) {
-                report.attachmentPaths.add(breadcrumbLogFile.getAbsolutePath());
-            }
+            report.attachmentPaths.add(breadcrumbLogFileDir.getAbsolutePath());
 
             long lastBreadcrumbId = backtraceBreadcrumbs.getCurrentBreadcrumbId();
             report.attributes.put("breadcrumbs.lastId", lastBreadcrumbId);
@@ -430,5 +433,40 @@ public class BacktraceBase implements Client {
                 }
             }
         };
+    }
+
+    private void handleExistingBreadcrumbLogFile(Context context) {
+        final File breadcrumbLogFile = new File(BacktraceBreadcrumbs.getBreadcrumbLogDirectory(context) +
+                "/" + BacktraceBreadcrumbs.getBreadcrumbLogFileName());
+        final File breadcrumbTempLogFile = new File(BacktraceBreadcrumbs.getBreadcrumbLogDirectory(context) +
+                "/bt-stalecrumbs");
+        try {
+            if (breadcrumbLogFile.exists()) {
+                FileUtils.moveFile(breadcrumbLogFile, breadcrumbTempLogFile);
+                BacktraceReport staleBreadcrumbsReport = new BacktraceReport("Found breadcrumbs from a previous session");
+                staleBreadcrumbsReport.attachmentPaths.add(breadcrumbTempLogFile.getAbsolutePath());
+
+                BacktraceData backtraceData = new BacktraceData(this.context, staleBreadcrumbsReport, this.attributes);
+                backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
+
+                final BacktraceDatabaseRecord record = this.database.add(staleBreadcrumbsReport, this.attributes, this.isProguardEnabled);
+
+                if (this.beforeSendEventListener != null) {
+                    backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
+                }
+
+                OnServerResponseEventListener staleBreadcrumbSubmissionCompleteCallback = new OnServerResponseEventListener() {
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        breadcrumbTempLogFile.delete();
+                    }
+                };
+
+                this.backtraceApi.send(backtraceData, this.getDatabaseCallback(record, staleBreadcrumbSubmissionCompleteCallback));
+            }
+        } catch (Exception ex) {
+            BacktraceLogger.e(LOG_TAG, "Could not send previously existing breadcrumbs due to: " + ex.getMessage());
+            breadcrumbLogFile.delete();
+        }
     }
 }
