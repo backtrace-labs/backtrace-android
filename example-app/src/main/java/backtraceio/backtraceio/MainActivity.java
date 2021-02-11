@@ -10,10 +10,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceExceptionHandler;
@@ -128,9 +132,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendReport(View view) {
-        backtraceClient.addBreadcrumb("Sending Backtrace Report");
+        final long id = Thread.currentThread().getId();
+        Map<String, Object> attributes = new HashMap<String, Object>() {{
+            put("Caller thread", id);
+        }};
+        backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
 
         BacktraceReport report = new BacktraceReport("Test");
         backtraceClient.send(report);
+    }
+
+    public void exit(View view) {
+        System.exit(0);
     }
 }

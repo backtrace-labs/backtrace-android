@@ -2,6 +2,7 @@ package backtraceio.library.breadcrumbs;
 
 import android.content.Context;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,8 @@ public class BacktraceBreadcrumbs {
      */
     private BacktraceBreadcrumbsLogger backtraceBreadcrumbsLogger;
 
+    final private static String breadcrumbLogDirectory = "breadcrumbs";
+
     private Context context;
 
     private static final int DEFAULT_MAX_LOG_SIZE_BYTES = 64000;
@@ -40,8 +43,8 @@ public class BacktraceBreadcrumbs {
     public BacktraceBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) throws IOException, NoSuchMethodException {
         // Create the breadcrumbs subdirectory for storing the breadcrumb logs
         this.context = context;
-        String breadcrumbLogDirectory = context.getFilesDir().getAbsolutePath() + "/breadcrumbs";
-        backtraceBreadcrumbsLogger = new BacktraceBreadcrumbsLogger(breadcrumbLogDirectory, maxBreadcrumbLogSizeBytes);
+        String fullBreadcrumbLogDirectory = getBreadcrumbLogDirectory(context);
+        backtraceBreadcrumbsLogger = new BacktraceBreadcrumbsLogger(fullBreadcrumbLogDirectory, maxBreadcrumbLogSizeBytes);
     }
 
     public BacktraceBreadcrumbs(Context context) throws IOException, NoSuchMethodException {
@@ -149,8 +152,12 @@ public class BacktraceBreadcrumbs {
         return enabledBreadcrumbTypes != null && !enabledBreadcrumbTypes.isEmpty();
     }
 
-    public String getBreadcrumbLogDirectory() {
-        return backtraceBreadcrumbsLogger.getLogDirectory();
+    public static String getBreadcrumbLogDirectory(Context context) {
+        return context.getFilesDir().getAbsolutePath() + "/" + BacktraceBreadcrumbs.breadcrumbLogDirectory;
+    }
+
+    public static String getBreadcrumbLogFileName() {
+        return BacktraceBreadcrumbsLogger.getLogFileName();
     }
 
     public long getCurrentBreadcrumbId() {
