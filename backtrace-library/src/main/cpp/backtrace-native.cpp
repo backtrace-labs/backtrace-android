@@ -78,6 +78,7 @@ namespace /* anonymous */
     bool InitializeImpl(jstring url,
                         jstring database_path,
                         jstring handler_path,
+                        jstring breadcrumbs_path,
                         jobjectArray attributeKeys,
                         jobjectArray attributeValues) {
         using namespace crashpad;
@@ -136,6 +137,13 @@ namespace /* anonymous */
         const char *filePath = env->GetStringUTFChars(database_path, 0);
         FilePath db(filePath);
 
+        // path to breadcrumbs log file
+        const char *breadcrumbsPath = env->GetStringUTFChars(breadcrumbs_path, 0);
+        // breadcrumbs to be sent as an attachment
+        std::string breadcrumbAttachmentArgumentString("--attachment=attachment_bt-breadcrumbs-0=");
+        breadcrumbAttachmentArgumentString.append(breadcrumbsPath);
+        arguments.push_back(breadcrumbAttachmentArgumentString);
+
         std::unique_ptr<CrashReportDatabase> database = CrashReportDatabase::Initialize(db);
         if (database == nullptr || database->GetSettings() == NULL) {
             return false;
@@ -153,6 +161,7 @@ namespace /* anonymous */
         env->ReleaseStringUTFChars(url, backtraceUrl);
         env->ReleaseStringUTFChars(handler_path, handlerPath);
         env->ReleaseStringUTFChars(database_path, filePath);
+        env->ReleaseStringUTFChars(breadcrumbs_path, breadcrumbsPath);
         return initialized;
     }
 }
@@ -208,13 +217,14 @@ JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
 bool Initialize(jstring url,
                 jstring database_path,
                 jstring handler_path,
+                jstring breadcrumbs_path,
                 jobjectArray attributeKeys,
                 jobjectArray attributeValues) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
         initialized = InitializeImpl(url,
-                                     database_path, handler_path,
+                                     database_path, handler_path, breadcrumbs_path,
                                      attributeKeys, attributeValues);
     });
     return initialized;
@@ -226,9 +236,10 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jstring url,
                                                       jstring database_path,
                                                       jstring handler_path,
+                                                      jstring breadcrumbs_path,
                                                       jobjectArray attributeKeys,
                                                       jobjectArray attributeValues) {
-    return Initialize(url, database_path, handler_path, attributeKeys, attributeValues);
+    return Initialize(url, database_path, handler_path, breadcrumbs_path, attributeKeys, attributeValues);
 }
 
 

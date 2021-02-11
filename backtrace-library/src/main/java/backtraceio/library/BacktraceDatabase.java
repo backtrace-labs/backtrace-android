@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -59,15 +60,15 @@ public class BacktraceDatabase implements Database {
     /**
      * Initialize Backtrace-native integration
      *
-     * @param url             url to Backtrace
-     * @param databasePath    path to Backtrace-native database
-     * @param handlerPath     path to error handler
-     * @param attributeKeys   array of attribute keys
-     * @param attributeValues array of attribute values
+     * @param url               url to Backtrace
+     * @param databasePath      path to Backtrace-native database
+     * @param handlerPath       path to error handler
+     * @param breadcrumbLogPath path to breadcrumb logs
+     * @param attributeKeys     array of attribute keys
+     * @param attributeValues   array of attribute values
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
-    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
-
+    private native boolean initialize(String url, String databasePath, String handlerPath, String breadcrumbLogPath, String[] attributeKeys, String[] attributeValues);
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -135,8 +136,11 @@ public class BacktraceDatabase implements Database {
         if (minidumpSubmissionUrl == null) {
             return false;
         }
-        // path to crashpad native handler
+        // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
+        // Path to Breadcrumbs log file
+        String breadcrumbLogPath = BacktraceBreadcrumbs.getBreadcrumbLogDirectory(_applicationContext) +
+                                    "/" + BacktraceBreadcrumbs.getBreadcrumbLogFileName();
 
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
@@ -146,6 +150,7 @@ public class BacktraceDatabase implements Database {
                 minidumpSubmissionUrl,
                 databasePath,
                 handlerPath,
+                breadcrumbLogPath,
                 keys,
                 values
         );
