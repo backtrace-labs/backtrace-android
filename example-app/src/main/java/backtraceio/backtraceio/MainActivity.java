@@ -16,6 +16,8 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -67,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public native void cppCrash();
+
+    public native void registerNativeBreadcrumbs(BacktraceBase backtraceBase);
+    public native void addNativeBreadcrumb();
 
     private ArrayList<String> equippedItems;
 
@@ -125,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void enableBreadcrumbs(View view) {
         backtraceClient.enableBreadcrumbs(view.getContext());
+        registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
     public void disableBreadcrumbs(View view) {
@@ -137,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
             put("Caller thread", id);
         }};
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
+
+        addNativeBreadcrumb();
 
         BacktraceReport report = new BacktraceReport("Test");
         backtraceClient.send(report);

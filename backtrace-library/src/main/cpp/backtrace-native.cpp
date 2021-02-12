@@ -8,6 +8,7 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include <unordered_map>
 
 #include "base/logging.h"
 #include "client/crashpad_client.h"
@@ -73,7 +74,6 @@ namespace /* anonymous */
         }
         return m_pJniEnv;
     }
-
 
     bool InitializeImpl(jstring url,
                         jstring database_path,
@@ -239,7 +239,8 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jstring breadcrumbs_path,
                                                       jobjectArray attributeKeys,
                                                       jobjectArray attributeValues) {
-    return Initialize(url, database_path, handler_path, breadcrumbs_path, attributeKeys, attributeValues);
+    return Initialize(url, database_path, handler_path, breadcrumbs_path, attributeKeys,
+                      attributeValues);
 }
 
 
