@@ -3,9 +3,7 @@ package backtraceio.library;
 import android.content.Context;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;

@@ -1,20 +1,18 @@
 package backtraceio.library.base;
 
 import android.content.Context;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -28,8 +26,6 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.enums.BacktraceBreadcrumbLevel;
-import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 

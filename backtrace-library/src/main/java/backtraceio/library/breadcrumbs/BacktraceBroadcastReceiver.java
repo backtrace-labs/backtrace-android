@@ -7,13 +7,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.logger.BacktraceLogger;
 
@@ -33,8 +30,8 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action == null)
         {
-            action = "Null action received. This is a bug";
-            BacktraceLogger.e(LOG_TAG, action);
+            BacktraceLogger.e(LOG_TAG, "Null action received. This is a bug");
+            return;
         }
 
         Map<String, Object> attributes = null;

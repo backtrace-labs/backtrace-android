@@ -2,7 +2,6 @@ package backtraceio.library.interfaces;
 
 import java.util.Map;
 
-import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
