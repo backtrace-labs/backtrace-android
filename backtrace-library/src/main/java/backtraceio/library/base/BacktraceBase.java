@@ -6,7 +6,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -215,10 +217,36 @@ public class BacktraceBase implements Client {
      * @return true if we successfully enabled breadcrumbs
      */
     public boolean enableBreadcrumbs(Context context) {
+        final Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes = new HashSet<BacktraceBreadcrumbType>(){{
+            add(BacktraceBreadcrumbType.CONFIGURATION);
+            add(BacktraceBreadcrumbType.HTTP);
+            add(BacktraceBreadcrumbType.LOG);
+            add(BacktraceBreadcrumbType.MANUAL);
+            add(BacktraceBreadcrumbType.NAVIGATION);
+            add(BacktraceBreadcrumbType.SYSTEM);
+            add(BacktraceBreadcrumbType.USER);
+        }};
+
+        return enableBreadcrumbs(context, enabledBreadcrumbTypes);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     *          breadcrumbs will always be enabled
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(Context context,
+                                     Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         try {
-            handleExistingBreadcrumbLogFile(context);
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            if (!isBreadcrumbsEnabled()) {
+                // Only do these if we're starting from a fresh state
+                handleExistingBreadcrumbLogFile(context);
+                backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            }
+            backtraceBreadcrumbs.enableBreadcrumbs(breadcrumbTypesToEnable);
         } catch (Exception ex) {
             BacktraceLogger.w(LOG_TAG, "Could not enable breadcrumbs due to " + ex.getMessage());
             return false;

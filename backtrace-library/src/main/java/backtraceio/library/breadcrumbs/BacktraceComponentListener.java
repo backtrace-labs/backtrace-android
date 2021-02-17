@@ -87,6 +87,7 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         attributes.put("orientation", orientation);
         backtraceBreadcrumbs.addBreadcrumb("Configuration changed",
                                         attributes,
+                                        BacktraceBreadcrumbType.SYSTEM,
                                         BacktraceBreadcrumbLevel.INFO);
     }
 
