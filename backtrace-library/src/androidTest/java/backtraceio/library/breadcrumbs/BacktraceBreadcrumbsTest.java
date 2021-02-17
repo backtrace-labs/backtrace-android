@@ -31,8 +31,7 @@ import static junit.framework.TestCase.fail;
 public class BacktraceBreadcrumbsTest {
     public Context context;
 
-    static
-    {
+    static {
         System.loadLibrary("backtrace-native");
     }
 
@@ -58,7 +57,7 @@ public class BacktraceBreadcrumbsTest {
             backtraceBreadcrumbs.disableBreadcrumbs();
             assertFalse(backtraceBreadcrumbs.isBreadcrumbsEnabled());
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -79,7 +78,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -111,7 +110,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -123,8 +122,8 @@ public class BacktraceBreadcrumbsTest {
             backtraceBreadcrumbs.enableBreadcrumbs();
 
             Map<String, Object> attributes = new HashMap<String, Object>() {{
-               put("floopy","doopy");
-               put("flim","flam");
+                put("floopy", "doopy");
+                put("flim", "flam");
             }};
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
@@ -139,7 +138,7 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("doopy", parsedBreadcrumb.get("floopy"));
             assertEquals("flam", parsedBreadcrumb.get("flim"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -161,7 +160,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -183,7 +182,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals("Testing_ 1 2_ 3_", parsedBreadcrumb.get("message"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -196,9 +195,9 @@ public class BacktraceBreadcrumbsTest {
             backtraceBreadcrumbs.enableBreadcrumbs();
 
             Map<String, Object> attributes = new HashMap<String, Object>() {{
-               put(" flo opy","do o py ");
-               put("fl\nim","fl\nam\n");
-               put(" foo ","b\na r ");
+                put(" flo opy", "do o py ");
+                put("fl\nim", "fl\nam\n");
+                put(" foo ", "b\na r ");
             }};
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
@@ -214,7 +213,7 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("fl_am_", parsedBreadcrumb.get("fl_im"));
             assertEquals("b_a_r_", parsedBreadcrumb.get("_foo_"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -235,7 +234,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals(expectedLongTestMessage, parsedBreadcrumb.get("message"));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -263,7 +262,7 @@ public class BacktraceBreadcrumbsTest {
             assertEquals(expectedLongTestAttributeValue, parsedBreadcrumb.get(expectedLongTestAttributeKey));
             assertNull(parsedBreadcrumb.get(reasonableLengthAttributeKey));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -291,7 +290,7 @@ public class BacktraceBreadcrumbsTest {
             assertEquals(reasonableLengthAttributeValue, parsedBreadcrumb.get(reasonableLengthAttributeKey));
             assertNull(parsedBreadcrumb.get(expectedLongTestAttributeKey));
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -322,10 +321,8 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
             assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) == 0);
 
-
             // We start from the second breadcrumb
-            for (int i = 1; i < breadcrumbLogFileData.size(); i++)
-            {
+            for (int i = 1; i < breadcrumbLogFileData.size(); i++) {
                 parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
                 parsedBreadcrumbList.add(parsedBreadcrumb);
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -337,16 +334,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to a number
                 Integer.parseInt(parsedBreadcrumb.get("id"));
             }
-
-            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
-                public int compare(Map<String, String> m1, Map<String, String> m2) {
-                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
-                }
-            };
-
-            Collections.sort(parsedBreadcrumbList, mapComparator);
-
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -371,8 +359,7 @@ public class BacktraceBreadcrumbsTest {
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
-            for (int i = 0; i < breadcrumbLogFileData.size(); i++)
-            {
+            for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
                 Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
                 parsedBreadcrumbList.add(parsedBreadcrumb);
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -384,16 +371,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to a number, and should skew larger (earlier breadcrumbs rolled off)
                 assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) > 450);
             }
-
-            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
-                public int compare(Map<String, String> m1, Map<String, String> m2) {
-                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
-                }
-            };
-
-            Collections.sort(parsedBreadcrumbList, mapComparator);
-
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -424,10 +402,8 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
             assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) == 0);
 
-
             // We start from the second breadcrumb
-            for (int i = 1; i < breadcrumbLogFileData.size(); i++)
-            {
+            for (int i = 1; i < breadcrumbLogFileData.size(); i++) {
                 parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
                 parsedBreadcrumbList.add(parsedBreadcrumb);
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -439,16 +415,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to a number
                 Integer.parseInt(parsedBreadcrumb.get("id"));
             }
-
-            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
-                public int compare(Map<String, String> m1, Map<String, String> m2) {
-                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
-                }
-            };
-
-            Collections.sort(parsedBreadcrumbList, mapComparator);
-
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -473,8 +440,7 @@ public class BacktraceBreadcrumbsTest {
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
-            for (int i = 0; i < breadcrumbLogFileData.size(); i++)
-            {
+            for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
                 Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
                 parsedBreadcrumbList.add(parsedBreadcrumb);
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -486,16 +452,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to a number, and should skew larger (earlier breadcrumbs rolled off)
                 assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) > 45);
             }
-
-            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
-                public int compare(Map<String, String> m1, Map<String, String> m2) {
-                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
-                }
-            };
-
-            Collections.sort(parsedBreadcrumbList, mapComparator);
-
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -518,8 +475,7 @@ public class BacktraceBreadcrumbsTest {
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            for (int i = 1; i < breadcrumbLogFileData.size(); i++)
-            {
+            for (int i = 1; i < breadcrumbLogFileData.size(); i++) {
                 Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
                 parsedBreadcrumbList.add(parsedBreadcrumb);
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -531,16 +487,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to a number
                 Integer.parseInt(parsedBreadcrumb.get("id"));
             }
-
-            Comparator<Map<String, String>> mapComparator = new Comparator<Map<String, String>>() {
-                public int compare(Map<String, String> m1, Map<String, String> m2) {
-                    return Integer.parseInt(m1.get("id")) - Integer.parseInt(m2.get("id"));
-                }
-            };
-
-            Collections.sort(parsedBreadcrumbList, mapComparator);
-
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -588,13 +535,11 @@ public class BacktraceBreadcrumbsTest {
         // The encoding contains headers for the encoded data
         // We just throw away lines that don't start with "timestamp
         StringBuilder stringBuilder = new StringBuilder();
-        while(inputStream.available() > 0) {
+        while (inputStream.available() > 0) {
             char c = (char) inputStream.read();
-            if (c == '\n')
-            {
+            if (c == '\n') {
                 String line = stringBuilder.toString();
-                if (line.matches(".*timestamp.*"))
-                {
+                if (line.matches(".*timestamp.*")) {
                     breadcrumbLogFileData.add(line);
                 }
                 stringBuilder = new StringBuilder();
@@ -618,13 +563,12 @@ public class BacktraceBreadcrumbsTest {
         for (int i = 0; i < breadcrumbTokens.length; i++) {
             switch (breadcrumbTokens[i]) {
                 case "attributes":
-                    while (breadcrumbTokens[++i].equals("attr"))
-                    {
+                    while (breadcrumbTokens[++i].equals("attr")) {
                         parsedBreadcrumb.put(breadcrumbTokens[++i], breadcrumbTokens[++i]);
                     }
                 case "message":
                     String reconstructedMessage = "";
-                    for (i++ ; i < breadcrumbTokens.length; i++) {
+                    for (i++; i < breadcrumbTokens.length; i++) {
                         reconstructedMessage += breadcrumbTokens[i];
                         if (i < breadcrumbTokens.length - 1) {
                             reconstructedMessage += " ";
@@ -644,11 +588,9 @@ public class BacktraceBreadcrumbsTest {
             "\n" +
             "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra diam sit amet. Ipsum dolor sit amet consectetur adipiscing elit duis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus. Faucibus interdum posuere lorem ipsum dolor. Aliquet risus feugiat in ante metus dictum at. Pretium aenean pharetra magna ac placerat vestibulum lectus mauris ultrices. Enim nulla aliquet porttitor lacus luctus accumsan. Diam ut venenatis tellus in metus. Facilisi nullam vehicula ipsum a arcu cursus.\n" +
             "\n" +
-            "Sed faucibus turpis in eu mi bibendum neque egestas congue. Ipsum nunc aliquet bibendum enim facilisis gravida neque convallis. Vitae congue mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Id donec ultrices tincidunt arcu non sodales neque. Eu turpis egestas pretium aenean pharetra magna ac. Est ullamcorper eget nulla facilisi etiam dignissim diam. Eget arcu dictum varius duis at. Pretium quam vulputate dignissim suspendisse in est. Morbi quis commodo odio aenean sed adipiscing diam. Leo urna molestie at elementum eu."
-            ;
+            "Sed faucibus turpis in eu mi bibendum neque egestas congue. Ipsum nunc aliquet bibendum enim facilisis gravida neque convallis. Vitae congue mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Id donec ultrices tincidunt arcu non sodales neque. Eu turpis egestas pretium aenean pharetra magna ac. Est ullamcorper eget nulla facilisi etiam dignissim diam. Eget arcu dictum varius duis at. Pretium quam vulputate dignissim suspendisse in est. Morbi quis commodo odio aenean sed adipiscing diam. Leo urna molestie at elementum eu.";
 
-    private final String expectedLongTestMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.__Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra ..."
-            ;
+    private final String expectedLongTestMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.__Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra dia";
 
     private final String longTestAttributeKey = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.";
 

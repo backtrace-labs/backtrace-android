@@ -1,17 +1,11 @@
 package backtraceio.library.breadcrumbs;
 
-import com.squareup.tape.QueueFile;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceBreadcrumbsLogger {
 
@@ -40,19 +34,19 @@ public class BacktraceBreadcrumbsLogger {
         // we will use it here.
         long time = System.currentTimeMillis();
 
-        message = StringUtils.abbreviate(message, maxMessageSizeBytes);
+        message = message.substring(0, Math.min(message.length(), maxMessageSizeBytes));
 
-        String breadcrumb = "\ntimestamp " + Long.toString(time);
-        breadcrumb += " id " + Long.toString(breadcrumbId);
-        breadcrumb += " level " + level.toString();
-        breadcrumb += " type " + type.toString();
-        breadcrumb += " attributes " + serializeAttributes(attributes);
-        breadcrumb += " message " + message.replace('\n', '_');
-        breadcrumb += "\n";
+        StringBuilder breadcrumb = new StringBuilder("\ntimestamp " + Long.toString(time));
+        breadcrumb.append(" id " + Long.toString(breadcrumbId));
+        breadcrumb.append(" level " + level.toString());
+        breadcrumb.append(" type " + type.toString());
+        breadcrumb.append(" attributes " + serializeAttributes(attributes));
+        breadcrumb.append(" message " + message.replace('\n', '_'));
+        breadcrumb.append("\n");
 
         breadcrumbId++;
 
-        return backtraceQueueFileHelper.add(breadcrumb.getBytes());
+        return backtraceQueueFileHelper.add(breadcrumb.toString().getBytes());
     }
 
     public boolean clear() {
@@ -64,7 +58,7 @@ public class BacktraceBreadcrumbsLogger {
     }
 
     private String serializeAttributes(final Map<String, Object> attributes) {
-        String serializedAttributes = "";
+        StringBuilder serializedAttributes = new StringBuilder();
         if (attributes != null) {
             for (Map.Entry<String, Object> entry : attributes.entrySet()) {
                 String key = entry.getKey().replace(' ', '_').replace('\n', '_');
@@ -73,7 +67,7 @@ public class BacktraceBreadcrumbsLogger {
                 // We don't want to break the attributes for parsing purposes, so we
                 // stop adding attributes once we are over length.
                 if (serializedAttributes.length() + key.length() + value.length() <= maxSerializedAttributeSizeBytes) {
-                    serializedAttributes += " attr " + key + " " + value + " ";
+                    serializedAttributes.append(" attr " + key + " " + value + " ");
                 } else {
                     BacktraceLogger.w(LOG_TAG, "Breadcrumb attributes truncated");
                     break;
@@ -81,7 +75,7 @@ public class BacktraceBreadcrumbsLogger {
             }
         }
 
-        return serializedAttributes;
+        return serializedAttributes.toString();
     }
 
     public long getCurrentBreadcrumbId() {

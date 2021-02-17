@@ -2,8 +2,6 @@ package backtraceio.library;
 
 import android.net.Uri;
 
-import java.net.URI;
-
 /**
  * Backtrace credentials information
  */

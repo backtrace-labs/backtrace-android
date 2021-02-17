@@ -2,7 +2,6 @@ package backtraceio.library.breadcrumbs;
 
 import com.squareup.tape.QueueFile;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -27,6 +26,9 @@ public class BacktraceQueueFileHelper {
 
     private int maxQueueFileSizeBytes;
 
+    // This minimum file size comes from QueueFile::INITIAL_LENGTH
+    private final int minimumQueueFileSizeBytes = 4096;
+
     private Method usedBytes;
 
     public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
@@ -40,9 +42,8 @@ public class BacktraceQueueFileHelper {
         usedBytes = QueueFile.class.getDeclaredMethod("usedBytes");
         usedBytes.setAccessible(true);
 
-        // This minimum file size comes from QueueFile::INITIAL_LENGTH
-        if (maxQueueFileSizeBytes < 4096) {
-            this.maxQueueFileSizeBytes = 4096;
+        if (maxQueueFileSizeBytes < minimumQueueFileSizeBytes) {
+            this.maxQueueFileSizeBytes = minimumQueueFileSizeBytes;
         } else {
             this.maxQueueFileSizeBytes = maxQueueFileSizeBytes;
         }
@@ -63,6 +64,7 @@ public class BacktraceQueueFileHelper {
 
             if (breadcrumbLength > 4096) {
                 BacktraceLogger.e(LOG_TAG, "We should not have a breadcrumb this big, this is a bug!");
+                return false;
             }
 
             // We clear the space we need from the QueueFile first to prevent

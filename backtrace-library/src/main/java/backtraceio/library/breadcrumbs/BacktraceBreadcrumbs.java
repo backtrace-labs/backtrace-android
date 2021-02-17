@@ -2,7 +2,6 @@ package backtraceio.library.breadcrumbs;
 
 import android.content.Context;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
