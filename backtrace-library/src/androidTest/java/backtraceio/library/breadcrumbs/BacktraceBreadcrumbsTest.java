@@ -16,9 +16,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -30,6 +34,9 @@ import static junit.framework.TestCase.fail;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceBreadcrumbsTest {
     public Context context;
+    Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes = new HashSet<BacktraceBreadcrumbType>(){{
+        add(BacktraceBreadcrumbType.MANUAL);
+    }};
 
     static {
         System.loadLibrary("backtrace-native");
@@ -51,7 +58,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
 
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
             assertTrue(backtraceBreadcrumbs.isBreadcrumbsEnabled());
 
             backtraceBreadcrumbs.disableBreadcrumbs();
@@ -66,7 +73,7 @@ public class BacktraceBreadcrumbsTest {
     public void testAddBreadcrumb() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
@@ -87,7 +94,7 @@ public class BacktraceBreadcrumbsTest {
     public void testClearBreadcrumbs() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
@@ -119,7 +126,7 @@ public class BacktraceBreadcrumbsTest {
     public void testAddBreadcrumbWithAttributes() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             Map<String, Object> attributes = new HashMap<String, Object>() {{
                 put("floopy", "doopy");
@@ -148,7 +155,7 @@ public class BacktraceBreadcrumbsTest {
     public void testSpaceInMessage() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             backtraceBreadcrumbs.addBreadcrumb("Testing 1 2 3");
 
@@ -170,7 +177,7 @@ public class BacktraceBreadcrumbsTest {
     public void testNewlineInMessage() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
 
@@ -192,7 +199,7 @@ public class BacktraceBreadcrumbsTest {
     public void testInvalidCharsInAttribute() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             Map<String, Object> attributes = new HashMap<String, Object>() {{
                 put(" flo opy", "do o py ");
@@ -222,7 +229,7 @@ public class BacktraceBreadcrumbsTest {
     public void testLongMessage() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             backtraceBreadcrumbs.addBreadcrumb(longTestMessage);
 
@@ -243,7 +250,7 @@ public class BacktraceBreadcrumbsTest {
     public void testLongAttributesLongFirst() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {{
                 put(longTestAttributeKey, longTestAttributeValue);
@@ -271,7 +278,7 @@ public class BacktraceBreadcrumbsTest {
     public void testLongAttributesShortFirst() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {{
                 put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
@@ -301,7 +308,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -345,7 +352,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -382,7 +389,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -426,7 +433,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -464,7 +471,7 @@ public class BacktraceBreadcrumbsTest {
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs();
+            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             for (int i = 0; i < numThreads; i++) {
                 new Thread(new BreadcrumbLogger(backtraceBreadcrumbs, numIterationsPerThread)).start();

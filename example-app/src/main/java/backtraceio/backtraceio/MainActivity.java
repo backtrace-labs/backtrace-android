@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
@@ -130,6 +132,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void enableBreadcrumbs(View view) {
         backtraceClient.enableBreadcrumbs(view.getContext());
+        registerNativeBreadcrumbs(backtraceClient); // Order should not matter
+    }
+
+
+    public void enableBreadcrumbsUserOnly(View view) {
+        Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable = new HashSet<BacktraceBreadcrumbType>() {{
+            add(BacktraceBreadcrumbType.USER);
+        }};
+        backtraceClient.enableBreadcrumbs(view.getContext(), breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 

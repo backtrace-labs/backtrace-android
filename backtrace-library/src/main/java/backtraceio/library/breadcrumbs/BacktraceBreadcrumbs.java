@@ -1,6 +1,7 @@
 package backtraceio.library.breadcrumbs;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,36 +52,28 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         this(context, DEFAULT_MAX_LOG_SIZE_BYTES);
     }
 
-    private void enableSystemBreadcrumbs() {
-        backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
-        context.registerReceiver(backtraceBroadcastReceiver, backtraceBroadcastReceiver.getIntentFilter());
-
-        backtraceComponentListener = new BacktraceComponentListener(this);
-        context.registerComponentCallbacks(backtraceComponentListener);
-    }
-
-    private void enableBreadcrumbType(BacktraceBreadcrumbType type) {
-        switch (type)
-        {
-            case SYSTEM:
-                enableSystemBreadcrumbs();
-                break;
+    private void registerAutomaticBreadcrumbReceivers(Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+        if (isBreadcrumbsEnabled()) {
+            unregisterAutomaticBreadcrumbReceivers();
         }
+
+        backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
+        context.registerReceiver(backtraceBroadcastReceiver,
+                backtraceBroadcastReceiver.getIntentFilter(breadcrumbTypesToEnable));
+
+        if (breadcrumbTypesToEnable.contains(BacktraceBreadcrumbType.SYSTEM)) {
+            backtraceComponentListener = new BacktraceComponentListener(this);
+            context.registerComponentCallbacks(backtraceComponentListener);
+        }
+
+        this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
     }
 
     public void setEnabledBreadcrumbTypes(Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         if (breadcrumbTypesToEnable == null)
             return;
 
-        // Register the new breadcrumb types
-        for (BacktraceBreadcrumbType enabledType : breadcrumbTypesToEnable) {
-            if (this.enabledBreadcrumbTypes == null ||
-                    !this.enabledBreadcrumbTypes.contains(enabledType)) {
-                enableBreadcrumbType(enabledType);
-            }
-        }
-
-        this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
+        registerAutomaticBreadcrumbReceivers(breadcrumbTypesToEnable);
     }
 
     public void enableBreadcrumbs(Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes)
@@ -91,20 +84,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         addConfigurationBreadcrumb();
     }
 
-    public void enableBreadcrumbs() {
-        final Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes = new HashSet<BacktraceBreadcrumbType>(){{
-            add(BacktraceBreadcrumbType.CONFIGURATION);
-            add(BacktraceBreadcrumbType.HTTP);
-            add(BacktraceBreadcrumbType.LOG);
-            add(BacktraceBreadcrumbType.MANUAL);
-            add(BacktraceBreadcrumbType.NAVIGATION);
-            add(BacktraceBreadcrumbType.SYSTEM);
-            add(BacktraceBreadcrumbType.USER);
-        }};
-        enableBreadcrumbs(enabledBreadcrumbTypes);
-    }
-
-    private void disableSystemBreadcrumbs() {
+    private void unregisterAutomaticBreadcrumbReceivers() {
         this.context.unregisterReceiver(backtraceBroadcastReceiver);
         backtraceBroadcastReceiver = null;
 
@@ -112,30 +92,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         backtraceComponentListener = null;
     }
 
-    private void disableBreadcrumbType(BacktraceBreadcrumbType type) {
-        switch (type)
-        {
-            case SYSTEM:
-                disableSystemBreadcrumbs();
-                break;
-        }
-    }
-
     public void disableBreadcrumbs() {
-        final Set<BacktraceBreadcrumbType> breadcrumbTypesToDisable = new HashSet<BacktraceBreadcrumbType>(){{
-            add(BacktraceBreadcrumbType.CONFIGURATION);
-            add(BacktraceBreadcrumbType.HTTP);
-            add(BacktraceBreadcrumbType.LOG);
-            add(BacktraceBreadcrumbType.MANUAL);
-            add(BacktraceBreadcrumbType.NAVIGATION);
-            add(BacktraceBreadcrumbType.SYSTEM);
-            add(BacktraceBreadcrumbType.USER);
-        }};
-
-        for (BacktraceBreadcrumbType breadcrumbType : breadcrumbTypesToDisable)
-        {
-            disableBreadcrumbType(breadcrumbType);
-        }
+        unregisterAutomaticBreadcrumbReceivers();
 
         enabledBreadcrumbTypes = null;
 
@@ -155,7 +113,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         return enabledBreadcrumbTypes != null && !enabledBreadcrumbTypes.isEmpty();
     }
 
-    public static String getBreadcrumbLogDirectory(Context context) {
+    public static String getBreadcrumbLogDirectory(@NonNull Context context) {
         return context.getFilesDir().getAbsolutePath() + "/" + BacktraceBreadcrumbs.breadcrumbLogDirectory;
     }
 
