@@ -58,5 +58,5 @@ after_success:
 script:
   - ./gradlew assembleDebug
   - ./gradlew test --info
-  - travis_wait ./gradlew connectedAndroidTest
+  - travis_wait 30 ./gradlew connectedAndroidTest
   - ./gradlew connectedCheck
