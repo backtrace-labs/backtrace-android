@@ -213,9 +213,6 @@ public class BacktraceBase implements Client {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
-
-
-
     /**
      * Enable logging of breadcrumbs and submission with crash reports
      * @param context   context of current state of the application

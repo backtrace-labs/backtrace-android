@@ -32,7 +32,9 @@ public class BacktraceQueueFileHelper {
     public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
         File breadcrumbLogsDir = new File(breadcrumbLogDirectory);
-        breadcrumbLogsDir.mkdir();
+        if (breadcrumbLogsDir.mkdir() == false) {
+            BacktraceLogger.e(LOG_TAG, "Could not make a breadcrumb log directory");
+        }
         breadcrumbStore = new QueueFile(new File(breadcrumbLogsDir + "/" + logFileName));
 
         usedBytes = QueueFile.class.getDeclaredMethod("usedBytes");
