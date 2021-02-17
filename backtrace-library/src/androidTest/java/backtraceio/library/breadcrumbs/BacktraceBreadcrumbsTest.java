@@ -85,6 +85,38 @@ public class BacktraceBreadcrumbsTest {
     }
 
     @Test
+    public void testClearBreadcrumbs() {
+        try {
+            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
+            backtraceBreadcrumbs.enableBreadcrumbs();
+
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
+
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
+            assertEquals(2, breadcrumbLogFileData.size());
+
+            // First breadcrumb is configuration breadcrumb
+            // We start from the second breadcrumb
+            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+
+            assertEquals("Test", parsedBreadcrumb.get("message"));
+
+            assertTrue(backtraceBreadcrumbs.clearBreadcrumbs());
+
+            // Should have cleared the breadcrumb we just read but
+            // We should still have a configuration breadcrumb
+            breadcrumbLogFileData = readBreadcrumbLogFiles();
+            assertEquals(1, breadcrumbLogFileData.size());
+            parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(0));
+
+            assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
+
+        } catch(Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
     public void testAddBreadcrumbWithAttributes() {
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
@@ -579,6 +611,9 @@ public class BacktraceBreadcrumbsTest {
         Map<String, String> parsedBreadcrumb = new HashMap<String, String>();
 
         String[] breadcrumbTokens = breadcrumb.split("[ ]+");
+        if (breadcrumbTokens.length == 0) {
+            return null;
+        }
 
         for (int i = 0; i < breadcrumbTokens.length; i++) {
             switch (breadcrumbTokens[i]) {

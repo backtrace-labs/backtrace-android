@@ -82,6 +82,17 @@ public class BacktraceQueueFileHelper {
         return true;
     }
 
+    public boolean clear() {
+        try {
+            breadcrumbStore.clear();
+        } catch (Exception ex) {
+            BacktraceLogger.w(LOG_TAG, "Exception: " + ex.getMessage() +
+                    "\nWhen clearing breadcrumbs");
+            return false;
+        }
+        return true;
+    }
+
     public static String getLogFileName() {
         return BacktraceQueueFileHelper.logFileName;
     }

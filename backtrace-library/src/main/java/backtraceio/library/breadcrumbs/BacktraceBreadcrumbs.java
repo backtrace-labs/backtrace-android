@@ -144,8 +144,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         addConfigurationBreadcrumb();
     }
 
-    public void clearBreadcrumbs() {
-        // TODO: Not implemented
+    public boolean clearBreadcrumbs() {
+        boolean success = backtraceBreadcrumbsLogger.clear();
+        // Make sure the configuration is always known
+        addConfigurationBreadcrumb();
+        return success;
     }
 
     public boolean isBreadcrumbsEnabled()
