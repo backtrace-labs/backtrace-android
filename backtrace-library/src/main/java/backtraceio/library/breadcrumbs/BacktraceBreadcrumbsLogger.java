@@ -55,6 +55,10 @@ public class BacktraceBreadcrumbsLogger {
         return backtraceQueueFileHelper.add(breadcrumb.getBytes());
     }
 
+    public boolean clear() {
+        return backtraceQueueFileHelper.clear();
+    }
+
     public static String getLogFileName() {
         return BacktraceQueueFileHelper.getLogFileName();
     }

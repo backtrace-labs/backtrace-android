@@ -88,7 +88,6 @@ public class BacktraceClient extends BacktraceBase {
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            Database database, Map<String, Object> attributes) {
         super(context, credentials, database, attributes);
-
     }
 
     /**
