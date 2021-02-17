@@ -70,8 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
     public native void cppCrash();
 
-    public native void registerNativeBreadcrumbs(BacktraceBase backtraceBase);
-    public native void addNativeBreadcrumb();
+    public native boolean registerNativeBreadcrumbs(BacktraceBase backtraceBase);
+    public native boolean addNativeBreadcrumb();
+    public native boolean addNativeBreadcrumbUserError();
+    public native void cleanupNativeBreadcrumbHandler();
 
     private ArrayList<String> equippedItems;
 
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void disableBreadcrumbs(View view) {
         backtraceClient.disableBreadcrumbs(view.getContext());
+        cleanupNativeBreadcrumbHandler();
     }
 
     public void sendReport(View view) {
@@ -145,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
 
         addNativeBreadcrumb();
+        addNativeBreadcrumbUserError();
 
         BacktraceReport report = new BacktraceReport("Test");
         backtraceClient.send(report);

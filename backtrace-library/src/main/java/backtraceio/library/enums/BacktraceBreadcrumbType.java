@@ -1,5 +1,8 @@
 package backtraceio.library.enums;
 
+/**
+ * @Note: These are also maintained in the public header backtrace-android.h
+ */
 public enum BacktraceBreadcrumbType {
     MANUAL,
     LOG,

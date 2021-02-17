@@ -11,8 +11,9 @@ import java.util.Set;
 
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.interfaces.Breadcrumbs;
 
-public class BacktraceBreadcrumbs {
+public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Which breadcrumb types are enabled?

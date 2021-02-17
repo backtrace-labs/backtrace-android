@@ -71,7 +71,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -97,7 +97,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -121,7 +121,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Testing 1 2 3");
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -143,7 +143,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -171,7 +171,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -195,7 +195,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb(longTestMessage);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -221,7 +221,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -249,7 +249,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -280,7 +280,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
 
@@ -335,7 +335,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
@@ -382,7 +382,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
 
@@ -437,7 +437,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
@@ -481,7 +481,7 @@ public class BacktraceBreadcrumbsTest {
                 new Thread(new BreadcrumbLogger(backtraceBreadcrumbs, numIterationsPerThread)).start();
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles(backtraceBreadcrumbs);
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
 
             List<Map<String, String>> parsedBreadcrumbList = new ArrayList<Map<String, String>>();
             // First breadcrumb is configuration breadcrumb
@@ -546,7 +546,7 @@ public class BacktraceBreadcrumbsTest {
     }
 
     // This assumes we will only have one breadcrumb log file, which we will most of the time
-    public List<String> readBreadcrumbLogFiles(BacktraceBreadcrumbs backtraceBreadcrumbs) throws IOException {
+    public List<String> readBreadcrumbLogFiles() throws IOException {
         File breadcrumbLogFilesDir = new File(BacktraceBreadcrumbs.getBreadcrumbLogDirectory(context));
         File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
 
