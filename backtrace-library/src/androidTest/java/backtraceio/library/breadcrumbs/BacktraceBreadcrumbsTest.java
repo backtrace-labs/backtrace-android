@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -468,13 +466,18 @@ public class BacktraceBreadcrumbsTest {
     public void breadcrumbsEnduranceTest() {
         int numIterationsPerThread = 200;
         int numThreads = 10;
+        Thread[] threads = new Thread[numThreads];
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
             backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes);
 
             for (int i = 0; i < numThreads; i++) {
-                new Thread(new BreadcrumbLogger(backtraceBreadcrumbs, numIterationsPerThread)).start();
+                threads[i] = new Thread(new BreadcrumbLogger(backtraceBreadcrumbs, numIterationsPerThread));
+                threads[i].start();
+            }
+            for (int i = 0; i < numThreads; i++) {
+                threads[i].join();
             }
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFiles();
