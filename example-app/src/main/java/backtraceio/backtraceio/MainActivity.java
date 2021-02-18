@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void enableBreadcrumbs(View view) {
-        backtraceClient.enableBreadcrumbs(view.getContext());
+        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
@@ -140,12 +140,12 @@ public class MainActivity extends AppCompatActivity {
         Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable = new HashSet<BacktraceBreadcrumbType>() {{
             add(BacktraceBreadcrumbType.USER);
         }};
-        backtraceClient.enableBreadcrumbs(view.getContext(), breadcrumbTypesToEnable);
+        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
     public void disableBreadcrumbs(View view) {
-        backtraceClient.disableBreadcrumbs(view.getContext());
+        backtraceClient.disableBreadcrumbs(view.getContext().getApplicationContext());
         cleanupNativeBreadcrumbHandler();
     }
 

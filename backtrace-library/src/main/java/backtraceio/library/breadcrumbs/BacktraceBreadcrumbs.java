@@ -1,5 +1,7 @@
 package backtraceio.library.breadcrumbs;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
@@ -29,6 +31,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * The Backtrace ComponentCallbacks2 listener
      */
     private BacktraceComponentListener backtraceComponentListener;
+
+    /**
+     * The Backtrace ActivityLifecycleCallbacks listener
+     */
+    private BacktraceActivityLifecycleListener backtraceActivityLifecycleListener;
 
     /**
      * The Backtrace Breadcrumbs logger instance
@@ -64,6 +71,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         if (breadcrumbTypesToEnable.contains(BacktraceBreadcrumbType.SYSTEM)) {
             backtraceComponentListener = new BacktraceComponentListener(this);
             context.registerComponentCallbacks(backtraceComponentListener);
+
+            backtraceActivityLifecycleListener = new BacktraceActivityLifecycleListener(this);
+            if (context instanceof Application) {
+                ((Application) context).registerActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
+            }
         }
 
         this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
@@ -90,6 +102,10 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
         this.context.unregisterComponentCallbacks(backtraceComponentListener);
         backtraceComponentListener = null;
+
+        if (context instanceof Application) {
+            ((Application) context).unregisterActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
+        }
     }
 
     public void disableBreadcrumbs() {
