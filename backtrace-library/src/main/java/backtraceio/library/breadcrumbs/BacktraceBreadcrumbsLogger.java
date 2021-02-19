@@ -53,10 +53,6 @@ public class BacktraceBreadcrumbsLogger {
         return backtraceQueueFileHelper.clear();
     }
 
-    public static String getLogFileName() {
-        return BacktraceQueueFileHelper.getLogFileName();
-    }
-
     private String serializeAttributes(final Map<String, Object> attributes) {
         StringBuilder serializedAttributes = new StringBuilder();
         if (attributes != null) {
