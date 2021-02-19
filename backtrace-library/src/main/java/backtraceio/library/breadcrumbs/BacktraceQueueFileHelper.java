@@ -4,7 +4,6 @@ import com.squareup.tape.QueueFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 
@@ -72,7 +71,6 @@ public class BacktraceQueueFileHelper {
             // the QueueFile from expanding to accommodate the new breadcrumb
             while (!breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes) {
                 breadcrumbStore.remove();
-                usedBytes--;
             }
 
             breadcrumbStore.add(bytes);

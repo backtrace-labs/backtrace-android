@@ -2,13 +2,9 @@ package backtraceio.library.base;
 
 import android.content.Context;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -20,6 +16,7 @@ import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.logger.BacktraceLogger;
@@ -34,7 +31,7 @@ import backtraceio.library.services.BacktraceApi;
 /**
  * Base Backtrace Android client
  */
-public class BacktraceBase implements Client {
+public class BacktraceBase implements Client, Breadcrumbs {
 
     static {
         System.loadLibrary("backtrace-native");
@@ -240,7 +237,7 @@ public class BacktraceBase implements Client {
      * @return true if we successfully enabled breadcrumbs
      */
     public boolean enableBreadcrumbs(Context context,
-                                     Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         try {
             boolean isNewInstance = false;
             if (backtraceBreadcrumbs == null) {

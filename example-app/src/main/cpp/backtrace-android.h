@@ -36,10 +36,11 @@ namespace Backtrace {
     };
 
     /**
-     * Registers a BacktraceBase object to handle future AddBreadcrumb requests.
+     * Registers an object to handle future AddBreadcrumb requests. The object must implement
+     * backtraceio.library.interfaces.Breadcrumbs
      *
      * @param env - The JNI environment
-     * @param backtrace_base - A BacktraceBase object
+     * @param backtrace_base - A BacktraceBase object (or another object which implements backtraceio.library.interfaces.Breadcrumbs)
      * @return true if the Breadcrumbs object was registered successfully
      */
     bool InitializeNativeBreadcrumbs(JNIEnv *env, jobject backtrace_base);

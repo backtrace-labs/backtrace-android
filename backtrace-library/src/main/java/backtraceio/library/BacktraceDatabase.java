@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
+import backtraceio.library.breadcrumbs.BacktraceBreadcrumbsLogger;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -142,7 +143,7 @@ public class BacktraceDatabase implements Database {
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
         // Paths to Crashpad attachments
-        String[] attachmentPaths = new String[] {BacktraceBreadcrumbs.getBreadcrumbLogPath(_applicationContext)};
+        String[] attachmentPaths = new String[] {BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(_applicationContext)};
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
