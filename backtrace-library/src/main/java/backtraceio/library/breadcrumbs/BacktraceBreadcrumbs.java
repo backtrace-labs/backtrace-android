@@ -56,7 +56,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     final private static String breadcrumbLogDirectory = "breadcrumbs";
 
-    final private static String breadcrumbLogPath = "bt-breadcrumbs";
+    final private static String breadcrumbLogPath = "bt-breadcrumb-0";
 
     private Context context;
 
