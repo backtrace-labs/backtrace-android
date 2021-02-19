@@ -4,6 +4,7 @@ import com.squareup.tape.QueueFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 
@@ -20,8 +21,6 @@ public class BacktraceQueueFileHelper {
      */
     private QueueFile breadcrumbStore;
 
-    final private static String logFileName = "bt-breadcrumbs-0";
-
     private final String LOG_TAG = BacktraceQueueFileHelper.class.getSimpleName();
 
     private int maxQueueFileSizeBytes;
@@ -29,16 +28,18 @@ public class BacktraceQueueFileHelper {
     // This minimum file size comes from QueueFile::INITIAL_LENGTH
     private final int minimumQueueFileSizeBytes = 4096;
 
-    private Method usedBytes;
+    private final Method usedBytes;
 
+    // Let our exceptions bubble all the way up to BacktraceBreadcrumbsLogger constructor
+    // We definitely cannot construct BacktraceBreadcrumbsLogger without an open file log
     public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
-        File breadcrumbLogsDir = new File(breadcrumbLogDirectory);
-        if (breadcrumbLogsDir.mkdir() == false) {
-            BacktraceLogger.e(LOG_TAG, "Could not make a breadcrumb log directory");
-        }
-        breadcrumbStore = new QueueFile(new File(breadcrumbLogsDir + "/" + logFileName));
+        breadcrumbStore = new QueueFile(new File(this.breadcrumbLogDirectory));
 
+        // QueueFile pre-allocates a file of a certain size and fills with empty data,
+        // so normal File operations will not give us an accurate count of the bytes
+        // in the file.
+        // Therefore we expose the private method QueueFile::usedBytes
         usedBytes = QueueFile.class.getDeclaredMethod("usedBytes");
         usedBytes.setAccessible(true);
 
@@ -95,24 +96,13 @@ public class BacktraceQueueFileHelper {
         return true;
     }
 
-    public static String getLogFileName() {
-        return BacktraceQueueFileHelper.logFileName;
-    }
-
     public void shutdownHook() {
         try {
             breadcrumbStore.close();
 
-            File breadcrumbLogFilesDir = new File(this.breadcrumbLogDirectory);
-
-            File[] breadcrumbLogFiles = breadcrumbLogFilesDir.listFiles();
-
-            for (File breadcrumbLogFile : breadcrumbLogFiles) {
-                System.out.println(breadcrumbLogFile);
-                System.out.println(breadcrumbLogFile.getName());
-                if (breadcrumbLogFile.getName().equals(logFileName)) {
-                    breadcrumbLogFile.delete();
-                }
+            File breadcrumbLogFile = new File(this.breadcrumbLogDirectory);
+            if (breadcrumbLogFile.exists()) {
+                breadcrumbLogFile.delete();
             }
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception: " + ex.getMessage() +

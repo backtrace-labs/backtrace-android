@@ -53,6 +53,10 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
     public IntentFilter getIntentFilter(Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes) {
         IntentFilter filter = new IntentFilter();
 
+        if (enabledBreadcrumbTypes == null) {
+            return filter;
+        }
+
         if (enabledBreadcrumbTypes.contains(BacktraceBreadcrumbType.USER)) {
             filter.addAction("android.appwidget.action.APPWIDGET_DELETED");
             filter.addAction("android.appwidget.action.APPWIDGET_DISABLED");

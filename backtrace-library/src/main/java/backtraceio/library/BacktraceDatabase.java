@@ -137,8 +137,7 @@ public class BacktraceDatabase implements Database {
         // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
         // Path to Breadcrumbs log file
-        String breadcrumbLogPath = BacktraceBreadcrumbs.getBreadcrumbLogDirectory(_applicationContext) +
-                                    "/" + BacktraceBreadcrumbs.getBreadcrumbLogFileName();
+        String breadcrumbLogPath = BacktraceBreadcrumbs.getBreadcrumbLogPath(_applicationContext);
 
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);

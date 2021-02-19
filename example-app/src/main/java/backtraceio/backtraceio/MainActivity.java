@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void disableBreadcrumbs(View view) {
-        backtraceClient.disableBreadcrumbs(view.getContext().getApplicationContext());
+        backtraceClient.disableBreadcrumbs();
         cleanupNativeBreadcrumbHandler();
     }
 
