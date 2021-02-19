@@ -37,13 +37,12 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
         Map<String, Object> attributes = null;
         Bundle extras = intent.getExtras();
 
-        if (extras != null) {
+        if (extras != null && extras.keySet() != null) {
             Set<String> keys = extras.keySet();
-            if (keys != null) {
-                attributes = new HashMap<String, Object>();
-                for (String key : keys) {
-                    attributes.put(key, extras.get(key));
-                }
+
+            attributes = new HashMap<String, Object>();
+            for (String key : keys) {
+                attributes.put(key, extras.get(key));
             }
         }
 

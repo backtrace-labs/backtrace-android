@@ -139,25 +139,29 @@ namespace /* anonymous */
         FilePath db(filePath);
 
         // paths to file attachments
-        jint attachmentsLength = env->GetArrayLength(attachmentPaths);
-        for (int attachmentIndex = 0; attachmentIndex < attachmentsLength; ++attachmentIndex) {
-            jstring jstringAttachmentPath = (jstring) env->GetObjectArrayElement(attachmentPaths,
-                                                                             attachmentIndex);
-            jboolean isCopy;
-            const char *convertedAttachmentPath = (env)->GetStringUTFChars(jstringAttachmentPath, &isCopy);
+        if (attachmentPaths != nullptr) {
+            jint attachmentsLength = env->GetArrayLength(attachmentPaths);
+            for (int attachmentIndex = 0; attachmentIndex < attachmentsLength; ++attachmentIndex) {
+                jstring jstringAttachmentPath = (jstring) env->GetObjectArrayElement(
+                        attachmentPaths,
+                        attachmentIndex);
+                jboolean isCopy;
+                const char *convertedAttachmentPath = (env)->GetStringUTFChars(
+                        jstringAttachmentPath, &isCopy);
 
-            if (!convertedAttachmentPath)
-                continue;
+                if (!convertedAttachmentPath)
+                    continue;
 
-            std::string attachmentBaseName = basename(convertedAttachmentPath);
+                std::string attachmentBaseName = basename(convertedAttachmentPath);
 
-            std::string breadcrumbAttachmentArgumentString("--attachment=");
-            breadcrumbAttachmentArgumentString += attachmentBaseName;
-            breadcrumbAttachmentArgumentString += "=";
-            breadcrumbAttachmentArgumentString += convertedAttachmentPath;
-            arguments.push_back(breadcrumbAttachmentArgumentString);
+                std::string breadcrumbAttachmentArgumentString("--attachment=");
+                breadcrumbAttachmentArgumentString += attachmentBaseName;
+                breadcrumbAttachmentArgumentString += "=";
+                breadcrumbAttachmentArgumentString += convertedAttachmentPath;
+                arguments.push_back(breadcrumbAttachmentArgumentString);
 
-            env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
+                env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
+            }
         }
 
         std::unique_ptr<CrashReportDatabase> database = CrashReportDatabase::Initialize(db);

@@ -1,5 +1,9 @@
 package backtraceio.library.breadcrumbs;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -8,6 +12,12 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceBreadcrumbsLogger {
+    /**
+     * The base directory of the breadcrumb logs
+     */
+    final private static String breadcrumbLogDirectory = "breadcrumbs";
+
+    final private static String breadcrumbLogFileName = "bt-breadcrumb-0";
 
     private final String LOG_TAG = BacktraceBreadcrumbsLogger.class.getSimpleName();
 
@@ -25,8 +35,10 @@ public class BacktraceBreadcrumbsLogger {
      */
     private final int maxSerializedAttributeSizeBytes = 1024;
 
-    public BacktraceBreadcrumbsLogger(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
-        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(breadcrumbLogDirectory, maxQueueFileSizeBytes);
+    public BacktraceBreadcrumbsLogger(Context context, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
+        File breadcrumbLogDir = new File(BacktraceBreadcrumbsLogger.getBreadcrumbLogDirectory(context));
+        breadcrumbLogDir.mkdir();
+        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(context), maxQueueFileSizeBytes);
     }
 
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
@@ -84,5 +96,13 @@ public class BacktraceBreadcrumbsLogger {
 
     public long getCurrentBreadcrumbId() {
         return breadcrumbId;
+    }
+
+    public static String getBreadcrumbLogDirectory(@NonNull Context context) {
+        return context.getFilesDir().getAbsolutePath() + "/" + BacktraceBreadcrumbsLogger.breadcrumbLogDirectory;
+    }
+
+    public static String getBreadcrumbLogPath(@NonNull Context context) {
+        return BacktraceBreadcrumbsLogger.getBreadcrumbLogDirectory(context) + "/" + BacktraceBreadcrumbsLogger.breadcrumbLogFileName;
     }
 }

@@ -10,10 +10,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
@@ -137,9 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void enableBreadcrumbsUserOnly(View view) {
-        Set<BacktraceBreadcrumbType> breadcrumbTypesToEnable = new HashSet<BacktraceBreadcrumbType>() {{
-            add(BacktraceBreadcrumbType.USER);
-        }};
+        EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
         backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }

@@ -13,12 +13,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 
@@ -32,10 +31,7 @@ import static junit.framework.TestCase.fail;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceBreadcrumbsTest {
     public Context context;
-    Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes = new HashSet<BacktraceBreadcrumbType>(){{
-        add(BacktraceBreadcrumbType.MANUAL);
-    }};
-
+    EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes = EnumSet.of(BacktraceBreadcrumbType.MANUAL);
     static {
         System.loadLibrary("backtrace-native");
     }
@@ -557,7 +553,7 @@ public class BacktraceBreadcrumbsTest {
     }
 
     public List<String> readBreadcrumbLogFile() throws IOException {
-        File breadcrumbLogFile = new File(BacktraceBreadcrumbs.getBreadcrumbLogPath(context));
+        File breadcrumbLogFile = new File(BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(context));
 
         List<String> breadcrumbLogFileData = new ArrayList<String>();
         FileInputStream inputStream = new FileInputStream(breadcrumbLogFile.getAbsolutePath());
