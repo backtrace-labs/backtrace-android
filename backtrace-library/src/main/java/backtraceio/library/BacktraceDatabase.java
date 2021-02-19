@@ -61,12 +61,12 @@ public class BacktraceDatabase implements Database {
      * @param url               url to Backtrace
      * @param databasePath      path to Backtrace-native database
      * @param handlerPath       path to error handler
-     * @param breadcrumbLogPath path to breadcrumb logs
      * @param attributeKeys     array of attribute keys
      * @param attributeValues   array of attribute values
+     * @param attachmentPaths   array of paths to file attachments
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
-    private native boolean initialize(String url, String databasePath, String handlerPath, String breadcrumbLogPath, String[] attributeKeys, String[] attributeValues);
+    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues, String[] attachmentPaths);
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -136,20 +136,22 @@ public class BacktraceDatabase implements Database {
         }
         // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
-        // Path to Breadcrumbs log file
-        String breadcrumbLogPath = BacktraceBreadcrumbs.getBreadcrumbLogPath(_applicationContext);
 
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
+
+        // Paths to Crashpad attachments
+        String[] attachmentPaths = new String[] {BacktraceBreadcrumbs.getBreadcrumbLogPath(_applicationContext)};
+
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
                 minidumpSubmissionUrl,
                 databasePath,
                 handlerPath,
-                breadcrumbLogPath,
                 keys,
-                values
+                values,
+                attachmentPaths
         );
         return initialized;
     }
