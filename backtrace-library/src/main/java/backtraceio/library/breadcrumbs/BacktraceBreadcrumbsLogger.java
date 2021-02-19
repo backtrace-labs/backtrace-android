@@ -37,11 +37,16 @@ public class BacktraceBreadcrumbsLogger {
         message = message.substring(0, Math.min(message.length(), maxMessageSizeBytes));
 
         StringBuilder breadcrumb = new StringBuilder("\ntimestamp " + Long.toString(time));
-        breadcrumb.append(" id " + Long.toString(breadcrumbId));
-        breadcrumb.append(" level " + level.toString());
-        breadcrumb.append(" type " + type.toString());
-        breadcrumb.append(" attributes " + serializeAttributes(attributes));
-        breadcrumb.append(" message " + message.replace('\n', '_'));
+        breadcrumb.append(" id ");
+        breadcrumb.append(breadcrumbId);
+        breadcrumb.append(" level ");
+        breadcrumb.append(level.toString());
+        breadcrumb.append(" type ");
+        breadcrumb.append(type.toString());
+        breadcrumb.append(" attributes ");
+        breadcrumb.append(serializeAttributes(attributes));
+        breadcrumb.append(" message ");
+        breadcrumb.append(message.replace("\n", ""));
         breadcrumb.append("\n");
 
         breadcrumbId++;
@@ -63,14 +68,17 @@ public class BacktraceBreadcrumbsLogger {
                 // We don't want to break the attributes for parsing purposes, so we
                 // stop adding attributes once we are over length.
                 if (serializedAttributes.length() + key.length() + value.length() <= maxSerializedAttributeSizeBytes) {
-                    serializedAttributes.append(" attr " + key + " " + value + " ");
+                    serializedAttributes.append(" attr ");
+                    serializedAttributes.append(key);
+                    serializedAttributes.append(" ");
+                    serializedAttributes.append(value);
+                    serializedAttributes.append(" ");
                 } else {
                     BacktraceLogger.w(LOG_TAG, "Breadcrumb attributes truncated");
                     break;
                 }
             }
         }
-
         return serializedAttributes.toString();
     }
 
