@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,6 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
@@ -59,7 +59,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
@@ -81,7 +81,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
@@ -91,7 +91,7 @@ public class BacktraceBreadcrumbsTest {
             // We should still have a configuration breadcrumb
             breadcrumbLogFileData = readBreadcrumbLogFile();
             assertEquals(1, breadcrumbLogFileData.size());
-            parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(0));
+            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
 
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
 
@@ -112,7 +112,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
@@ -120,7 +120,7 @@ public class BacktraceBreadcrumbsTest {
             // We get a new breadcrumb because the configuration changed (breadcrumbs disabled)
             breadcrumbLogFileData = readBreadcrumbLogFile();
             assertEquals(3, breadcrumbLogFileData.size());
-            parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(2));
+            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(2));
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
 
             assertFalse(backtraceBreadcrumbs.addBreadcrumb("Test2"));
@@ -128,7 +128,7 @@ public class BacktraceBreadcrumbsTest {
             // Existing breadcrumbs should be there but no new ones
             breadcrumbLogFileData = readBreadcrumbLogFile();
             assertEquals(3, breadcrumbLogFileData.size());
-            parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(2));
+            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(2));
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
 
             // Now add new ones again
@@ -136,14 +136,14 @@ public class BacktraceBreadcrumbsTest {
             // New configuration breadcrumb because configuration changed (breadcrumbs enabled)
             breadcrumbLogFileData = readBreadcrumbLogFile();
             assertEquals(4, breadcrumbLogFileData.size());
-            parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(3));
+            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(3));
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test2"));
 
             breadcrumbLogFileData = readBreadcrumbLogFile();
             assertEquals(5, breadcrumbLogFileData.size());
-            parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(4));
+            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(4));
 
             assertEquals("Test2", parsedBreadcrumb.get("message"));
 
@@ -169,11 +169,11 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals("doopy", parsedBreadcrumb.get("floopy"));
-            assertEquals("flam", parsedBreadcrumb.get("flim"));
+            assertEquals("doopy", parsedBreadcrumb.getJSONObject("attributes").get("floopy"));
+            assertEquals("flam", parsedBreadcrumb.getJSONObject("attributes").get("flim"));
 
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -193,7 +193,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
 
@@ -215,7 +215,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
 
@@ -243,12 +243,12 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals("do_o_py_", parsedBreadcrumb.get("_flo_opy"));
-            assertEquals("fl_am_", parsedBreadcrumb.get("fl_im"));
-            assertEquals("b_a_r_", parsedBreadcrumb.get("_foo_"));
+            assertEquals("do o py ", parsedBreadcrumb.getJSONObject("attributes").get(" flo opy"));
+            assertEquals("flam", parsedBreadcrumb.getJSONObject("attributes").get("flim"));
+            assertEquals("ba r ", parsedBreadcrumb.getJSONObject("attributes").get(" foo "));
 
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -267,7 +267,7 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals(expectedLongTestMessage, parsedBreadcrumb.get("message"));
 
@@ -293,11 +293,11 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals(expectedLongTestAttributeValue, parsedBreadcrumb.get(expectedLongTestAttributeKey));
-            assertNull(parsedBreadcrumb.get(reasonableLengthAttributeKey));
+            assertEquals(expectedLongTestAttributeValue, parsedBreadcrumb.getJSONObject("attributes").get(expectedLongTestAttributeKey));
+            assertFalse(parsedBreadcrumb.getJSONObject("attributes").has(reasonableLengthAttributeKey));
 
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -321,11 +321,11 @@ public class BacktraceBreadcrumbsTest {
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(1));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals(reasonableLengthAttributeValue, parsedBreadcrumb.get(reasonableLengthAttributeKey));
-            assertNull(parsedBreadcrumb.get(expectedLongTestAttributeKey));
+            assertEquals(reasonableLengthAttributeValue, parsedBreadcrumb.getJSONObject("attributes").get(reasonableLengthAttributeKey));
+            assertFalse(parsedBreadcrumb.getJSONObject("attributes").has(expectedLongTestAttributeKey));
 
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -334,7 +334,7 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testQueueFileShouldNotRollover() {
-        int numIterations = 500;
+        int numIterations = 450;
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
@@ -351,21 +351,21 @@ public class BacktraceBreadcrumbsTest {
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
 
             // First breadcrumb is configuration breadcrumb, it should be valid
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(0));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
-            assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) == 0);
+            assertTrue(((int) parsedBreadcrumb.get("id")) == 0);
 
             // We start from the second breadcrumb
             for (int i = 1; i < breadcrumbLogFileData.size(); i++) {
-                parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
-                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
                 assertEquals("manual", parsedBreadcrumb.get("type"));
                 assertEquals("info", parsedBreadcrumb.get("level"));
-                // Timestamp should be convertible to a number
-                Long.parseLong(parsedBreadcrumb.get("timestamp"));
-                // Id should be convertible to a number
-                Integer.parseInt(parsedBreadcrumb.get("id"));
+                // Timestamp should be convertible to a long
+                assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
+                // Id should be convertible to an int
+                assertTrue(parsedBreadcrumb.get("id") instanceof Integer);
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -392,15 +392,15 @@ public class BacktraceBreadcrumbsTest {
 
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
             for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
-                Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
-                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
                 assertEquals("manual", parsedBreadcrumb.get("type"));
                 assertEquals("info", parsedBreadcrumb.get("level"));
-                // Timestamp should be convertible to a number
-                Long.parseLong(parsedBreadcrumb.get("timestamp"));
-                // Id should be convertible to a number, and should skew larger (earlier breadcrumbs rolled off)
-                assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) > 450);
+                // Timestamp should be convertible to an int
+                assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
+                // Id should be convertible to an int
+                assertTrue(((int)parsedBreadcrumb.get("id")) > 450);
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -409,7 +409,7 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testQueueFileShouldNotRolloverCustomMax() {
-        int numIterations = 50;
+        int numIterations = 45;
 
         try {
             BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
@@ -426,21 +426,21 @@ public class BacktraceBreadcrumbsTest {
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
 
             // First breadcrumb is configuration breadcrumb, it should be valid
-            Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(0));
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
-            assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) == 0);
+            assertTrue(((int) parsedBreadcrumb.get("id")) == 0);
 
             // We start from the second breadcrumb
             for (int i = 1; i < breadcrumbLogFileData.size(); i++) {
-                parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
-                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
                 assertEquals("manual", parsedBreadcrumb.get("type"));
                 assertEquals("info", parsedBreadcrumb.get("level"));
-                // Timestamp should be convertible to a number
-                Long.parseLong(parsedBreadcrumb.get("timestamp"));
-                // Id should be convertible to a number
-                Integer.parseInt(parsedBreadcrumb.get("id"));
+                // Timestamp should be convertible to a long
+                assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
+                // Id should be convertible to an int
+                assertTrue(parsedBreadcrumb.get("id") instanceof Integer);
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -467,15 +467,15 @@ public class BacktraceBreadcrumbsTest {
 
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
             for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
-                Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
-                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
                 assertEquals("manual", parsedBreadcrumb.get("type"));
                 assertEquals("info", parsedBreadcrumb.get("level"));
-                // Timestamp should be convertible to a number
-                Long.parseLong(parsedBreadcrumb.get("timestamp"));
-                // Id should be convertible to a number, and should skew larger (earlier breadcrumbs rolled off)
-                assertTrue(Integer.parseInt(parsedBreadcrumb.get("id")) > 45);
+                // Timestamp should be convertible to a long
+                assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
+                // Id should be convertible to an int
+                assertTrue(((int)parsedBreadcrumb.get("id")) > 45);
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -505,15 +505,15 @@ public class BacktraceBreadcrumbsTest {
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
             for (int i = 1; i < breadcrumbLogFileData.size(); i++) {
-                Map<String, String> parsedBreadcrumb = parseBreadcrumb(breadcrumbLogFileData.get(i));
+                JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
-                assertNotNull(parsedBreadcrumb.get("From_Thread"));
+                assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
                 assertEquals("manual", parsedBreadcrumb.get("type"));
                 assertEquals("info", parsedBreadcrumb.get("level"));
-                // Timestamp should be convertible to a number
-                Long.parseLong(parsedBreadcrumb.get("timestamp"));
-                // Id should be convertible to a number
-                Integer.parseInt(parsedBreadcrumb.get("id"));
+                // Timestamp should be convertible to a long
+                assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
+                // Id should be convertible to an int
+                assertTrue(parsedBreadcrumb.get("id") instanceof Integer);
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -577,39 +577,6 @@ public class BacktraceBreadcrumbsTest {
         return breadcrumbLogFileData;
     }
 
-    // THIS IS NOT A FULLY ROBUST BREADCRUMB PARSER. THIS IS JUST FOR TESTING
-    public Map<String, String> parseBreadcrumb(String breadcrumb) {
-        Map<String, String> parsedBreadcrumb = new HashMap<String, String>();
-
-        String[] breadcrumbTokens = breadcrumb.split("[ ]+");
-        if (breadcrumbTokens.length == 0) {
-            return null;
-        }
-
-        for (int i = 0; i < breadcrumbTokens.length; i++) {
-            switch (breadcrumbTokens[i]) {
-                case "attributes":
-                    while (breadcrumbTokens[++i].equals("attr")) {
-                        parsedBreadcrumb.put(breadcrumbTokens[++i], breadcrumbTokens[++i]);
-                    }
-                case "message":
-                    String reconstructedMessage = "";
-                    for (i++; i < breadcrumbTokens.length; i++) {
-                        reconstructedMessage += breadcrumbTokens[i];
-                        if (i < breadcrumbTokens.length - 1) {
-                            reconstructedMessage += " ";
-                        }
-                    }
-                    parsedBreadcrumb.put("message", reconstructedMessage);
-                    break;
-                default:
-                    parsedBreadcrumb.put(breadcrumbTokens[i++], breadcrumbTokens[i]);
-            }
-        }
-
-        return parsedBreadcrumb;
-    }
-
     private final String longTestMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.\n" +
             "\n" +
             "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra diam sit amet. Ipsum dolor sit amet consectetur adipiscing elit duis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus. Faucibus interdum posuere lorem ipsum dolor. Aliquet risus feugiat in ante metus dictum at. Pretium aenean pharetra magna ac placerat vestibulum lectus mauris ultrices. Enim nulla aliquet porttitor lacus luctus accumsan. Diam ut venenatis tellus in metus. Facilisi nullam vehicula ipsum a arcu cursus.\n" +
@@ -622,9 +589,9 @@ public class BacktraceBreadcrumbsTest {
 
     private final String longTestAttributeValue = "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio";
 
-    private final String expectedLongTestAttributeKey = "Lorem_ipsum_dolor_sit_amet,_consectetur_adipiscing_elit,_sed_do_eiusmod_tempor_incididunt_ut_labore_et_dolore_magna_aliqua._Ipsum_consequat_nisl_vel_pretium_lectus_quam_id._Velit_dignissim_sodales_ut_eu_sem_integer_vitae_justo._Cursus_euismod_quis_viverra_nibh_cras_pulvinar._Pellentesque_adipiscing_commodo_elit_at_imperdiet._Pellentesque_eu_tincidunt_tortor_aliquam_nulla_facilisi_cras_fermentum._Elementum_facilisis_leo_vel_fringilla_est_ullamcorper_eget_nulla._Purus_sit_amet_luctus_venenatis._Non_consectetur_a_erat_nam_at._Pellentesque_id_nibh_tortor_id_aliquet_lectus_proin._Purus_semper_eget_duis_at_tellus._Sodales_ut_etiam_sit_amet_nisl_purus._Viverra_justo_nec_ultrices_dui_sapien_eget.";
+    private final String expectedLongTestAttributeKey = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.";
 
-    private final String expectedLongTestAttributeValue = "Et_ultrices_neque_ornare_aenean_euismod_elementum_nisi_quis_eleifend._Ut_diam_quam_nulla_porttitor._Vitae_elementum_curabitur_vitae_nunc_sed._Feugiat_sed_lectus_vestibulum_mattis_ullamcorper_velit_sed._A_diam_sollicitudin_tempor_id_eu_nisl_nunc._At_urna_condimentum_mattis_pellentesque_id._Arcu_odio";
+    private final String expectedLongTestAttributeValue = "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio";
 
     private final String reasonableLengthAttributeKey = "reasonablySizedKey";
 

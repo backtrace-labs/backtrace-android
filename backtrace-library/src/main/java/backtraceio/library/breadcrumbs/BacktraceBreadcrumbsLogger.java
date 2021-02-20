@@ -3,6 +3,8 @@ package backtraceio.library.breadcrumbs;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -31,9 +33,9 @@ public class BacktraceBreadcrumbsLogger {
     private final int maxMessageSizeBytes = 1024;
 
     /**
-     * We truncate serialized attribute strings longer than this
+     * We stop adding new attributes once we hit this limit
      */
-    private final int maxSerializedAttributeSizeBytes = 1024;
+    private final int maxAttributeSizeBytes = 1024;
 
     public BacktraceBreadcrumbsLogger(Context context, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
         File breadcrumbLogDir = new File(BacktraceBreadcrumbsLogger.getBreadcrumbLogDirectory(context));
@@ -48,50 +50,44 @@ public class BacktraceBreadcrumbsLogger {
 
         message = message.substring(0, Math.min(message.length(), maxMessageSizeBytes));
 
-        StringBuilder breadcrumb = new StringBuilder("\ntimestamp " + Long.toString(time));
-        breadcrumb.append(" id ");
-        breadcrumb.append(breadcrumbId);
-        breadcrumb.append(" level ");
-        breadcrumb.append(level.toString());
-        breadcrumb.append(" type ");
-        breadcrumb.append(type.toString());
-        breadcrumb.append(" attributes ");
-        breadcrumb.append(serializeAttributes(attributes));
-        breadcrumb.append(" message ");
-        breadcrumb.append(message.replace("\n", ""));
-        breadcrumb.append("\n");
+        JSONObject breadcrumb = new JSONObject();
+        try {
+            breadcrumb.put("timestamp", time);
+            breadcrumb.put("id", breadcrumbId);
+            breadcrumb.put("level", level.toString());
+            breadcrumb.put("type", type.toString());
+            breadcrumb.put("message", message);
+
+            if (attributes != null) {
+                JSONObject attributesJson = new JSONObject();
+                int currentAttributeSize = 0;
+                for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+                    currentAttributeSize += entry.getKey().length() + entry.getValue().toString().length();
+                    if (currentAttributeSize < maxAttributeSizeBytes) {
+                        attributesJson.put(entry.getKey(), entry.getValue());
+                    }
+                }
+                if (attributesJson.length() > 0) {
+                    breadcrumb.put("attributes", attributesJson);
+                }
+            }
+        } catch (Exception ex) {
+            BacktraceLogger.e(LOG_TAG, "Could not create the breadcrumb JSON");
+            return false;
+        }
+
+        // Guard the JSON with newlines so the parser can parse it from the QueueFile encoding
+        StringBuilder breadcrumbSerializedString = new StringBuilder("\n");
+        breadcrumbSerializedString.append(breadcrumb.toString().replace("\\n", ""));
+        breadcrumbSerializedString.append("\n");
 
         breadcrumbId++;
 
-        return backtraceQueueFileHelper.add(breadcrumb.toString().getBytes());
+        return backtraceQueueFileHelper.add(breadcrumbSerializedString.toString().getBytes());
     }
 
     public boolean clear() {
         return backtraceQueueFileHelper.clear();
-    }
-
-    private String serializeAttributes(final Map<String, Object> attributes) {
-        StringBuilder serializedAttributes = new StringBuilder();
-        if (attributes != null) {
-            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-                String key = entry.getKey().replace(' ', '_').replace('\n', '_');
-                String value = entry.getValue().toString().replace(' ', '_').replace('\n', '_');
-
-                // We don't want to break the attributes for parsing purposes, so we
-                // stop adding attributes once we are over length.
-                if (serializedAttributes.length() + key.length() + value.length() <= maxSerializedAttributeSizeBytes) {
-                    serializedAttributes.append(" attr ");
-                    serializedAttributes.append(key);
-                    serializedAttributes.append(" ");
-                    serializedAttributes.append(value);
-                    serializedAttributes.append(" ");
-                } else {
-                    BacktraceLogger.w(LOG_TAG, "Breadcrumb attributes truncated");
-                    break;
-                }
-            }
-        }
-        return serializedAttributes.toString();
     }
 
     public long getCurrentBreadcrumbId() {
