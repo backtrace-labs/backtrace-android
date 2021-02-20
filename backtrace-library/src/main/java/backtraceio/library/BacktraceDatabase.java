@@ -10,7 +10,6 @@ import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.base.BacktraceBase;
-import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbsLogger;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
