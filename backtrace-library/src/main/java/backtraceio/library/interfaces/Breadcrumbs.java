@@ -29,6 +29,27 @@ public interface Breadcrumbs {
                               EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable);
 
     /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context                   context of current state of the application
+     * @param maxBreadcrumbLogSizeBytes    breadcrumb log size limit in bytes, should be a power of 2
+     * @return true if we successfully enabled breadcrumbs
+     */
+    boolean enableBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes);
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
+     * @param maxBreadcrumbLogSizeBytes    breadcrumb log size limit in bytes, should be a power of 2
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     *          breadcrumbs will always be enabled
+     * @return true if we successfully enabled breadcrumbs
+     */
+    boolean enableBreadcrumbs(Context context,
+                              EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+                              int maxBreadcrumbLogSizeBytes);
+
+    /**
      * Disable logging of breadcrumbs and submission with crash reports
      */
     void disableBreadcrumbs();

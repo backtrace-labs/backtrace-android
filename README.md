@@ -4,12 +4,12 @@
 [![Build Status](https://travis-ci.org/backtrace-labs/backtrace-android.png?branch=master)](https://travis-ci.org/backtrace-labs/backtrace-android)
 <!--
 [![Backtrace@release](https://img.shields.io/badge/Backtrace%40master-2.0.5-blue.svg)](https://www.nuget.org/packages/Backtrace)
- [![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp) 
+ [![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp)
  -->
 
 <!--
 [![Backtrace@pre-release](https://img.shields.io/badge/Backtrace%40dev-2.0.6-blue.svg)](https://www.nuget.org/packages/Backtrace)
-[![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu/branch/dev?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp/branch/dev) 
+[![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu/branch/dev?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp/branch/dev)
 -->
 
 
@@ -52,9 +52,10 @@ catch (e: Exception) {
 4. [Installation](#installation)
 5. [Running sample application](#sample-app)
 6. [Using Backtrace library](#using-backtrace)
-7. [Working with NDK applications](#working_with_ndk)
-8. [Working with Proguard](#working_with_proguard)
-9. [Documentation](#documentation)
+7. [Breadcrumbs](#breadcrumbs)
+8. [Working with NDK applications](#working_with_ndk)
+9. [Working with Proguard](#working_with_proguard)
+10. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
@@ -65,11 +66,14 @@ catch (e: Exception) {
 * Supports detection of blocking the application's main thread (Application Not Responding).
 * Supports monitoring the blocking of manually created threads by providing watchdog.
 * Supports native (JNI/NDK) exceptions and crashes.
+* Supports Proguard obfuscated Crashes.
+* Supports Breadcrumbs.
 
 # Supported SDKs <a name="supported-sdks"></a>
-* Minimal SDK version 21 (Android 5.0)
+* Minimum SDK version 21 (Android 5.0)
 * Target SDK version 28 (Android 9.0)
-* Minimal NDK version 21
+* Minimum NDK version 20
+* Maximum NDK version 21
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>
 * Getting the status that the device is in power saving mode is available from API 21.
@@ -234,7 +238,7 @@ Java
 try {
     // throw exception here
 } catch (Exception e) {
-    BacktraceReport report = new BacktraceReport(e, 
+    BacktraceReport report = new BacktraceReport(e,
     new HashMap<String, Object>() {{
         put("key", "value");
     }}, new ArrayList<String>() {{
@@ -289,10 +293,10 @@ try {
 } catch (Exception exception) {
 
   backtraceClient.send(new BacktraceReport(exception));
-  
+
   // pass exception to send method
   backtraceClient.send(exception);
-  
+
   // pass your custom message to send method
   backtraceClient.send("Message");
 }
@@ -303,10 +307,10 @@ try {
     // throw exception here
 } catch (exception: Exception) {
   backtraceClient.send(BacktraceReport(exception));
-  
+
   // pass exception to send method
   backtraceClient.send(exception);
-  
+
   // pass your custom message to send method
   backtraceClient.send("Message");
 }
@@ -316,7 +320,7 @@ try {
 ## Attaching custom event handlers <a name="documentation-events"></a>
 
 All events are written in *listener* pattern. `BacktraceClient` allows you to attach your custom event handlers. For example, you can trigger actions before the `send` method:
- 
+
  Java
 ```java
 backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
@@ -346,7 +350,7 @@ backtraceClient.setOnBeforeSendEventListener { data ->
 `BacktraceClient` also supports reporting of unhandled application exceptions not captured by your try-catch blocks. To enable reporting of unhandled exceptions:
 ```java
 BacktraceExceptionHandler.enable(backtraceClient);
-``` 
+```
 
 You can add custom map of attributes to `BacktraceExceptionHandler` which will be sent with each unhandled exception:
 
@@ -370,13 +374,12 @@ BacktraceLogger.setLevel(LogLevel.DEBUG);
 
 ## Custom client and report classes <a name="documentation-customization"></a>
 
-You can extend `BacktraceBase` to create your own Backtrace client and error report implementation. You can refer to `BacktraceClient` for implementation inspirations. 
+You can extend `BacktraceBase` to create your own Backtrace client and error report implementation. You can refer to `BacktraceClient` for implementation inspirations.
 
 ## Monitoring custom threads
 Library provides structures and methods to monitor the blocking of your own threads. It is the responsibility of the library user to check whether the thread is blocked and the user's thread should increment the counter.
 
-Java
-```
+```java
 BacktraceWatchdog watchdog = BacktraceWatchdog(backtraceClient); // Initialize BacktraceWatchdog
 watchdog.registerThread(customThread, timeout, delay); // Register custom thread
 
@@ -386,6 +389,77 @@ watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the ti
 // The following code should be executed inside the thread you want to monitor
 watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
 ```
+
+# Breadcrumbs <a name="breadcrumbs"></a>
+Breadcrumbs help you track events leading up to your crash, error, or other submitted object.
+
+When breadcrumbs are enabled, any captured breadcrumbs will automatically be attached as a file to your crash, error, or other submitted object (including native crashes) and displayed in the UI in the `Breadcrumbs` tab.
+
+## Enabling Breadcrumbs
+```java
+backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
+```
+Pass the Application Context to get automatic breadcrumbs for [ActivityLifecycleCallbacks](https://developer.android.com/reference/android/app/Application.ActivityLifecycleCallbacks)
+
+## Adding Breadcrumbs
+```java
+backtraceClient.addBreadcrumb("About to send Backtrace report", BacktraceBreadcrumbType.LOG);
+```
+
+## Automatic Breadcrumbs
+By default if you enable breadcrumbs we will register handlers to capture Android Broadcasts and other common system events, such as low memory warnings, battery warnings, screen orientation changes, ActivityLifecycleCallbacks, etc.
+
+You can limit the types of automatic events we capture for you by specifying which automatic breadcrumb types you want to enable, such as:
+```java
+EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
+backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
+```
+
+To disable all automatic breadcrumbs:
+```java
+EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.MANUAL);
+backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
+```
+
+NOTE: Breadcrumbs that you add using `addBreadcrumb` calls in your own code are always logged, regardless of their `BacktraceBreadcrumbType`, as long as breadcrumbs are enabled. The enabled breadcrumb types do not affect your own `addBreadcrumb` calls.
+
+## Adding Breadcrumbs from NDK
+To add breadcrumbs from NDK, first you must register your `BacktraceClient` Java class with the NDK.
+
+You can do this by creating a JNI function which passes the active `BacktraceClient` to the below function from `backtrace-android.h`, included in the `example-app` in this repo.
+
+JNI
+```cpp
+#include <jni.h>
+#include "backtrace-android.h"
+
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_backtraceio_MainActivity_registerNativeBreadcrumbs(JNIEnv *env, jobject thiz,
+        jobject backtrace_base) {
+    return Backtrace::InitializeNativeBreadcrumbs(env, backtrace_base);
+}
+```
+
+`backtrace-android.h`
+```cpp
+bool Backtrace::InitializeNativeBreadcrumbs(JNIEnv *env, jobject backtrace_base);
+```
+Once you have registered your `BacktraceClient` by passing it to `Backtrace::InitializeNativeBreadcrumbs`, you can add breadcrumbs from your NDK code by directly calling the below function from `backtrace-android.h`
+
+```cpp
+#include "backtrace-android.h"
+
+std::unordered_map<std::string, std::string> attributes;
+attributes["My Attribute"] = "Attribute Value";
+bool success = Backtrace::AddBreadcrumb(env,
+                                    "My Native Breadcrumb",
+                                    &attributes,
+                                    Backtrace::BreadcrumbType::USER,
+                                    Backtrace::BreadcrumbLevel::ERROR);
+```
+
+## Breadcrumbs Best Practices
+- Don't make calls to `addBreadcrumb` from performance-critical code paths.
 
 # Working with NDK applications <a name="working_with_ndk"></a>
 
@@ -433,13 +507,13 @@ final Map<String, Object> attributes = new HashMap<String, Object>() {{
 ##### 4. Upload your Proguard mapping file with the UUID from the above step to Backtrace
 
 Currently we don't have a way to upload the Proguard mapping file from the UI. You will need to use a tool such as `curl` or Postman to upload the Proguard mapping file to Backtrace.
-To do so, please construct an HTTP POST request with the following parameters, and submit the mapping file as the request body: 
+To do so, please construct an HTTP POST request with the following parameters, and submit the mapping file as the request body:
 `https://<Universe Name>.sp.backtrace.io:6098/post?format=proguard&token=<Symbol Upload Token>&universe=<Universe Name>&project=<Project Name>&symbolication_id=<symbolication_id from above>`
 
-##### 5. Start sending Proguard obfuscated crashes! 
+##### 5. Start sending Proguard obfuscated crashes!
 If the symbolication_id from the submitted crash matches a symbolication_id of a submitted Proguard mapping file, it will attempt to use that mapping file to deobfuscate the symbols from the submitted crash.
 
-#### Important Note for Windows users: 
+#### Important Note for Windows users:
 Please ensure your Proguard mapping file has Unix line endings before submitting to Backtrace!
 
 # Documentation  <a name="documentation"></a>
@@ -464,18 +538,18 @@ Please ensure your Proguard mapping file has Unix line endings before submitting
 
 ## BacktraceDatabase  <a name="documentation-BacktraceDatabase"></a>
 
-**`BacktraceDatabase`** is a class that stores error report data in your local hard drive. If `DatabaseSettings` dones't contain a **valid** `DatabasePath` then `BacktraceDatabase` won't store error report data. 
+**`BacktraceDatabase`** is a class that stores error report data in your local hard drive. If `DatabaseSettings` dones't contain a **valid** `DatabasePath` then `BacktraceDatabase` won't store error report data.
 
-`BacktraceDatabase` stores error reports that were not sent successfully due to network outage or server unavailability. `BacktraceDatabase` periodically tries to resend reports 
-cached in the database.  In `BacktraceDatabaseSettings` you can set the maximum number of entries (`MaxRecordCount`) to be stored in the database. The database will retry sending 
-stored reports every `RetryInterval` seconds up to `RetryLimit` times, both customizable in the `BacktraceDatabaseSettings`. 
+`BacktraceDatabase` stores error reports that were not sent successfully due to network outage or server unavailability. `BacktraceDatabase` periodically tries to resend reports
+cached in the database.  In `BacktraceDatabaseSettings` you can set the maximum number of entries (`MaxRecordCount`) to be stored in the database. The database will retry sending
+stored reports every `RetryInterval` seconds up to `RetryLimit` times, both customizable in the `BacktraceDatabaseSettings`.
 
 `BacktraceDatabaseSettings` has the following properties:
 - `DatabasePath` - the local directory path where `BacktraceDatabase` stores error report data when reports fail to send
 - `MaxRecordCount` - Maximum number of stored reports in Database. If value is equal to `0`, then there is no limit.
 - `MaxDatabaseSize` - Maximum database size in MB. If value is equal to `0`, there is no limit.
 - `AutoSendMode` - if the value is `true`, `BacktraceDatabase` will automatically try to resend stored reports. Default is `false`.
-- `RetryBehavior` - 
+- `RetryBehavior` -
 	- `RetryBehavior.ByInterval` - Default. `BacktraceDatabase` will try to resend the reports every time interval specified by `RetryInterval`.
 	- `RetryBehavior.NoRetry` - Will not attempt to resend reports
 - `RetryInterval` - the time interval between retries, in seconds.

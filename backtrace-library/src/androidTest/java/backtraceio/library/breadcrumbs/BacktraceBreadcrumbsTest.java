@@ -371,8 +371,8 @@ public class BacktraceBreadcrumbsTest {
         cleanUp();
 
         try {
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath(), 6400);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(context, 6400);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -415,8 +415,8 @@ public class BacktraceBreadcrumbsTest {
         cleanUp();
 
         try {
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath(), 6400);
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
+            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(context, 6400);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
