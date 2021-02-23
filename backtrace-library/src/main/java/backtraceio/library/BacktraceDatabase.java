@@ -335,21 +335,35 @@ public class BacktraceDatabase implements Database {
         this.backtraceDatabaseContext.delete(record);
     }
 
+    @Override
     public boolean enableBreadcrumbs(Context context) {
         return backtraceBreadcrumbs.enableBreadcrumbs(context);
     }
 
+    @Override
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         return backtraceBreadcrumbs.enableBreadcrumbs(context, breadcrumbTypesToEnable);
     }
 
+    @Override
+    public boolean enableBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) {
+        return backtraceBreadcrumbs.enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
+        return backtraceBreadcrumbs.enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+    }
+
+    @Override
     public void disableBreadcrumbs() {
         if (backtraceBreadcrumbs != null) {
             backtraceBreadcrumbs.disableBreadcrumbs();
         }
     }
 
+    @Override
     public boolean clearBreadcrumbs() {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.clearBreadcrumbs();
@@ -357,6 +371,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message);
@@ -364,6 +379,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, level);
@@ -371,6 +387,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, attributes);
@@ -378,6 +395,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, attributes, level);
@@ -385,6 +403,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, type);
@@ -392,6 +411,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, type, level);
@@ -399,6 +419,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type);
@@ -406,6 +427,7 @@ public class BacktraceDatabase implements Database {
         return false;
     }
 
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         if (backtraceBreadcrumbs != null) {
             return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type, level);

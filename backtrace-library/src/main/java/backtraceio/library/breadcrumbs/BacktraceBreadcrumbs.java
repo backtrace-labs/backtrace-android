@@ -46,19 +46,12 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     private static final int DEFAULT_MAX_LOG_SIZE_BYTES = 64000;
 
-    private int maxBreadcrumbLogSizeBytes;
-
     String breadcrumbLogDirectory;
 
     final private static String breadcrumbLogFileName = "bt-breadcrumbs-0";
 
-    public BacktraceBreadcrumbs(String breadcrumbLogDirectory, int maxBreadcrumbLogSizeBytes) {
-        this.breadcrumbLogDirectory = breadcrumbLogDirectory;
-        this.maxBreadcrumbLogSizeBytes = maxBreadcrumbLogSizeBytes;
-    }
-
     public BacktraceBreadcrumbs(String breadcrumbLogDirectory) {
-        this(breadcrumbLogDirectory, DEFAULT_MAX_LOG_SIZE_BYTES);
+        this.breadcrumbLogDirectory = breadcrumbLogDirectory;
     }
 
     private void registerAutomaticBreadcrumbReceivers() {
@@ -87,29 +80,41 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
     }
 
-    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes) {
+    @Override
+    public boolean enableBreadcrumbs(Context context) {
+        return enableBreadcrumbs(context, BacktraceBreadcrumbType.ALL);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+        return enableBreadcrumbs(context, breadcrumbTypesToEnable, DEFAULT_MAX_LOG_SIZE_BYTES);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) {
+        return enableBreadcrumbs(context, BacktraceBreadcrumbType.ALL, maxBreadcrumbLogSizeBytes);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
         this.context = context;
         if (backtraceBreadcrumbsLogManager == null) {
             try {
                 backtraceBreadcrumbsLogManager = new BacktraceBreadcrumbsLogManager(
-                                    breadcrumbLogDirectory + "/" + breadcrumbLogFileName,
-                                    this.maxBreadcrumbLogSizeBytes);
+                        breadcrumbLogDirectory + "/" + breadcrumbLogFileName,
+                        maxBreadcrumbLogSizeBytes);
             } catch (Exception ex) {
                 BacktraceLogger.e(LOG_TAG, "Could not start the Breadcrumb logger due to: " + ex.getMessage());
                 return false;
             }
         }
 
-        this.enabledBreadcrumbTypes = enabledBreadcrumbTypes;
+        this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
         registerAutomaticBreadcrumbReceivers();
 
         // We should log all breadcrumb configuration changes in the breadcrumbs
         addConfigurationBreadcrumb();
         return true;
-    }
-
-    public boolean enableBreadcrumbs(Context context) {
-        return enableBreadcrumbs(context, BacktraceBreadcrumbType.ALL);
     }
 
     private void unregisterAutomaticBreadcrumbReceivers() {
@@ -131,6 +136,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
     }
 
+    @Override
     public void disableBreadcrumbs() {
         if (this.isBreadcrumbsEnabled()) {
             unregisterAutomaticBreadcrumbReceivers();
@@ -141,6 +147,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         addConfigurationBreadcrumb();
     }
 
+    @Override
     public boolean clearBreadcrumbs() {
         boolean success = backtraceBreadcrumbsLogManager.clear();
         // Make sure the configuration is always known
@@ -165,6 +172,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param message
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message) {
         return addBreadcrumb(message, null, BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO);
     }
@@ -175,6 +183,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param level
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
         return addBreadcrumb(message, null, BacktraceBreadcrumbType.MANUAL, level);
     }
@@ -185,6 +194,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param attributes
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
         return addBreadcrumb(message, attributes, BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO);
     }
@@ -196,6 +206,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param level
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
         return addBreadcrumb(message, attributes, BacktraceBreadcrumbType.MANUAL, level);
     }
@@ -206,6 +217,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param type
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
         return addBreadcrumb(message, null, type, BacktraceBreadcrumbLevel.INFO);
     }
@@ -217,6 +229,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param level
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         return addBreadcrumb(message, null, type, level);
     }
@@ -228,6 +241,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param type
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
         return addBreadcrumb(message, attributes, type, BacktraceBreadcrumbLevel.INFO);
     }
@@ -240,6 +254,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @param level
      * @return true if the breadcrumb was successfully added
      */
+    @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         if (this.isBreadcrumbsEnabled() && backtraceBreadcrumbsLogManager != null) {
             return backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
@@ -251,6 +266,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * If Breadcrumbs is currently enabled, process the BacktraceReport for sending the Breadcrumb logs
      * @param backtraceReport
      */
+    @Override
     public void processReportBreadcrumbs(BacktraceReport backtraceReport) {
         if (this.isBreadcrumbsEnabled() == false) {
             return;

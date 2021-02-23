@@ -33,8 +33,8 @@ Java_backtraceio_backtraceio_MainActivity_addNativeBreadcrumbUserError(JNIEnv *e
 
 JNIEXPORT jboolean JNICALL
 Java_backtraceio_backtraceio_MainActivity_registerNativeBreadcrumbs(JNIEnv *env, jobject thiz,
-        jobject backtrace_breadcrumbs) {
-    return Backtrace::InitializeNativeBreadcrumbs(env, backtrace_breadcrumbs);
+        jobject backtrace_base) {
+    return Backtrace::InitializeNativeBreadcrumbs(env, backtrace_base);
 }
 
 JNIEXPORT void JNICALL

@@ -9,8 +9,6 @@
 // for NDK applications using the `backtrace-android` crash-reporting
 // library
 
-////////////////// BEGIN API ///////////////////////
-
 namespace Backtrace {
     /**
      * @see: backtraceio.library.enums.BacktraceBreadcrumbType
@@ -34,6 +32,8 @@ namespace Backtrace {
         ERROR,
         FATAL
     };
+
+    ////////////////// BEGIN API ///////////////////////
 
     /**
      * Registers an object to handle future AddBreadcrumb requests. The object must implement
