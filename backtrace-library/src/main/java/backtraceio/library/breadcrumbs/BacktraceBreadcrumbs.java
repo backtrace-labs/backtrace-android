@@ -3,21 +3,14 @@ package backtraceio.library.breadcrumbs;
 import android.app.Application;
 import android.content.Context;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
-import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceBreadcrumbs implements Breadcrumbs {
@@ -45,9 +38,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     private BacktraceActivityLifecycleListener backtraceActivityLifecycleListener;
 
     /**
-     * The Backtrace Breadcrumbs logger instance
+     * The Backtrace Breadcrumbs log manager
      */
-    private BacktraceBreadcrumbsLogger backtraceBreadcrumbsLogger;
+    private BacktraceBreadcrumbsLogManager backtraceBreadcrumbsLogManager;
 
     private Context context;
 
@@ -55,13 +48,17 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     private int maxBreadcrumbLogSizeBytes;
 
-    public BacktraceBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) {
-        this.context = context;
+    String breadcrumbLogDirectory;
+
+    final private static String breadcrumbLogFileName = "bt-breadcrumbs-0";
+
+    public BacktraceBreadcrumbs(String breadcrumbLogDirectory, int maxBreadcrumbLogSizeBytes) {
+        this.breadcrumbLogDirectory = breadcrumbLogDirectory;
         this.maxBreadcrumbLogSizeBytes = maxBreadcrumbLogSizeBytes;
     }
 
-    public BacktraceBreadcrumbs(Context context) throws IOException, NoSuchMethodException {
-        this(context, DEFAULT_MAX_LOG_SIZE_BYTES);
+    public BacktraceBreadcrumbs(String breadcrumbLogDirectory) {
+        this(breadcrumbLogDirectory, DEFAULT_MAX_LOG_SIZE_BYTES);
     }
 
     private void registerAutomaticBreadcrumbReceivers() {
@@ -90,15 +87,13 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
     }
 
-    public boolean enableBreadcrumbs(EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes,
-                                  boolean isNewInstance,
-                                  BacktraceBase staleBreadcrumbLogSender) {
-        if (isNewInstance == true) {
-            handleExistingBreadcrumbLogFile(context, staleBreadcrumbLogSender);
-        }
-        if (backtraceBreadcrumbsLogger == null) {
+    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes) {
+        this.context = context;
+        if (backtraceBreadcrumbsLogManager == null) {
             try {
-                backtraceBreadcrumbsLogger = new BacktraceBreadcrumbsLogger(this.context, this.maxBreadcrumbLogSizeBytes);
+                backtraceBreadcrumbsLogManager = new BacktraceBreadcrumbsLogManager(
+                                    breadcrumbLogDirectory + "/" + breadcrumbLogFileName,
+                                    this.maxBreadcrumbLogSizeBytes);
             } catch (Exception ex) {
                 BacktraceLogger.e(LOG_TAG, "Could not start the Breadcrumb logger due to: " + ex.getMessage());
                 return false;
@@ -113,8 +108,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         return true;
     }
 
-    public boolean enableBreadcrumbs(boolean isNewInstance, BacktraceBase staleBreadcrumbLogSender) {
-        return enableBreadcrumbs(BacktraceBreadcrumbType.ALL, isNewInstance, staleBreadcrumbLogSender);
+    public boolean enableBreadcrumbs(Context context) {
+        return enableBreadcrumbs(context, BacktraceBreadcrumbType.ALL);
     }
 
     private void unregisterAutomaticBreadcrumbReceivers() {
@@ -147,13 +142,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     }
 
     public boolean clearBreadcrumbs() {
-        boolean success = backtraceBreadcrumbsLogger.clear();
+        boolean success = backtraceBreadcrumbsLogManager.clear();
         // Make sure the configuration is always known
         addConfigurationBreadcrumb();
         return success;
     }
-
-
 
     /**
      * Get the current breadcrumb ID (exclusive). This is useful when breadcrumbs are queued and
@@ -164,7 +157,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @return current breadcrumb ID (exclusive)
      */
     public long getCurrentBreadcrumbId() {
-        return backtraceBreadcrumbsLogger.getCurrentBreadcrumbId();
+        return backtraceBreadcrumbsLogManager.getCurrentBreadcrumbId();
     }
 
     /**
@@ -248,8 +241,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (this.isBreadcrumbsEnabled() && backtraceBreadcrumbsLogger != null) {
-            return backtraceBreadcrumbsLogger.addBreadcrumb(message, attributes, type, level);
+        if (this.isBreadcrumbsEnabled() && backtraceBreadcrumbsLogManager != null) {
+            return backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
         }
         return false;
     }
@@ -258,12 +251,12 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * If Breadcrumbs is currently enabled, process the BacktraceReport for sending the Breadcrumb logs
      * @param backtraceReport
      */
-    public void processBacktraceReport(BacktraceReport backtraceReport) {
+    public void processReportBreadcrumbs(BacktraceReport backtraceReport) {
         if (this.isBreadcrumbsEnabled() == false) {
             return;
         }
 
-        backtraceReport.attachmentPaths.add(BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(context));
+        backtraceReport.attachmentPaths.add(this.getBreadcrumbLogPath());
 
         long lastBreadcrumbId = this.getCurrentBreadcrumbId();
         backtraceReport.attributes.put("breadcrumbs.lastId", lastBreadcrumbId);
@@ -275,7 +268,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      */
     private boolean addConfigurationBreadcrumb()
     {
-        if (backtraceBreadcrumbsLogger == null) {
+        if (backtraceBreadcrumbsLogManager == null) {
             return false;
         }
 
@@ -293,42 +286,18 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
             attributes.put(enabledType.toString(), state);
         }
 
-        return backtraceBreadcrumbsLogger.addBreadcrumb("Breadcrumbs configuration",
+        return backtraceBreadcrumbsLogManager.addBreadcrumb("Breadcrumbs configuration",
                 attributes,
                 BacktraceBreadcrumbType.CONFIGURATION,
                 BacktraceBreadcrumbLevel.INFO);
     }
 
-    private void handleExistingBreadcrumbLogFile(Context context, BacktraceBase breadcrumbLogSender) {
-        if (context == null || breadcrumbLogSender == null) {
-            return;
-        }
-
-        final File breadcrumbLogFile = new File(BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(context));
-        final File breadcrumbTempLogFile = new File(BacktraceBreadcrumbsLogger.getBreadcrumbLogDirectory(context) + "/bt-stalecrumbs");
-        try {
-            if (breadcrumbLogFile.exists()) {
-                FileUtils.moveFile(breadcrumbLogFile, breadcrumbTempLogFile);
-                BacktraceReport staleBreadcrumbsReport = new BacktraceReport("Found breadcrumbs from a previous session");
-                staleBreadcrumbsReport.attachmentPaths.add(breadcrumbTempLogFile.getAbsolutePath());
-
-                OnServerResponseEventListener staleBreadcrumbSubmissionCompleteCallback = new OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        breadcrumbTempLogFile.delete();
-                    }
-                };
-
-                breadcrumbLogSender.send(staleBreadcrumbsReport, staleBreadcrumbSubmissionCompleteCallback);
-            }
-        } catch (Exception ex) {
-            BacktraceLogger.e(LOG_TAG, "Could not send previously existing breadcrumbs due to: " + ex.getMessage());
-            breadcrumbLogFile.delete();
-        }
-    }
-
     private boolean isBreadcrumbsEnabled()
     {
         return enabledBreadcrumbTypes != null && !enabledBreadcrumbTypes.isEmpty();
+    }
+
+    public String getBreadcrumbLogPath() {
+        return this.breadcrumbLogDirectory + "/" + this.breadcrumbLogFileName;
     }
 }
