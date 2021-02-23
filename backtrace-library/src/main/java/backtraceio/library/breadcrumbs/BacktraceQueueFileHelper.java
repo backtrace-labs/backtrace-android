@@ -29,8 +29,8 @@ public class BacktraceQueueFileHelper {
 
     private final Method usedBytes;
 
-    // Let our exceptions bubble all the way up to BacktraceBreadcrumbsLogger constructor
-    // We definitely cannot construct BacktraceBreadcrumbsLogger without an open file log
+    // Let our exceptions bubble all the way up to BacktraceBreadcrumbsLogManager constructor
+    // We definitely cannot construct BacktraceBreadcrumbsLogManager without an open file log
     public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
         breadcrumbStore = new QueueFile(new File(this.breadcrumbLogDirectory));
@@ -47,14 +47,6 @@ public class BacktraceQueueFileHelper {
         } else {
             this.maxQueueFileSizeBytes = maxQueueFileSizeBytes;
         }
-
-        Runtime.getRuntime().addShutdownHook(
-            new Thread() {
-                public void run() {
-                    shutdownHook();
-                }
-            }
-        );
     }
 
     public boolean add(byte[] bytes) {
@@ -92,19 +84,5 @@ public class BacktraceQueueFileHelper {
             return false;
         }
         return true;
-    }
-
-    public void shutdownHook() {
-        try {
-            breadcrumbStore.close();
-
-            File breadcrumbLogFile = new File(this.breadcrumbLogDirectory);
-            if (breadcrumbLogFile.exists()) {
-                breadcrumbLogFile.delete();
-            }
-        } catch (Exception ex) {
-            BacktraceLogger.e(LOG_TAG, "Exception: " + ex.getMessage() +
-                    "\nwhen trying to close the Breadcrumbs QueueFile");
-        }
     }
 }

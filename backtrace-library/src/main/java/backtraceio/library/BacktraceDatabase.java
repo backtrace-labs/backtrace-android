@@ -4,14 +4,17 @@ import android.content.Context;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.base.BacktraceBase;
-import backtraceio.library.breadcrumbs.BacktraceBreadcrumbsLogger;
+import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Api;
@@ -46,6 +49,7 @@ public class BacktraceDatabase implements Database {
     private DatabaseFileContext backtraceDatabaseFileContext;
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
+    private BacktraceBreadcrumbs backtraceBreadcrumbs;
 
     /**
      * Add attributes to native reports
@@ -113,6 +117,7 @@ public class BacktraceDatabase implements Database {
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
+        this.backtraceBreadcrumbs = new BacktraceBreadcrumbs(getDatabasePath());
     }
 
     private String getDatabasePath() {
@@ -142,7 +147,7 @@ public class BacktraceDatabase implements Database {
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
         // Paths to Crashpad attachments
-        String[] attachmentPaths = new String[] {BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(_applicationContext)};
+        String[] attachmentPaths = new String[] {this.backtraceBreadcrumbs.getBreadcrumbLogPath()};
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
@@ -328,6 +333,91 @@ public class BacktraceDatabase implements Database {
             return;
         }
         this.backtraceDatabaseContext.delete(record);
+    }
+
+    public boolean enableBreadcrumbs(Context context) {
+        return backtraceBreadcrumbs.enableBreadcrumbs(context);
+    }
+
+    public boolean enableBreadcrumbs(Context context,
+                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+        return backtraceBreadcrumbs.enableBreadcrumbs(context, breadcrumbTypesToEnable);
+    }
+
+    public void disableBreadcrumbs() {
+        if (backtraceBreadcrumbs != null) {
+            backtraceBreadcrumbs.disableBreadcrumbs();
+        }
+    }
+
+    public boolean clearBreadcrumbs() {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.clearBreadcrumbs();
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, level);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, level);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, type);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, type, level);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type);
+        }
+        return false;
+    }
+
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        if (backtraceBreadcrumbs != null) {
+            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type, level);
+        }
+        return false;
+    }
+
+    @Override
+    public void processReportBreadcrumbs(BacktraceReport report) {
+        if (backtraceBreadcrumbs != null) {
+            backtraceBreadcrumbs.processReportBreadcrumbs(report);
+        }
     }
 
     public int count() {

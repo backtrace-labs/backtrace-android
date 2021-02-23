@@ -14,13 +14,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -31,28 +28,28 @@ import static junit.framework.TestCase.fail;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceBreadcrumbsTest {
     public Context context;
-    EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes = EnumSet.of(BacktraceBreadcrumbType.MANUAL);
+    public BacktraceBreadcrumbs backtraceBreadcrumbs;
     static {
         System.loadLibrary("backtrace-native");
     }
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         this.context = InstrumentationRegistry.getContext();
+        
+        backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+        backtraceBreadcrumbs.enableBreadcrumbs(context);
     }
 
     @After
     public void cleanUp() {
-        File dir = new File(context.getFilesDir().getAbsolutePath() + "/breadcrumbs");
+        File dir = new File(context.getFilesDir().getAbsolutePath());
         deleteRecursive(dir);
     }
 
     @Test
     public void testAddBreadcrumb() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -62,7 +59,6 @@ public class BacktraceBreadcrumbsTest {
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -71,9 +67,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testClearBreadcrumbs() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -94,7 +87,6 @@ public class BacktraceBreadcrumbsTest {
             parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
 
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -103,9 +95,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testEnableBreadcrumbs() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -132,7 +121,7 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
 
             // Now add new ones again
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
+            backtraceBreadcrumbs.enableBreadcrumbs(context);
             // New configuration breadcrumb because configuration changed (breadcrumbs enabled)
             breadcrumbLogFileData = readBreadcrumbLogFile();
             assertEquals(4, breadcrumbLogFileData.size());
@@ -146,7 +135,6 @@ public class BacktraceBreadcrumbsTest {
             parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(4));
 
             assertEquals("Test2", parsedBreadcrumb.get("message"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -155,9 +143,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testAddBreadcrumbWithAttributes() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             Map<String, Object> attributes = new HashMap<String, Object>() {{
                 put("floopy", "doopy");
                 put("flim", "flam");
@@ -174,7 +159,6 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Test", parsedBreadcrumb.get("message"));
             assertEquals("doopy", parsedBreadcrumb.getJSONObject("attributes").get("floopy"));
             assertEquals("flam", parsedBreadcrumb.getJSONObject("attributes").get("flim"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -184,9 +168,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testSpaceInMessage() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             backtraceBreadcrumbs.addBreadcrumb("Testing 1 2 3");
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -196,7 +177,6 @@ public class BacktraceBreadcrumbsTest {
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -206,9 +186,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testNewlineInMessage() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -218,7 +195,6 @@ public class BacktraceBreadcrumbsTest {
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Testing 1 2 3", parsedBreadcrumb.get("message"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -228,9 +204,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testInvalidCharsInAttribute() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             Map<String, Object> attributes = new HashMap<String, Object>() {{
                 put(" flo opy", "do o py ");
                 put("fl\nim", "fl\nam\n");
@@ -249,7 +222,6 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("do o py ", parsedBreadcrumb.getJSONObject("attributes").get(" flo opy"));
             assertEquals("flam", parsedBreadcrumb.getJSONObject("attributes").get("flim"));
             assertEquals("ba r ", parsedBreadcrumb.getJSONObject("attributes").get(" foo "));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -258,9 +230,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testLongMessage() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             backtraceBreadcrumbs.addBreadcrumb(longTestMessage);
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -270,7 +239,6 @@ public class BacktraceBreadcrumbsTest {
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals(expectedLongTestMessage, parsedBreadcrumb.get("message"));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -279,9 +247,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testLongAttributesLongFirst() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {{
                 put(longTestAttributeKey, longTestAttributeValue);
                 put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
@@ -298,7 +263,6 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Test", parsedBreadcrumb.get("message"));
             assertEquals(expectedLongTestAttributeValue, parsedBreadcrumb.getJSONObject("attributes").get(expectedLongTestAttributeKey));
             assertFalse(parsedBreadcrumb.getJSONObject("attributes").has(reasonableLengthAttributeKey));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -307,9 +271,6 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testLongAttributesShortFirst() {
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {{
                 put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
                 put(longTestAttributeKey, longTestAttributeValue);
@@ -326,7 +287,6 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Test", parsedBreadcrumb.get("message"));
             assertEquals(reasonableLengthAttributeValue, parsedBreadcrumb.getJSONObject("attributes").get(reasonableLengthAttributeKey));
             assertFalse(parsedBreadcrumb.getJSONObject("attributes").has(expectedLongTestAttributeKey));
-
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -337,9 +297,6 @@ public class BacktraceBreadcrumbsTest {
         int numIterations = 450;
 
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
                 Map<String, Object> attributes = new HashMap<String, Object>() {{
@@ -367,6 +324,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to an int
                 assertTrue(parsedBreadcrumb.get("id") instanceof Integer);
             }
+
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -377,9 +335,6 @@ public class BacktraceBreadcrumbsTest {
         int numIterations = 1000;
 
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
                 Map<String, Object> attributes = new HashMap<String, Object>() {{
@@ -402,6 +357,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to an int
                 assertTrue(((int)parsedBreadcrumb.get("id")) > 450);
             }
+
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -410,10 +366,13 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testQueueFileShouldNotRolloverCustomMax() {
         int numIterations = 45;
+        // Cleanup after default BacktraceBreadcrumbs constructor
+        // Because we want to create our own instance with custom parameters
+        cleanUp();
 
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
+            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath(), 6400);
+            backtraceBreadcrumbs.enableBreadcrumbs(context);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -442,6 +401,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to an int
                 assertTrue(parsedBreadcrumb.get("id") instanceof Integer);
             }
+
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -450,10 +410,13 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testQueueFileRolloverCustomMax() {
         int numIterations = 100;
+        // Cleanup after default BacktraceBreadcrumbs constructor
+        // Because we want to create our own instance with custom parameters
+        cleanUp();
 
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context, 6400);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
+            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath(), 6400);
+            backtraceBreadcrumbs.enableBreadcrumbs(context);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
@@ -477,6 +440,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to an int
                 assertTrue(((int)parsedBreadcrumb.get("id")) > 45);
             }
+
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -489,9 +453,6 @@ public class BacktraceBreadcrumbsTest {
         Thread[] threads = new Thread[numThreads];
 
         try {
-            BacktraceBreadcrumbs backtraceBreadcrumbs = new BacktraceBreadcrumbs(context);
-            backtraceBreadcrumbs.enableBreadcrumbs(enabledBreadcrumbTypes, true, null);
-
             for (int i = 0; i < numThreads; i++) {
                 threads[i] = new Thread(new BreadcrumbLogger(backtraceBreadcrumbs, numIterationsPerThread));
                 threads[i].start();
@@ -515,6 +476,7 @@ public class BacktraceBreadcrumbsTest {
                 // Id should be convertible to an int
                 assertTrue(parsedBreadcrumb.get("id") instanceof Integer);
             }
+
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -553,7 +515,8 @@ public class BacktraceBreadcrumbsTest {
     }
 
     public List<String> readBreadcrumbLogFile() throws IOException {
-        File breadcrumbLogFile = new File(BacktraceBreadcrumbsLogger.getBreadcrumbLogPath(context));
+        BacktraceBreadcrumbs breadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+        File breadcrumbLogFile = new File(breadcrumbs.getBreadcrumbLogPath());
 
         List<String> breadcrumbLogFileData = new ArrayList<String>();
         FileInputStream inputStream = new FileInputStream(breadcrumbLogFile.getAbsolutePath());

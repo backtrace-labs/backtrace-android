@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNull;
 public class BacktraceClientBreadcrumbsTest {
     private Context context;
     private BacktraceCredentials credentials;
+    private BacktraceClient backtraceClient;
     private final String resultMessage = "From request handler";
 
     static
@@ -41,18 +42,20 @@ public class BacktraceClientBreadcrumbsTest {
     public void setUp() {
         context = InstrumentationRegistry.getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+
+        BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        backtraceClient = new BacktraceClient(context, credentials, database);
     }
 
     @After
     public void cleanUp() {
-        File dir = new File(context.getFilesDir().getAbsolutePath() + "/breadcrumbs");
+        File dir = new File(context.getFilesDir().getAbsolutePath());
         deleteRecursive(dir);
     }
 
     @Test
     public void sendBacktraceExceptionBreadcrumbs() {
         // GIVEN
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         backtraceClient.enableBreadcrumbs(context);
 
         final Waiter waiter = new Waiter();
@@ -100,7 +103,6 @@ public class BacktraceClientBreadcrumbsTest {
     @Test
     public void sendBacktraceExceptionBreadcrumbsAddBreadcrumb() {
         // GIVEN
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         backtraceClient.enableBreadcrumbs(context);
 
         final Waiter waiter = new Waiter();
@@ -150,8 +152,6 @@ public class BacktraceClientBreadcrumbsTest {
     @Test
     public void sendBacktraceExceptionNoBreadcrumbs() {
         // GIVEN
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override

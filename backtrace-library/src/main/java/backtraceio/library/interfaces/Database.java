@@ -8,7 +8,7 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
-public interface Database {
+public interface Database extends Breadcrumbs {
     /**
      * Start all database tasks - data storage, timers, file loading
      */
