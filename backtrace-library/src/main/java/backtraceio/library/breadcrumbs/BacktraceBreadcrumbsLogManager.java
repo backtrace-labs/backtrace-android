@@ -78,7 +78,11 @@ public class BacktraceBreadcrumbsLogManager {
     }
 
     public boolean clear() {
-        return backtraceQueueFileHelper.clear();
+        boolean success = backtraceQueueFileHelper.clear();
+        if (success) {
+            breadcrumbId = 0;
+        }
+        return success;
     }
 
     public long getCurrentBreadcrumbId() {
