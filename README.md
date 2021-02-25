@@ -66,7 +66,7 @@ catch (e: Exception) {
 * Supports detection of blocking the application's main thread (Application Not Responding).
 * Supports monitoring the blocking of manually created threads by providing watchdog.
 * Supports native (JNI/NDK) exceptions and crashes.
-* Supports Proguard obfuscated Crashes.
+* Supports Proguard obfuscated crashes.
 * Supports Breadcrumbs.
 
 # Supported SDKs <a name="supported-sdks"></a>
