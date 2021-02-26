@@ -251,13 +251,6 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Disable logging of breadcrumbs and submission with crash reports
-     */
-    public void disableBreadcrumbs() {
-        database.getBreadcrumbs().disableBreadcrumbs();
-    }
-
-    /**
      * Clear breadcrumb logs
      */
     public boolean clearBreadcrumbs() {

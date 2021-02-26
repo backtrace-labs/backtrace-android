@@ -50,9 +50,10 @@ public interface Breadcrumbs {
                               int maxBreadcrumbLogSizeBytes);
 
     /**
-     * Disable logging of breadcrumbs and submission with crash reports
+     * Gets the enabled breadcrumb types
+     * @return enabled breadcrumb types
      */
-    void disableBreadcrumbs();
+    EnumSet<BacktraceBreadcrumbType> getEnabledBreadcrumbTypes();
 
     /**
      * Clear breadcrumb logs

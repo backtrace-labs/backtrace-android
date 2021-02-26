@@ -76,17 +76,6 @@
         app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbs" />
 
     <Button
-        android:id="@+id/disableBreadcrumbs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Disable Breadcrumbs"
-        android:onClick="disableBreadcrumbs"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbsUserOnly" />
-
-    <Button
         android:id="@+id/sendReport"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -95,7 +84,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/disableBreadcrumbs" />
+        app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbsUserOnly" />
 
     <Button
         android:id="@+id/exit"

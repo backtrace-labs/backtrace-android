@@ -134,16 +134,10 @@ public class MainActivity extends AppCompatActivity {
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
-
     public void enableBreadcrumbsUserOnly(View view) {
         EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
         backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
-    }
-
-    public void disableBreadcrumbs(View view) {
-        backtraceClient.disableBreadcrumbs();
-        cleanupNativeBreadcrumbHandler();
     }
 
     public void sendReport(View view) {
@@ -152,10 +146,8 @@ public class MainActivity extends AppCompatActivity {
             put("Caller thread", id);
         }};
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
-
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();
-
         BacktraceReport report = new BacktraceReport("Test");
         backtraceClient.send(report);
     }
