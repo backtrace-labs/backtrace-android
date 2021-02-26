@@ -4,7 +4,6 @@ import android.content.Context;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.EnumSet;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,11 +12,10 @@ import java.util.concurrent.CountDownLatch;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
-import backtraceio.library.enums.BacktraceBreadcrumbLevel;
-import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.interfaces.DatabaseFileContext;
@@ -49,7 +47,7 @@ public class BacktraceDatabase implements Database {
     private DatabaseFileContext backtraceDatabaseFileContext;
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
-    private BacktraceBreadcrumbs backtraceBreadcrumbs;
+    private Breadcrumbs breadcrumbs;
 
     /**
      * Add attributes to native reports
@@ -117,7 +115,7 @@ public class BacktraceDatabase implements Database {
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
-        this.backtraceBreadcrumbs = new BacktraceBreadcrumbs(getDatabasePath());
+        this.breadcrumbs = new BacktraceBreadcrumbs(getDatabasePath());
     }
 
     private String getDatabasePath() {
@@ -147,7 +145,7 @@ public class BacktraceDatabase implements Database {
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
         // Paths to Crashpad attachments
-        String[] attachmentPaths = new String[] {this.backtraceBreadcrumbs.getBreadcrumbLogPath()};
+        String[] attachmentPaths = new String[] {this.breadcrumbs.getBreadcrumbLogPath()};
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
@@ -159,6 +157,11 @@ public class BacktraceDatabase implements Database {
                 attachmentPaths
         );
         return initialized;
+    }
+
+    @Override
+    public Breadcrumbs getBreadcrumbs() {
+        return this.breadcrumbs;
     }
 
     public void start() {
@@ -333,113 +336,6 @@ public class BacktraceDatabase implements Database {
             return;
         }
         this.backtraceDatabaseContext.delete(record);
-    }
-
-    @Override
-    public boolean enableBreadcrumbs(Context context) {
-        return backtraceBreadcrumbs.enableBreadcrumbs(context);
-    }
-
-    @Override
-    public boolean enableBreadcrumbs(Context context,
-                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
-        return backtraceBreadcrumbs.enableBreadcrumbs(context, breadcrumbTypesToEnable);
-    }
-
-    @Override
-    public boolean enableBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) {
-        return backtraceBreadcrumbs.enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
-    }
-
-    @Override
-    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
-        return backtraceBreadcrumbs.enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
-    }
-
-    @Override
-    public void disableBreadcrumbs() {
-        if (backtraceBreadcrumbs != null) {
-            backtraceBreadcrumbs.disableBreadcrumbs();
-        }
-    }
-
-    @Override
-    public boolean clearBreadcrumbs() {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.clearBreadcrumbs();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, level);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, attributes);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, level);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, type);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, type, level);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (backtraceBreadcrumbs != null) {
-            return backtraceBreadcrumbs.addBreadcrumb(message, attributes, type, level);
-        }
-        return false;
-    }
-
-    @Override
-    public void processReportBreadcrumbs(BacktraceReport report) {
-        if (backtraceBreadcrumbs != null) {
-            backtraceBreadcrumbs.processReportBreadcrumbs(report);
-        }
     }
 
     public int count() {

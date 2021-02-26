@@ -56,6 +56,7 @@ public interface Breadcrumbs {
 
     /**
      * Clear breadcrumb logs
+     * @return  true if log was successfully cleared
      */
     boolean clearBreadcrumbs();
 
@@ -130,7 +131,12 @@ public interface Breadcrumbs {
     /**
      * Process a Backtrace Report to add breadcrumbs, if breadcrumbs is enabled
      * @param report
-     * @return
      */
     void processReportBreadcrumbs(BacktraceReport report);
+
+    /**
+     * Get the location of the breadcrumb log
+     * @return  Location of the breadcrumb log
+     */
+    String getBreadcrumbLogPath();
 }

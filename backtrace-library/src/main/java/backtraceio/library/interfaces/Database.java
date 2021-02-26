@@ -8,7 +8,7 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
-public interface Database extends Breadcrumbs {
+public interface Database {
     /**
      * Start all database tasks - data storage, timers, file loading
      */
@@ -86,4 +86,11 @@ public interface Database extends Breadcrumbs {
      * @param credentials Backtrace credentials
      */
     Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);
+
+    /**
+     * Get the breadcrumbs implementation
+     *
+     * @return the breadcrumbs implementation for this Database, if any
+     */
+    Breadcrumbs getBreadcrumbs();
 }
