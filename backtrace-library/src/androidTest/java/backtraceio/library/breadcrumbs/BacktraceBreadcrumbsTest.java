@@ -95,6 +95,11 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testEnableBreadcrumbs() {
         try {
+            cleanUp();
+
+            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            assertTrue(backtraceBreadcrumbs.enableBreadcrumbs(context));
+
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
@@ -105,36 +110,6 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
-            backtraceBreadcrumbs.disableBreadcrumbs();
-            // We get a new breadcrumb because the configuration changed (breadcrumbs disabled)
-            breadcrumbLogFileData = readBreadcrumbLogFile();
-            assertEquals(3, breadcrumbLogFileData.size());
-            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(2));
-            assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
-
-            assertFalse(backtraceBreadcrumbs.addBreadcrumb("Test2"));
-
-            // Existing breadcrumbs should be there but no new ones
-            breadcrumbLogFileData = readBreadcrumbLogFile();
-            assertEquals(3, breadcrumbLogFileData.size());
-            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(2));
-            assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
-
-            // Now add new ones again
-            backtraceBreadcrumbs.enableBreadcrumbs(context);
-            // New configuration breadcrumb because configuration changed (breadcrumbs enabled)
-            breadcrumbLogFileData = readBreadcrumbLogFile();
-            assertEquals(4, breadcrumbLogFileData.size());
-            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(3));
-            assertEquals("Breadcrumbs configuration", parsedBreadcrumb.get("message"));
-
-            assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test2"));
-
-            breadcrumbLogFileData = readBreadcrumbLogFile();
-            assertEquals(5, breadcrumbLogFileData.size());
-            parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(4));
-
-            assertEquals("Test2", parsedBreadcrumb.get("message"));
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

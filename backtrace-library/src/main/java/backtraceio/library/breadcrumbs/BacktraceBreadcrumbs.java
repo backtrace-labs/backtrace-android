@@ -54,28 +54,50 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
     }
 
+    private void unregisterAutomaticBreadcrumbReceivers() {
+        // Unregister old receivers
+        if (backtraceBroadcastReceiver != null) {
+            BacktraceLogger.d(LOG_TAG, "Unregistering previous BacktraceBroadcastReceiver");
+            this.context.unregisterReceiver(backtraceBroadcastReceiver);
+            backtraceBroadcastReceiver = null;
+        }
+
+        if (backtraceComponentListener != null) {
+            BacktraceLogger.d(LOG_TAG, "Unregistering previous BacktraceComponentListener");
+            this.context.unregisterComponentCallbacks(backtraceComponentListener);
+            backtraceComponentListener = null;
+        }
+
+        if (backtraceActivityLifecycleListener != null) {
+            if (context instanceof Application) {
+                BacktraceLogger.d(LOG_TAG, "Unregistering previous BacktraceActivityLifecycleListener");
+                ((Application) context).unregisterActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
+                backtraceActivityLifecycleListener = null;
+            } else {
+                BacktraceLogger.e(LOG_TAG, "BacktraceActivityLifecycleListener registered with non-Activity context");
+            }
+        }
+    }
+
     private void registerAutomaticBreadcrumbReceivers() {
+        unregisterAutomaticBreadcrumbReceivers();
+
         if (enabledBreadcrumbTypes == null) {
+            BacktraceLogger.d(LOG_TAG, "No breadcrumbs are enabled, not registering any new breadcrumb receivers");
             return;
         }
 
-        if (backtraceBroadcastReceiver == null) {
-            backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
-            context.registerReceiver(backtraceBroadcastReceiver,
-                    backtraceBroadcastReceiver.getIntentFilter(enabledBreadcrumbTypes));
-        }
+        backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
+        context.registerReceiver(backtraceBroadcastReceiver,
+                backtraceBroadcastReceiver.getIntentFilter());
 
         if (enabledBreadcrumbTypes.contains(BacktraceBreadcrumbType.SYSTEM)) {
-            if (backtraceComponentListener == null) {
-                backtraceComponentListener = new BacktraceComponentListener(this);
-                context.registerComponentCallbacks(backtraceComponentListener);
-            }
+            backtraceComponentListener = new BacktraceComponentListener(this);
+            context.registerComponentCallbacks(backtraceComponentListener);
 
-            if (backtraceActivityLifecycleListener == null) {
+            if (context instanceof Application) {
                 backtraceActivityLifecycleListener = new BacktraceActivityLifecycleListener(this);
-                if (context instanceof Application) {
-                    ((Application) context).registerActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
-                }
+                ((Application) context).registerActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
             }
         }
     }
@@ -117,34 +139,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         return true;
     }
 
-    private void unregisterAutomaticBreadcrumbReceivers() {
-        if (backtraceBroadcastReceiver != null) {
-            this.context.unregisterReceiver(backtraceBroadcastReceiver);
-            backtraceBroadcastReceiver = null;
-        }
-
-        if (backtraceComponentListener != null) {
-            this.context.unregisterComponentCallbacks(backtraceComponentListener);
-            backtraceComponentListener = null;
-        }
-
-        if (backtraceActivityLifecycleListener != null) {
-            if (context instanceof Application) {
-                ((Application) context).unregisterActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
-            }
-            backtraceActivityLifecycleListener = null;
-        }
-    }
-
     @Override
-    public void disableBreadcrumbs() {
-        if (this.isBreadcrumbsEnabled()) {
-            unregisterAutomaticBreadcrumbReceivers();
-        }
-
-        // We should log all breadcrumb configuration changes in the breadcrumbs
-        enabledBreadcrumbTypes = BacktraceBreadcrumbType.NONE;
-        addConfigurationBreadcrumb();
+    public EnumSet<BacktraceBreadcrumbType> getEnabledBreadcrumbTypes() {
+        return this.enabledBreadcrumbTypes;
     }
 
     @Override
@@ -285,6 +282,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     private boolean addConfigurationBreadcrumb()
     {
         if (backtraceBreadcrumbsLogManager == null) {
+            BacktraceLogger.e(LOG_TAG, "Could not add configuration breadcrumb, BreadcrumbsLogManager is null");
             return false;
         }
 

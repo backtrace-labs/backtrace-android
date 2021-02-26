@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -49,8 +50,9 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
         backtraceBreadcrumbs.addBreadcrumb(action, attributes, BacktraceBreadcrumbType.SYSTEM);
     }
 
-    public IntentFilter getIntentFilter(Set<BacktraceBreadcrumbType> enabledBreadcrumbTypes) {
+    public IntentFilter getIntentFilter() {
         IntentFilter filter = new IntentFilter();
+        EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes = backtraceBreadcrumbs.getEnabledBreadcrumbTypes();
 
         if (enabledBreadcrumbTypes == null) {
             return filter;
