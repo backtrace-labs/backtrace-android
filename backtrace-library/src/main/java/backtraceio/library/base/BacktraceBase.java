@@ -206,7 +206,7 @@ public class BacktraceBase implements Client {
      * @return true if we successfully enabled breadcrumbs
      */
     public boolean enableBreadcrumbs(Context context) {
-        return database.enableBreadcrumbs(context);
+        return database.getBreadcrumbs().enableBreadcrumbs(context);
     }
 
     /**
@@ -219,7 +219,7 @@ public class BacktraceBase implements Client {
      */
     public boolean enableBreadcrumbs(Context context,
                                      int maxBreadcrumbLogSizeBytes) {
-        return database.enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
+        return database.getBreadcrumbs().enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
     }
 
     /**
@@ -232,7 +232,7 @@ public class BacktraceBase implements Client {
      */
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
-        return database.enableBreadcrumbs(context, breadcrumbTypesToEnable);
+        return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable);
     }
 
     /**
@@ -247,21 +247,21 @@ public class BacktraceBase implements Client {
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
                                      int maxBreadcrumbLogSizeBytes) {
-        return database.enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+        return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
     }
 
     /**
      * Disable logging of breadcrumbs and submission with crash reports
      */
     public void disableBreadcrumbs() {
-        database.disableBreadcrumbs();
+        database.getBreadcrumbs().disableBreadcrumbs();
     }
 
     /**
      * Clear breadcrumb logs
      */
     public boolean clearBreadcrumbs() {
-        return database.clearBreadcrumbs();
+        return database.getBreadcrumbs().clearBreadcrumbs();
     }
 
     /**
@@ -270,7 +270,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message) {
-        return database.addBreadcrumb(message);
+        return database.getBreadcrumbs().addBreadcrumb(message);
     }
 
     /**
@@ -280,7 +280,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
-        return database.addBreadcrumb(message, level);
+        return database.getBreadcrumbs().addBreadcrumb(message, level);
     }
 
     /**
@@ -290,7 +290,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
-        return database.addBreadcrumb(message, attributes);
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes);
     }
 
     /**
@@ -301,7 +301,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
-        return database.addBreadcrumb(message, attributes, level);
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes, level);
     }
 
     /**
@@ -311,7 +311,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
-        return database.addBreadcrumb(message, type);
+        return database.getBreadcrumbs().addBreadcrumb(message, type);
     }
 
     /**
@@ -322,7 +322,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        return database.addBreadcrumb(message, type, level);
+        return database.getBreadcrumbs().addBreadcrumb(message, type, level);
     }
 
     /**
@@ -333,7 +333,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
-        return database.addBreadcrumb(message, attributes, type);
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes, type);
     }
 
     /**
@@ -345,7 +345,7 @@ public class BacktraceBase implements Client {
      * @return              true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        return database.addBreadcrumb(message, attributes, type, level);
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
     }
 
     public void nativeCrash() {
@@ -373,7 +373,7 @@ public class BacktraceBase implements Client {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
-        this.database.processReportBreadcrumbs(report);
+        this.database.getBreadcrumbs().processReportBreadcrumbs(report);
 
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
         backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
