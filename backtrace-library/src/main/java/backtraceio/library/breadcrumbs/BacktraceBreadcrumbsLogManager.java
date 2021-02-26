@@ -11,8 +11,6 @@ import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceBreadcrumbsLogManager {
 
-    private String breadcrumbLogPath;
-
     private final String LOG_TAG = BacktraceBreadcrumbsLogManager.class.getSimpleName();
 
     private long breadcrumbId = 0;
@@ -30,8 +28,7 @@ public class BacktraceBreadcrumbsLogManager {
     private final int maxAttributeSizeBytes = 1024;
 
     public BacktraceBreadcrumbsLogManager(String breadcrumbLogPath, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
-        this.breadcrumbLogPath = breadcrumbLogPath;
-        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(this.breadcrumbLogPath, maxQueueFileSizeBytes);
+        this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(breadcrumbLogPath, maxQueueFileSizeBytes);
     }
 
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {

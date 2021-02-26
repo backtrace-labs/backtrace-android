@@ -23,19 +23,19 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         switch (level)
         {
             case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
-                return "TRIM_MEMORY_UI_HIDDEN";
+                return "TRIM MEMORY UI HIDDEN";
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
-                return "TRIM_MEMORY_RUNNING_MODERATE";
+                return "TRIM MEMORY RUNNING MODERATE";
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
-                return "TRIM_MEMORY_RUNNING_LOW";
+                return "TRIM MEMORY RUNNING LOW";
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
-                return "TRIM_MEMORY_RUNNING_CRITICAL";
+                return "TRIM MEMORY RUNNING CRITICAL";
             case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
-                return "TRIM_MEMORY_BACKGROUND";
+                return "TRIM MEMORY BACKGROUND";
             case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
-                return "TRIM_MEMORY_MODERATE";
+                return "TRIM MEMORY MODERATE";
             case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
-                return "TRIM_MEMORY_COMPLETE";
+                return "TRIM MEMORY COMPLETE";
             default:
                 return "Generic memory warning";
         }
@@ -87,7 +87,7 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         attributes.put("orientation", orientation);
         backtraceBreadcrumbs.addBreadcrumb("Configuration changed",
                                         attributes,
-                                        BacktraceBreadcrumbType.SYSTEM,
+                                        BacktraceBreadcrumbType.USER,
                                         BacktraceBreadcrumbLevel.INFO);
     }
 
