@@ -15,6 +15,7 @@ import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.BacktraceData;
@@ -366,7 +367,10 @@ public class BacktraceBase implements Client {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
-        this.database.getBreadcrumbs().processReportBreadcrumbs(report);
+        Breadcrumbs breadcrumbs = this.database.getBreadcrumbs();
+        if (breadcrumbs != null) {
+            breadcrumbs.processReportBreadcrumbs(report);
+        }
 
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
         backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
