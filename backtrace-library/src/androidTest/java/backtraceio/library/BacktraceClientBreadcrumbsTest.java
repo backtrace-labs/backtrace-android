@@ -93,7 +93,7 @@ public class BacktraceClientBreadcrumbsTest {
                         assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                         // We log one breadcrumb by default, the breadcrumb configuration
-                        assertEquals((long) 1,
+                        assertEquals(1L,
                                 backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                         waiter.resume();
@@ -152,7 +152,7 @@ public class BacktraceClientBreadcrumbsTest {
                             assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                             // After adding a new breadcrumb, we should have incremented the breadcrumbs.lastId
-                            assertEquals((long) 2,
+                            assertEquals(2L,
                                     backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
@@ -202,7 +202,7 @@ public class BacktraceClientBreadcrumbsTest {
                             assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                             // After adding new breadcrumbs, we should have incremented the breadcrumbs.lastId
-                            assertEquals((long) 3,
+                            assertEquals(3L,
                                     backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
@@ -240,7 +240,7 @@ public class BacktraceClientBreadcrumbsTest {
                             assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                             // Since we cleared, we should only have the configuration breadcrumb
-                            assertEquals((long) 1,
+                            assertEquals(1L,
                                     backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
