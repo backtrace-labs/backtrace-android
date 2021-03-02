@@ -49,6 +49,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.squareup:tape:1.2.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'net.jodah:concurrentunit:0.4.4'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

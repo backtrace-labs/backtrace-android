@@ -8,6 +8,8 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include <unordered_map>
+#include <libgen.h>
 
 #include "base/logging.h"
 #include "client/crashpad_client.h"
@@ -74,12 +76,12 @@ namespace /* anonymous */
         return m_pJniEnv;
     }
 
-
     bool InitializeImpl(jstring url,
                         jstring database_path,
                         jstring handler_path,
                         jobjectArray attributeKeys,
-                        jobjectArray attributeValues) {
+                        jobjectArray attributeValues,
+                        jobjectArray attachmentPaths = nullptr) {
         using namespace crashpad;
         // avoid multi initialization
         if (initialized) {
@@ -135,6 +137,32 @@ namespace /* anonymous */
         // path to crashpad database
         const char *filePath = env->GetStringUTFChars(database_path, 0);
         FilePath db(filePath);
+
+        // paths to file attachments
+        if (attachmentPaths != nullptr) {
+            jint attachmentsLength = env->GetArrayLength(attachmentPaths);
+            for (int attachmentIndex = 0; attachmentIndex < attachmentsLength; ++attachmentIndex) {
+                jstring jstringAttachmentPath = (jstring) env->GetObjectArrayElement(
+                        attachmentPaths,
+                        attachmentIndex);
+                jboolean isCopy;
+                const char *convertedAttachmentPath = (env)->GetStringUTFChars(
+                        jstringAttachmentPath, &isCopy);
+
+                if (!convertedAttachmentPath)
+                    continue;
+
+                std::string attachmentBaseName = basename(convertedAttachmentPath);
+
+                std::string breadcrumbAttachmentArgumentString("--attachment=");
+                breadcrumbAttachmentArgumentString += attachmentBaseName;
+                breadcrumbAttachmentArgumentString += "=";
+                breadcrumbAttachmentArgumentString += convertedAttachmentPath;
+                arguments.push_back(breadcrumbAttachmentArgumentString);
+
+                env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
+            }
+        }
 
         std::unique_ptr<CrashReportDatabase> database = CrashReportDatabase::Initialize(db);
         if (database == nullptr || database->GetSettings() == NULL) {
@@ -209,13 +237,15 @@ bool Initialize(jstring url,
                 jstring database_path,
                 jstring handler_path,
                 jobjectArray attributeKeys,
-                jobjectArray attributeValues) {
+                jobjectArray attributeValues,
+                jobjectArray attachmentPaths = nullptr) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
         initialized = InitializeImpl(url,
                                      database_path, handler_path,
-                                     attributeKeys, attributeValues);
+                                     attributeKeys, attributeValues,
+                                     attachmentPaths);
     });
     return initialized;
 }
@@ -227,8 +257,10 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jstring database_path,
                                                       jstring handler_path,
                                                       jobjectArray attributeKeys,
-                                                      jobjectArray attributeValues) {
-    return Initialize(url, database_path, handler_path, attributeKeys, attributeValues);
+                                                      jobjectArray attributeValues,
+                                                      jobjectArray attachmentPaths = nullptr) {
+    return Initialize(url, database_path, handler_path, attributeKeys,
+                      attributeValues, attachmentPaths);
 }
 
 

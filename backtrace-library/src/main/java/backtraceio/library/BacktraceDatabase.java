@@ -3,19 +3,19 @@ package backtraceio.library;
 import android.content.Context;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.interfaces.DatabaseFileContext;
@@ -47,6 +47,7 @@ public class BacktraceDatabase implements Database {
     private DatabaseFileContext backtraceDatabaseFileContext;
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
+    private Breadcrumbs breadcrumbs;
 
     /**
      * Add attributes to native reports
@@ -59,15 +60,15 @@ public class BacktraceDatabase implements Database {
     /**
      * Initialize Backtrace-native integration
      *
-     * @param url             url to Backtrace
-     * @param databasePath    path to Backtrace-native database
-     * @param handlerPath     path to error handler
-     * @param attributeKeys   array of attribute keys
-     * @param attributeValues array of attribute values
+     * @param url               url to Backtrace
+     * @param databasePath      path to Backtrace-native database
+     * @param handlerPath       path to error handler
+     * @param attributeKeys     array of attribute keys
+     * @param attributeValues   array of attribute values
+     * @param attachmentPaths   array of paths to file attachments
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
-    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues);
-
+    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues, String[] attachmentPaths);
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -114,6 +115,7 @@ public class BacktraceDatabase implements Database {
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
+        this.breadcrumbs = new BacktraceBreadcrumbs(getDatabasePath());
     }
 
     private String getDatabasePath() {
@@ -135,21 +137,31 @@ public class BacktraceDatabase implements Database {
         if (minidumpSubmissionUrl == null) {
             return false;
         }
-        // path to crashpad native handler
+        // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
 
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
+
+        // Paths to Crashpad attachments
+        String[] attachmentPaths = new String[] {this.breadcrumbs.getBreadcrumbLogPath()};
+
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
                 minidumpSubmissionUrl,
                 databasePath,
                 handlerPath,
                 keys,
-                values
+                values,
+                attachmentPaths
         );
         return initialized;
+    }
+
+    @Override
+    public Breadcrumbs getBreadcrumbs() {
+        return this.breadcrumbs;
     }
 
     public void start() {

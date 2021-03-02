@@ -3,21 +3,22 @@ package backtraceio.backtraceio;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceExceptionHandler;
@@ -67,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public native void cppCrash();
+
+    public native boolean registerNativeBreadcrumbs(BacktraceBase backtraceBase);
+    public native boolean addNativeBreadcrumb();
+    public native boolean addNativeBreadcrumbUserError();
+    public native void cleanupNativeBreadcrumbHandler();
 
     private ArrayList<String> equippedItems;
 
@@ -121,5 +127,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void anr(View view) throws InterruptedException {
         Thread.sleep(anrTimeout + 2000);
+    }
+
+    public void enableBreadcrumbs(View view) {
+        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
+        registerNativeBreadcrumbs(backtraceClient); // Order should not matter
+    }
+
+    public void enableBreadcrumbsUserOnly(View view) {
+        EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
+        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
+        registerNativeBreadcrumbs(backtraceClient); // Order should not matter
+    }
+
+    public void sendReport(View view) {
+        final long id = Thread.currentThread().getId();
+        Map<String, Object> attributes = new HashMap<String, Object>() {{
+            put("Caller thread", id);
+        }};
+        backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
+        addNativeBreadcrumb();
+        addNativeBreadcrumbUserError();
+        BacktraceReport report = new BacktraceReport("Test");
+        backtraceClient.send(report);
+    }
+
+    public void exit(View view) {
+        System.exit(0);
     }
 }
