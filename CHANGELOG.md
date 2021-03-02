@@ -1,4 +1,9 @@
 # Backtrace Android Release Notes
+
+## Version 3.2.0 - 02.03.20201
+- Added Breadcrumbs feature to give Backtrace users context leading up to a `BacktraceReport`
+- Improved support for Proguard
+
 ## Version 3.1.0 - 29.09.2020
 - Backtrace Android allows to capture native crashes from Android NDK code. To enable NDK crashes exception handler use `setupNativeIntegration` method and pass backtraceClient with credentials.
 
@@ -7,11 +12,11 @@
 ```
 
 ## Version 3.0.2 - 23.01.2020
-- Fixed checking internal path during filtering attachments 
+- Fixed checking internal path during filtering attachments
 
 ## Version 3.0.1 - 15.01.2020
 - Fixed setting custom global attributes on BacktraceClient
-- Added support for custom attributes to BacktraceExceptionHandler 
+- Added support for custom attributes to BacktraceExceptionHandler
 
 ## Version 3.0.0 - 03.12.2019
 - Added support for `submit.backtrace.io` urls
@@ -34,7 +39,7 @@
 - Moved event `OnServerResponseEventListener` to parameter of `send` method
 - Created dedicated thread to sending HTTP requests to server what caused the removal of AsyncTasks, speeding up the library and fixing errors related to creating threads when closing the application
 - Added `BacktraceLogger` to debug the flow of library code execution
-- Removed deprecated and unused code 
+- Removed deprecated and unused code
 
 ## Version 1.2.1 - 12.04.2019
 - Added check is temperature file is empty and remove print stacktrace
