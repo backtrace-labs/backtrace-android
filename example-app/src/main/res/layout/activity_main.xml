@@ -53,4 +53,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
 
+    <Button
+        android:id="@+id/enableBreadcrumbs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Breadcrumbs (All)"
+        android:onClick="enableBreadcrumbs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/anr" />
+
+    <Button
+        android:id="@+id/enableBreadcrumbsUserOnly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Breadcrumbs (User Only)"
+        android:onClick="enableBreadcrumbsUserOnly"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbs" />
+
+    <Button
+        android:id="@+id/sendReport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Report"
+        android:onClick="sendReport"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbsUserOnly" />
+
+    <Button
+        android:id="@+id/exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exit"
+        android:onClick="exit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendReport" />
+
 </android.support.constraint.ConstraintLayout>

@@ -4,27 +4,12 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import net.jodah.concurrentunit.Waiter;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import backtraceio.library.BacktraceClient;
-import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.events.RequestHandler;
-import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
-import backtraceio.library.models.database.BacktraceDatabaseRecord;
-import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 import static org.junit.Assert.assertEquals;

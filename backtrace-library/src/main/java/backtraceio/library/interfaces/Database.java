@@ -2,7 +2,6 @@ package backtraceio.library.interfaces;
 
 import java.util.Map;
 
-import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -87,4 +86,11 @@ public interface Database {
      * @param credentials Backtrace credentials
      */
     Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);
+
+    /**
+     * Get the breadcrumbs implementation
+     *
+     * @return the breadcrumbs implementation for this Database, if any
+     */
+    Breadcrumbs getBreadcrumbs();
 }

@@ -2,19 +2,22 @@ package backtraceio.library.base;
 
 import android.content.Context;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -198,10 +201,155 @@ public class BacktraceBase implements Client {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
 
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context   context of current state of the application
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(Context context) {
+        return database.getBreadcrumbs().enableBreadcrumbs(context);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context                   context of current state of the application
+     * @param maxBreadcrumbLogSizeBytes    breadcrumb log size limit in bytes, should be a power of 2
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     *          breadcrumbs will always be enabled
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(Context context,
+                                     int maxBreadcrumbLogSizeBytes) {
+        return database.getBreadcrumbs().enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     *          breadcrumbs will always be enabled
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(Context context,
+                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+        return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
+     * @param maxBreadcrumbLogSizeBytes    breadcrumb log size limit in bytes, should be a power of 2
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     *          breadcrumbs will always be enabled
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(Context context,
+                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+                                     int maxBreadcrumbLogSizeBytes) {
+        return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+    }
+
+    /**
+     * Clear breadcrumb logs
+     */
+    public boolean clearBreadcrumbs() {
+        return database.getBreadcrumbs().clearBreadcrumbs();
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message) {
+        return database.getBreadcrumbs().addBreadcrumb(message);
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and the desired level with the provided message string
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
+        return database.getBreadcrumbs().addBreadcrumb(message, level);
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes);
+    }
+
+    /**
+     * Add a breadcrumb of type "Manual" and the desired level with the provided message string and attributes
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes, level);
+    }
+
+    /**
+     * Add a breadcrumb of the desired type and level "Info" with the provided message string
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param type          broadly describes the category of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
+        return database.getBreadcrumbs().addBreadcrumb(message, type);
+    }
+
+    /**
+     * Add a breadcrumb of the desired level and type with the provided message string
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param type          broadly describes the category of this breadcrumb
+     * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        return database.getBreadcrumbs().addBreadcrumb(message, type, level);
+    }
+
+    /**
+     * Add a breadcrumb of the desired type and level "Info" with the provided message string and attributes
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param type          broadly describes the category of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes, type);
+    }
+
+    /**
+     * Add a breadcrumb of the desired level and type with the provided message string and attributes
+     * @param message       a message which describes this breadcrumb (1KB max)
+     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param type          broadly describes the category of this breadcrumb
+     * @param level         the severity level of this breadcrumb
+     * @return              true if the breadcrumb was successfully added
+     */
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+        return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
+    }
+
     public void nativeCrash() {
         crash();
     }
 
+    /**
+     * Force a native crash report and minidump submission
+     * @param message
+     */
     public native void dumpWithoutCrash(String message);
 
     /**
@@ -219,6 +367,11 @@ public class BacktraceBase implements Client {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
+        Breadcrumbs breadcrumbs = this.database.getBreadcrumbs();
+        if (breadcrumbs != null) {
+            breadcrumbs.processReportBreadcrumbs(report);
+        }
+
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
         backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
 
