@@ -423,10 +423,10 @@ backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), bre
 
 NOTE: Breadcrumbs that you add using `addBreadcrumb` calls in your own code are always logged, regardless of their `BacktraceBreadcrumbType`, as long as breadcrumbs are enabled. The enabled breadcrumb types do not affect your own `addBreadcrumb` calls.
 
-## Adding Breadcrumbs from NDK
+## Adding Breadcrumbs from NDK/C++
 To add breadcrumbs from NDK, first you must register your `BacktraceClient` Java class with the NDK.
 
-You can do this by creating a JNI function which passes the active `BacktraceClient` to the below function from `backtrace-android.h`, included in the `example-app` in this repo.
+You can do this by creating a JNI function which passes your active `BacktraceClient` to the `Backtrace::InitializeNativeBreadcrumbs` function from the Backtrace header, `backtrace-android.h`. `backtrace-android.h` is included in the `example-app` in this repo.
 
 JNI
 ```cpp
@@ -444,9 +444,10 @@ Java_backtraceio_backtraceio_MainActivity_registerNativeBreadcrumbs(JNIEnv *env,
 ```cpp
 bool Backtrace::InitializeNativeBreadcrumbs(JNIEnv *env, jobject backtrace_base);
 ```
-Once you have registered your `BacktraceClient` by passing it to `Backtrace::InitializeNativeBreadcrumbs`, you can add breadcrumbs from your NDK code by directly calling the below function from `backtrace-android.h`
+Once you have registered your `BacktraceClient` by passing it to `Backtrace::InitializeNativeBreadcrumbs`, you can add breadcrumbs from your NDK/C++ code by directly calling the below function from `backtrace-android.h`
 
 ```cpp
+#include <jni.h>
 #include "backtrace-android.h"
 
 std::unordered_map<std::string, std::string> attributes;
