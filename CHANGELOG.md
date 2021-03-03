@@ -1,6 +1,6 @@
 # Backtrace Android Release Notes
 
-## Version 3.2.0 - 02.03.20201
+## Version 3.2.0 - 02.03.2021
 - Added Breadcrumbs feature to give Backtrace users context leading up to a `BacktraceReport`
 - Improved support for Proguard
 
