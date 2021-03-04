@@ -72,7 +72,7 @@ catch (e: Exception) {
 # Supported SDKs <a name="supported-sdks"></a>
 * Minimum SDK version 21 (Android 5.0)
 * Target SDK version 28 (Android 9.0)
-* Minimum NDK version 20
+* Minimum NDK version 17c
 * Maximum NDK version 21
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>
@@ -83,7 +83,7 @@ catch (e: Exception) {
 * Gradle
 ```
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.1.0'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.2.0'
 }
 ```
 
