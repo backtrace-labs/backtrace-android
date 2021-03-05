@@ -21,6 +21,7 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
+import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 import static org.junit.Assert.assertEquals;
@@ -204,5 +205,12 @@ public class SettingAttributesTest {
         } catch (Exception exception) {
             Assert.fail(exception.getMessage());
         }
+    }
+
+    @Test
+    public void ensureClientCustomAttributesPassedToNewBacktraceAttributes() {
+        BacktraceClient client = new BacktraceClient(context, backtraceCredentials, clientAttributes);
+        BacktraceAttributes attributes = new BacktraceAttributes(context, null, clientAttributes);
+        assertEquals(clientAttributes.get("custom-client-attribute-id"), attributes.attributes.get("custom-client-attribute-id"));
     }
 }
