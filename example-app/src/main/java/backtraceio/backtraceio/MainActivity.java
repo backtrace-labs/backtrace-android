@@ -54,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
         settings.setAutoSendMode(true);
         settings.setRetryOrder(RetryOrder.Queue);
 
+        Map<String, Object> attributes = new HashMap<String, Object>() {{
+            put("custom.attribute", "My Custom Attribute");
+        }};
+
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
-        backtraceClient = new BacktraceClient(context, credentials, database);
+        backtraceClient = new BacktraceClient(context, credentials, database, attributes);
 
         BacktraceExceptionHandler.enable(backtraceClient);
         backtraceClient.send("test");

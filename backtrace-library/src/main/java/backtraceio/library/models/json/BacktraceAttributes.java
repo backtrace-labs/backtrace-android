@@ -48,8 +48,14 @@ public class BacktraceAttributes {
             clientAttributes) {
         this.context = context;
         if (report != null) {
-            this.convertAttributes(report, clientAttributes);
+            this.convertReportAttributes(report);
             this.setExceptionAttributes(report);
+        }
+        if (clientAttributes != null) {
+            this.convertClientAttributes(clientAttributes);
+        }
+        if (report != null && clientAttributes != null) {
+            BacktraceReport.concatAttributes(report, clientAttributes);
         }
         setAppInformation();
         setDeviceInformation();
@@ -152,13 +158,34 @@ public class BacktraceAttributes {
     }
 
     /**
+     * Divide client attributes into primitive and complex attributes and add to this object
+     *
+     * @param clientAttributes client's attributes
+     */
+    private void convertClientAttributes(Map<String, Object> clientAttributes) {
+        convertAttributes(clientAttributes);
+    }
+
+    /**
+     * Divide report attributes into primitive and complex attributes and add to this object
+     *
+     * @param report report to extract attributes from
+     */
+    private void convertReportAttributes(BacktraceReport report) {
+        Map<String, Object> attributes = BacktraceReport.concatAttributes(report, null);
+        convertAttributes(attributes);
+        // add exception information to Complex attributes.
+        if (report.exceptionTypeReport) {
+            this.complexAttributes.put("Exception properties", report.exception);
+        }
+    }
+
+    /**
      * Divide custom user attributes into primitive and complex attributes and add to this object
      *
-     * @param report           received report
-     * @param clientAttributes client's attributes (report and client)
+     * @param attributes client's attributes
      */
-    private void convertAttributes(BacktraceReport report, Map<String, Object> clientAttributes) {
-        Map<String, Object> attributes = BacktraceReport.concatAttributes(report, clientAttributes);
+    private void convertAttributes(Map<String, Object> attributes) {
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             Object value = entry.getValue();
             if (value == null) {
@@ -170,10 +197,6 @@ public class BacktraceAttributes {
             } else {
                 this.complexAttributes.put(entry.getKey(), value);
             }
-        }
-        // add exception information to Complex attributes.
-        if (report.exceptionTypeReport) {
-            this.complexAttributes.put("Exception properties", report.exception);
         }
     }
 }
