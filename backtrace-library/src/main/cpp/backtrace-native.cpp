@@ -97,6 +97,8 @@ namespace /* anonymous */
 
         std::map<std::string, std::string> attributes;
         attributes["format"] = "minidump";
+        // save native main thread id
+        attributes["thread.main"] = std::to_string(gettid());
 
         jint keyLength = env->GetArrayLength(attributeKeys);
         jint valueLength = env->GetArrayLength(attributeValues);
