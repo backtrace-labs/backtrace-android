@@ -3,7 +3,9 @@ package backtraceio.library;
 import android.content.Context;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -145,7 +147,13 @@ public class BacktraceDatabase implements Database {
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
         // Paths to Crashpad attachments
-        String[] attachmentPaths = new String[] {this.breadcrumbs.getBreadcrumbLogPath()};
+        List<String> attachmentPaths = new ArrayList<String>();
+        attachmentPaths.add(this.breadcrumbs.getBreadcrumbLogPath());
+        if (client.attachments != null) {
+            for (String path : client.attachments) {
+                attachmentPaths.add(path);
+            }
+        }
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
@@ -154,7 +162,7 @@ public class BacktraceDatabase implements Database {
                 handlerPath,
                 keys,
                 values,
-                attachmentPaths
+                attachmentPaths.toArray(new String[0])
         );
         return initialized;
     }
