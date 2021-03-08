@@ -31,6 +31,7 @@ static crashpad::CrashpadClient *client;
 // check if crashpad client is already initialized
 static std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
+static std::string thread_id;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -41,7 +42,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
         return JNI_ERR;
     }
     javaVm = jvm;
-
+    thread_id = std::to_string(gettid());
     return JNI_VERSION_1_4;
 }
 
@@ -97,6 +98,10 @@ namespace /* anonymous */
 
         std::map<std::string, std::string> attributes;
         attributes["format"] = "minidump";
+        // save native main thread id
+        if(!thread_id.empty()) {
+            attributes["thread.main"] = thread_id;
+        }
 
         jint keyLength = env->GetArrayLength(attributeKeys);
         jint valueLength = env->GetArrayLength(attributeValues);
