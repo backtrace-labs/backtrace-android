@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
@@ -37,7 +38,6 @@ public class BacktraceBase implements Client {
 
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
-
     public native void crash();
 
     /**
@@ -69,6 +69,11 @@ public class BacktraceBase implements Client {
     public final Map<String, Object> attributes;
 
     /**
+     * File attachments to attach to crashes and reports.
+     */
+    public final List<String> attachments;
+
+    /**
      * Event which will be executed before sending data to Backtrace API
      */
     private OnBeforeSendEventListener beforeSendEventListener = null;
@@ -93,10 +98,35 @@ public class BacktraceBase implements Client {
      *
      * @param context     context of current state of the application
      * @param credentials Backtrace credentials to access Backtrace API
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, List<String> attachments) {
+        this(context, credentials, (Database) null, attachments);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
      * @param attributes  additional information about current application
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
         this(context, credentials, (Database) null, attributes);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param attributes  additional information about current application
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes, List<String> attachments) {
+        this(context, credentials, (Database) null, attributes, attachments);
     }
 
     /**
@@ -116,10 +146,37 @@ public class BacktraceBase implements Client {
      * @param context          context of current state of the application
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, List<String> attachments) {
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings), attachments);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
      * @param attributes       additional information about current application
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
+     * @param attributes       additional information about current application
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes, List<String> attachments) {
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes, attachments);
     }
 
     /**
@@ -130,7 +187,20 @@ public class BacktraceBase implements Client {
      * @param database    Backtrace database
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database) {
-        this(context, credentials, database, null);
+        this(context, credentials, database, (Map<String, Object>) null);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, List<String> attachments) {
+        this(context, credentials, database, null, attachments);
     }
 
     /**
@@ -142,13 +212,29 @@ public class BacktraceBase implements Client {
      * @param attributes  additional information about current application
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes) {
+        this(context, credentials, database, attributes, null);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     * @param attributes  additional information about current application
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes, List<String> attachments) {
         this.context = context;
         this.credentials = credentials;
         this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
+        this.attachments = attachments;
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
     }
+
 
     /**
      * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
@@ -371,6 +457,7 @@ public class BacktraceBase implements Client {
         if (breadcrumbs != null) {
             breadcrumbs.processReportBreadcrumbs(report);
         }
+        addReportAttachments(report);
 
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
         backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
@@ -399,5 +486,13 @@ public class BacktraceBase implements Client {
                 }
             }
         };
+    }
+
+    private void addReportAttachments(BacktraceReport report) {
+        if (this.attachments != null) {
+            for (String path : this.attachments) {
+                report.attachmentPaths.add(path);
+            }
+        }
     }
 }

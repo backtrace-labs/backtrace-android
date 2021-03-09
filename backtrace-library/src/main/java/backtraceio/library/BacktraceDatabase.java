@@ -3,7 +3,9 @@ package backtraceio.library;
 import android.content.Context;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -144,8 +146,16 @@ public class BacktraceDatabase implements Database {
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
+        // Leave room for breadcrumbs attachment path too
+        String[] attachmentPaths = new String[client.attachments.size() + 1];
+
         // Paths to Crashpad attachments
-        String[] attachmentPaths = new String[] {this.breadcrumbs.getBreadcrumbLogPath()};
+        if (client.attachments != null) {
+            for (int i = 0; i < client.attachments.size(); i++) {
+                attachmentPaths[i] = client.attachments.get(i);
+            }
+        }
+        attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
@@ -222,7 +232,7 @@ public class BacktraceDatabase implements Database {
                 BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
                 while (record != null) {
                     final CountDownLatch threadWaiter = new CountDownLatch(1);
-                    BacktraceData backtraceData = record.getBacktraceData();
+                    BacktraceData backtraceData = record.getBacktraceData(_applicationContext);
                     if (backtraceData == null || backtraceData.report == null) {
                         BacktraceLogger.d(LOG_TAG, "Timer - backtrace data or report is null - " +
                                 "deleting record");
@@ -272,7 +282,7 @@ public class BacktraceDatabase implements Database {
 
         BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
         while (record != null) {
-            BacktraceData backtraceData = record.getBacktraceData();
+            BacktraceData backtraceData = record.getBacktraceData(this._applicationContext);
             this.delete(record);
             if (backtraceData != null) {
                 BacktraceApi.send(backtraceData, null);

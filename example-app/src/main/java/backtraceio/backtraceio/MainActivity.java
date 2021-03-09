@@ -3,15 +3,19 @@ package backtraceio.backtraceio;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
@@ -54,8 +58,22 @@ public class MainActivity extends AppCompatActivity {
         settings.setAutoSendMode(true);
         settings.setRetryOrder(RetryOrder.Queue);
 
+        Map<String, Object> attributes = new HashMap<String, Object>() {{
+            put("custom.attribute", "My Custom Attribute");
+        }};
+
+        // NOTE: your custom files may be deleted when you create a new BacktraceClient
+        // Ensure you don't create any files with data you want to keep until
+        // AFTER creating the BacktraceClient
+        final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+        List<String> attachments = new ArrayList<String>(){{
+            add(fileName);
+        }};
+
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
-        backtraceClient = new BacktraceClient(context, credentials, database);
+        backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
+
+        writeMyCustomFile(fileName);
 
         BacktraceExceptionHandler.enable(backtraceClient);
         backtraceClient.send("test");
@@ -150,6 +168,17 @@ public class MainActivity extends AppCompatActivity {
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");
         backtraceClient.send(report);
+    }
+
+    private void writeMyCustomFile(String filePath) {
+        String fileData = "My custom data\nMore of my data\nEnd of my data";
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(filePath));
+            outputStreamWriter.write(fileData);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+                Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
+        }
     }
 
     public void exit(View view) {

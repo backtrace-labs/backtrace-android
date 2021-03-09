@@ -1,5 +1,7 @@
 package backtraceio.library.models.database;
 
+import android.content.Context;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
@@ -106,8 +108,9 @@ public class BacktraceDatabaseRecord {
      * Get valid BacktraceData from current record
      *
      * @return valid BacktraceData object
+     * @param context
      */
-    public BacktraceData getBacktraceData() {
+    public BacktraceData getBacktraceData(Context context) {
         if (this.record != null) {
             return this.record;
         }
@@ -132,6 +135,8 @@ public class BacktraceDatabaseRecord {
             // diagnostic data to API
             diagnosticData.report = BacktraceSerializeHelper.fromJson(jsonReport,
                     BacktraceReport.class);
+            // Serialized data loses the context, give context again when deserializing
+            diagnosticData.context = context;
             return diagnosticData;
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception occurs on deserialization of diagnostic data", ex);
