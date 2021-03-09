@@ -28,12 +28,16 @@ public class BacktraceSerializeHelper {
      * @return serialized object in JSON string format
      */
     public static String toJson(Object object) {
-        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
+        Gson gson = buildGson();
         return gson.toJson(object);
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
-        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
+        Gson gson = buildGson();
         return gson.fromJson(json, type);
+    }
+
+    private static Gson buildGson() {
+        return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
     }
 }
