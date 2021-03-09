@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.database.RetryOrder;
@@ -21,6 +23,7 @@ import backtraceio.library.models.json.BacktraceReport;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -56,12 +59,48 @@ public class BacktraceDatabaseRecordTest {
         boolean validResult = record.valid();
         record.close();
 
-        BacktraceData loadedData = record.getBacktraceData();
+        BacktraceData loadedData = record.getBacktraceData(context);
 
         // THEN
         assertTrue(saveResult);
         assertTrue(validResult);
         assertEquals(data.report.message, loadedData.report.message);
+    }
+
+    @Test
+    public void saveAndGetRecordWithAttachments() {
+        // GIVEN
+        final String attachment0 = context.getFilesDir() + "/someFile.log";
+        final String attachment1 = context.getFilesDir() + "/someOtherFile.log";
+        List<String> attachments = new ArrayList<String>() {{
+            add(attachment0);
+            add(attachment1);
+        }};
+
+        try {
+            assertTrue(new File(attachment0).createNewFile());
+            assertTrue(new File(attachment1).createNewFile());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+
+        BacktraceReport report = new BacktraceReport(testMessage, attachments);
+        BacktraceData data = new BacktraceData(this.context, report, null);
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+
+        // WHEN
+        boolean saveResult = record.save();
+        boolean validResult = record.valid();
+        record.close();
+
+        BacktraceData loadedData = record.getBacktraceData(context);
+
+        // THEN
+        assertTrue(saveResult);
+        assertTrue(validResult);
+        assertEquals(data.report.message, loadedData.report.message);
+        assertTrue(loadedData.getAttachments().contains(attachment0));
+        assertTrue(loadedData.getAttachments().contains(attachment1));
     }
 
     @Test
@@ -130,7 +169,7 @@ public class BacktraceDatabaseRecordTest {
 
         // WHEN
         BacktraceDatabaseRecord recordFromFile = BacktraceDatabaseRecord.readFromFile(new File(record.getRecordPath()));
-        BacktraceData dataFromFile = recordFromFile.getBacktraceData();
+        BacktraceData dataFromFile = recordFromFile.getBacktraceData(context);
 
         // THEN
         assertEquals(data.report.message, dataFromFile.report.message);

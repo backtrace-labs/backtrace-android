@@ -230,7 +230,7 @@ public class BacktraceDatabase implements Database {
                 BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
                 while (record != null) {
                     final CountDownLatch threadWaiter = new CountDownLatch(1);
-                    BacktraceData backtraceData = record.getBacktraceData();
+                    BacktraceData backtraceData = record.getBacktraceData(_applicationContext);
                     if (backtraceData == null || backtraceData.report == null) {
                         BacktraceLogger.d(LOG_TAG, "Timer - backtrace data or report is null - " +
                                 "deleting record");
@@ -280,7 +280,7 @@ public class BacktraceDatabase implements Database {
 
         BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
         while (record != null) {
-            BacktraceData backtraceData = record.getBacktraceData();
+            BacktraceData backtraceData = record.getBacktraceData(this._applicationContext);
             this.delete(record);
             if (backtraceData != null) {
                 BacktraceApi.send(backtraceData, null);
