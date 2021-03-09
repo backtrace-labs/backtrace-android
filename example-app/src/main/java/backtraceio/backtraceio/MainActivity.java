@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         // NOTE: your custom files may be deleted when you create a new BacktraceClient
         // Ensure you don't create any files with data you want to keep until
-        // after creating the BacktraceClient
+        // AFTER creating the BacktraceClient
         final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
         List<String> attachments = new ArrayList<String>(){{
             add(fileName);
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         backtraceClient.send(report);
     }
 
-    public void writeMyCustomFile(String filePath) {
+    private void writeMyCustomFile(String filePath) {
         String fileData = "My custom data\nMore of my data\nEnd of my data";
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(filePath));

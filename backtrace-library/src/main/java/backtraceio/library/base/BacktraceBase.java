@@ -38,7 +38,6 @@ public class BacktraceBase implements Client {
 
     private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
-
     public native void crash();
 
     /**
@@ -458,7 +457,7 @@ public class BacktraceBase implements Client {
         if (breadcrumbs != null) {
             breadcrumbs.processReportBreadcrumbs(report);
         }
-        processReportAttachments(report);
+        addReportAttachments(report);
 
         BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
         backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
@@ -489,7 +488,7 @@ public class BacktraceBase implements Client {
         };
     }
 
-    private void processReportAttachments(BacktraceReport report) {
+    private void addReportAttachments(BacktraceReport report) {
         if (this.attachments != null) {
             for (String path : this.attachments) {
                 report.attachmentPaths.add(path);

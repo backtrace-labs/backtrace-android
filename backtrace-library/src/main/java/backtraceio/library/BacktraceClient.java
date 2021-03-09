@@ -2,6 +2,7 @@ package backtraceio.library;
 
 import android.content.Context;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -131,7 +132,7 @@ public class BacktraceClient extends BacktraceBase {
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            Database database) {
-        this(context, credentials, database, (Map<String, Object>) null);
+        this(context, credentials, database, new HashMap<String, Object>());
     }
 
     /**
