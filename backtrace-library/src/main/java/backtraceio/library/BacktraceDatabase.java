@@ -146,14 +146,16 @@ public class BacktraceDatabase implements Database {
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
+        // Leave room for breadcrumbs attachment path too
+        String[] attachmentPaths = new String[client.attachments.size() + 1];
+
         // Paths to Crashpad attachments
-        List<String> attachmentPaths = new ArrayList<String>();
-        attachmentPaths.add(this.breadcrumbs.getBreadcrumbLogPath());
         if (client.attachments != null) {
-            for (String path : client.attachments) {
-                attachmentPaths.add(path);
+            for (int i = 0; i < client.attachments.size(); i++) {
+                attachmentPaths[i] = client.attachments.get(i);
             }
         }
+        attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
         Boolean initialized = initialize(
@@ -162,7 +164,7 @@ public class BacktraceDatabase implements Database {
                 handlerPath,
                 keys,
                 values,
-                attachmentPaths.toArray(new String[0])
+                attachmentPaths
         );
         return initialized;
     }
