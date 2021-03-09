@@ -48,9 +48,9 @@ public class BacktraceDatabaseProguardTest {
         database.add(report, null);
 
         // THEN
-        assertEquals(report, database.get().iterator().next().getBacktraceData().report);
-        assertNull(database.get().iterator().next().getBacktraceData().symbolication);
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().report.message);
+        assertEquals(report, database.get().iterator().next().getBacktraceData(context).report);
+        assertNull(database.get().iterator().next().getBacktraceData(context).symbolication);
+        assertEquals(testMessage, database.get().iterator().next().getBacktraceData(context).report.message);
         assertEquals(1, database.count());
     }
 
@@ -66,9 +66,9 @@ public class BacktraceDatabaseProguardTest {
         database.add(report, null, true);
 
         // THEN
-        assertEquals(report, database.get().iterator().next().getBacktraceData().report);
-        assertEquals("proguard", database.get().iterator().next().getBacktraceData().symbolication);
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().report.message);
+        assertEquals(report, database.get().iterator().next().getBacktraceData(context).report);
+        assertEquals("proguard", database.get().iterator().next().getBacktraceData(context).symbolication);
+        assertEquals(testMessage, database.get().iterator().next().getBacktraceData(context).report.message);
         assertEquals(1, database.count());
     }
 }

@@ -2,6 +2,8 @@ package backtraceio.library;
 
 import android.content.Context;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.base.BacktraceBase;
@@ -29,7 +31,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials credentials to Backtrace API server
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials) {
-        this(context, credentials, (BacktraceDatabase) null, null);
+        this(context, credentials, (BacktraceDatabase) null);
     }
 
     /**
@@ -37,9 +39,35 @@ public class BacktraceClient extends BacktraceBase {
      *
      * @param context     application context
      * @param credentials credentials to Backtrace API server
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials, List<String> attachments) {
+        this(context, credentials, (BacktraceDatabase) null, attachments);
+    }
+
+    /**
+     * Initializing Backtrace client instance with BacktraceCredentials
+     *
+     * @param context     application context
+     * @param credentials credentials to Backtrace API server
+     * @param attributes  additional information about current application
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
         this(context, credentials, (BacktraceDatabase) null, attributes);
+    }
+
+    /**
+     * Initializing Backtrace client instance with BacktraceCredentials
+     *
+     * @param context     application context
+     * @param credentials credentials to Backtrace API server
+     * @param attributes  additional information about current application
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials, Map<String, Object> attributes, List<String> attachments) {
+        this(context, credentials, (BacktraceDatabase) null, attributes, attachments);
     }
 
     /**
@@ -60,10 +88,39 @@ public class BacktraceClient extends BacktraceBase {
      * @param context          context of current state of the application
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           BacktraceDatabaseSettings databaseSettings, List<String> attachments) {
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings), attachments);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
+     * @param attributes  additional information about current application
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context          context of current state of the application
+     * @param credentials      Backtrace credentials to access Backtrace API
+     * @param databaseSettings Backtrace database settings
+     * @param attributes  additional information about current application
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes,
+                           List<String> attachments) {
+        this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes, attachments);
     }
 
     /**
@@ -75,7 +132,7 @@ public class BacktraceClient extends BacktraceBase {
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            Database database) {
-        this(context, credentials, database, null);
+        this(context, credentials, database, new HashMap<String, Object>());
     }
 
     /**
@@ -84,10 +141,40 @@ public class BacktraceClient extends BacktraceBase {
      * @param context     context of current state of the application
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           Database database, List<String> attachments) {
+        this(context, credentials, database, null, attachments);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     * @param attributes  additional information about current application
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            Database database, Map<String, Object> attributes) {
-        super(context, credentials, database, attributes);
+        this(context, credentials, database, attributes, null);
+    }
+
+    /**
+     * Initialize new client instance with BacktraceCredentials
+     *
+     * @param context     context of current state of the application
+     * @param credentials Backtrace credentials to access Backtrace API
+     * @param database    Backtrace database
+     * @param attributes  additional information about current application
+     * @param attachments File attachment paths to consider for reports
+     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     */
+    public BacktraceClient(Context context, BacktraceCredentials credentials,
+                           Database database, Map<String, Object> attributes,
+                           List<String> attachments) {
+        super(context, credentials, database, attributes, attachments);
     }
 
     /**
