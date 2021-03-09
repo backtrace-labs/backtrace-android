@@ -33,6 +33,7 @@ public class BacktraceSerializeHelper {
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
-        return new Gson().fromJson(json, type);
+        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
+        return gson.fromJson(json, type);
     }
 }
