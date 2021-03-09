@@ -47,7 +47,6 @@ public class SettingAttributesTest {
         clientAttributes = new HashMap<>();
 
         clientAttributes.put(customClientAttributeKey, customClientAttributeValue);
-
     }
 
     @Test
@@ -209,8 +208,10 @@ public class SettingAttributesTest {
 
     @Test
     public void ensureClientCustomAttributesPassedToNewBacktraceAttributes() {
-        BacktraceClient client = new BacktraceClient(context, backtraceCredentials, clientAttributes);
         BacktraceAttributes attributes = new BacktraceAttributes(context, null, clientAttributes);
-        assertEquals(clientAttributes.get("custom-client-attribute-id"), attributes.attributes.get("custom-client-attribute-id"));
+        assertNotNull(clientAttributes.get("custom-client-attribute-id"));
+        assertNotNull(attributes.attributes.get("custom-client-attribute-id"));
+        assertEquals(customClientAttributeValue, clientAttributes.get("custom-client-attribute-id"));
+        assertEquals(customClientAttributeValue, attributes.attributes.get("custom-client-attribute-id"));
     }
 }
