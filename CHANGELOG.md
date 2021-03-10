@@ -1,5 +1,10 @@
 # Backtrace Android Release Notes
 
+## Version 3.2.1 - 09.03.2021
+- Native crashes now support custom attributes
+- Improved file attachment support for managed and native crashes
+- Fixed file attachments bug in BacktraceDatabaseRecord
+
 ## Version 3.2.0 - 02.03.2021
 - Added Breadcrumbs feature to give Backtrace users context leading up to a `BacktraceReport`
 - Improved support for Proguard
