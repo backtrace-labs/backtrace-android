@@ -2,6 +2,7 @@ package backtraceio.library.base;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -229,7 +230,7 @@ public class BacktraceBase implements Client {
         this.context = context;
         this.credentials = credentials;
         this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
-        this.attachments = attachments;
+        this.attachments = attachments != null ? attachments : new ArrayList<String>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();

@@ -89,7 +89,6 @@ namespace /* anonymous */
             return true;
         }
 
-
         JNIEnv *env = GetJniEnv();
         if (env == nullptr) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
@@ -159,11 +158,11 @@ namespace /* anonymous */
 
                 std::string attachmentBaseName = basename(convertedAttachmentPath);
 
-                std::string breadcrumbAttachmentArgumentString("--attachment=");
-                breadcrumbAttachmentArgumentString += attachmentBaseName;
-                breadcrumbAttachmentArgumentString += "=";
-                breadcrumbAttachmentArgumentString += convertedAttachmentPath;
-                arguments.push_back(breadcrumbAttachmentArgumentString);
+                std::string attachmentArgumentString("--attachment=");
+                attachmentArgumentString += attachmentBaseName;
+                attachmentArgumentString += "=";
+                attachmentArgumentString += convertedAttachmentPath;
+                arguments.push_back(attachmentArgumentString);
 
                 env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
             }
