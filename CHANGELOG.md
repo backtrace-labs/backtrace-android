@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 3.2.2 - 10.03.2021
+- Hotfix for crash when user enables native integration without file attachments
+
 ## Version 3.2.1 - 09.03.2021
 - Native crashes now support custom attributes
 - Improved file attachment support for managed and native crashes
