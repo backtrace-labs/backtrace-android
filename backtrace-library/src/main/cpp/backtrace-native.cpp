@@ -194,7 +194,7 @@ void Crash() {
     *(volatile int *) 0 = 0;
 }
 
-void DumpWithoutCrash(jstring message) {
+void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread) {
     crashpad::NativeCPUContext context;
     crashpad::CaptureContext(&context);
 
@@ -202,7 +202,7 @@ void DumpWithoutCrash(jstring message) {
     crashpad::SimpleStringDictionary *annotations = NULL;
     bool did_attach = false;
 
-    if (message != NULL) {
+    if (message != NULL || set_main_thread_as_faulting_thread == true) {
         JNIEnv *env = GetJniEnv();
         if (env == nullptr) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
@@ -215,14 +215,18 @@ void DumpWithoutCrash(jstring message) {
             annotations = new crashpad::SimpleStringDictionary();
             info->set_simple_annotations(annotations);
         }
-
-        // user can't override error.message - exception message that Crashpad/crash-reporting tool
-        // will set to tell user about error message. This code will set error.message only for single
-        // report and after creating a dump, method will clean up this attribute.
-        jboolean isCopy;
-        const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
-        annotations->SetKeyValue("error.message", rawMessage);
-        env->ReleaseStringUTFChars(message, rawMessage);
+        if(set_main_thread_as_faulting_thread == true) {
+            annotations->SetKeyValue("_mod_faulting_tid", thread_id);
+        }
+        if(message != NULL) {
+            // user can't override error.message - exception message that Crashpad/crash-reporting tool
+            // will set to tell user about error message. This code will set error.message only for single
+            // report and after creating a dump, method will clean up this attribute.
+            jboolean isCopy;
+            const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
+            annotations->SetKeyValue("error.message", rawMessage);
+            env->ReleaseStringUTFChars(message, rawMessage);
+        }
     }
     client->DumpWithoutCrash(&context);
 
@@ -305,8 +309,16 @@ Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thi
 }
 
 JNIEXPORT void JNICALL
-Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash(JNIEnv *env, jobject thiz,
-                                                             jstring message) {
-    DumpWithoutCrash(message);
+Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2(JNIEnv *env,
+                                                                                  jobject thiz,
+                                                                                  jstring message) {
+    DumpWithoutCrash(message, false);
+}
+JNIEXPORT void JNICALL
+Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2Z(JNIEnv *env,
+                                                                                   jobject thiz,
+                                                                                   jstring message,
+                                                                                   jboolean set_main_thread_as_faulting_thread) {
+    DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
 }
 }
