@@ -439,6 +439,8 @@ public class BacktraceBase implements Client {
      */
     public native void dumpWithoutCrash(String message);
 
+    public native void dumpWithoutCrash(String message, boolean setMainThreadAsFaultingThread);
+
     /**
      * Sending an exception to Backtrace API
      *
