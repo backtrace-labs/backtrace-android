@@ -32,6 +32,9 @@ set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashp
 # Crashpad Headers
 include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 
+# Bun Libraries
+add_subdirectory(libbun)
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -60,4 +63,5 @@ target_link_libraries( # Specifies the target library.
                         crashpad_client
                         crashpad_util
                         base
+			bun
         )
