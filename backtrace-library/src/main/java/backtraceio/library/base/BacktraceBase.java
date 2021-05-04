@@ -429,6 +429,15 @@ public class BacktraceBase implements Client {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
     }
 
+    /**
+     * Enable client-side callstack resolution
+     *
+     * @return true on success, otherwise returns false
+     */
+    public boolean enableClientSideUnwinding() {
+        return database.enableClientSideUnwinding();
+    }
+
     public void nativeCrash() {
         crash();
     }

@@ -93,4 +93,11 @@ public interface Database {
      * @return the breadcrumbs implementation for this Database, if any
      */
     Breadcrumbs getBreadcrumbs();
+
+    /**
+     * Enable client-side callstack resolution
+     *
+     * @return true on success, otherwise returns false
+     */
+    boolean enableClientSideUnwinding();
 }

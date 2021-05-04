@@ -62,15 +62,19 @@ public class BacktraceDatabase implements Database {
     /**
      * Initialize Backtrace-native integration
      *
-     * @param url               url to Backtrace
-     * @param databasePath      path to Backtrace-native database
-     * @param handlerPath       path to error handler
-     * @param attributeKeys     array of attribute keys
-     * @param attributeValues   array of attribute values
-     * @param attachmentPaths   array of paths to file attachments
+     * @param url                       url to Backtrace
+     * @param databasePath              path to Backtrace-native database
+     * @param handlerPath               path to error handler
+     * @param attributeKeys             array of attribute keys
+     * @param attributeValues           array of attribute values
+     * @param attachmentPaths           array of paths to file attachments
+     * @param enableClientSideUnwinding enable client side stack unwinding
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
-    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues, String[] attachmentPaths);
+    private native boolean initialize(String url, String databasePath, String handlerPath,
+                                      String[] attributeKeys, String[] attributeValues,
+                                      String[] attachmentPaths,
+                                      boolean enableClientSideUnwinding);
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -164,7 +168,8 @@ public class BacktraceDatabase implements Database {
                 handlerPath,
                 keys,
                 values,
-                attachmentPaths
+                attachmentPaths,
+                true
         );
         return initialized;
     }
@@ -406,4 +411,6 @@ public class BacktraceDatabase implements Database {
     public long getDatabaseSize() {
         return backtraceDatabaseContext.getDatabaseSize();
     }
+
+    public native boolean enableClientSideUnwinding();
 }

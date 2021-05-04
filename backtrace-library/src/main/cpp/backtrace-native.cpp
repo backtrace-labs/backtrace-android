@@ -17,6 +17,11 @@
 #include "client/crash_report_database.h"
 #include "client/settings.h"
 
+#include "bun/bun.h"
+#include "bun/stream.h"
+
+#include <sys/syscall.h>
+
 using namespace base;
 
 // supported JNI version
@@ -32,6 +37,21 @@ static crashpad::CrashpadClient *client;
 static std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
 static std::string thread_id;
+
+// bun handle
+bun_t *handle;
+
+char buf[65536];
+
+// bun signal handler
+static void bun_sighandler(int)
+{
+    void* buf;
+    size_t buf_size;
+    bun_unwind(handle, &buf, &buf_size);
+    crashpad::CrashpadInfo::GetCrashpadInfo()
+            ->AddUserDataMinidumpStream(BUN_STREAM_ID, buf, buf_size);
+}
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -82,7 +102,8 @@ namespace /* anonymous */
                         jstring handler_path,
                         jobjectArray attributeKeys,
                         jobjectArray attributeValues,
-                        jobjectArray attachmentPaths = nullptr) {
+                        jobjectArray attachmentPaths = nullptr,
+                        jboolean enableClientSideUnwinding = false) {
         using namespace crashpad;
         // avoid multi initialization
         if (initialized) {
@@ -246,14 +267,15 @@ bool Initialize(jstring url,
                 jstring handler_path,
                 jobjectArray attributeKeys,
                 jobjectArray attributeValues,
-                jobjectArray attachmentPaths = nullptr) {
+                jobjectArray attachmentPaths = nullptr,
+                jboolean enableClientSideUnwinding = false) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
         initialized = InitializeImpl(url,
                                      database_path, handler_path,
                                      attributeKeys, attributeValues,
-                                     attachmentPaths);
+                                     attachmentPaths, enableClientSideUnwinding);
     });
     return initialized;
 }
@@ -266,9 +288,10 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jstring handler_path,
                                                       jobjectArray attributeKeys,
                                                       jobjectArray attributeValues,
-                                                      jobjectArray attachmentPaths = nullptr) {
+                                                      jobjectArray attachmentPaths = nullptr,
+                                                      jboolean enableClientSideUnwinding = false) {
     return Initialize(url, database_path, handler_path, attributeKeys,
-                      attributeValues, attachmentPaths);
+                      attributeValues, attachmentPaths, enableClientSideUnwinding);
 }
 
 
@@ -320,5 +343,27 @@ Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_
                                                                                    jstring message,
                                                                                    jboolean set_main_thread_as_faulting_thread) {
     DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_BacktraceDatabase_enableClientSideUnwinding(JNIEnv *env, jobject thiz) {
+    if (!initialized) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Crashpad needs to be initialized to enable client-side unwinding");
+        return false;
+    }
+    bun_config cfg;
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.unwind_backend = BUN_LIBUNWINDSTACK;
+    cfg.buffer_size = 65536;
+    cfg.buffer = buf;
+    handle = bun_create(&cfg);
+    if (!bun_register_signal_handers(handle, &bun_sighandler)) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not register the bun signal handler");
+        return false;
+    }
+    return true;
 }
 }

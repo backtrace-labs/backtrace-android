@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
+
+        // Enable client-side callstack resolution
+        backtraceClient.enableClientSideUnwinding();
     }
 
     public native void cppCrash();
