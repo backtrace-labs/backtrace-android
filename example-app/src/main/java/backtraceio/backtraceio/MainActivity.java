@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         BacktraceCredentials credentials =
-                new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/post", "09caa94aa9c0639e937c522a3eeae2030c88c272e506eec62e65041501ce981a");
+                new BacktraceCredentials("<endpoint-url>", "<token>");
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
