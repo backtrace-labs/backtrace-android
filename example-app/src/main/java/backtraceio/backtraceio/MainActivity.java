@@ -25,6 +25,8 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -43,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BacktraceLogger.setLevel(LogLevel.ERROR);
         setContentView(R.layout.activity_main);
 
         BacktraceCredentials credentials =
-                new BacktraceCredentials("<endpoint-url>", "<token>");
+                new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/post", "09caa94aa9c0639e937c522a3eeae2030c88c272e506eec62e65041501ce981a");
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
+
         writeMyCustomFile(fileName);
 
         BacktraceExceptionHandler.enable(backtraceClient);
@@ -83,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
+
+        backtraceClient.setBatteryMonitoring(true);
     }
 
     public native void cppCrash();
@@ -183,5 +189,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void exit(View view) {
         System.exit(0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        backtraceClient.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        backtraceClient.onPause();
     }
 }

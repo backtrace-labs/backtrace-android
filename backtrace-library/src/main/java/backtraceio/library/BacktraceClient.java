@@ -1,6 +1,8 @@
 package backtraceio.library;
 
 import android.content.Context;
+import android.content.IntentFilter;
+import android.content.Intent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +15,7 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.watchdog.BacktraceANRWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
+import backtraceio.library.common.BatteryStateHelper;
 
 /**
  * Backtrace Java Android Client
@@ -23,6 +26,21 @@ public class BacktraceClient extends BacktraceBase {
      * Backtrace ANR watchdog instance
      */
     private BacktraceANRWatchdog anrWatchdog;
+
+    /**
+     * Backtrace Battery Helper
+     */
+     private BatteryStateHelper batteryStateHelper;
+
+    /**
+     * Filter for the batteryStateHelper
+     */
+    private IntentFilter ifilter;
+
+    /**
+     * Battery monitoring enabled
+     */
+    private boolean monitoringBattery = false;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -177,6 +195,26 @@ public class BacktraceClient extends BacktraceBase {
         super(context, credentials, database, attributes, attachments);
     }
 
+    public void setBatteryMonitoring(boolean state) {
+        monitoringBattery = state;
+        if (state) {
+                if (batteryStateHelper == null)
+                    batteryStateHelper = new BatteryStateHelper(context, database);
+                batteryStateHelper.enable();
+                if (ifilter == null) {
+                    ifilter = new IntentFilter();
+                    ifilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+                }
+                if (batteryStateHelper != null && ifilter != null) {
+                    context.registerReceiver(batteryStateHelper, ifilter);
+                }
+        } else {
+            if (batteryStateHelper != null)
+                batteryStateHelper.disable();
+                context.unregisterReceiver(batteryStateHelper);
+        }
+    }
+
     /**
      * Sending a message to Backtrace API
      *
@@ -290,6 +328,20 @@ public class BacktraceClient extends BacktraceBase {
     public void disableAnr() {
         if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
             this.anrWatchdog.stopMonitoringAnr();
+        }
+    }
+
+    public void onPause() {
+        if(monitoringBattery) {
+            if (batteryStateHelper != null)
+                context.unregisterReceiver(batteryStateHelper);
+        }
+    }
+
+    public void onResume() {
+        if(monitoringBattery) {
+            if (batteryStateHelper != null && ifilter != null)
+                context.registerReceiver(batteryStateHelper, ifilter);
         }
     }
 }

@@ -57,14 +57,13 @@ public class DeviceAttributesHelper {
         result.put("device.gps.enabled", getGpsStatus().toString());
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
         result.put("device.cpu.temperature", String.valueOf(getCpuTemperature()));
-        result.put("device.is_power_saving_mode", String.valueOf(isPowerSavingMode()));
+        //result.put("device.is_power_saving_mode", String.valueOf(isPowerSavingMode()));
         result.put("device.wifi.status", getWifiStatus().toString());
         result.put("system.memory.total", getMaxRamSize());
         result.put("system.memory.free", getDeviceFreeRam());
         result.put("system.memory.active", getDeviceActiveRam());
         result.put("app.storage_used", getAppUsedStorageSize());
-        result.put("battery.level", String.valueOf(getBatteryLevel()));
-        result.put("battery.state", getBatteryState().toString());
+        result.putAll(BatteryStateHelper.getValues());
         return result;
     }
 
@@ -187,6 +186,7 @@ public class DeviceAttributesHelper {
      * @return is power saving mode activated
      */
     // TODO: replace bool to enum
+    /*
     private boolean isPowerSavingMode() {
         if (Build.VERSION.SDK_INT < 21) {
             return false;
@@ -194,13 +194,15 @@ public class DeviceAttributesHelper {
         PowerManager powerManager = (PowerManager) this.context.getSystemService(Context
                 .POWER_SERVICE);
         return powerManager.isPowerSaveMode();
-    }
+    }*/
 
+    // Try removing this since it's not the correct way to do this
     /**
      * Get a battery level in float value (from 0.0 to 1.0) or -1 if error occurs
      *
      * @return battery level from 0.0 to 1.0 or -1 if error occurs
      */
+     /*
     private float getBatteryLevel() {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryStatus = this.context.registerReceiver(null, intentFilter);
@@ -212,13 +214,14 @@ public class DeviceAttributesHelper {
         int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
         return level / (float) scale;
-    }
+    }*
 
     /**
      * Get battery state
      *
      * @return battery state (full, charging, unplaggeed, unknown)
      */
+     /*
     private BatteryState getBatteryState() {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryStatus = context.registerReceiver(null, intentFilter);
@@ -239,7 +242,7 @@ public class DeviceAttributesHelper {
             default:
                 return BatteryState.UNKNOWN;
         }
-    }
+    }*/
 
     /**
      * Generate unique identifier to unambiguously identify the device

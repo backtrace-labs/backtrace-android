@@ -359,6 +359,26 @@ You can add custom map of attributes to `BacktraceExceptionHandler` which will b
 BacktraceExceptionHandler.setCustomAttributes(customAttributes);
 ```
 
+## Enabling Battery Monitoring
+The `BacktraceClient`can allow for that status of the battery info to be attached to exception and native crash reports.  The following information will be collected if enabled 
+- `battery.health` - Health status of the battery.
+- `battery.level` - Decimal value of the battery level percentage (0-1)
+- `battery.technology` - Type of battery in use
+- `battery.temperature` - Temperature of the battery in celsius
+- `battery.charging.state` - Charging state of the battery (i.e. Charging, Discharging, Full, etc.)
+- `battery.charging.source` - Source of the charging (i.e. USB, AC, etc.)
+
+To enable use the following
+```java
+backtraceClient.setBatteryMonitoring(true)
+```
+To disable the following should be called
+```java
+backtraceClient.setBatteryMonitoring(false)
+```
+
+If enabled the `backtraceClient.onPause` and `backtraceClient.onResume` methods should be called from the activity `onPause` and `onResume` methods respectivly.
+
 ## Enable library logger - debug mode
 `BacktraceLogger` is a class which helps with debugging and analysis code flow execution inside the library. Logger is a wrapper on Android `Log` class. `BacktraceLogger` supports 4 logging levels:
 - `DEBUG`
