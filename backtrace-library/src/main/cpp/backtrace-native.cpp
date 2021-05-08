@@ -40,7 +40,7 @@ static std::string thread_id;
 
 // bun handle
 bun_t *handle;
-
+// bun buffer
 char buf[65536];
 
 // bun signal handler
@@ -345,9 +345,7 @@ Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_
     DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
 }
 
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_backtraceio_library_BacktraceDatabase_enableClientSideUnwinding(JNIEnv *env, jobject thiz) {
+bool EnableClientSideUnwinding() {
     if (!initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Crashpad needs to be initialized to enable client-side unwinding");
@@ -365,5 +363,11 @@ Java_backtraceio_library_BacktraceDatabase_enableClientSideUnwinding(JNIEnv *env
         return false;
     }
     return true;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_BacktraceDatabase_enableClientSideUnwinding(JNIEnv *env, jobject thiz) {
+    return EnableClientSideUnwinding();
 }
 }
