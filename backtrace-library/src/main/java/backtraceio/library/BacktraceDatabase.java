@@ -212,8 +212,14 @@ public class BacktraceDatabase implements Database {
             public void run() {
                 String dateTimeNow = Calendar.getInstance().getTime().toString();
                 BacktraceLogger.d(LOG_TAG, "Timer - " + dateTimeNow);
-                if (backtraceDatabaseContext == null || backtraceDatabaseContext.isEmpty()) {
-                    BacktraceLogger.d(LOG_TAG, "Timer - Database context is null or empty: " +
+                if (backtraceDatabaseContext == null) {
+                    BacktraceLogger.w(LOG_TAG, "Timer - database context is null: " +
+                            dateTimeNow);
+                    return;
+                }
+
+                if(backtraceDatabaseContext.isEmpty()) {
+                    BacktraceLogger.d(LOG_TAG, "Timer - database is empty (no records): " +
                             dateTimeNow);
                     return;
                 }
