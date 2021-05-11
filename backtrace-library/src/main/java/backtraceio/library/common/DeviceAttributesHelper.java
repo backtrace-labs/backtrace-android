@@ -57,7 +57,7 @@ public class DeviceAttributesHelper {
         result.put("device.gps.enabled", getGpsStatus().toString());
         result.put("device.bluetooth_status", isBluetoothEnabled().toString());
         result.put("device.cpu.temperature", String.valueOf(getCpuTemperature()));
-        //result.put("device.is_power_saving_mode", String.valueOf(isPowerSavingMode()));
+        result.put("device.is_power_saving_mode", String.valueOf(isPowerSavingMode()));
         result.put("device.wifi.status", getWifiStatus().toString());
         result.put("system.memory.total", getMaxRamSize());
         result.put("system.memory.free", getDeviceFreeRam());
@@ -83,13 +83,21 @@ public class DeviceAttributesHelper {
      * @return location status (enabled/disabled)
      */
     private LocationStatus getLocationServiceStatus() {
-        int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure
-                        .LOCATION_MODE,
-                Settings.Secure.LOCATION_MODE_OFF);
-        if (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF) {
-            return LocationStatus.ENABLED;
+        if (Build.VERSION.SDK_INT < 28) {
+            int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure
+                            .LOCATION_MODE,
+                    Settings.Secure.LOCATION_MODE_OFF);
+            if (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF) {
+                return LocationStatus.ENABLED;
+            }
+            return LocationStatus.DISABLED;
+        } else {
+            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            if (lm.isLocationEnabled())
+                return LocationStatus.ENABLED;
+            else
+                return LocationStatus.DISABLED;
         }
-        return LocationStatus.DISABLED;
     }
 
     /**
@@ -186,7 +194,7 @@ public class DeviceAttributesHelper {
      * @return is power saving mode activated
      */
     // TODO: replace bool to enum
-    /*
+
     private boolean isPowerSavingMode() {
         if (Build.VERSION.SDK_INT < 21) {
             return false;
@@ -194,55 +202,7 @@ public class DeviceAttributesHelper {
         PowerManager powerManager = (PowerManager) this.context.getSystemService(Context
                 .POWER_SERVICE);
         return powerManager.isPowerSaveMode();
-    }*/
-
-    // Try removing this since it's not the correct way to do this
-    /**
-     * Get a battery level in float value (from 0.0 to 1.0) or -1 if error occurs
-     *
-     * @return battery level from 0.0 to 1.0 or -1 if error occurs
-     */
-     /*
-    private float getBatteryLevel() {
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = this.context.registerReceiver(null, intentFilter);
-        if (batteryStatus == null) {
-            return -1.0f;
-        }
-
-        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-        return level / (float) scale;
-    }*
-
-    /**
-     * Get battery state
-     *
-     * @return battery state (full, charging, unplaggeed, unknown)
-     */
-     /*
-    private BatteryState getBatteryState() {
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = context.registerReceiver(null, intentFilter);
-
-        if (batteryStatus == null) {
-            return BatteryState.UNKNOWN;
-        }
-
-        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-
-        switch (status) {
-            case BatteryManager.BATTERY_STATUS_FULL:
-                return BatteryState.FULL;
-            case BatteryManager.BATTERY_STATUS_CHARGING:
-                return BatteryState.CHARGING;
-            case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
-                return BatteryState.UNPLAGGED;
-            default:
-                return BatteryState.UNKNOWN;
-        }
-    }*/
+    }
 
     /**
      * Generate unique identifier to unambiguously identify the device
