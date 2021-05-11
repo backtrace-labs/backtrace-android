@@ -193,25 +193,14 @@ public class BacktraceClient extends BacktraceBase {
                            Database database, Map<String, Object> attributes,
                            List<String> attachments) {
         super(context, credentials, database, attributes, attachments);
+        batteryStateHelper = BatteryStateHelper.getInstance(context, database);
     }
 
-    public void setBatteryMonitoring(boolean state) {
-        monitoringBattery = state;
-        if (state) {
-                if (batteryStateHelper == null)
-                    batteryStateHelper = new BatteryStateHelper(context, database);
-                batteryStateHelper.enable();
-                if (ifilter == null) {
-                    ifilter = new IntentFilter();
-                    ifilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-                }
-                if (batteryStateHelper != null && ifilter != null) {
-                    context.registerReceiver(batteryStateHelper, ifilter);
-                }
+    public void setBatteryMonitoring(boolean enable) {
+        if (enable) {
+            batteryStateHelper.enable();
         } else {
-            if (batteryStateHelper != null)
-                batteryStateHelper.disable();
-                context.unregisterReceiver(batteryStateHelper);
+            batteryStateHelper.disable();
         }
     }
 
@@ -328,20 +317,6 @@ public class BacktraceClient extends BacktraceBase {
     public void disableAnr() {
         if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
             this.anrWatchdog.stopMonitoringAnr();
-        }
-    }
-
-    public void onPause() {
-        if(monitoringBattery) {
-            if (batteryStateHelper != null)
-                context.unregisterReceiver(batteryStateHelper);
-        }
-    }
-
-    public void onResume() {
-        if(monitoringBattery) {
-            if (batteryStateHelper != null && ifilter != null)
-                context.registerReceiver(batteryStateHelper, ifilter);
         }
     }
 }
