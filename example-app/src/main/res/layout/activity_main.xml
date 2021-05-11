@@ -88,6 +88,17 @@
         app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbsUserOnly" />
 
     <Button
+        android:id="@+id/toggleBatteryStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toggle Battery Monitoring"
+        android:onClick="toggleBatteryMonitoring"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendReport"/>
+
+    <Button
         android:id="@+id/exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,6 +107,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendReport" />
+        app:layout_constraintTop_toBottomOf="@+id/toggleBatteryStatus" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
