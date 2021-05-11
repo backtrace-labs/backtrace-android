@@ -2,9 +2,11 @@ package backtraceio.backtraceio;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -194,12 +196,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        backtraceClient.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        backtraceClient.onPause();
     }
 }
