@@ -196,12 +196,16 @@ public class BacktraceClient extends BacktraceBase {
         batteryStateHelper = BatteryStateHelper.getInstance(context, database);
     }
 
-    public void setBatteryMonitoring(boolean enable) {
+    public void enableBatteryMonitoring(boolean enable) {
         if (enable) {
             batteryStateHelper.enable();
         } else {
             batteryStateHelper.disable();
         }
+    }
+
+    public boolean isMonitoringBattery() {
+        return batteryStateHelper.isEnabled();
     }
 
     /**

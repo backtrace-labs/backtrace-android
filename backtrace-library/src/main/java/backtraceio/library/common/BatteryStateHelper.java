@@ -7,13 +7,18 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
 import java.util.HashMap;
 
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.logger.BacktraceLogger;
 
-public class BatteryStateHelper extends BroadcastReceiver {
+public class BatteryStateHelper extends BroadcastReceiver implements LifecycleObserver {
     private static Context context;
     private static BacktraceDatabase database;
     private static boolean enabled;
@@ -61,8 +66,8 @@ public class BatteryStateHelper extends BroadcastReceiver {
         }
         result.put("battery.health", batteryHealth);
         result.put("battery.level", batteryLevel);
-        result.put("battery.charging.source", batteryChargingStatus);
-        result.put("battery.charging.status", batteryChargingSource);
+        result.put("battery.charging.source", batteryChargingSource);
+        result.put("battery.charging.status", batteryChargingStatus);
         result.put("battery.technology", batteryTechnology);
         result.put("battery.temperature", batteryTemperature);
         return result;
@@ -72,12 +77,14 @@ public class BatteryStateHelper extends BroadcastReceiver {
         enabled = false;
         if (getInstance(null, null) != null) {
             context.unregisterReceiver(batteryStateHelper);
+            ProcessLifecycleOwner.get().getLifecycle().removeObserver(batteryStateHelper);
         }
     }
 
     public void enable() {
         if (getInstance(null, null) != null) {
             enabled = true;
+            ProcessLifecycleOwner.get().getLifecycle().addObserver(batteryStateHelper);
             Intent batteryStatus = context.registerReceiver(null, intentFilter);
             getBatteryHealth(batteryStatus);
             getBatteryChargeSource(batteryStatus);
@@ -90,7 +97,7 @@ public class BatteryStateHelper extends BroadcastReceiver {
             }
             context.registerReceiver(batteryStateHelper, intentFilter);
         } else {
-            BacktraceLogger.d(TAG,"Context not set.  Run getInstance(context, database)");
+            BacktraceLogger.d(TAG,"Context not set.  Run getInstance(context, database) first");
         }
     }
 
@@ -108,7 +115,6 @@ public class BatteryStateHelper extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         boolean present = intent.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false);
-
         if (present) {
             getBatteryHealth(intent);
             getBatteryLevel(intent);
@@ -218,5 +224,21 @@ public class BatteryStateHelper extends BroadcastReceiver {
         if (temp > -1) {
             BatteryStateHelper.batteryTemperature = String.valueOf(temp / 10f);
         }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onBackground() {
+        BacktraceLogger.d(TAG, "App moved to background");
+        batteryStateHelper.disable();
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public void onForeground() {
+        BacktraceLogger.d(TAG, "App moved to foreground");
+        batteryStateHelper.enable();
     }
 }

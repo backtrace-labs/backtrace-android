@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
 
-        backtraceClient.setBatteryMonitoring(true);
+        backtraceClient.enableBatteryMonitoring(true);
     }
 
     public native void cppCrash();
@@ -176,6 +176,10 @@ public class MainActivity extends AppCompatActivity {
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");
         backtraceClient.send(report);
+    }
+
+    public void toggleBatteryMonitoring(View view) {
+        backtraceClient.enableBatteryMonitoring(!backtraceClient.isMonitoringBattery());
     }
 
     private void writeMyCustomFile(String filePath) {
