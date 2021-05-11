@@ -11,20 +11,46 @@ import java.util.HashMap;
 
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.interfaces.Database;
+import backtraceio.library.logger.BacktraceLogger;
 
 public class BatteryStateHelper extends BroadcastReceiver {
     private static Context context;
     private static BacktraceDatabase database;
-    private static boolean trackBattery;
+    private static boolean enabled;
     private static String batteryHealth, batteryLevel, batteryChargingSource, batteryChargingStatus, batteryTechnology, batteryTemperature;
+    private static IntentFilter intentFilter;
+    private static BatteryStateHelper batteryStateHelper;
+    private static String TAG = "BatteryStateHelper";
 
-    public BatteryStateHelper(Context context) {
-        this(context, null);
+    private BatteryStateHelper(Context context, Database database) {
+        if (BatteryStateHelper.context == null){
+            BatteryStateHelper.context = context;
+            if (database != null) {
+                BatteryStateHelper.database = (BacktraceDatabase)database;
+            }
+        }
+        if (intentFilter == null) {
+            intentFilter = new IntentFilter();
+            intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        }
+    }
+
+    public static BatteryStateHelper getInstance(Context context, Database database) {
+        if (batteryStateHelper == null) {
+            if (context == null)
+                return null;
+            batteryStateHelper = new BatteryStateHelper(context, database);
+        }
+        return  batteryStateHelper;
+    }
+
+    public static void setDatabase(Database database) {
+        batteryStateHelper.database = (BacktraceDatabase) null;
     }
 
     public static HashMap<String, String> getValues() {
         HashMap<String, String> result = new HashMap<String, String>();
-        if (!trackBattery) {
+        if (!enabled) {
             result.put("battery.health", "N/A");
             result.put("battery.level", "N/A");
             result.put("battery.charging.source", "N/A");
@@ -42,31 +68,29 @@ public class BatteryStateHelper extends BroadcastReceiver {
         return result;
     }
 
-    public BatteryStateHelper(Context context, Database database) {
-        if (BatteryStateHelper.context == null){
-            BatteryStateHelper.context = context;
-            if (database != null) {
-                BatteryStateHelper.database = (BacktraceDatabase)database;
-            }
+    public void disable() {
+        enabled = false;
+        if (getInstance(null, null) != null) {
+            context.unregisterReceiver(batteryStateHelper);
         }
     }
 
-    public void disable() {
-        trackBattery = false;
-    }
-
     public void enable() {
-        trackBattery = true;
-        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = context.registerReceiver(null, ifilter);
-        getBatteryHealth(batteryStatus);
-        getBatteryChargeSource(batteryStatus);
-        getBatteryChargingStatus(batteryStatus);
-        getBatteryLevel(batteryStatus);
-        getBatteryTechnology(batteryStatus);
-        getBatteryTemp(batteryStatus);
-        if (database != null) {
-            updateDatabase();
+        if (getInstance(null, null) != null) {
+            enabled = true;
+            Intent batteryStatus = context.registerReceiver(null, intentFilter);
+            getBatteryHealth(batteryStatus);
+            getBatteryChargeSource(batteryStatus);
+            getBatteryChargingStatus(batteryStatus);
+            getBatteryLevel(batteryStatus);
+            getBatteryTechnology(batteryStatus);
+            getBatteryTemp(batteryStatus);
+            if (database != null) {
+                updateDatabase();
+            }
+            context.registerReceiver(batteryStateHelper, intentFilter);
+        } else {
+            BacktraceLogger.d(TAG,"Context not set.  Run getInstance(context, database)");
         }
     }
 
