@@ -353,7 +353,7 @@ bool EnableClientSideUnwinding() {
     }
     bun_config cfg;
     memset(&cfg, 0, sizeof(cfg));
-    cfg.unwind_backend = BUN_LIBUNWINDSTACK;
+    cfg.unwind_backend = BUN_BACKEND_LIBUNWINDSTACK;
     cfg.buffer_size = 65536;
     cfg.buffer = buf;
     handle = bun_create(&cfg);
