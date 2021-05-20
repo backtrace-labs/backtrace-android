@@ -13,7 +13,7 @@ public class BacktraceBreadcrumbsLogManager {
 
     private final String LOG_TAG = BacktraceBreadcrumbsLogManager.class.getSimpleName();
 
-    private long breadcrumbId = 0;
+    private long breadcrumbId = System.currentTimeMillis();
 
     private BacktraceQueueFileHelper backtraceQueueFileHelper;
 
@@ -41,7 +41,7 @@ public class BacktraceBreadcrumbsLogManager {
         JSONObject breadcrumb = new JSONObject();
         try {
             breadcrumb.put("timestamp", time);
-            breadcrumb.put("id", breadcrumbId);
+            breadcrumb.put("id", breadcrumbId++);
             breadcrumb.put("level", level.toString());
             breadcrumb.put("type", type.toString());
             breadcrumb.put("message", message);
@@ -68,8 +68,6 @@ public class BacktraceBreadcrumbsLogManager {
         StringBuilder breadcrumbSerializedString = new StringBuilder("\n");
         breadcrumbSerializedString.append(breadcrumb.toString().replace("\\n", ""));
         breadcrumbSerializedString.append("\n");
-
-        breadcrumbId++;
 
         return backtraceQueueFileHelper.add(breadcrumbSerializedString.toString().getBytes());
     }
