@@ -33,6 +33,7 @@ set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashp
 include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 
 # Bun Libraries
+set(LIBUNWINDSTACK_ENABLED TRUE)
 add_subdirectory(libbun)
 
 # Searches for a specified prebuilt library and stores the path as a
