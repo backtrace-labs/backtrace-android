@@ -39,18 +39,22 @@ static std::mutex attribute_synchronization;
 static std::string thread_id;
 
 // bun handle
-bun_t *handle;
+struct bun_handle handle;
 // bun buffer
 char buf[65536];
 
-// bun signal handler
-static void bun_sighandler(int)
+/*
+ * Signal handler executed by CrashpadClient::SetFirstChanceExceptionHandler.
+ */
+static bool bun_sighandler(int signum, siginfo_t *info, ucontext_t *context)
 {
-    void* buf;
-    size_t buf_size;
-    bun_unwind(handle, &buf, &buf_size);
-    crashpad::CrashpadInfo::GetCrashpadInfo()
-            ->AddUserDataMinidumpStream(BUN_STREAM_ID, buf, buf_size);
+    (void) signum;
+    (void) info;
+    (void) context;
+
+    bun_unwind(&handle, buf, sizeof(buf));
+
+    return false;
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
@@ -351,17 +355,13 @@ bool EnableClientSideUnwinding() {
                             "Crashpad needs to be initialized to enable client-side unwinding");
         return false;
     }
-    bun_config cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.unwind_backend = BUN_BACKEND_LIBUNWINDSTACK;
-    cfg.buffer_size = 65536;
-    cfg.buffer = buf;
-    handle = bun_create(&cfg);
-    if (!bun_register_signal_handers(handle, &bun_sighandler)) {
+    if (!bun_handle_init(&handle, BUN_BACKEND_LIBUNWINDSTACK)) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "Could not register the bun signal handler");
-        return false;
+                            "Could not initialize bun_handle");
     }
+    crashpad::CrashpadInfo::GetCrashpadInfo()
+            ->AddUserDataMinidumpStream(BUN_STREAM_ID, buf, sizeof(buf));
+    crashpad::CrashpadClient::SetFirstChanceExceptionHandler(bun_sighandler);
     return true;
 }
 
