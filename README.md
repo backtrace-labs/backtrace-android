@@ -242,8 +242,8 @@ try {
     new HashMap<String, Object>() {{
         put("key", "value");
     }}, new ArrayList<String>() {{
-        add("absoulte_file_path_1");
-        add("absoulte_file_path_2");
+        add("absolute_file_path_1");
+        add("absolute_file_path_2");
     }});
     backtraceClient.send(report);
 }
