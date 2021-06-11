@@ -76,6 +76,10 @@ catch (e: Exception) {
 * Minimum NDK version 17c
 * Maximum NDK version 21
 
+# Supported platforms
+* arm32/arm64
+* x86_64 emulator
+
 # Differences and limitations of the SDKs version <a name="limitations"></a>
 * Getting the status that the device is in power saving mode is available from API 21.
 
