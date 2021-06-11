@@ -396,7 +396,7 @@ watchdog.tick(this); // In your custom thread class make incrementation to infor
 ```
 # File Attachments <a name="file-attachments"></a>
 You can enable default file attachments which will be sent with all Backtrace reports both managed and native.
-Note: If you create any new files in the same directory as your `BacktraceDatabase` directory, they will be deleted when you create a new `BacktraceClient`.
+
 ```Java
 final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
 List<String> attachments = new ArrayList<String>(){{
@@ -405,6 +405,25 @@ List<String> attachments = new ArrayList<String>(){{
 
 backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 ```
+
+Backtrace crash file attachment paths can only be specified on initialization. If you have rotating file logs or another situation where the exact filename won't be known when you initialize your Backtrace client, you can use symlinks:
+
+```Java
+// The file simlink path to pass to Backtrace
+final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+List<String> attachments = new ArrayList<String>(){{
+    add(fileName);
+}};
+
+backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
+
+// The actual filename of the desired log, not known to the BacktraceClient on initialization
+final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
+// Create symlink
+Os.symlink(fileNameDateString, fileName);
+```
+
+Note: If you create any new files in the same directory as your `BacktraceDatabase` directory, they will be deleted when you create a new `BacktraceClient`.
 
 # Breadcrumbs <a name="breadcrumbs"></a>
 Breadcrumbs help you track events leading up to your crash, error, or other submitted object.
