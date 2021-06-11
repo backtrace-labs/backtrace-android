@@ -52,10 +52,11 @@ catch (e: Exception) {
 4. [Installation](#installation)
 5. [Running sample application](#sample-app)
 6. [Using Backtrace library](#using-backtrace)
-7. [Breadcrumbs](#breadcrumbs)
-8. [Working with NDK applications](#working_with_ndk)
-9. [Working with Proguard](#working_with_proguard)
-10. [Documentation](#documentation)
+7. [File attachments](#file-attachments)
+8. [Breadcrumbs](#breadcrumbs)
+9. [Working with NDK applications](#working_with_ndk)
+10. [Working with Proguard](#working_with_proguard)
+11. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
@@ -388,6 +389,17 @@ watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the ti
 
 // The following code should be executed inside the thread you want to monitor
 watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
+```
+# File Attachments <a name="file-attachments"></a>
+You can enable default file attachments which will be sent with all Backtrace reports both managed and native.
+Note: If you create any new files in the same directory as your `BacktraceDatabase` directory, they will be deleted when you create a new `BacktraceClient`.
+```Java
+final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+List<String> attachments = new ArrayList<String>(){{
+    add(fileName);
+}};
+
+backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 ```
 
 # Breadcrumbs <a name="breadcrumbs"></a>
