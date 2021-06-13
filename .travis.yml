@@ -2,7 +2,6 @@ sudo: true
 git:
   depth: 3
 language: android
-python: 3.9
 
 env:
   global:
