@@ -48,7 +48,7 @@ before_script:
   - python --version
   - python3 --version
   - python -m pip install --upgrade pip
-  - python3 -m pip install --upgrade pip
+  - python3 -m pip3 install --upgrade pip
   - pip3 install coverage
   - android list targets
   - echo no | android create avd --force -n test -t android-23 --tag "google_apis"
