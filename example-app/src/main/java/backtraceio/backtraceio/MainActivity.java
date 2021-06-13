@@ -62,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
             put("custom.attribute", "My Custom Attribute");
         }};
 
-        // NOTE: your custom files may be deleted when you create a new BacktraceClient
-        // Ensure you don't create any files with data you want to keep until
-        // AFTER creating the BacktraceClient
         final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
         List<String> attachments = new ArrayList<String>(){{
             add(fileName);

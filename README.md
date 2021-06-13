@@ -52,10 +52,11 @@ catch (e: Exception) {
 4. [Installation](#installation)
 5. [Running sample application](#sample-app)
 6. [Using Backtrace library](#using-backtrace)
-7. [Breadcrumbs](#breadcrumbs)
-8. [Working with NDK applications](#working_with_ndk)
-9. [Working with Proguard](#working_with_proguard)
-10. [Documentation](#documentation)
+7. [File attachments](#file-attachments)
+8. [Breadcrumbs](#breadcrumbs)
+9. [Working with NDK applications](#working_with_ndk)
+10. [Working with Proguard](#working_with_proguard)
+11. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
@@ -74,6 +75,10 @@ catch (e: Exception) {
 * Target SDK version 28 (Android 9.0)
 * Minimum NDK version 17c
 * Maximum NDK version 21
+
+# Supported platforms
+* arm32/arm64
+* x86_64 emulator
 
 # Differences and limitations of the SDKs version <a name="limitations"></a>
 * Getting the status that the device is in power saving mode is available from API 21.
@@ -242,8 +247,8 @@ try {
     new HashMap<String, Object>() {{
         put("key", "value");
     }}, new ArrayList<String>() {{
-        add("absoulte_file_path_1");
-        add("absoulte_file_path_2");
+        add("absolute_file_path_1");
+        add("absolute_file_path_2");
     }});
     backtraceClient.send(report);
 }
@@ -389,6 +394,36 @@ watchdog.checkIsAnyThreadIsBlocked(); // check if any thread has exceeded the ti
 // The following code should be executed inside the thread you want to monitor
 watchdog.tick(this); // In your custom thread class make incrementation to inform that the thread is not blocked
 ```
+# File Attachments <a name="file-attachments"></a>
+You can enable default file attachments which will be sent with all Backtrace reports both managed and native.
+
+```Java
+final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+List<String> attachments = new ArrayList<String>(){{
+    add(fileName);
+}};
+
+backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
+```
+
+Backtrace crash file attachment paths can only be specified on initialization. If you have rotating file logs or another situation where the exact filename won't be known when you initialize your Backtrace client, you can use symlinks:
+
+```Java
+// The file simlink path to pass to Backtrace
+final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+List<String> attachments = new ArrayList<String>(){{
+    add(fileName);
+}};
+
+backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
+
+// The actual filename of the desired log, not known to the BacktraceClient on initialization
+final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
+// Create symlink
+Os.symlink(fileNameDateString, fileName);
+```
+
+Note: If you create any new files in the same directory as your `BacktraceDatabase` directory, they will be deleted when you create a new `BacktraceClient`.
 
 # Breadcrumbs <a name="breadcrumbs"></a>
 Breadcrumbs help you track events leading up to your crash, error, or other submitted object.
