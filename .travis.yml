@@ -44,9 +44,11 @@ install:
 before_script:
   - sudo apt-get update
   - sudo apt-get install python3
+  - sudo apt-get install python3-pip
   - chmod +x gradlew
   - python --version
   - python3 --version
+  #- python3 -m pip install coverage
   - pip3 install coverage
   - android list targets
   - echo no | android create avd --force -n test -t android-23 --tag "google_apis"
