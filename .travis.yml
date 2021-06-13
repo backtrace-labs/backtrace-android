@@ -43,7 +43,7 @@ install:
   - echo y | sdkmanager "cmake;3.10.2.4988404"
 before_script:
   - chmod +x gradlew
-  - pip install -i http://pypi.python.org/simple codecov==2.1.10 #Install codecov
+  - pip install codecov==2.1.11 #Install codecov
   - android list targets
   - echo no | android create avd --force -n test -t android-23 --tag "google_apis"
   - emulator -avd test -no-window &
