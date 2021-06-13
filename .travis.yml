@@ -42,6 +42,8 @@ install:
   - echo y | sdkmanager 'ndk;20.0.5594570'
   - echo y | sdkmanager "cmake;3.10.2.4988404"
 before_script:
+  - sudo apt-get update
+  - sudo apt-get install python3
   - chmod +x gradlew
   - python --version
   - python3 --version
