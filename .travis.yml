@@ -49,7 +49,7 @@ before_script:
   - python --version
   - python3 --version
   #- python3 -m pip install coverage
-  - pip3 install codecov==2.1.11
+  - sudo pip3 install codecov==2.1.11
   - android list targets
   - echo no | android create avd --force -n test -t android-23 --tag "google_apis"
   - emulator -avd test -no-window &
