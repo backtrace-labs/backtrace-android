@@ -41,8 +41,14 @@ install:
   - echo y | sdkmanager 'ndk;20.0.5594570'
   - echo y | sdkmanager "cmake;3.10.2.4988404"
 before_script:
+  - sudo apt-get update
+  - sudo apt-get install python3
+  - sudo apt-get install python3-pip
   - chmod +x gradlew
-  - pip install --user codecov #Install codecov
+  - python --version
+  - python3 --version
+  #- python3 -m pip install coverage
+  - sudo pip3 install codecov==2.1.11
   - android list targets
   - echo no | android create avd --force -n test -t android-23 --tag "google_apis"
   - emulator -avd test -no-window &
