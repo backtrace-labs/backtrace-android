@@ -19,6 +19,7 @@
 
 #include "bun/bun.h"
 #include "bun/stream.h"
+#include "libbun/src/bun_internal.h"
 
 #include <sys/syscall.h>
 
@@ -43,6 +44,8 @@ struct bun_handle handle;
 // bun buffer
 char buf[65536];
 
+struct bun_buffer bun_buf;
+
 /*
  * Signal handler executed by CrashpadClient::SetFirstChanceExceptionHandler.
  */
@@ -52,7 +55,7 @@ static bool bun_sighandler(int signum, siginfo_t *info, ucontext_t *context)
     (void) info;
     (void) context;
 
-    bun_unwind(&handle, buf, sizeof(buf));
+    bun_unwind(&handle, &bun_buf);
 
     return false;
 }
@@ -358,6 +361,10 @@ bool EnableClientSideUnwinding() {
     if (!bun_handle_init(&handle, BUN_BACKEND_LIBUNWINDSTACK)) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Could not initialize bun_handle");
+    }
+    if (!bun_buffer_init(&bun_buf, buf, sizeof(buf))) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not initialize bun_buffer");
     }
     crashpad::CrashpadInfo::GetCrashpadInfo()
             ->AddUserDataMinidumpStream(BUN_STREAM_ID, buf, sizeof(buf));
