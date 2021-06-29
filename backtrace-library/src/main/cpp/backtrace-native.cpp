@@ -118,25 +118,17 @@ namespace /* anonymous */
         bun_handle handle;
 
         bool bun_initialized = bun_handle_init(&handle, BUN_BACKEND_LIBUNWINDSTACK);
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "Bun handle address? %p", handle);
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s",
                             "Bun initialized? %d", bun_initialized);
-
         if (!bun_initialized) {
             return -1;
         }
 
-
-
         bun_buffer buf = { buffer_child, BUFFER_SIZE };
 
-
         auto written = bun_unwind_remote(&handle, &buf, tid);
-
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s",
                             "Bun bytes written %d", written);
-
         (void) written;
 
         return -1;
@@ -331,9 +323,17 @@ namespace /* anonymous */
         env->ReleaseStringUTFChars(database_path, filePath);
 
         if (initialized && bun_initialized && sdkSupportsClientSideUnwinding()) {
-            crashpad::CrashpadInfo::GetCrashpadInfo()
-                    ->AddUserDataMinidumpStream(BUN_STREAM_ID, buf.data, buf.size);
-            crashpad::CrashpadClient::SetFirstChanceExceptionHandler(FirstChanceHandler);
+            /* Set the Minidump data stream to our buffer. */
+            crashpad::CrashpadInfo::GetCrashpadInfo()->AddUserDataMinidumpStream(
+                                                          BUN_STREAM_ID, buf.data, buf.size);
+
+            /*
+             * Set signal/exception handler for the libbun stream.
+             */
+            if (FirstChanceHandler)
+                crashpad::CrashpadClient::SetFirstChanceExceptionHandler(FirstChanceHandler);
+            __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android",
+                                "Client side unwinding enabled in crashpad");
         } else if (!initialized) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Crashpad not initialized properly, cannot enable client side unwinding");
@@ -489,13 +489,21 @@ bool EnableClientSideUnwinding(const char* path) {
         return false;
     }
 
-    static const char* buffer;
-
     struct bcd_config cf;
     bcd_error_t e;
 
     /* Initialize a shared memory region. */
-    buffer = static_cast<char *>(buffer_create());
+    static const char *buffer = static_cast<char *>(buffer_create());
+
+    /* Initialize the BCD configuration file. */
+    if (bcd_config_init(&cf, &e) == -1)
+        abort();
+
+    /* Request handler to be called when processing errors by BCD worker. */
+    cf.request_handler = request_handler;
+
+    /* Set a function to be called by the child for setting permissions. */
+    cf.monitor_init = monitor_init;
 
     /* Create the fully resolved path to the bcd socket file */
     const char* file_name = "/bcd.socket";
@@ -503,16 +511,7 @@ bool EnableClientSideUnwinding(const char* path) {
     strcpy(full_path, path);
     strcat(full_path, file_name);
 
-    /* Initialize the BCD configuration file. */
-    if (bcd_config_init(&cf, &e) == -1)
-        abort();
     cf.ipc.us.path = full_path;
-
-    /* Request handler to be called when processing errors by BCD worker. */
-    cf.request_handler = request_handler;
-
-    /* Set a function to be called by the child for setting permissions. */
-    cf.monitor_init = monitor_init;
 
     if (bcd_init(&cf, &e) == -1) {
         abort();
@@ -525,29 +524,12 @@ bool EnableClientSideUnwinding(const char* path) {
     buf.data = (char *)buffer;
     buf.size = BUFFER_SIZE;
 
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "My pid parent is %d", getpid());
-
-
     pid_t child_pid;
     memcpy(&child_pid, buffer, sizeof(child_pid));
 
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "My pid child is %d", child_pid);
+    prctl(PR_SET_PTRACER, child_pid, 0, 0, 0);
+    prctl(PR_SET_DUMPABLE, 1);
 
-    errno = 0;
-    int r = prctl(PR_SET_PTRACER, child_pid, 0, 0, 0);
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "PR_SET_PTRACER result %d", r);
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "PR_SET_PTRACER errno %d", errno);
-
-    errno = 0;
-    r = prctl(PR_SET_DUMPABLE, 1);
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "PR_SET_DUMPABLE result %d", r);
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "PR_SET_DUMPABLE errno %d", errno);
     bun_initialized = true;
     return true;
 }
