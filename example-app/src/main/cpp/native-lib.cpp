@@ -1,12 +1,20 @@
 #include <jni.h>
 #include <signal.h>
+#include <unistd.h>
 #include "backtrace-android.h"
+
+void * volatile always_null;
+void anotherCrash()
+{
+    memset(always_null, 0x42, 1 << 20);
+}
 
 extern "C"
 {
 JNIEXPORT void JNICALL
 Java_backtraceio_backtraceio_MainActivity_cppCrash(JNIEnv *env, jobject thiz) {
-    raise(SIGSEGV);
+    //__builtin_trap();
+    anotherCrash();
 }
 
 ////////////////// Begin Native Breadcrumb Examples //////////////////
@@ -29,7 +37,6 @@ Java_backtraceio_backtraceio_MainActivity_addNativeBreadcrumbUserError(JNIEnv *e
                                     Backtrace::BreadcrumbType::USER,
                                     Backtrace::BreadcrumbLevel::ERROR);
 }
-
 
 JNIEXPORT jboolean JNICALL
 Java_backtraceio_backtraceio_MainActivity_registerNativeBreadcrumbs(JNIEnv *env, jobject thiz,

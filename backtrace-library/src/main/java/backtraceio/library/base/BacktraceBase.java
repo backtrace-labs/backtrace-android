@@ -236,7 +236,6 @@ public class BacktraceBase implements Client {
         this.database.start();
     }
 
-
     /**
      * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
      */
@@ -259,7 +258,6 @@ public class BacktraceBase implements Client {
     public Map<String, Object> getAttributes() {
         return attributes;
     }
-
 
     /**
      * Set event executed before sending data to Backtrace API
@@ -434,8 +432,8 @@ public class BacktraceBase implements Client {
      *
      * @return true on success, otherwise returns false
      */
-    public boolean enableClientSideUnwinding() {
-        return database.enableClientSideUnwinding();
+    public boolean enableClientSideUnwinding(String path) {
+        return database.enableClientSideUnwinding(path);
     }
 
     public void nativeCrash() {

@@ -99,5 +99,5 @@ public interface Database {
      *
      * @return true on success, otherwise returns false
      */
-    boolean enableClientSideUnwinding();
+    boolean enableClientSideUnwinding(String path);
 }

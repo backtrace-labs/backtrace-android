@@ -412,5 +412,5 @@ public class BacktraceDatabase implements Database {
         return backtraceDatabaseContext.getDatabaseSize();
     }
 
-    public native boolean enableClientSideUnwinding();
+    public native boolean enableClientSideUnwinding(String path);
 }

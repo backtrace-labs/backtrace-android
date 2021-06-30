@@ -3,6 +3,8 @@ package backtraceio.backtraceio;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.util.Log;
 import android.view.View;
 
@@ -73,19 +75,25 @@ public class MainActivity extends AppCompatActivity {
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
-        writeMyCustomFile(fileName);
+        final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
+        try {
+            Os.symlink(fileNameDateString, fileName);
+        } catch (ErrnoException e) {
+            e.printStackTrace();
+        }
+        writeMyCustomFile(fileNameDateString);
 
         BacktraceExceptionHandler.enable(backtraceClient);
         backtraceClient.send("test");
+
+        // Enable client-side callstack resolution
+        backtraceClient.enableClientSideUnwinding(context.getFilesDir().getAbsolutePath());
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials);
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
-
-        // Enable client-side callstack resolution
-        backtraceClient.enableClientSideUnwinding();
     }
 
     public native void cppCrash();
