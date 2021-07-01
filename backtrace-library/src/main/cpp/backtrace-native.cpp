@@ -118,8 +118,7 @@ namespace /* anonymous */
         bun_handle handle;
 
         bool bun_initialized = bun_handle_init(&handle, BUN_BACKEND_LIBUNWINDSTACK);
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s",
-                            "Bun initialized? %d", bun_initialized);
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Bun initialized? %d", bun_initialized);
         if (!bun_initialized) {
             return -1;
         }
@@ -127,8 +126,7 @@ namespace /* anonymous */
         bun_buffer buf = { buffer_child, BUFFER_SIZE };
 
         auto written = bun_unwind_remote(&handle, &buf, tid);
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s",
-                            "Bun bytes written %d", written);
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Bun bytes written %d", written);
         (void) written;
 
         return -1;
