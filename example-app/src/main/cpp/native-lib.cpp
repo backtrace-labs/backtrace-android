@@ -13,8 +13,8 @@ extern "C"
 {
 JNIEXPORT void JNICALL
 Java_backtraceio_backtraceio_MainActivity_cppCrash(JNIEnv *env, jobject thiz) {
-    //__builtin_trap();
-    anotherCrash();
+    __builtin_trap();
+    //anotherCrash();
 }
 
 ////////////////// Begin Native Breadcrumb Examples //////////////////

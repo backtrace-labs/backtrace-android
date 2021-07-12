@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         // Ensure you don't create any files with data you want to keep until
         // AFTER creating the BacktraceClient
         final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+
         List<String> attachments = new ArrayList<String>(){{
             add(fileName);
         }};
@@ -194,5 +195,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void exit(View view) {
         System.exit(0);
+    }
+
+    public void dumpWithoutCrash(View view) {
+        backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
+    }
+
+    public void dumpWithoutCrashThenCrash(View view) {
+        backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
+        cppCrash();
     }
 }

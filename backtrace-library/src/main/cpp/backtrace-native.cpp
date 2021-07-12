@@ -119,6 +119,8 @@ namespace /* anonymous */
 
         bool bun_initialized = bun_handle_init(&handle, BUN_BACKEND_LIBUNWINDSTACK);
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Bun initialized? %d", bun_initialized);
+        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "request handler tid %ju, my pid %ju", (uintmax_t ) tid, (uintmax_t ) getpid());
+
         if (!bun_initialized) {
             return -1;
         }
@@ -144,7 +146,10 @@ namespace /* anonymous */
             abort();
 
         pid_t child_pid = getpid();
+
         memcpy(buffer_child, &child_pid, sizeof(child_pid));
+        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "child pid from monitor_init %ju", (uintmax_t ) child_pid);
+
         return;
     }
 
@@ -153,13 +158,26 @@ namespace /* anonymous */
      */
     bool FirstChanceHandler(int signum, siginfo_t *info, ucontext_t *context)
     {
+        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Entering FirstChanceHandler");
+
         (void) signum;
         (void) info;
         (void) context;
 
-        bcd_emit(&bcd, "1");
+        thread_local bool flag;
 
-        return false;
+        if (flag == false) {
+            flag = true;
+            bcd_emit(&bcd, "1");
+
+            crashpad::CrashpadClient::DumpWithoutCrash(context);
+
+            return true;
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     bool sdkSupportsClientSideUnwinding() {
@@ -210,6 +228,8 @@ namespace /* anonymous */
         return m_pJniEnv;
     }
 
+//#define CRASHPAD_FIRST_CHANCE 1
+#define BUN_SIGACTION_WRAPPER 1
     bool InitializeImpl(jstring url,
                         jstring database_path,
                         jstring handler_path,
@@ -328,8 +348,44 @@ namespace /* anonymous */
             /*
              * Set signal/exception handler for the libbun stream.
              */
-            if (FirstChanceHandler)
+            if (FirstChanceHandler) {
+#if CRASHPAD_FIRST_CHANCE
                 crashpad::CrashpadClient::SetFirstChanceExceptionHandler(FirstChanceHandler);
+#elif BUN_SIGACTION_WRAPPER
+                bool success = bun_register_signal_handler(+[](int sig, siginfo_t* info, void* ctx){
+                    FirstChanceHandler(sig, info, (ucontext_t*)ctx);
+                    std::exit(0);
+                });
+                if (!success) {
+                    __android_log_print(ANDROID_LOG_ERROR, "krzaq", "Sigaction error");
+                }
+#else
+                struct sigaction act;
+                memset (&act, '\0', sizeof(act));
+
+               // act.sa_sigaction = FirstChanceHandler;
+                act.sa_sigaction = +[](int sig, siginfo_t* info, void* ctx){
+                    FirstChanceHandler(sig, info, (ucontext_t*)ctx);
+                    std::exit(0);
+                };
+
+                /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
+                act.sa_flags = SA_SIGINFO;
+
+                if (sigaction(SIGTRAP, &act, NULL) < 0) {
+                    __android_log_print(ANDROID_LOG_ERROR, "krzaq", "Sigaction error");
+                    return false;
+                }
+                if (sigaction(SIGILL, &act, NULL) < 0) {
+                    __android_log_print(ANDROID_LOG_ERROR, "krzaq", "Sigaction error");
+                    return false;
+                }
+                if (sigaction(SIGSEGV, &act, NULL) < 0) {
+                    __android_log_print(ANDROID_LOG_ERROR, "krzaq", "Sigaction error");
+                    return false;
+                }
+#endif
+            }
             __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android",
                                 "Client side unwinding enabled in crashpad");
         } else if (!initialized) {
@@ -476,7 +532,7 @@ Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_
     DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
 }
 
-bool EnableClientSideUnwinding(const char* path) {
+bool EnableClientSideUnwinding(jstring path) {
     if (!sdkSupportsClientSideUnwinding()) {
         return false;
     }
@@ -487,6 +543,9 @@ bool EnableClientSideUnwinding(const char* path) {
         return false;
     }
 
+    JNIEnv* env = GetJniEnv();
+    const char *path_cstr = env->GetStringUTFChars(path, 0);
+
     struct bcd_config cf;
     bcd_error_t e;
 
@@ -495,7 +554,8 @@ bool EnableClientSideUnwinding(const char* path) {
 
     /* Initialize the BCD configuration file. */
     if (bcd_config_init(&cf, &e) == -1)
-        abort();
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "bcd_config_init failed, cannot start client side unwinding");
 
     /* Request handler to be called when processing errors by BCD worker. */
     cf.request_handler = request_handler;
@@ -505,29 +565,38 @@ bool EnableClientSideUnwinding(const char* path) {
 
     /* Create the fully resolved path to the bcd socket file */
     const char* file_name = "/bcd.socket";
-    char* full_path = (char*) malloc((strlen(path) + strlen(file_name) + 1) * sizeof(char));
-    strcpy(full_path, path);
+    char* full_path = (char*) malloc((strlen(path_cstr) + strlen(file_name) + 1) * sizeof(char));
+    strcpy(full_path, path_cstr);
     strcat(full_path, file_name);
 
     cf.ipc.us.path = full_path;
 
-    if (bcd_init(&cf, &e) == -1) {
-        abort();
-    }
+    if (bcd_init(&cf, &e) == -1)
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "bcd_init failed, cannot start client side unwinding");
 
     /* Initialize the BCD handler. */
     if (bcd_attach(&bcd, &e) == -1)
-        abort();
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "bcd_attach failed, cannot start client side unwinding");
 
     buf.data = (char *)buffer;
     buf.size = BUFFER_SIZE;
 
     pid_t child_pid;
     memcpy(&child_pid, buffer, sizeof(child_pid));
+    __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "child pid from parent %ju", (uintmax_t ) child_pid);
 
-    prctl(PR_SET_PTRACER, child_pid, 0, 0, 0);
-    prctl(PR_SET_DUMPABLE, 1);
 
+    int result = prctl(PR_SET_PTRACER, child_pid, 0, 0, 0);
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "SET_PTRACER child pid result %d", result);
+
+    result = prctl(PR_SET_DUMPABLE, 1);
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "SET_PTRACER child pid result %d", result);
+
+    env->ReleaseStringUTFChars(path, path_cstr);
     bun_initialized = true;
     return true;
 }
@@ -535,9 +604,6 @@ bool EnableClientSideUnwinding(const char* path) {
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_backtraceio_library_BacktraceDatabase_enableClientSideUnwinding(JNIEnv *env, jobject thiz, jstring path) {
-    const char *path_cstr = env->GetStringUTFChars(path, 0);
-    bool enabled = EnableClientSideUnwinding(path_cstr);
-    env->ReleaseStringUTFChars(path, path_cstr);
-    return enabled;
+    return EnableClientSideUnwinding(path);
 }
 }

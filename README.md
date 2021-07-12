@@ -484,6 +484,19 @@ More details about [extractNativeLibs](https://developer.android.com/guide/topic
 ## Uploading symbols to Backtrace
 For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
 
+## Client side unwinding
+For an NDK application, debugging symbols for system functions (for instance in `libc.so`) can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client). To enable client side unwinding, you can use the `BacktraceClient` `enableClientSideUnwinding` method.
+
+```cpp
+backtraceClient.enableClientSideUnwinding(context.getFilesDir().getAbsolutePath());
+
+database.setupNativeIntegration(backtraceClient, credentials);
+```
+
+NOTE: `enableClientSideUnwinding` must be called BEFORE `setupNativeIntegration`
+
+NOTE: Client side unwinding is only available in API level 23 (Android 6.0)+
+
 # Working with Proguard <a name="working_with_proguard"></a>
 
 ##### 1. Add the following to the `proguard_rules.pro` for your app

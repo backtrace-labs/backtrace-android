@@ -13,6 +13,7 @@ project("myapplication")
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
+set(CMAKE_CXX_FLAGS -fno-omit-frame-pointer)
 
 add_library( # Sets the name of the library.
              native-lib
