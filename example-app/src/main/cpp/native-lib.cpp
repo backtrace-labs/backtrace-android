@@ -7,6 +7,7 @@ void * volatile always_null;
 
 void anotherCrash()
 {
+    // Uncomment this to try a different type of crash
 //    memset(always_null, 0x42, 1 << 20);
     __builtin_trap();
 }

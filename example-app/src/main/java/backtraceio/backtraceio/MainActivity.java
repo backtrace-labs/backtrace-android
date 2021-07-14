@@ -25,6 +25,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceExceptionHandler;
@@ -87,11 +88,8 @@ public class MainActivity extends AppCompatActivity {
         BacktraceExceptionHandler.enable(backtraceClient);
         backtraceClient.send("test");
 
-        // Enable client-side callstack resolution
-        backtraceClient.enableClientSideUnwinding(context.getFilesDir().getAbsolutePath());
-
         // Enable handling of native crashes
-        database.setupNativeIntegration(backtraceClient, credentials);
+        database.setupNativeIntegration(backtraceClient, credentials, true);
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
