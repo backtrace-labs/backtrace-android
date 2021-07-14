@@ -366,7 +366,7 @@ namespace /* anonymous */
         return true;
     }
 
-    bool EnableClientSideUnwinding(JNIEnv *env, jstring path, jobject unwindingMode) {
+    bool EnableClientSideUnwinding(JNIEnv *env, jstring path, jint unwindingMode) {
         if (!sdkSupportsClientSideUnwinding()) {
             return false;
         }
@@ -377,14 +377,7 @@ namespace /* anonymous */
             return false;
         }
 
-        jint unwindingModeInt = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH;
-        if (unwindingMode != nullptr) {
-            jmethodID unwindingModeGetValueMethod = env->GetMethodID(env->FindClass(
-                    "backtraceio/library/enums/UnwindingMode"), "ordinal", "()I");
-            jint unwindingModeInt = env->CallIntMethod(unwindingMode, unwindingModeGetValueMethod);
-        }
-
-        unwinding_mode = static_cast<UnwindingMode>((int) unwindingModeInt);
+        unwinding_mode = static_cast<UnwindingMode>((int) unwindingMode);
 
         switch (unwinding_mode) {
             case UnwindingMode::LOCAL:
@@ -407,7 +400,7 @@ namespace /* anonymous */
                         jobjectArray attributeValues,
                         jobjectArray attachmentPaths = nullptr,
                         jboolean enableClientSideUnwinding = false,
-                        jobject unwindingMode = nullptr) {
+                        jint unwindingMode = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH) {
         using namespace crashpad;
 
         // avoid multi initialization
@@ -642,7 +635,7 @@ bool Initialize(jstring url,
                 jobjectArray attributeValues,
                 jobjectArray attachmentPaths = nullptr,
                 jboolean enableClientSideUnwinding = false,
-                jobject unwindingMode = nullptr) {
+                jint unwindingMode = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
@@ -666,9 +659,16 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jobjectArray attachmentPaths = nullptr,
                                                       jboolean enableClientSideUnwinding = false,
                                                       jobject unwindingMode = nullptr) {
+    jint unwindingModeInt = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH;
+    if (unwindingMode != nullptr) {
+        jmethodID unwindingModeGetValueMethod = env->GetMethodID(env->FindClass(
+                "backtraceio/library/enums/UnwindingMode"), "ordinal", "()I");
+        unwindingModeInt = env->CallIntMethod(unwindingMode, unwindingModeGetValueMethod);
+    }
+
     return Initialize(url, database_path, handler_path, attributeKeys,
                       attributeValues, attachmentPaths, enableClientSideUnwinding,
-                      unwindingMode);
+                      unwindingModeInt);
 }
 
 
