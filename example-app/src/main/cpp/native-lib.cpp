@@ -4,17 +4,18 @@
 #include "backtrace-android.h"
 
 void * volatile always_null;
+
 void anotherCrash()
 {
-    memset(always_null, 0x42, 1 << 20);
+//    memset(always_null, 0x42, 1 << 20);
+    __builtin_trap();
 }
 
 extern "C"
 {
 JNIEXPORT void JNICALL
 Java_backtraceio_backtraceio_MainActivity_cppCrash(JNIEnv *env, jobject thiz) {
-    __builtin_trap();
-    //anotherCrash();
+    anotherCrash();
 }
 
 ////////////////// Begin Native Breadcrumb Examples //////////////////

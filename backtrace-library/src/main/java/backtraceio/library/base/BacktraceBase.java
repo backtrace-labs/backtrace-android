@@ -12,6 +12,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -429,11 +430,21 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable client-side callstack resolution
-     *
+     * @param path              path to use for the socket file if DUMPWITHOUTCRASH unwinding is used, can be null
      * @return true on success, otherwise returns false
      */
     public boolean enableClientSideUnwinding(String path) {
-        return database.enableClientSideUnwinding(path);
+        return enableClientSideUnwinding(path, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
+    }
+
+    /**
+     * Enable client-side callstack resolution
+     * @param path              path to use for the socket file if DUMPWITHOUTCRASH unwinding is used, can be null
+     * @param unwindingMode     the unwinding mode to use for client side unwinding
+     * @return true on success, otherwise returns false
+     */
+    public boolean enableClientSideUnwinding(String path, UnwindingMode unwindingMode) {
+        return database.enableClientSideUnwinding(path, unwindingMode);
     }
 
     public void nativeCrash() {

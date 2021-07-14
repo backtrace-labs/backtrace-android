@@ -4,6 +4,7 @@ import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -99,5 +100,5 @@ public interface Database {
      *
      * @return true on success, otherwise returns false
      */
-    boolean enableClientSideUnwinding(String path);
+    boolean enableClientSideUnwinding(String path, UnwindingMode unwindingMode);
 }

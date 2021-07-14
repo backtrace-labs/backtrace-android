@@ -46,29 +46,35 @@ static std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
 static std::string thread_id;
 
-/* Default size of bun buffer. */
+// Default size of bun buffer.
 #define BUFFER_SIZE	65536
 
 // bun handle
 struct bun_handle handle;
-// bun buffer
-//char buf[BUFFER_SIZE];
-
-/* This descriptor is shared between the child and parent. */
-static int buffer_fd;
-
-static char *buffer_child;
-
-static bcd_t bcd;
 static struct bun_buffer buf;
 
-// is bun initialized
+// This descriptor is shared between the child and parent.
+static int buffer_fd;
+static char *buffer_child;
+
+// Is bun initialized?
 static std::atomic_bool bun_initialized;
 
-int unwindingModeInt = -1;
+// bcd instance for remote unwinding
+static bcd_t bcd;
 
-#define DEBUG_F(fmt, ...) __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android",  "%s:%d: %s -> " fmt "\n", __FILE__, __LINE__, #__VA_ARGS__, __VA_ARGS__);
-#define DEBUG(x) DEBUG_F("%s", x)
+// Possible modes for client side unwinding
+enum class UnwindingMode {
+    INVALID = -1,
+    LOCAL = 0,
+    REMOTE,
+    REMOTE_DUMPWITHOUTCRASH,
+    LOCAL_DUMPWITHOUTCRASH,
+    LOCAL_CONTEXT
+};
+
+// Store the unwinding mode
+UnwindingMode unwinding_mode = UnwindingMode::INVALID;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -120,10 +126,8 @@ namespace /* anonymous */
     static int
     request_handler(pid_t tid)
     {
+        // TODO revisit this logic
         bool bun_initialized = bun_handle_init(&handle, BUN_BACKEND_LIBUNWINDSTACK);
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Bun initialized? %d", bun_initialized);
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "request handler tid %ju, my pid %ju", (uintmax_t ) tid, (uintmax_t ) getpid());
-
         if (!bun_initialized) {
             return -1;
         }
@@ -131,7 +135,7 @@ namespace /* anonymous */
         bun_buffer buf = { buffer_child, BUFFER_SIZE };
 
         auto written = bun_unwind_remote(&handle, &buf, tid);
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Bun bytes written %d", written);
+
         (void) written;
 
         return -1;
@@ -151,41 +155,32 @@ namespace /* anonymous */
         pid_t child_pid = getpid();
 
         memcpy(buffer_child, &child_pid, sizeof(child_pid));
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "child pid from monitor_init %ju", (uintmax_t ) child_pid);
 
         return;
     }
 
     bool LocalUnwindingHandler(int signum, siginfo_t *info, ucontext_t *context)
     {
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Entering LocalUnwindingHandler");
-
         (void) signum;
         (void) info;
         (void) context;
         size_t bytes_written = bun_unwind(&handle, &buf);
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Local unwinding bytes written %d", bytes_written);
 
         return false;
     }
 
     bool LocalContextUnwindingHandler(int signum, siginfo_t *info, ucontext_t *context)
     {
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Entering LocalContextUnwindingHandler");
-
         (void) signum;
         (void) info;
         (void) context;
         size_t bytes_written = bun_unwind_context(&handle, &buf, context);
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Local context unwinding bytes written %d", bytes_written);
 
         return false;
     }
 
     bool LocalUnwindingHandlerDumpWithoutCrash(int signum, siginfo_t *info, ucontext_t *context)
     {
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Entering LocalUnwindingHandlerDumpWithoutCrash");
-
         (void) signum;
         (void) info;
         (void) context;
@@ -195,7 +190,6 @@ namespace /* anonymous */
         if (flag == false) {
             flag = true;
             size_t bytes_written = bun_unwind(&handle, &buf);
-            __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Local unwinding bytes written %d", bytes_written);
 
             crashpad::CrashpadClient::DumpWithoutCrash(context);
 
@@ -209,8 +203,6 @@ namespace /* anonymous */
 
     bool RemoteUnwindingHandler(int signum, siginfo_t *info, ucontext_t *context)
     {
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Entering RemoteUnwindingHandler");
-
         (void) signum;
         (void) info;
         (void) context;
@@ -219,13 +211,8 @@ namespace /* anonymous */
         return false;
     }
 
-    /*
-     * Signal handler executed by CrashpadClient::SetFirstChanceExceptionHandler.
-     */
     bool RemoteUnwindingHandlerDumpWithoutCrash(int signum, siginfo_t *info, ucontext_t *context)
     {
-        __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "Entering RemoteUnwindingHandlerDumpWithoutCrash");
-
         (void) signum;
         (void) info;
         (void) context;
@@ -294,15 +281,12 @@ namespace /* anonymous */
         return m_pJniEnv;
     }
 
-//#define CRASHPAD_FIRST_CHANCE 1
-#define BUN_SIGACTION_WRAPPER 1
     bool InitializeImpl(jstring url,
                         jstring database_path,
                         jstring handler_path,
                         jobjectArray attributeKeys,
                         jobjectArray attributeValues,
-                        jobjectArray attachmentPaths = nullptr,
-                        jboolean enableClientSideUnwinding = false) {
+                        jobjectArray attachmentPaths = nullptr) {
         using namespace crashpad;
         // avoid multi initialization
         if (initialized) {
@@ -393,7 +377,7 @@ namespace /* anonymous */
             return false;
         }
 
-        /* Enable automated uploads. */
+        // Enable automated uploads.
         database->GetSettings()->SetUploadsEnabled(true);
 
         // Start crash handler
@@ -406,29 +390,20 @@ namespace /* anonymous */
         env->ReleaseStringUTFChars(handler_path, handlerPath);
         env->ReleaseStringUTFChars(database_path, filePath);
 
-        DEBUG_F("testing %d", 15)
-
-
         if (initialized && bun_initialized && sdkSupportsClientSideUnwinding()) {
-            /* Set the Minidump data stream to our buffer. */
+            // Set the Minidump data stream to our buffer.
             crashpad::CrashpadInfo::GetCrashpadInfo()->AddUserDataMinidumpStream(
                                                           BUN_STREAM_ID, buf.data, buf.size);
 
-            /*
-             * Set signal/exception handler for the libbun stream.
-             */
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Unwinding mode int %d", unwindingModeInt);
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "we are initializing client side unwinding in crashpad", unwindingModeInt);
-
-            switch (unwindingModeInt) {
-                case 0:
-                    // local
+            // Set signal/exception handler for the libbun stream.
+            switch (unwinding_mode) {
+                case UnwindingMode::LOCAL:
                     crashpad::CrashpadClient::SetFirstChanceExceptionHandler(LocalUnwindingHandler);
                     break;
-                case 1:
+                case UnwindingMode::REMOTE:
                     crashpad::CrashpadClient::SetFirstChanceExceptionHandler(RemoteUnwindingHandler);
                     break;
-                case 2: {
+                case UnwindingMode::REMOTE_DUMPWITHOUTCRASH: {
                     bool success = bun_register_signal_handler(
                             +[](int sig, siginfo_t *info, void *ctx) {
                                 RemoteUnwindingHandlerDumpWithoutCrash(sig, info,
@@ -441,8 +416,7 @@ namespace /* anonymous */
                     }
                     break;
                 }
-                case 3: {
-                    // local dump without crash
+                case UnwindingMode::LOCAL_DUMPWITHOUTCRASH: {
                     bool success = bun_register_signal_handler(
                             +[](int sig, siginfo_t *info, void *ctx) {
                                 LocalUnwindingHandlerDumpWithoutCrash(sig, info,
@@ -455,8 +429,7 @@ namespace /* anonymous */
                     }
                     break;
                 }
-                case 4: {
-                    // local dump without crash
+                case UnwindingMode::LOCAL_CONTEXT: {
                     bool success = bun_register_signal_handler(
                             +[](int sig, siginfo_t *info, void *ctx) {
                                 LocalContextUnwindingHandler(sig, info,
@@ -473,12 +446,6 @@ namespace /* anonymous */
                     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Invalid client side unwinding mode");
                     return false;
             }
-
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "we have finished client side unwinding", unwindingModeInt);
-
-
-            __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android",
-                                "Client side unwinding enabled in crashpad");
         } else if (!initialized) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Crashpad not initialized properly, cannot enable client side unwinding");
@@ -499,7 +466,6 @@ void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thre
 
     // set dump message for single report
     crashpad::SimpleStringDictionary *annotations = NULL;
-    bool did_attach = false;
 
     if (message != NULL || set_main_thread_as_faulting_thread == true) {
         JNIEnv *env = GetJniEnv();
@@ -545,15 +511,14 @@ bool Initialize(jstring url,
                 jstring handler_path,
                 jobjectArray attributeKeys,
                 jobjectArray attributeValues,
-                jobjectArray attachmentPaths = nullptr,
-                jboolean enableClientSideUnwinding = false) {
+                jobjectArray attachmentPaths = nullptr) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
         initialized = InitializeImpl(url,
                                      database_path, handler_path,
                                      attributeKeys, attributeValues,
-                                     attachmentPaths, enableClientSideUnwinding);
+                                     attachmentPaths);
     });
     return initialized;
 }
@@ -566,10 +531,9 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jstring handler_path,
                                                       jobjectArray attributeKeys,
                                                       jobjectArray attributeValues,
-                                                      jobjectArray attachmentPaths = nullptr,
-                                                      jboolean enableClientSideUnwinding = false) {
+                                                      jobjectArray attachmentPaths = nullptr) {
     return Initialize(url, database_path, handler_path, attributeKeys,
-                      attributeValues, attachmentPaths, enableClientSideUnwinding);
+                      attributeValues, attachmentPaths);
 }
 
 
@@ -623,10 +587,8 @@ Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_
     DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
 }
 
-bool initializeLocalClientSideUnwinding(JNIEnv* env) {
-    __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android",
-                        "Using local unwinder");
-    /* Initialize a shared memory region. */
+bool InitializeLocalClientSideUnwinding(JNIEnv* env) {
+    // Initialize a shared memory region.
     static const char *buffer = static_cast<char *>(buffer_create());
 
     bun_buffer_init(&buf, (char*) buffer, BUFFER_SIZE);
@@ -641,29 +603,27 @@ bool initializeLocalClientSideUnwinding(JNIEnv* env) {
     return true;
 }
 
-bool initializeRemoteClientSideUnwinding(JNIEnv* env, jstring path) {
-    __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android",
-                            "Using remote unwinder");
+bool InitializeRemoteClientSideUnwinding(JNIEnv* env, jstring path) {
     struct bcd_config cf;
     bcd_error_t e;
 
-    /* Initialize a shared memory region. */
+    // Initialize a shared memory region.
     static const char *buffer = static_cast<char *>(buffer_create());
 
-    /* Initialize the BCD configuration file. */
+    // Initialize the BCD configuration file.
     if (bcd_config_init(&cf, &e) == -1)
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "bcd_config_init failed, cannot start client side unwinding");
+                            "bcd_config_init failed, cannot start client side unwinding, error message %s, error code %d", e.message, e.errnum);
 
-    /* Request handler to be called when processing errors by BCD worker. */
+    // Request handler to be called when processing errors by BCD worker.
     cf.request_handler = request_handler;
 
-    /* Set a function to be called by the child for setting permissions. */
+    // Set a function to be called by the child for setting permissions.
     cf.monitor_init = monitor_init;
 
     const char *path_cstr = env->GetStringUTFChars(path, 0);
 
-    /* Create the fully resolved path to the bcd socket file */
+    // Create the fully resolved path to the bcd socket file
     const char* file_name = "/bcd.socket";
     char* full_path = (char*) malloc((strlen(path_cstr) + strlen(file_name) + 1) * sizeof(char));
     strcpy(full_path, path_cstr);
@@ -675,7 +635,7 @@ bool initializeRemoteClientSideUnwinding(JNIEnv* env, jstring path) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "bcd_init failed, cannot start client side unwinding, error message %s, error code %d", e.message, e.errnum);
 
-    /* Initialize the BCD handler. */
+    // Initialize the BCD handler.
     if (bcd_attach(&bcd, &e) == -1)
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "bcd_attach failed, cannot start client side unwinding, error message %s, error code %d", e.message, e.errnum);
@@ -685,26 +645,16 @@ bool initializeRemoteClientSideUnwinding(JNIEnv* env, jstring path) {
 
     pid_t child_pid;
     memcpy(&child_pid, buffer, sizeof(child_pid));
-    __android_log_print(ANDROID_LOG_DEBUG, "Backtrace-Android", "child pid from parent %ju", (uintmax_t ) child_pid);
 
-
-    int result = prctl(PR_SET_PTRACER, child_pid, 0, 0, 0);
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "SET_PTRACER child pid result %d", result);
-
-    result = prctl(PR_SET_DUMPABLE, 1);
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "SET_PTRACER child pid result %d", result);
+    prctl(PR_SET_PTRACER, child_pid, 0, 0, 0);
+    prctl(PR_SET_DUMPABLE, 1);
 
     env->ReleaseStringUTFChars(path, path_cstr);
     bun_initialized = true;
     return true;
 }
 
-bool EnableClientSideUnwinding(jstring path, jint unwindingMode) {
-
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "Nowy log");
+bool EnableClientSideUnwinding(jstring path, jint unwinding_mode_int) {
     if (!sdkSupportsClientSideUnwinding()) {
         return false;
     }
@@ -716,21 +666,16 @@ bool EnableClientSideUnwinding(jstring path, jint unwindingMode) {
     }
 
     JNIEnv* env = GetJniEnv();
-    unwindingModeInt = (int) unwindingMode;
+    unwinding_mode = static_cast<UnwindingMode>(unwinding_mode_int);
 
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "Unwinding mode from EnableClientSideUnwinding %d and unwindingModeInt is %d", unwindingMode, unwindingModeInt);
-
-    switch (unwindingMode) {
-        case 0:
-        case 3:
-        case 4:
-            // local unwinding
-            return initializeLocalClientSideUnwinding(env);
-        case 1:
-        case 2:
-            // remote unwinding with dumpwithoutcrash
-            return initializeRemoteClientSideUnwinding(env, path);
+    switch (unwinding_mode) {
+        case UnwindingMode::LOCAL:
+        case UnwindingMode::LOCAL_DUMPWITHOUTCRASH:
+        case UnwindingMode::LOCAL_CONTEXT:
+            return InitializeLocalClientSideUnwinding(env);
+        case UnwindingMode::REMOTE:
+        case UnwindingMode::REMOTE_DUMPWITHOUTCRASH:
+            return InitializeRemoteClientSideUnwinding(env, path);
         default:
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad initialization failed");
             return false;
@@ -741,7 +686,7 @@ extern "C"
 JNIEXPORT jboolean JNICALL
 Java_backtraceio_library_BacktraceDatabase_enableClientSideUnwinding(JNIEnv *env, jobject thiz, jstring path, jobject unwindingMode) {
     jmethodID unwindingModeGetValueMethod = env->GetMethodID(env->FindClass(
-            "backtraceio/library/interfaces/Database$UnwindingMode"), "ordinal", "()I");
+            "backtraceio/library/enums/UnwindingMode"), "ordinal", "()I");
     jint value = env->CallIntMethod(unwindingMode, unwindingModeGetValueMethod);
     return EnableClientSideUnwinding(path, (int) value);
 }

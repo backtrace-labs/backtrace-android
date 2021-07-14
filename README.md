@@ -487,7 +487,7 @@ For an NDK application, debugging symbols are not available to Backtrace by defa
 ## Client side unwinding
 For an NDK application, debugging symbols for system functions (for instance in `libc.so`) can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client). To enable client side unwinding, you can use the `BacktraceClient` `enableClientSideUnwinding` method.
 
-```cpp
+```java
 backtraceClient.enableClientSideUnwinding(context.getFilesDir().getAbsolutePath());
 
 database.setupNativeIntegration(backtraceClient, credentials);

@@ -200,9 +200,4 @@ public class MainActivity extends AppCompatActivity {
     public void dumpWithoutCrash(View view) {
         backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
     }
-
-    public void dumpWithoutCrashThenCrash(View view) {
-        backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
-        cppCrash();
-    }
 }

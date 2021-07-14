@@ -48,23 +48,11 @@
         android:layout_height="wrap_content"
         android:text="DumpWithoutCrash"
         android:onClick="dumpWithoutCrash"
-        app:layout_constraintBottom_toTopOf="@+id/dumpWithoutCrashThenCrash"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
-
-    <Button
-        android:id="@+id/dumpWithoutCrashThenCrash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="DumpWithoutCrash then Crash"
-        android:onClick="dumpWithoutCrashThenCrash"
         app:layout_constraintBottom_toTopOf="@+id/anr"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dumpWithoutCrash" />
+        app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
 
     <Button
         android:id="@+id/anr"
@@ -75,7 +63,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dumpWithoutCrashThenCrash" />
+        app:layout_constraintTop_toBottomOf="@+id/dumpWithoutCrash" />
 
     <Button
         android:id="@+id/enableBreadcrumbs"
