@@ -67,11 +67,14 @@ public class BacktraceDatabase implements Database {
      * @param attributeKeys             array of attribute keys
      * @param attributeValues           array of attribute values
      * @param attachmentPaths           array of paths to file attachments
+     * @param enableClientSideUnwinding enable client side unwinding
+     * @param unwindingMode             unwinding mode for client side unwinding to use
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
     private native boolean initialize(String url, String databasePath, String handlerPath,
                                       String[] attributeKeys, String[] attributeValues,
-                                      String[] attachmentPaths);
+                                      String[] attachmentPaths, boolean enableClientSideUnwinding,
+                                      UnwindingMode unwindingMode);
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -132,6 +135,31 @@ public class BacktraceDatabase implements Database {
      * @param credentials Backtrace credentials
      */
     public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
+        return setupNativeIntegration(client, credentials, false);
+    }
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     */
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding) {
+        return setupNativeIntegration(client, credentials, enableClientSideUnwinding, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
+    }
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
         // avoid initialization when database doesn't exist
         if (getSettings() == null) {
             return false;
@@ -165,7 +193,9 @@ public class BacktraceDatabase implements Database {
                 handlerPath,
                 keys,
                 values,
-                attachmentPaths
+                attachmentPaths,
+                enableClientSideUnwinding,
+                unwindingMode
         );
         return initialized;
     }
@@ -407,6 +437,4 @@ public class BacktraceDatabase implements Database {
     public long getDatabaseSize() {
         return backtraceDatabaseContext.getDatabaseSize();
     }
-
-    public native boolean enableClientSideUnwinding(String path, UnwindingMode unwindingMode);
 }

@@ -245,6 +245,23 @@ public class BacktraceBase implements Client {
     }
 
     /**
+     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * @param enableClientSideUnwinding Enable client side unwinding
+     */
+    public void enableNativeIntegration(boolean enableClientSideUnwinding) {
+        this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding);
+    }
+
+    /**
+     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    public void enableNativeIntegration(boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+        this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding, unwindingMode);
+    }
+
+    /**
      * Inform Backtrace API that we are using Proguard symbolication
      */
     public void enableProguard() {
@@ -426,25 +443,6 @@ public class BacktraceBase implements Client {
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
-    }
-
-    /**
-     * Enable client-side callstack resolution
-     * @param path              path to use for the socket file if remote unwinding is used, can be null
-     * @return true on success, otherwise returns false
-     */
-    public boolean enableClientSideUnwinding(String path) {
-        return enableClientSideUnwinding(path, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
-    }
-
-    /**
-     * Enable client-side callstack resolution
-     * @param path              path to use for the socket file if remote unwinding is used, can be null
-     * @param unwindingMode     the unwinding mode to use for client side unwinding
-     * @return true on success, otherwise returns false
-     */
-    public boolean enableClientSideUnwinding(String path, UnwindingMode unwindingMode) {
-        return database.enableClientSideUnwinding(path, unwindingMode);
     }
 
     public void nativeCrash() {

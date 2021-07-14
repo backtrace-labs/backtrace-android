@@ -89,16 +89,30 @@ public interface Database {
     Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);
 
     /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     */
+    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding);
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode);
+
+    /**
      * Get the breadcrumbs implementation
      *
      * @return the breadcrumbs implementation for this Database, if any
      */
     Breadcrumbs getBreadcrumbs();
-
-    /**
-     * Enable client-side callstack resolution
-     *
-     * @return true on success, otherwise returns false
-     */
-    boolean enableClientSideUnwinding(String path, UnwindingMode unwindingMode);
 }
