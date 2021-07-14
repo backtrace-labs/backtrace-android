@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:text="Native Crash"
         android:onClick="nativeCrash"
-        app:layout_constraintBottom_toTopOf="@+id/dumpWithoutCrashThenCrash"
+        app:layout_constraintBottom_toTopOf="@+id/dumpWithoutCrash"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
