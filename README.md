@@ -485,17 +485,19 @@ More details about [extractNativeLibs](https://developer.android.com/guide/topic
 For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
 
 ## Client side unwinding
-For an NDK application, debugging symbols for system functions (for instance in `libc.so`) can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client). To enable client side unwinding, you can use the `BacktraceClient` `enableClientSideUnwinding` method.
+For an NDK application, debugging symbols for system functions (for instance in `libc.so`) and other opaque libraries can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client).
 
+To enable client side unwinding, you can call the `setupNativeIntegration` method with an additional boolean value.
 ```java
-backtraceClient.enableClientSideUnwinding(context.getFilesDir().getAbsolutePath());
-
-database.setupNativeIntegration(backtraceClient, credentials);
+database.setupNativeIntegration(backtraceClient, credentials, true);
 ```
 
-NOTE: `enableClientSideUnwinding` must be called BEFORE `setupNativeIntegration`
+You can also optionally specify the unwinding mode (`REMOTE_DUMPWITHOUTCRASH` is the default)
+```java
+database.setupNativeIntegration(backtraceClient, credentials, true, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
+```
 
-NOTE: Client side unwinding is only available in API level 23 (Android 6.0)+
+NOTE: Client side unwinding is only available in API level 23+ (Android 6.0)+
 
 # Working with Proguard <a name="working_with_proguard"></a>
 
