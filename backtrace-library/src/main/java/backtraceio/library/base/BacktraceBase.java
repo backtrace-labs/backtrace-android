@@ -430,7 +430,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable client-side callstack resolution
-     * @param path              path to use for the socket file if DUMPWITHOUTCRASH unwinding is used, can be null
+     * @param path              path to use for the socket file if remote unwinding is used, can be null
      * @return true on success, otherwise returns false
      */
     public boolean enableClientSideUnwinding(String path) {
@@ -439,7 +439,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable client-side callstack resolution
-     * @param path              path to use for the socket file if DUMPWITHOUTCRASH unwinding is used, can be null
+     * @param path              path to use for the socket file if remote unwinding is used, can be null
      * @param unwindingMode     the unwinding mode to use for client side unwinding
      * @return true on success, otherwise returns false
      */
