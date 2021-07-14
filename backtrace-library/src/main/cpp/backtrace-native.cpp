@@ -230,16 +230,14 @@ namespace /* anonymous */
 
         thread_local bool flag;
 
-        if (flag == false) {
-            flag = true;
-            bcd_emit(&bcd, "1");
-
-            crashpad::CrashpadClient::DumpWithoutCrash(context);
-
-            return true;
-        } else {
+        if (flag == true) {
             return false;
         }
+
+        flag = true;
+        bcd_emit(&bcd, "1");
+
+        crashpad::CrashpadClient::DumpWithoutCrash(context);
 
         return true;
     }
