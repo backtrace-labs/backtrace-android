@@ -485,7 +485,7 @@ More details about [extractNativeLibs](https://developer.android.com/guide/topic
 For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
 
 ## Client side unwinding
-For an NDK application, debugging symbols for system functions (for instance in `libc.so`) and other opaque libraries can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client).
+For an NDK application, debugging symbols for system functions (for instance in `libc.so`) and other opaque libraries can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client). This may not provide the same callstack quality as with debugging symbols, but will give you debugging information you would otherwise not have if you don't have debugging symbols available.
 
 To enable client side unwinding, you can call the `setupNativeIntegration` method with an additional boolean value.
 ```java
@@ -503,8 +503,9 @@ NOTE: Client side unwinding is only available in API level 23+ (Android 6.0)+
 
 - **LOCAL** - Unwinding is done within the same process that has the crash. This is less robust than remote unwinding, but avoids the complexity of creating a child process and IPC. Local unwinding is executed from a signal handler and needs to be signal-safe.
 - **REMOTE** - Unwinding is done by a child process. This means that the unwinding is correct even in case of severe malfunctions in the crashing parent process, and signal-safety is not a concern.
-- **DUMPWITHOUTCRASH** - Instead of using the regular Crashpad reporting mechanism, tell Crashpad that we're the ones who are responsible for sending the crash report. Then, we send the report using Crashpad's `DumpWithoutCrash()` method.
-- **CONTEXT** - Use `ucontext *` from signal handler to reconstruct the callstack.
+- **LOCAL_DUMPWITHOUTCRASH** - The same as `LOCAL` unwinding, but instead of using the regular Crashpad reporting mechanism, Backtrace's custom reporting mechanism will be used. Then, we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **REMOTE_DUMPWITHOUTCRASH** - The same as `REMOTE` unwinding, but instead of using the regular Crashpad reporting mechanism, Backtrace's custom reporting mechanism will be used. Then, we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **LOCAL_CONTEXT** -  The same as `LOCAL` unwinding, but use `ucontext_t *` from the signal handler to reconstruct the callstack.
 
 # Working with Proguard <a name="working_with_proguard"></a>
 
