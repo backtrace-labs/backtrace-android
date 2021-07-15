@@ -12,6 +12,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.events.OnBeforeSendEventListener;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -236,12 +237,28 @@ public class BacktraceBase implements Client {
         this.database.start();
     }
 
-
     /**
      * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
      */
     public void enableNativeIntegration() {
         this.database.setupNativeIntegration(this, this.credentials);
+    }
+
+    /**
+     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * @param enableClientSideUnwinding Enable client side unwinding
+     */
+    public void enableNativeIntegration(boolean enableClientSideUnwinding) {
+        this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding);
+    }
+
+    /**
+     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    public void enableNativeIntegration(boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+        this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding, unwindingMode);
     }
 
     /**
@@ -259,7 +276,6 @@ public class BacktraceBase implements Client {
     public Map<String, Object> getAttributes() {
         return attributes;
     }
-
 
     /**
      * Set event executed before sending data to Backtrace API

@@ -1,3 +1,6 @@
 [submodule "backtrace-library/src/main/cpp/crashpad-builds"]
 	path = backtrace-library/src/main/cpp/crashpad-builds
 	url = https://github.com/backtrace-labs/crashpad-builds.git
+[submodule "backtrace-library/src/main/cpp/libbun"]
+	path = backtrace-library/src/main/cpp/libbun
+	url = git@github.com:backtrace-labs/libbun.git
