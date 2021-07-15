@@ -4,6 +4,7 @@ import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -86,6 +87,27 @@ public interface Database {
      * @param credentials Backtrace credentials
      */
     Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials);
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     */
+    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding);
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode);
 
     /**
      * Get the breadcrumbs implementation

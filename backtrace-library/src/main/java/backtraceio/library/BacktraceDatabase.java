@@ -3,9 +3,7 @@ package backtraceio.library;
 import android.content.Context;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Api;
@@ -62,15 +61,20 @@ public class BacktraceDatabase implements Database {
     /**
      * Initialize Backtrace-native integration
      *
-     * @param url               url to Backtrace
-     * @param databasePath      path to Backtrace-native database
-     * @param handlerPath       path to error handler
-     * @param attributeKeys     array of attribute keys
-     * @param attributeValues   array of attribute values
-     * @param attachmentPaths   array of paths to file attachments
+     * @param url                       url to Backtrace
+     * @param databasePath              path to Backtrace-native database
+     * @param handlerPath               path to error handler
+     * @param attributeKeys             array of attribute keys
+     * @param attributeValues           array of attribute values
+     * @param attachmentPaths           array of paths to file attachments
+     * @param enableClientSideUnwinding enable client side unwinding
+     * @param unwindingMode             unwinding mode for client side unwinding to use
      * @return true - if backtrace-native was able to initialize correctly, otherwise false.
      */
-    private native boolean initialize(String url, String databasePath, String handlerPath, String[] attributeKeys, String[] attributeValues, String[] attachmentPaths);
+    private native boolean initialize(String url, String databasePath, String handlerPath,
+                                      String[] attributeKeys, String[] attributeValues,
+                                      String[] attachmentPaths, boolean enableClientSideUnwinding,
+                                      UnwindingMode unwindingMode);
 
     /**
      * Create disabled instance of BacktraceDatabase
@@ -131,6 +135,31 @@ public class BacktraceDatabase implements Database {
      * @param credentials Backtrace credentials
      */
     public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials) {
+        return setupNativeIntegration(client, credentials, false);
+    }
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     */
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding) {
+        return setupNativeIntegration(client, credentials, enableClientSideUnwinding, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
+    }
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
         // avoid initialization when database doesn't exist
         if (getSettings() == null) {
             return false;
@@ -164,7 +193,9 @@ public class BacktraceDatabase implements Database {
                 handlerPath,
                 keys,
                 values,
-                attachmentPaths
+                attachmentPaths,
+                enableClientSideUnwinding,
+                unwindingMode
         );
         return initialized;
     }

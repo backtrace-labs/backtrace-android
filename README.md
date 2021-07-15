@@ -519,6 +519,33 @@ More details about [extractNativeLibs](https://developer.android.com/guide/topic
 ## Uploading symbols to Backtrace
 For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)
 
+## Client side unwinding
+For an NDK application, debugging symbols for system functions (for instance in `libc.so`) and other opaque libraries can be difficult to obtain. In these cases, it is better to unwind the callstack on the crashing application (i.e: the client). This may not provide the same callstack quality as with debugging symbols, but will give you debugging information you would otherwise not have if you don't have debugging symbols available.
+
+To enable client side unwinding, you can call the `setupNativeIntegration` method with an additional boolean value.
+```java
+database.setupNativeIntegration(backtraceClient, credentials, true);
+```
+
+**NOTE:** Client side unwinding is only available in API level 23+ (Android 6.0)+
+
+**NOTE:** When viewing a crash in the Backtrace Debugger, it may still show warning messages that symbols are missing from certain frames after client-side unwinding is performed. This warning is expected if these symbols are not available on the Backtrace server, and should have no impact to the end-user's ability to read the call stack.
+
+**NOTE:** Client side unwinding is only available for fatal crashes. Non-fatal Crashpad dumps you generate via `DumpWithoutCrash` for instance will not use client side unwinding.
+
+### Unwinding Modes and Options
+
+You can optionally specify the unwinding mode (`REMOTE_DUMPWITHOUTCRASH` is the default)
+```java
+database.setupNativeIntegration(backtraceClient, credentials, true, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
+```
+
+- **LOCAL** - Unwinding is done within the same process that has the crash. This is less robust than remote unwinding, but avoids the complexity of creating a child process and IPC. Local unwinding is executed from a signal handler and needs to be signal-safe.
+- **REMOTE** - Unwinding is done by a child process. This means that the unwinding is correct even in case of severe malfunctions in the crashing parent process, and signal-safety is not a concern.
+- **LOCAL_DUMPWITHOUTCRASH** - The same as `LOCAL` unwinding, but instead of using the regular Crashpad signal hander to call the unwinder and regular Crashpad reporting mechanism, Backtrace's custom signal handler will be used to call the unwinder before we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **REMOTE_DUMPWITHOUTCRASH** - This is the default and recommended option. Same as `LOCAL` unwinding, but instead of using the regular Crashpad signal hander to call the unwinder and regular Crashpad reporting mechanism, Backtrace's custom signal handler will be used to call the unwinder before we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **LOCAL_CONTEXT** -  The same as `LOCAL` unwinding, but use `ucontext_t *` from the signal handler to reconstruct the callstack.
+
 # Working with Proguard <a name="working_with_proguard"></a>
 
 ##### 1. Add the following to the `proguard_rules.pro` for your app

@@ -36,11 +36,23 @@
         android:layout_height="wrap_content"
         android:text="Native Crash"
         android:onClick="nativeCrash"
-        app:layout_constraintBottom_toTopOf="@+id/anr"
+        app:layout_constraintBottom_toTopOf="@+id/dumpWithoutCrash"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/unhandledException" />
+
+    <Button
+        android:id="@+id/dumpWithoutCrash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DumpWithoutCrash"
+        android:onClick="dumpWithoutCrash"
+        app:layout_constraintBottom_toTopOf="@+id/anr"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
 
     <Button
         android:id="@+id/anr"
@@ -51,7 +63,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
+        app:layout_constraintTop_toBottomOf="@+id/dumpWithoutCrash" />
 
     <Button
         android:id="@+id/enableBreadcrumbs"

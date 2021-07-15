@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+
+## Version 3.3.0 - 15.07.2021
+- Added support for client side unwinding of native crashes
+
 ## Version 3.2.2 - 10.03.2021
 - Hotfix for crash when user enables native integration without file attachments
 

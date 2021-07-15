@@ -3,6 +3,8 @@ package backtraceio.backtraceio;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.util.Log;
 import android.view.View;
 
@@ -23,6 +25,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceExceptionHandler;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }};
 
         final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+
         List<String> attachments = new ArrayList<String>(){{
             add(fileName);
         }};
@@ -70,13 +74,19 @@ public class MainActivity extends AppCompatActivity {
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
-        writeMyCustomFile(fileName);
+        final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
+        try {
+            Os.symlink(fileNameDateString, fileName);
+        } catch (ErrnoException e) {
+            e.printStackTrace();
+        }
+        writeMyCustomFile(fileNameDateString);
 
         BacktraceExceptionHandler.enable(backtraceClient);
         backtraceClient.send("test");
 
         // Enable handling of native crashes
-        database.setupNativeIntegration(backtraceClient, credentials);
+        database.setupNativeIntegration(backtraceClient, credentials, true);
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
@@ -180,5 +190,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void exit(View view) {
         System.exit(0);
+    }
+
+    public void dumpWithoutCrash(View view) {
+        backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
     }
 }
