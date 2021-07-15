@@ -499,6 +499,13 @@ database.setupNativeIntegration(backtraceClient, credentials, true, UnwindingMod
 
 NOTE: Client side unwinding is only available in API level 23+ (Android 6.0)+
 
+### Unwinding Modes and Options
+
+- **LOCAL** - Unwinding is done within the same process that has the crash. This is less robust than remote unwinding, but avoids the complexity of creating a child process and IPC. Local unwinding is executed from a signal handler and needs to be signal-safe.
+- **REMOTE** - Unwinding is done by a child process. This means that the unwinding is correct even in case of severe malfunctions in the crashing parent process, and signal-safety is not a concern.
+- **DUMPWITHOUTCRASH** - Instead of using the regular Crashpad reporting mechanism, tell Crashpad that we're the ones who are responsible for sending the crash report. Then, we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **CONTEXT** - Use `ucontext *` from signal handler to reconstruct the callstack.
+
 # Working with Proguard <a name="working_with_proguard"></a>
 
 ##### 1. Add the following to the `proguard_rules.pro` for your app
