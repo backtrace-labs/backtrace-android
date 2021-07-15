@@ -492,19 +492,21 @@ To enable client side unwinding, you can call the `setupNativeIntegration` metho
 database.setupNativeIntegration(backtraceClient, credentials, true);
 ```
 
-You can also optionally specify the unwinding mode (`REMOTE_DUMPWITHOUTCRASH` is the default)
+**NOTE:** Client side unwinding is only available in API level 23+ (Android 6.0)+
+
+**NOTE:** When viewing a crash in the Backtrace Debugger, it may still show warning messages that symbols are missing from certain frames after client-side unwinding is performed. This warning is expected if these symbols are not available on the Backtrace server, and should have no impact to the end-user's ability to read the call stack.
+
+### Unwinding Modes and Options
+
+You can optionally specify the unwinding mode (`REMOTE_DUMPWITHOUTCRASH` is the default)
 ```java
 database.setupNativeIntegration(backtraceClient, credentials, true, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
 ```
 
-NOTE: Client side unwinding is only available in API level 23+ (Android 6.0)+
-
-### Unwinding Modes and Options
-
 - **LOCAL** - Unwinding is done within the same process that has the crash. This is less robust than remote unwinding, but avoids the complexity of creating a child process and IPC. Local unwinding is executed from a signal handler and needs to be signal-safe.
 - **REMOTE** - Unwinding is done by a child process. This means that the unwinding is correct even in case of severe malfunctions in the crashing parent process, and signal-safety is not a concern.
-- **LOCAL_DUMPWITHOUTCRASH** - The same as `LOCAL` unwinding, but instead of using the regular Crashpad reporting mechanism, Backtrace's custom reporting mechanism will be used. Then, we send the report using Crashpad's `DumpWithoutCrash()` method.
-- **REMOTE_DUMPWITHOUTCRASH** - The same as `REMOTE` unwinding, but instead of using the regular Crashpad reporting mechanism, Backtrace's custom reporting mechanism will be used. Then, we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **LOCAL_DUMPWITHOUTCRASH** - The same as `LOCAL` unwinding, but instead of using the regular Crashpad signal hander to call the unwinder and regular Crashpad reporting mechanism, Backtrace's custom signal handler will be used to call the unwinder before we send the report using Crashpad's `DumpWithoutCrash()` method.
+- **REMOTE_DUMPWITHOUTCRASH** - This is the default and recommended option. Same as `LOCAL` unwinding, but instead of using the regular Crashpad signal hander to call the unwinder and regular Crashpad reporting mechanism, Backtrace's custom signal handler will be used to call the unwinder before we send the report using Crashpad's `DumpWithoutCrash()` method.
 - **LOCAL_CONTEXT** -  The same as `LOCAL` unwinding, but use `ucontext_t *` from the signal handler to reconstruct the callstack.
 
 # Working with Proguard <a name="working_with_proguard"></a>
