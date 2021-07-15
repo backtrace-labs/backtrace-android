@@ -146,6 +146,7 @@ namespace /* anonymous */
 
         (void) written;
 
+        // We return -1 on purpose to tell bcd to not employ its own ptrace dumping mechanism
         return -1;
     }
 
