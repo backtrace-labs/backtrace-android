@@ -496,6 +496,8 @@ database.setupNativeIntegration(backtraceClient, credentials, true);
 
 **NOTE:** When viewing a crash in the Backtrace Debugger, it may still show warning messages that symbols are missing from certain frames after client-side unwinding is performed. This warning is expected if these symbols are not available on the Backtrace server, and should have no impact to the end-user's ability to read the call stack.
 
+**NOTE:** Client side unwinding is only available for fatal crashes. Non-fatal Crashpad dumps you generate via `DumpWithoutCrash` for instance will not use client side unwinding.
+
 ### Unwinding Modes and Options
 
 You can optionally specify the unwinding mode (`REMOTE_DUMPWITHOUTCRASH` is the default)
