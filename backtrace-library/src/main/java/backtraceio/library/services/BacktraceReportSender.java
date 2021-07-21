@@ -7,12 +7,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.metrics.EventsPayload;
+import backtraceio.library.metrics.EventsResult;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.HttpException;
@@ -20,7 +30,7 @@ import backtraceio.library.models.types.HttpException;
 /**
  * Class for sending and processing HTTP request
  */
-class BacktraceReportSender {
+public class BacktraceReportSender {
 
     private static final String LOG_TAG = BacktraceReportSender.class.getSimpleName();
 
@@ -77,8 +87,7 @@ class BacktraceReportSender {
                 String message = getResponse(urlConnection);
                 message = (message == null || message.equals("")) ?
                         urlConnection.getResponseMessage() : message;
-                throw new HttpException(statusCode, String.format("%s: %s",
-                        Integer.toString(statusCode), message));
+                throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }
 
         } catch (Exception e) {
@@ -96,6 +105,86 @@ class BacktraceReportSender {
                 } catch (Exception e) {
                     BacktraceLogger.e(LOG_TAG, "Disconnecting HttpUrlConnection failed", e);
                     result = BacktraceResult.OnError(report, e);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Send HTTP request for certain url server with information about events
+     *
+     * @param serverUrl             server http address to which the request will be sent
+     * @param json                  message wih information about events
+     * @param payload               information about events
+     * @param ignoreSslValidation   disable ssl validation for this request
+     * @param errorCallback         event that will be executed after receiving an error from the server
+     * @return information from the server about the result of processing the request
+     */
+    public static EventsResult sendEvents(String serverUrl, String json, EventsPayload payload, boolean ignoreSslValidation, OnServerErrorEventListener errorCallback) {
+        HttpURLConnection urlConnection = null;
+        EventsResult result;
+        int statusCode = -1;
+
+        try {
+            URL url = new URL(serverUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            if (ignoreSslValidation) {
+                BacktraceReportSender.ignoreSslValidation(urlConnection);
+            }
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setUseCaches(false);
+
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+
+            urlConnection.setChunkedStreamingMode(128 * 1024);
+            urlConnection.setRequestProperty("Connection", "Keep-Alive");
+            urlConnection.setRequestProperty("Cache-Control", "no-cache");
+
+            urlConnection.setRequestProperty("Content-Type",
+                    MultiFormRequestHelper.getContentType());
+
+            BacktraceLogger.d(LOG_TAG, "HttpURLConnection successfully initialized");
+            DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
+
+            MultiFormRequestHelper.addJson(request, json);
+            MultiFormRequestHelper.addEndOfRequest(request);
+
+            request.flush();
+            request.close();
+
+            statusCode = urlConnection.getResponseCode();
+            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + Integer.toString(statusCode));
+
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                result = BacktraceSerializeHelper.fromJson(getResponse(urlConnection), EventsResult.class);
+                result.setEventsPayload(payload);
+                result.setStatusCode(statusCode);
+            } else {
+                String message = getResponse(urlConnection);
+                message = (message == null || message.equals("")) ?
+                        urlConnection.getResponseMessage() : message;
+                throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
+            }
+
+        } catch (Exception e) {
+            if (errorCallback != null) {
+                BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
+                errorCallback.onEvent(e);
+            }
+            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
+            result = EventsResult.OnError(payload, e, statusCode);
+        } finally {
+            if (urlConnection != null) {
+                try {
+                    urlConnection.disconnect();
+                    BacktraceLogger.d(LOG_TAG, "Disconnecting HttpUrlConnection successful");
+                } catch (Exception e) {
+                    BacktraceLogger.e(LOG_TAG, "Disconnecting HttpUrlConnection failed", e);
+                    result = EventsResult.OnError(payload, e, statusCode);
                 }
             }
         }
@@ -129,5 +218,47 @@ class BacktraceReportSender {
         }
         br.close();
         return responseSB.toString();
+    }
+
+    // https://stackoverflow.com/questions/35548162/how-to-bypass-ssl-certificate-validation-in-android-app
+    private static void ignoreSslValidation(HttpURLConnection urlConnection) {
+        if (!(urlConnection instanceof HttpsURLConnection)) {
+            BacktraceLogger.e(LOG_TAG, "Cannot disable ssl validation, not an HttpsURLConnection instance");
+            return;
+        }
+
+        HttpsURLConnection localUrlConnection = (HttpsURLConnection) urlConnection;
+
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            localUrlConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            localUrlConnection.setDefaultHostnameVerifier(allHostsValid);
+        } catch (Exception e) {
+            BacktraceLogger.e(LOG_TAG, "Could not disable ssl validation");
+            return;
+        }
     }
 }

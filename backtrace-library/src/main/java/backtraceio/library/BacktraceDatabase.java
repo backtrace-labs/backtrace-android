@@ -80,6 +80,7 @@ public class BacktraceDatabase implements Database {
      * Create disabled instance of BacktraceDatabase
      */
     public BacktraceDatabase() {
+        BacktraceLogger.w(LOG_TAG, "Disabled instance of BacktraceDatabase created, native crashes won't be captured");
     }
 
     /**

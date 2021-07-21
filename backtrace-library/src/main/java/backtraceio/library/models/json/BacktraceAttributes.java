@@ -85,16 +85,8 @@ public class BacktraceAttributes {
     private void setAppInformation() {
         this.attributes.put("application.package", this.context.getApplicationContext()
                 .getPackageName());
-
-        this.attributes.put("application", this.context.getApplicationInfo().loadLabel(this.context
-                .getPackageManager()).toString());
-
-        try {
-            this.attributes.put("version", this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        this.attributes.put("application", getApplicationName());
+        this.attributes.put("version", getApplicationVersion());
     }
 
     /**
@@ -198,5 +190,27 @@ public class BacktraceAttributes {
                 this.complexAttributes.put(entry.getKey(), value);
             }
         }
+    }
+
+    public String getApplicationName() {
+        return this.context.getApplicationInfo().loadLabel(this.context
+                .getPackageManager()).toString();
+    }
+
+    public String getApplicationVersion() {
+        try {
+            return this.attributes.put("version", this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return new String();
+        }
+    }
+
+    public Map<String, Object> getAllBacktraceAttributes() {
+        Map<String, Object> attributes = new HashMap<String, Object>();
+        attributes.putAll(this.attributes);
+        attributes.putAll(this.complexAttributes);
+        return attributes;
     }
 }

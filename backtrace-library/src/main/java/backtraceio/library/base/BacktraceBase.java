@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -21,6 +22,12 @@ import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
+import backtraceio.library.interfaces.Metrics;
+import backtraceio.library.metrics.BacktraceMetrics;
+import backtraceio.library.metrics.EventsOnServerResponseEventListener;
+import backtraceio.library.metrics.EventsRequestHandler;
+import backtraceio.library.metrics.SummedEvent;
+import backtraceio.library.metrics.UniqueEvent;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -84,6 +91,11 @@ public class BacktraceBase implements Client {
      * Is Proguard symbolication enabled? We have to inform the Backtrace API
      */
     private boolean isProguardEnabled = false;
+
+    /**
+     * Backtrace metrics instance
+     */
+    private Metrics metrics = null;
 
     /**
      * Initialize new client instance with BacktraceCredentials
@@ -296,12 +308,30 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Custom request handler for call to server
+     * Custom request handler for sending Backtrace reports to server
      *
      * @param requestHandler object with method which will be executed
      */
     public void setOnRequestHandler(RequestHandler requestHandler) {
         this.backtraceApi.setRequestHandler(requestHandler);
+    }
+
+    /**
+     * Custom request handler for sending Backtrace unique events to server
+     *
+     * @param eventsRequestHandler object with method which will be executed
+     */
+    public void setUniqueEventsRequestHandler(EventsRequestHandler eventsRequestHandler) {
+        backtraceApi.setUniqueEventsRequestHandler(eventsRequestHandler);
+    }
+
+    /**
+     * Custom request handler for sending Backtrace summed events to server
+     *
+     * @param eventsRequestHandler object with method which will be executed
+     */
+    public void setSummedEventsRequestHandler(EventsRequestHandler eventsRequestHandler) {
+        backtraceApi.setSummedEventsRequestHandler(eventsRequestHandler);
     }
 
     /**
@@ -445,6 +475,105 @@ public class BacktraceBase implements Client {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
     }
 
+    /**
+     * Enable backtrace metrics support
+     * @param universeName  Backtrace universe name
+     * @param token         Backtrace submission token
+     */
+    public void enableMetrics(String universeName, String token) {
+        enableMetrics(BacktraceMetrics.defaultBaseUrl, universeName, token);
+    }
+
+    /**
+     * Enable backtrace metrics support
+     * @param baseUrl       Base URL to send metrics
+     * @param universeName  Backtrace universe name
+     * @param token         Backtrace submission token
+     */
+    public void enableMetrics(String baseUrl, String universeName, String token) {
+        enableMetrics(baseUrl, universeName, token, BacktraceMetrics.defaultTimeIntervalMillis);
+    }
+
+    /**
+     * Enable backtrace metrics support
+     * @param universeName          Backtrace universe name
+     * @param token                 Backtrace submission token
+     * @param timeIntervalMillis    Time interval between metrics auto-send events, 0 disables auto-send
+     */
+    public void enableMetrics(String universeName, String token, long timeIntervalMillis) {
+        enableMetrics(BacktraceMetrics.defaultBaseUrl, universeName, token, timeIntervalMillis);
+    }
+
+    /**
+     * Enable backtrace metrics support
+     * @param baseUrl               Base URL to send metrics
+     * @param universeName          Backtrace universe name
+     * @param token                 Backtrace submission token
+     * @param timeIntervalMillis    Time interval between metrics auto-send events, 0 disables auto-send
+     */
+    public void enableMetrics(String baseUrl, String universeName, String token, long timeIntervalMillis) {
+        enableMetrics(baseUrl, universeName, token, timeIntervalMillis, BacktraceMetrics.defaultTimeBetweenRetriesMillis);
+    }
+
+    /**
+     * Enable backtrace metrics support
+     * @param baseUrl                   Base URL to send metrics
+     * @param universeName              Backtrace universe name
+     * @param token                     Backtrace submission token
+     * @param timeIntervalMillis        Time interval between metrics auto-send events, 0 disables auto-send
+     * @param timeBetweenRetriesMillis  Maximum time between retries in milliseconds
+     */
+    public void enableMetrics(String baseUrl, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        metrics = new BacktraceMetrics(context, attributes, baseUrl, universeName, token, timeIntervalMillis, timeBetweenRetriesMillis);
+        metrics.startMetricsEventHandlers(backtraceApi);
+        metrics.sendStartupEvent();
+    }
+
+    public boolean addUniqueEvent(String attributeName) {
+        return metrics.addUniqueEvent(attributeName);
+    }
+
+    public boolean addUniqueEvent(String attributeName, Map<String, Object> attributes) {
+        return metrics.addUniqueEvent(attributeName, attributes);
+    }
+
+    public boolean addSummedEvent(String metricGroupName) {
+        return metrics.addSummedEvent(metricGroupName);
+    }
+
+    public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
+        return metrics.addSummedEvent(metricGroupName, attributes);
+    }
+
+    public ConcurrentLinkedDeque<UniqueEvent> getUniqueEvents() {
+        return metrics.getUniqueEvents();
+    }
+
+    public ConcurrentLinkedDeque<SummedEvent> getSummedEvents() {
+        return metrics.getSummedEvents();
+    }
+
+    public int getEventsCount() {
+        return metrics.count();
+    }
+
+    /**
+     * Manually send metrics
+     */
+    public void sendMetrics() {
+        metrics.send();
+    }
+
+    /**
+     * Set maximum number of metrics events to store. Additional events will be dropped. When
+     * events are added
+     *
+     * @param maximumNumberOfEvents
+     */
+    public void setMaximumNumberOfEvents(int maximumNumberOfEvents) {
+        metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
+    }
+
     public void nativeCrash() {
         crash();
     }
@@ -513,5 +642,23 @@ public class BacktraceBase implements Client {
                 report.attachmentPaths.add(path);
             }
         }
+    }
+
+    /**
+     * Custom callback to be executed on server response to a unique events submission request
+     *
+     * @param callback object with method which will be executed
+     */
+    public void setUniqueEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
+        backtraceApi.setUniqueEventsOnServerResponse(callback);
+    }
+
+    /**
+     * Custom callback to be executed on server response to a summed events submission request
+     *
+     * @param callback object with method which will be executed
+     */
+    public void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
+        backtraceApi.setSummedEventsOnServerResponse(callback);
     }
 }
