@@ -100,6 +100,7 @@ namespace /* anonymous */
         if (r == MAP_FAILED) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Could not create memory mapped file for client side unwinding");
+            return nullptr;
         }
 
         return r;
@@ -158,7 +159,7 @@ namespace /* anonymous */
          * a memory mapping to the same descriptor.
          */
         buffer_child = (char *)buffer_reader(buffer_fd, PROT_READ | PROT_WRITE);
-        if (buffer_child == NULL) {
+        if (buffer_child == nullptr) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Could not create memory mapped file for client side unwinding");
             return;
@@ -294,6 +295,10 @@ namespace /* anonymous */
     bool InitializeLocalClientSideUnwinding(JNIEnv* env) {
         // Initialize a shared memory region.
         static const char *buffer = static_cast<char *>(buffer_create());
+        if (buffer == nullptr) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create buffer for client side unwinding, client side unwinding disabled");
+            return false;
+        }
 
         bun_buffer_init(&buf, (char*) buffer, BUFFER_SIZE);
 
@@ -313,6 +318,10 @@ namespace /* anonymous */
 
         // Initialize a shared memory region.
         static const char *buffer = static_cast<char *>(buffer_create());
+        if (buffer == nullptr) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create buffer for client side unwinding, client side unwinding disabled");
+            return false;
+        }
 
         // Initialize the BCD configuration file.
         if (bcd_config_init(&cf, &e) == -1) {
