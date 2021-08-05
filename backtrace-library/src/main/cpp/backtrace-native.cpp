@@ -17,11 +17,13 @@
 #include "client/crash_report_database.h"
 #include "client/settings.h"
 
+#if __ANDROID_API__ >= 23
 #include "bun/bun.h"
 #include "bun/stream.h"
 #include "bun/utils.h"
 #include "libbun/src/bun_internal.h"
 #include "bcd.h"
+#endif
 
 #include <sys/syscall.h>
 #include <sys/mman.h>
@@ -46,6 +48,7 @@ static std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
 static std::string thread_id;
 
+#if __ANDROID_API__ >= 23
 // Default size of bun buffer.
 #define BUFFER_SIZE	65536
 
@@ -62,6 +65,7 @@ static std::atomic_bool bun_initialized;
 
 // bcd instance for remote unwinding
 static bcd_t bcd;
+#endif
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -78,6 +82,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
 
 namespace /* anonymous */
 {
+#if __ANDROID_API__ >= 23
     // Possible modes for client side unwinding
     enum class UnwindingMode {
         INVALID = -1,
@@ -112,7 +117,7 @@ namespace /* anonymous */
         void *r;
         int fd;
 
-        fd = bun_memfd_create("_backtrace_buffer", MFD_CLOEXEC);
+        fd = bun_memfd_create("_backtrace_buffer");
         if (fd == -1) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Could not create anonymous file for client side unwinding");
@@ -243,25 +248,7 @@ namespace /* anonymous */
 
         return true;
     }
-
-    bool sdkSupportsClientSideUnwinding() {
-        char sdk_ver_str[PROP_VALUE_MAX];
-        int sdk_ver = -1;
-        if (__system_property_get("ro.build.version.sdk", sdk_ver_str)) {
-            sdk_ver = atoi(sdk_ver_str);
-            if (sdk_ver < 23) {
-                __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                    "Client side unwinding not supported on SDK version %d",
-                                    sdk_ver);
-                return false;
-            }
-        } else {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                "Could not get SDK version, cannot safely enable client side unwinding");
-            return false;
-        }
-        return true;
-    }
+#endif
 
     /**
      * Get JNI Environment pointer
@@ -292,6 +279,7 @@ namespace /* anonymous */
         return m_pJniEnv;
     }
 
+#if __ANDROID_API__ >= 23
     bool InitializeLocalClientSideUnwinding(JNIEnv* env) {
         // Initialize a shared memory region.
         static const char *buffer = static_cast<char *>(buffer_create());
@@ -377,10 +365,6 @@ namespace /* anonymous */
     }
 
     bool EnableClientSideUnwinding(JNIEnv *env, jstring path, jint unwindingMode) {
-        if (!sdkSupportsClientSideUnwinding()) {
-            return false;
-        }
-
         if (initialized) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Client side unwinding needs to be enabled BEFORE crashpad initialization");
@@ -402,6 +386,7 @@ namespace /* anonymous */
                 return false;
         }
     }
+#endif
 
     bool InitializeImpl(jstring url,
                         jstring database_path,
@@ -410,7 +395,12 @@ namespace /* anonymous */
                         jobjectArray attributeValues,
                         jobjectArray attachmentPaths = nullptr,
                         jboolean enableClientSideUnwinding = false,
-                        jint unwindingMode = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH) {
+#if __ANDROID_API__ >= 23
+                        jint unwindingMode = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH
+#else
+                        jint unwindingMode = -1
+#endif
+                        ) {
         using namespace crashpad;
 
         // avoid multi initialization
@@ -425,10 +415,14 @@ namespace /* anonymous */
         }
 
         if (enableClientSideUnwinding) {
+#if __ANDROID_API__ >= 23
             bool success = EnableClientSideUnwinding(env, database_path, unwindingMode);
             if (!success) {
                 __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot enable client side unwinding");
             }
+#else
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Client side unwinding not available for API level < 23");
+#endif
         }
 
         std::map<std::string, std::string> attributes;
@@ -522,7 +516,8 @@ namespace /* anonymous */
         env->ReleaseStringUTFChars(handler_path, handlerPath);
         env->ReleaseStringUTFChars(database_path, filePath);
 
-        if (initialized && bun_initialized && sdkSupportsClientSideUnwinding()) {
+#if __ANDROID_API__ >= 23
+        if (initialized && bun_initialized) {
             // Set the Minidump data stream to our buffer.
             crashpad::CrashpadInfo::GetCrashpadInfo()->AddUserDataMinidumpStream(
                                                           BUN_STREAM_ID, buf.data, buf.size);
@@ -582,6 +577,7 @@ namespace /* anonymous */
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                                 "Crashpad not initialized properly, cannot enable client side unwinding");
         }
+#endif
 
         return initialized;
     }
@@ -645,7 +641,12 @@ bool Initialize(jstring url,
                 jobjectArray attributeValues,
                 jobjectArray attachmentPaths = nullptr,
                 jboolean enableClientSideUnwinding = false,
-                jint unwindingMode = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH) {
+#if __ANDROID_API__ >= 23
+                jint unwindingMode = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH
+#else
+                jint unwindingMode = -1
+#endif
+                ) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
@@ -669,12 +670,16 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jobjectArray attachmentPaths = nullptr,
                                                       jboolean enableClientSideUnwinding = false,
                                                       jobject unwindingMode = nullptr) {
+#if __ANDROID_API__ >= 23
     jint unwindingModeInt = (int) UnwindingMode::REMOTE_DUMPWITHOUTCRASH;
     if (unwindingMode != nullptr) {
         jmethodID unwindingModeGetValueMethod = env->GetMethodID(env->FindClass(
                 "backtraceio/library/enums/UnwindingMode"), "ordinal", "()I");
         unwindingModeInt = env->CallIntMethod(unwindingMode, unwindingModeGetValueMethod);
     }
+#else
+    jint unwindingModeInt = -1;
+#endif
 
     return Initialize(url, database_path, handler_path, attributeKeys,
                       attributeValues, attachmentPaths, enableClientSideUnwinding,

@@ -4,7 +4,7 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -32,9 +32,13 @@ set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashp
 # Crashpad Headers
 include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 
-# Bun Libraries
-set(LIBUNWINDSTACK_ENABLED TRUE)
-add_subdirectory(libbun)
+if(NOT ANDROID_PLATFORM MATCHES "^android-([0-9]|1[0-9]|2[0-2])$")
+    # Bun Libraries
+    set(LIBUNWINDSTACK_ENABLED TRUE)
+    add_subdirectory(libbun)
+else()
+    message("API version < 23, client-side unwinding will be disabled")
+endif()
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -55,14 +59,14 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
+list(APPEND LIBS backtrace-native)
+list(APPEND LIBS ${log-lib})
+list(APPEND LIBS crashpad_client)
+list(APPEND LIBS crashpad_util)
+list(APPEND LIBS base)
 
-target_link_libraries( # Specifies the target library.
-                        backtrace-native
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
-                        crashpad_client
-                        crashpad_util
-                        base
-                        bun
-                     )
+if(NOT ANDROID_PLATFORM MATCHES "^android-([0-9]|1[0-9]|2[0-2])$")
+    list(APPEND LIBS bun)
+endif()
+
+target_link_libraries(${LIBS})
