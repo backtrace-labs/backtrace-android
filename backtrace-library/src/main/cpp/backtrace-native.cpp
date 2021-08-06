@@ -133,8 +133,11 @@ namespace /* anonymous */
         buffer_fd = fd;
 
         r = buffer_reader(buffer_fd, PROT_READ|PROT_WRITE);
-
+#if DEBUG_BUFFER_CREATE
+        return nullptr;
+#else
         return r;
+#endif
     }
 
     static int
