@@ -4,6 +4,7 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -32,9 +33,14 @@ set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashp
 # Crashpad Headers
 include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 
-# Bun Libraries
-set(LIBUNWINDSTACK_ENABLED TRUE)
-add_subdirectory(libbun)
+message("clang version")
+message(${CMAKE_CXX_COMPILER_VERSION})
+# Clang 9 is used in NDK 21+
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+    # Bun Libraries
+    set(LIBUNWINDSTACK_ENABLED TRUE)
+    add_subdirectory(libbun)
+endif()
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -56,13 +62,16 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries( # Specifies the target library.
-                        backtrace-native
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
-                        crashpad_client
-                        crashpad_util
-                        base
-                        bun
-                     )
+list(APPEND LIBS backtrace-native)
+list(APPEND LIBS ${log-lib})
+list(APPEND LIBS crashpad_client)
+list(APPEND LIBS crashpad_util)
+list(APPEND LIBS base)
+
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+list(APPEND LIBS bun)
+endif()
+
+target_link_libraries(${LIBS})
+
+
