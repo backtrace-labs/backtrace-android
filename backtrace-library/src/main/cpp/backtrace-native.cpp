@@ -12,18 +12,20 @@
 #include <unordered_map>
 #include <libgen.h>
 
+#define USE_BREAKPAD 1
+
+#ifndef USE_BREAKPAD
 #include "base/logging.h"
 #include "client/crashpad_client.h"
 #include "client/crashpad_info.h"
 #include "client/crash_report_database.h"
 #include "client/settings.h"
+#endif
 
 #include "client-side-unwinding.h"
 
 #include <sys/types.h>
 #include <sys/system_properties.h>
-
-using namespace base;
 
 // supported JNI version
 static jint JNI_VERSION = JNI_VERSION_1_6;
@@ -32,12 +34,29 @@ static jint JNI_VERSION = JNI_VERSION_1_6;
 static JavaVM *javaVm;
 
 // crashpad client
+#ifndef USE_BREAKPAD
+using namespace base;
 static crashpad::CrashpadClient *client;
+#endif
 
-// check if crashpad client is already initialized
+// check if native crash client is already initialized
 std::atomic_bool initialized;
 static std::mutex attribute_synchronization;
 static std::string thread_id;
+
+// TODO: Gate to NDK version
+#if USE_BREAKPAD
+#include "exception_handler.h"
+#include "common/linux/http_upload.h"
+#include "cacert.h"
+
+//std::unique_ptr<google_breakpad::ExceptionHandler*> eh;
+static google_breakpad::ExceptionHandler* eh;
+std::string upload_url_str;
+std::map<std::string, std::string> attributes;
+std::string certificate_path;
+
+#endif
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -86,6 +105,7 @@ namespace /* anonymous */
         return m_pJniEnv;
     }
 
+#ifndef USE_BREAKPAD
     bool InitializeImpl(jstring url,
                         jstring database_path,
                         jstring handler_path,
@@ -211,6 +231,140 @@ namespace /* anonymous */
 
         return initialized;
     }
+#endif
+
+#if USE_BREAKPAD
+    static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
+                             void* context, bool succeeded) {
+
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
+
+        upload_url_str = std::string("https://yolo.sp.backtrace.io:6098/post?format=minidump&token=d8ca0bad4874d43982241ade3d5afeebf7d6823a50ab5de6a5b508ea2beda8d0");
+
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s.\n", upload_url_str.c_str());
+
+        /* try to open file to read */
+        FILE *file;
+        if (file = fopen(descriptor.path(), "r")) {
+            fclose(file);
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path exists");
+        } else {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path does not exist");
+        }
+
+        if (succeeded == true) {
+            std::map<string, string> files;
+            files["upload_file_minidump"] = descriptor.path();
+            // Send it
+            string response, error;
+            bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
+                                                                    attributes,
+                                                                    files,
+                                                                    "",
+                                                                    "",
+                                                                    certificate_path,
+                                                                    &response,
+                                                                    NULL,
+                                                                    &error);
+            if (success) {
+                __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                    "Successfully sent the minidump file.\n");
+            } else {
+                __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                    "Failed to send minidump: %s\n", error.c_str());
+            }
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response:\n");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s\n", response.c_str());
+        } else {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad dump callback reports failure\n");
+        }
+        return succeeded;
+    }
+
+    std::string CreateCertificateFile(const char* directory) {
+        certificate_path = std::string(directory) + "/backtrace-cacert.pem";
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Certificate path: %s\n", certificate_path.c_str());
+
+        FILE* f = fopen(certificate_path.c_str(), "w");
+        if (f) {
+            fwrite(backtrace::cacert, 1, sizeof(backtrace::cacert), f);
+            fclose(f);
+        } else {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create certificate file");
+        }
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Finished writing certificate file");
+    }
+
+    int InitializeBreakpad(jstring url,
+                           jstring database_path,
+                           jstring handler_path,
+                           jobjectArray attributeKeys,
+                           jobjectArray attributeValues,
+                           jobjectArray attachmentPaths = nullptr,
+                           jboolean enableClientSideUnwinding = false,
+                           jint unwindingMode = UNWINDING_MODE_DEFAULT) {
+        JNIEnv *env = GetJniEnv();
+        if (env == nullptr) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
+            return false;
+        }
+
+        // path to crash handler executable
+        const char *database_path_cstr = env->GetStringUTFChars(database_path, 0);
+        // Backtrace url
+        const char *backtrace_url_cstr = env->GetStringUTFChars(url, 0);
+        upload_url_str = std::string(backtrace_url_cstr);
+
+        google_breakpad::MinidumpDescriptor descriptor(database_path_cstr);
+
+        CreateCertificateFile(database_path_cstr);
+
+        attributes["format"] = "minidump";
+        // save native main thread id
+        if(!thread_id.empty()) {
+            attributes["thread.main"] = thread_id;
+        }
+
+        jint keyLength = env->GetArrayLength(attributeKeys);
+        jint valueLength = env->GetArrayLength(attributeValues);
+        if (keyLength == valueLength) {
+            for (int attributeIndex = 0; attributeIndex < keyLength; ++attributeIndex) {
+                jstring jstringKey = (jstring) env->GetObjectArrayElement(attributeKeys,
+                                                                          attributeIndex);
+                jboolean isCopy;
+                const char *convertedKey = (env)->GetStringUTFChars(jstringKey, &isCopy);
+
+                jstring stringValue = (jstring) env->GetObjectArrayElement(attributeValues,
+                                                                           attributeIndex);
+                const char *convertedValue = (env)->GetStringUTFChars(stringValue, &isCopy);
+
+                if (!convertedKey || !convertedValue)
+                    continue;
+
+                attributes[convertedKey] = convertedValue;
+
+                env->ReleaseStringUTFChars(jstringKey, convertedKey);
+                env->ReleaseStringUTFChars(stringValue, convertedValue);
+            }
+        } else {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Attribute array length doesn't match. Attributes won't be available in the Crashpad integration");
+        }
+
+
+        //std::unique_ptr<google_breakpad::ExceptionHandler, cpp_deleter>(new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1), cpp_deleter());
+        eh = new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1);
+
+        env->ReleaseStringUTFChars(url, backtrace_url_cstr);
+        env->ReleaseStringUTFChars(database_path, database_path_cstr);
+
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Breakpad initialized");
+
+        return 0;
+    }
+
+#endif
 }
 
 extern "C" {
@@ -218,6 +372,7 @@ void Crash() {
     *(volatile int *) 0 = 0;
 }
 
+#ifndef USE_BREAKPAD
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread) {
     crashpad::NativeCPUContext context;
     crashpad::CaptureContext(&context);
@@ -257,6 +412,7 @@ void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thre
         annotations->RemoveKey("error.message");
     }
 }
+#endif
 
 JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
         JNIEnv *env,
@@ -264,6 +420,7 @@ JNIEXPORT void JNICALL Java_backtraceio_library_base_BacktraceBase_crash(
     Crash();
 }
 
+#ifndef USE_BREAKPAD
 bool Initialize(jstring url,
                 jstring database_path,
                 jstring handler_path,
@@ -283,6 +440,7 @@ bool Initialize(jstring url,
     });
     return initialized;
 }
+#endif
 
 JNIEXPORT jboolean JNICALL
 Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
@@ -295,13 +453,18 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jobjectArray attachmentPaths = nullptr,
                                                       jboolean enableClientSideUnwinding = false,
                                                       jobject unwindingMode = nullptr) {
+#if USE_BREAKPAD
+    return InitializeBreakpad(url, database_path, handler_path, attributeKeys,
+                              attributeValues, attachmentPaths, enableClientSideUnwinding);
+#else
     jint unwindingModeInt = ExtractClientSideUnwindingMode(env, unwindingMode);
     return Initialize(url, database_path, handler_path, attributeKeys,
                       attributeValues, attachmentPaths, enableClientSideUnwinding,
                       unwindingModeInt);
+#endif
 }
 
-
+#ifndef USE_BREAKPAD
 void AddAttribute(jstring key, jstring value) {
     if (initialized == false) {
         __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android",
@@ -331,24 +494,32 @@ void AddAttribute(jstring key, jstring value) {
     env->ReleaseStringUTFChars(key, crashpadKey);
     env->ReleaseStringUTFChars(value, crashpadValue);
 }
+#endif
 
 JNIEXPORT void JNICALL
 Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thiz,
                                                         jstring name, jstring value) {
+#ifndef USE_BREAKPAD
     AddAttribute(name, value);
+#endif
 }
 
 JNIEXPORT void JNICALL
 Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2(JNIEnv *env,
                                                                                   jobject thiz,
                                                                                   jstring message) {
+#ifndef USE_BREAKPAD
     DumpWithoutCrash(message, false);
+#endif
 }
 JNIEXPORT void JNICALL
 Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2Z(JNIEnv *env,
                                                                                    jobject thiz,
                                                                                    jstring message,
                                                                                    jboolean set_main_thread_as_faulting_thread) {
+#ifndef USE_BREAKPAD
     DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
+#endif
 }
+
 }

@@ -150,16 +150,7 @@ public class BacktraceDatabase implements Database {
         return setupNativeIntegration(client, credentials, enableClientSideUnwinding, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
     }
 
-    /**
-     * Setup native crash handler
-     *
-     * @param client                    Backtrace client
-     * @param credentials               Backtrace credentials
-     * @param enableClientSideUnwinding Enable client side unwinding
-     * @param unwindingMode             Unwinding mode to use for client side unwinding
-     */
-    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
-                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+    public Boolean setupCrashpadIntegration(BacktraceBase client, BacktraceCredentials credentials, boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
         // avoid initialization when database doesn't exist
         if (getSettings() == null) {
             return false;
@@ -186,7 +177,7 @@ public class BacktraceDatabase implements Database {
         }
         attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
 
-        String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
+        String databasePath = getSettings().getDatabasePath();
         Boolean initialized = initialize(
                 minidumpSubmissionUrl,
                 databasePath,
@@ -198,6 +189,31 @@ public class BacktraceDatabase implements Database {
                 unwindingMode
         );
         return initialized;
+    }
+
+ //   public native boolean setupBreakpadIntegration();
+
+    /**
+     * Setup native crash handler
+     *
+     * @param client                    Backtrace client
+     * @param credentials               Backtrace credentials
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     */
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+        // TODO: We don't know NDK version from Java land, unless we create a JNI function
+        // We can maybe keep legacy functions for Unity and switch to new API?
+        // Unity can switch to new API too
+        // Can we change C++ API?
+        // Checking NDK version from Java seems a bad idea, but we can do it with a JNI call
+    //    if (true) {
+            return setupCrashpadIntegration(client, credentials, enableClientSideUnwinding, unwindingMode);
+     //   }
+    //    else {
+    //        return setupBreakpadIntegration();
+    //    }
     }
 
     @Override
