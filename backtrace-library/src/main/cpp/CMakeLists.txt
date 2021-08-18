@@ -8,20 +8,29 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 # Get Android NDK revision
 # https://github.com/android/ndk/issues/596
-set(BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX
-        "^Pkg\\.Desc = Android NDK\nPkg\\.Revision = ([0-9]+)\\.")
-if(NOT ANDROID_NDK_SOURCE_PROPERTIES MATCHES
-        "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}")
-    message(SEND_ERROR "Failed to parse Android NDK revision:
- ${ANDROID_NDK}/source.properties.\n${ANDROID_NDK_SOURCE_PROPERTIES}")
-endif()
-string(REGEX REPLACE "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}" "\\1."
-BT_ANDROID_NDK_REVISION "${ANDROID_NDK_SOURCE_PROPERTIES}")
 
-if(BT_ANDROID_NDK_REVISION VERSION_LESS 17)
-    set(BREAKPAD_BACKEND TRUE)
+if (NOT ANDROID_NDK_MAJOR)
+    set(BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX
+            "^Pkg\\.Desc = Android NDK\nPkg\\.Revision = ([0-9]+)\\.")
+    if(NOT ANDROID_NDK_SOURCE_PROPERTIES MATCHES
+            "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}")
+        message(SEND_ERROR "Failed to parse Android NDK revision:
+     ${ANDROID_NDK}/source.properties.\n${ANDROID_NDK_SOURCE_PROPERTIES}")
+    endif()
+    string(REGEX REPLACE "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}" "\\1."
+    BT_ANDROID_NDK_REVISION "${ANDROID_NDK_SOURCE_PROPERTIES}")
+
+    if(BT_ANDROID_NDK_REVISION VERSION_LESS 17)
+        set(BREAKPAD_BACKEND TRUE)
+    else()
+        set(CRASHPAD_BACKEND TRUE)
+    endif()
 else()
-    set(CRASHPAD_BACKEND TRUE)
+    if (ANDROID_NDK_MAJOR LESS 17)
+        set(BREAKPAD_BACKEND TRUE)
+    else()
+        set(CRASHPAD_BACKEND TRUE)
+    endif()
 endif()
 
 add_library( # Sets the name of the library.
