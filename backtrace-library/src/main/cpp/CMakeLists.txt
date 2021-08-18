@@ -6,10 +6,23 @@
 cmake_minimum_required(VERSION 3.4.1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+# Get Android NDK revision
+# https://github.com/android/ndk/issues/596
+set(BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX
+        "^Pkg\\.Desc = Android NDK\nPkg\\.Revision = ([0-9]+)\\.")
+if(NOT ANDROID_NDK_SOURCE_PROPERTIES MATCHES
+        "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}")
+    message(SEND_ERROR "Failed to parse Android NDK revision:
+ ${ANDROID_NDK}/source.properties.\n${ANDROID_NDK_SOURCE_PROPERTIES}")
+endif()
+string(REGEX REPLACE "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}" "\\1."
+BT_ANDROID_NDK_REVISION "${ANDROID_NDK_SOURCE_PROPERTIES}")
+
+if(BT_ANDROID_NDK_REVISION VERSION_LESS 17)
+    set(BREAKPAD_BACKEND TRUE)
+else()
+    set(CRASHPAD_BACKEND TRUE)
+endif()
 
 add_library( # Sets the name of the library.
              backtrace-native
@@ -20,8 +33,7 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
         backtrace-native.cpp)
 
-# TODO: Gate with NDK version
-if(false)
+if(CRASHPAD_BACKEND)
 # Crashpad Libraries
 add_library(crashpad_client STATIC IMPORTED)
 set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
@@ -36,6 +48,7 @@ set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashp
 include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 endif()
 
+# TODO: Change this to use NDK revision
 message("clang version")
 message(${CMAKE_CXX_COMPILER_VERSION})
 # Clang 9 is used in NDK 21+
@@ -45,9 +58,7 @@ if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
     add_subdirectory(libbun)
 endif()
 
-# TODO: Gate with NDK version
-if (true)
-    set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "RelWithDebInfo;Release;")
+if (BREAKPAD_BACKEND)
   #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_LIMIT_MACROS")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -llog")
 
@@ -92,17 +103,16 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 list(APPEND LIBS backtrace-native)
-# TODO: Gate with NDK version
-if (true)
+list(APPEND LIBS ${log-lib})
+
+if (BREAKPAD_BACKEND)
     list(APPEND LIBS breakpad_client)
     list(APPEND LIBS curl)
   #  list(APPEND LIBS ssl)
  #   list(APPEND LIBS crypto)
 endif()
-list(APPEND LIBS ${log-lib})
 
-# TODO: Gate with NDK version
-if (false)
+if (CRASHPAD_BACKEND)
     list(APPEND LIBS crashpad_client)
     list(APPEND LIBS crashpad_util)
     list(APPEND LIBS base)

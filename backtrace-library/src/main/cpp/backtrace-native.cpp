@@ -239,8 +239,6 @@ namespace /* anonymous */
 
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
 
-        upload_url_str = std::string("https://yolo.sp.backtrace.io:6098/post?format=minidump&token=d8ca0bad4874d43982241ade3d5afeebf7d6823a50ab5de6a5b508ea2beda8d0");
-
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s.\n", upload_url_str.c_str());
 
         /* try to open file to read */
@@ -281,14 +279,14 @@ namespace /* anonymous */
         return succeeded;
     }
 
-    std::string CreateCertificateFile(const char* directory) {
+    void CreateCertificateFile(const char* directory) {
         certificate_path = std::string(directory) + "/backtrace-cacert.pem";
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Certificate path: %s\n", certificate_path.c_str());
 
-        FILE* f = fopen(certificate_path.c_str(), "w");
+        FILE* f = std::fopen(certificate_path.c_str(), "w");
         if (f) {
-            fwrite(backtrace::cacert, 1, sizeof(backtrace::cacert), f);
-            fclose(f);
+            std::fwrite(backtrace::cacert, 1, sizeof(backtrace::cacert), f);
+            std::fclose(f);
         } else {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create certificate file");
         }
@@ -307,6 +305,10 @@ namespace /* anonymous */
         if (env == nullptr) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
             return false;
+        }
+
+        if (enableClientSideUnwinding) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Client side unwinding not available with Breakpad native crash reporting backend");
         }
 
         // path to crash handler executable
