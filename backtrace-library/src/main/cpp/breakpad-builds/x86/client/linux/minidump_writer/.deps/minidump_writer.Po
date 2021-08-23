@@ -1,0 +1,957 @@
+src/client/linux/minidump_writer/minidump_writer.o: \
+  src/client/linux/minidump_writer/minidump_writer.cc \
+  src/client/linux/handler/minidump_descriptor.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/assert.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/cdefs.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/api-level.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/versioning.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stddef.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/__stddef_max_align_t.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stdint.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/stdint.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/wchar_limits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/int-ll64.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/bitsperlong.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/bitsperlong.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/posix_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/stddef.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/compiler.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/posix_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/posix_types_32.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/posix_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/pthread_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/string \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/c++config.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/os_defines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/cpu_defines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stringfwd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/memoryfwd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/char_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_algobase.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/functexcept.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/exception_defines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/cpp_type_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/type_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/numeric_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_pair.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/move.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/concept_check.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/type_traits \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_iterator_base_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_iterator_base_funcs.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/debug/debug.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_iterator.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/ptr_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/predefined_ops.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/postypes.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cwchar \
+  src/common/android/testing/include/wchar.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/wchar.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/stdio.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stdarg.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/seek_constants.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/struct_file.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/time.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/time.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/time.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/select.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/signal.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/sigcontext.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/timespec.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/limits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/limits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/float.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/limits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/posix_limits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/signal.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/signal.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/signal-defs.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/siginfo.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/siginfo.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/ucontext.h \
+  src/common/android/include/sys/user.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/user.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_signal_inlines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/xlocale.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/mbstate_t.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/wctype.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cstdint \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/allocator.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/c++allocator.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/new_allocator.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/new \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/exception \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/atomic_lockfree_defines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/exception_ptr.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/nested_exception.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/localefwd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/c++locale.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/clocale \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/locale.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/iosfwd \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cctype \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/ctype.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/ostream_insert.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/cxxabi_forced.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_function.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/backward/binders.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/range_access.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/basic_string.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/atomicity.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/gthr.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/gthr-default.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/pthread.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sched.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/sched.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/atomic_word.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/initializer_list \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/functional_hash.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/hash_bytes.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/basic_string.tcc \
+  src/client/linux/handler/microdump_extra_info.h \
+  src/common/using_std_string.h \
+  src/client/linux/minidump_writer/minidump_writer.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/unistd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/fcntl.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/getopt.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/ioctl.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/lockf.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/sysconf.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/list \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_list.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/list.tcc \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/utility \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_relops.h \
+  src/client/linux/minidump_writer/linux_dumper.h \
+  src/common/android/include/elf.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/libgen.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/elf.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/auxvec.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/auxvec.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/auxvec.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_arm.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_arm64.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_mips.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_x86.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_x86_64.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/elf.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/elf-em.h \
+  src/common/android/include/link.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/link.h \
+  src/client/linux/dump_writer_common/mapping_info.h \
+  src/google_breakpad/common/minidump_format.h \
+  src/google_breakpad/common/breakpad_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/inttypes.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/inttypes.h \
+  src/google_breakpad/common/minidump_cpu_amd64.h \
+  src/google_breakpad/common/minidump_cpu_arm.h \
+  src/google_breakpad/common/minidump_cpu_arm64.h \
+  src/google_breakpad/common/minidump_cpu_mips.h \
+  src/google_breakpad/common/minidump_cpu_ppc.h \
+  src/google_breakpad/common/minidump_cpu_ppc64.h \
+  src/google_breakpad/common/minidump_cpu_sparc.h \
+  src/google_breakpad/common/minidump_cpu_x86.h \
+  src/google_breakpad/common/minidump_exception_linux.h \
+  src/google_breakpad/common/minidump_exception_mac.h \
+  src/google_breakpad/common/minidump_exception_ps3.h \
+  src/google_breakpad/common/minidump_exception_solaris.h \
+  src/google_breakpad/common/minidump_exception_win32.h \
+  src/client/linux/dump_writer_common/thread_info.h \
+  src/client/linux/dump_writer_common/raw_context_cpu.h \
+  src/common/memory.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/stdlib.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/alloca.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/malloc.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_stdlib_inlines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/mman.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/mman.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/mman.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/mman-common.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_sys_mman_inlines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/memory \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_construct.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/alloc_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/alloc_traits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_uninitialized.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_tempbuf.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_raw_storage_iter.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/typeinfo \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/concurrence.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/uses_allocator.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/functional \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/tuple \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/array \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/stdexcept \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/unique_ptr.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/shared_ptr.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/shared_ptr_base.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/aligned_buffer.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/backward/auto_ptr.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/vector \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_vector.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_bvector.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/vector.tcc \
+  src/third_party/lss/linux_syscall_support.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/errno.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/errno.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/errno.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/errno.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/errno-base.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_errno_inlines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/fcntl.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/fadvise.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/falloc.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/fcntl.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/fcntl.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/fcntl.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/stat.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/uio.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/string.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/strcasecmp.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/strings.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_strings_inlines.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/ptrace.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/ptrace.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/ptrace.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/ptrace-abi.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/processor-flags.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/const.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/resource.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/resource.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/resource.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/resource.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/syscall.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/unistd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/unistd_32.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/glibc-syscalls.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/unistd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/endian.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/endian.h \
+  src/common/linux/file_id.h src/common/linux/guid_creator.h \
+  src/client/minidump_file_writer-inl.h \
+  src/client/minidump_file_writer.h \
+  src/google_breakpad/common/minidump_size.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/system_properties.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stdbool.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/utsname.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/algorithm \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_algo.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cstdlib \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/algorithmfwd.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_heap.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/random \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cmath \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/math.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/limits \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/random.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/opt_random.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/x86intrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/ia32intrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/immintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xmmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mm_malloc.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/emmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/f16cintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/pmmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/tmmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/smmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/wmmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/__wmmintrin_aes.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/__wmmintrin_pclmul.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/clflushoptintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avxintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx2intrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/bmiintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/bmi2intrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/lzcntintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/fmaintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512fintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vlintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512bwintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512cdintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512dqintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vlbwintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vlcdintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vldqintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512erintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512ifmaintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512ifmavlintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vbmiintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vbmivlintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512pfintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/pkuintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/rtmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xtestintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/shaintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/fxsrintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsaveintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsaveoptintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsavecintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsavesintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/adxintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mm3dnow.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/prfchwintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/popcntintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/rdseedintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/ammintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/fma4intrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xopintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/tbmintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mwaitxintrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/clzerointrin.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/random.tcc \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/numeric \
+  /mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_numeric.h \
+  src/client/linux/dump_writer_common/ucontext_reader.h \
+  src/client/linux/handler/exception_handler.h \
+  src/client/linux/crash_generation/crash_generation_client.h \
+  src/common/basictypes.h src/common/scoped_ptr.h \
+  src/client/linux/minidump_writer/cpu_set.h \
+  src/common/linux/linux_libc_support.h \
+  src/client/linux/minidump_writer/line_reader.h \
+  src/client/linux/minidump_writer/linux_ptrace_dumper.h \
+  src/client/linux/minidump_writer/proc_cpuinfo_reader.h \
+  src/common/minidump_type_helper.h
+
+src/client/linux/handler/minidump_descriptor.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/assert.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/cdefs.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/api-level.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/versioning.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stddef.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/__stddef_max_align_t.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stdint.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/stdint.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/wchar_limits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/int-ll64.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/bitsperlong.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/bitsperlong.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/posix_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/stddef.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/compiler.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/posix_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/posix_types_32.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/posix_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/pthread_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/string:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/c++config.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/os_defines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/cpu_defines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stringfwd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/memoryfwd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/char_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_algobase.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/functexcept.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/exception_defines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/cpp_type_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/type_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/numeric_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_pair.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/move.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/concept_check.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/type_traits:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_iterator_base_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_iterator_base_funcs.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/debug/debug.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_iterator.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/ptr_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/predefined_ops.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/postypes.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cwchar:
+
+src/common/android/testing/include/wchar.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/wchar.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/stdio.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stdarg.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/seek_constants.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/struct_file.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/time.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/time.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/time.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/select.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/signal.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/sigcontext.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/timespec.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/limits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/limits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/float.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/limits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/posix_limits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/signal.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/signal.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/signal-defs.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/siginfo.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/siginfo.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/ucontext.h:
+
+src/common/android/include/sys/user.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/user.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_signal_inlines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/xlocale.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/mbstate_t.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/wctype.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cstdint:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/allocator.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/c++allocator.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/new_allocator.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/new:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/exception:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/atomic_lockfree_defines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/exception_ptr.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/nested_exception.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/localefwd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/c++locale.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/clocale:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/locale.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/iosfwd:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cctype:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/ctype.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/ostream_insert.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/cxxabi_forced.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_function.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/backward/binders.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/range_access.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/basic_string.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/atomicity.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/gthr.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/gthr-default.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/pthread.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sched.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/sched.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/atomic_word.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/initializer_list:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/functional_hash.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/hash_bytes.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/basic_string.tcc:
+
+src/client/linux/handler/microdump_extra_info.h:
+
+src/common/using_std_string.h:
+
+src/client/linux/minidump_writer/minidump_writer.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/unistd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/fcntl.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/getopt.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/ioctl.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/lockf.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/sysconf.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/list:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_list.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/list.tcc:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/utility:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_relops.h:
+
+src/client/linux/minidump_writer/linux_dumper.h:
+
+src/common/android/include/elf.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/libgen.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/elf.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/auxvec.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/auxvec.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/auxvec.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_arm.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_arm64.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_mips.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_x86.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/elf_x86_64.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/elf.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/elf-em.h:
+
+src/common/android/include/link.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/link.h:
+
+src/client/linux/dump_writer_common/mapping_info.h:
+
+src/google_breakpad/common/minidump_format.h:
+
+src/google_breakpad/common/breakpad_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/inttypes.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/inttypes.h:
+
+src/google_breakpad/common/minidump_cpu_amd64.h:
+
+src/google_breakpad/common/minidump_cpu_arm.h:
+
+src/google_breakpad/common/minidump_cpu_arm64.h:
+
+src/google_breakpad/common/minidump_cpu_mips.h:
+
+src/google_breakpad/common/minidump_cpu_ppc.h:
+
+src/google_breakpad/common/minidump_cpu_ppc64.h:
+
+src/google_breakpad/common/minidump_cpu_sparc.h:
+
+src/google_breakpad/common/minidump_cpu_x86.h:
+
+src/google_breakpad/common/minidump_exception_linux.h:
+
+src/google_breakpad/common/minidump_exception_mac.h:
+
+src/google_breakpad/common/minidump_exception_ps3.h:
+
+src/google_breakpad/common/minidump_exception_solaris.h:
+
+src/google_breakpad/common/minidump_exception_win32.h:
+
+src/client/linux/dump_writer_common/thread_info.h:
+
+src/client/linux/dump_writer_common/raw_context_cpu.h:
+
+src/common/memory.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/stdlib.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/alloca.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/malloc.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_stdlib_inlines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/mman.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/mman.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/mman.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/mman-common.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_sys_mman_inlines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/memory:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_construct.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/alloc_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/alloc_traits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_uninitialized.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_tempbuf.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_raw_storage_iter.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/typeinfo:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/concurrence.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/uses_allocator.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/functional:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/tuple:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/array:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/stdexcept:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/unique_ptr.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/shared_ptr.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/shared_ptr_base.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/ext/aligned_buffer.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/backward/auto_ptr.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/vector:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_vector.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_bvector.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/vector.tcc:
+
+src/third_party/lss/linux_syscall_support.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/errno.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/errno.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/errno.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/errno.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/errno-base.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_errno_inlines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/fcntl.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/fadvise.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/falloc.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/fcntl.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/fcntl.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/fcntl.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/stat.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/uio.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/string.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/strcasecmp.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/strings.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/android/legacy_strings_inlines.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/ptrace.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/ptrace.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/ptrace.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/ptrace-abi.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/processor-flags.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/const.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/resource.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/resource.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/resource.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm-generic/resource.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/syscall.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/unistd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/asm/unistd_32.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/bits/glibc-syscalls.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/linux/unistd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/endian.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/endian.h:
+
+src/common/linux/file_id.h:
+
+src/common/linux/guid_creator.h:
+
+src/client/minidump_file_writer-inl.h:
+
+src/client/minidump_file_writer.h:
+
+src/google_breakpad/common/minidump_size.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/system_properties.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/stdbool.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/sys/utsname.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/algorithm:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_algo.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cstdlib:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/algorithmfwd.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_heap.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/random:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/cmath:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../sysroot/usr/include/math.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/limits:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/random.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/i686-linux-android/bits/opt_random.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/x86intrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/ia32intrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/immintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xmmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mm_malloc.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/emmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/f16cintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/pmmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/tmmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/smmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/wmmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/__wmmintrin_aes.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/__wmmintrin_pclmul.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/clflushoptintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avxintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx2intrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/bmiintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/bmi2intrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/lzcntintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/fmaintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512fintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vlintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512bwintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512cdintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512dqintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vlbwintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vlcdintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vldqintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512erintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512ifmaintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512ifmavlintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vbmiintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512vbmivlintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/avx512pfintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/pkuintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/rtmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xtestintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/shaintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/fxsrintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsaveintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsaveoptintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsavecintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xsavesintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/adxintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mm3dnow.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/prfchwintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/popcntintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/rdseedintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/ammintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/fma4intrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/xopintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/tbmintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/mwaitxintrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/lib64/clang/5.0.300080/include/clzerointrin.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/random.tcc:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/numeric:
+
+/mnt/c/backtrace-breakpad/ndk-16b-x86/bin/../lib/gcc/i686-linux-android/4.9.x/../../../../include/c++/4.9.x/bits/stl_numeric.h:
+
+src/client/linux/dump_writer_common/ucontext_reader.h:
+
+src/client/linux/handler/exception_handler.h:
+
+src/client/linux/crash_generation/crash_generation_client.h:
+
+src/common/basictypes.h:
+
+src/common/scoped_ptr.h:
+
+src/client/linux/minidump_writer/cpu_set.h:
+
+src/common/linux/linux_libc_support.h:
+
+src/client/linux/minidump_writer/line_reader.h:
+
+src/client/linux/minidump_writer/linux_ptrace_dumper.h:
+
+src/client/linux/minidump_writer/proc_cpuinfo_reader.h:
+
+src/common/minidump_type_helper.h:

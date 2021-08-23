@@ -6,71 +6,64 @@
 cmake_minimum_required(VERSION 3.4.1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-# Get Android NDK revision
+# Determine native crash backend
+# ANDROID_NDK_MAJOR not defined until ndk 17+
 # https://github.com/android/ndk/issues/596
-
-if (NOT ANDROID_NDK_MAJOR)
-    set(BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX
-            "^Pkg\\.Desc = Android NDK\nPkg\\.Revision = ([0-9]+)\\.")
-    if(NOT ANDROID_NDK_SOURCE_PROPERTIES MATCHES
-            "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}")
-        message(SEND_ERROR "Failed to parse Android NDK revision:
-     ${ANDROID_NDK}/source.properties.\n${ANDROID_NDK_SOURCE_PROPERTIES}")
-    endif()
-    string(REGEX REPLACE "${BT_ANDROID_NDK_SOURCE_PROPERTIES_REGEX}" "\\1."
-    BT_ANDROID_NDK_REVISION "${ANDROID_NDK_SOURCE_PROPERTIES}")
-
-    if(BT_ANDROID_NDK_REVISION VERSION_LESS 17)
-        set(BREAKPAD_BACKEND TRUE)
-    else()
-        set(CRASHPAD_BACKEND TRUE)
-    endif()
+if (ANDROID_ABI STREQUAL "x86")
+    message("Native crash reporting not supported for x86 emulator")
+elseif (NOT ANDROID_NDK_MAJOR)
+    set(BACKEND "BREAKPAD_BACKEND")
+    add_definitions(-DBREAKPAD_BACKEND)
+elseif(ANDROID_NDK_MAJOR LESS 17)
+    set(BACKEND "BREAKPAD_BACKEND")
+    add_definitions(-DBREAKPAD_BACKEND)
 else()
-    if (ANDROID_NDK_MAJOR LESS 17)
-        set(BREAKPAD_BACKEND TRUE)
-    else()
-        set(CRASHPAD_BACKEND TRUE)
-    endif()
+    set(BACKEND "CRASHPAD_BACKEND")
+    add_definitions(-DCRASHPAD_BACKEND)
 endif()
 
-add_library( # Sets the name of the library.
-             backtrace-native
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-        backtrace-native.cpp)
-
-if(CRASHPAD_BACKEND)
-# Crashpad Libraries
-add_library(crashpad_client STATIC IMPORTED)
-set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
-
-add_library(crashpad_util STATIC IMPORTED)
-set_property(TARGET crashpad_util PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/util/libcrashpad_util.a)
-
-add_library(base STATIC IMPORTED)
-set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/third_party/mini_chromium/mini_chromium/base/libbase.a)
-
-# Crashpad Headers
-include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
+if (ANDROID_NDK_MAJOR GREATER_EQUAL 21 AND ANDROID_NATIVE_API_LEVEL GREATER_EQUAL 23)
+    set(CLIENT_SIDE_UNWINDING TRUE)
+    add_definitions(-DCLIENT_SIDE_UNWINDING)
 endif()
 
-# TODO: Change this to use NDK revision
-message("clang version")
-message(${CMAKE_CXX_COMPILER_VERSION})
-# Clang 9 is used in NDK 21+
-if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
-    # Bun Libraries
-    set(LIBUNWINDSTACK_ENABLED TRUE)
-    add_subdirectory(libbun)
+# Sources
+list(APPEND SOURCES backtrace-native.cpp)
+list(APPEND SOURCES client-side-unwinding.cpp)
+if(BACKEND STREQUAL "CRASHPAD_BACKEND")
+    list(APPEND SOURCES backends/crashpad-backend.cpp)
+elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
+    list(APPEND SOURCES backends/breakpad-backend.cpp)
+else()
+    message("No native debugging backend selected")
 endif()
 
-if (BREAKPAD_BACKEND)
-  #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_LIMIT_MACROS")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -llog")
+add_library(# Sets the name of the library.
+            backtrace-native
 
+            # Sets the library as a shared library.
+            SHARED
+
+            # Provides a relative path to your source file(s).
+            ${SOURCES})
+
+# Includes
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+if(BACKEND STREQUAL "CRASHPAD_BACKEND")
+    # Crashpad Libraries
+    add_library(crashpad_client STATIC IMPORTED)
+    set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
+
+    add_library(crashpad_util STATIC IMPORTED)
+    set_property(TARGET crashpad_util PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/util/libcrashpad_util.a)
+
+    add_library(base STATIC IMPORTED)
+    set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/third_party/mini_chromium/mini_chromium/base/libbase.a)
+
+    # Crashpad Headers
+    include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
+elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     # Breakpad Libraries
     add_library(breakpad_client STATIC IMPORTED)
     set_property(TARGET breakpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/libbreakpad_client.a)
@@ -79,16 +72,16 @@ if (BREAKPAD_BACKEND)
     add_library(curl SHARED IMPORTED)
     set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/curl-builds/${ANDROID_ABI}/libcurl.so)
 
-    # SSL Libraries
- #   add_library(ssl SHARED IMPORTED)
- #   set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/libssl.so)
-
-    # Crypto Libraries
-  #  add_library(crypto SHARED IMPORTED)
- #   set_property(TARGET crypto PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/libcrypto.so)
-
     # Breakpad Headers
-    include_directories(${PROJECT_SOURCE_DIR}/breakpad-builds/headers/ ${PROJECT_SOURCE_DIR}/breakpad-builds/headers/src ${PROJECT_SOURCE_DIR}/breakpad-builds/headers/src/common/android/include)
+    include_directories(${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI} ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/src ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/src/common/android/include)
+else()
+    message("No native debugging backend selected")
+endif()
+
+if (CLIENT_SIDE_UNWINDING)
+    # Bun Libraries
+    set(LIBUNWINDSTACK_ENABLED TRUE)
+    add_subdirectory(libbun)
 endif()
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -105,8 +98,6 @@ find_library( # Sets the name of the path variable.
               log
             )
 
-
-
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
@@ -114,20 +105,18 @@ find_library( # Sets the name of the path variable.
 list(APPEND LIBS backtrace-native)
 list(APPEND LIBS ${log-lib})
 
-if (BREAKPAD_BACKEND)
-    list(APPEND LIBS breakpad_client)
-    list(APPEND LIBS curl)
-  #  list(APPEND LIBS ssl)
- #   list(APPEND LIBS crypto)
-endif()
-
-if (CRASHPAD_BACKEND)
+if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     list(APPEND LIBS crashpad_client)
     list(APPEND LIBS crashpad_util)
     list(APPEND LIBS base)
+elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
+    list(APPEND LIBS breakpad_client)
+    list(APPEND LIBS curl)
+else()
+    message("No native debugging backend selected")
 endif()
 
-if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+if (CLIENT_SIDE_UNWINDING)
     list(APPEND LIBS bun)
 endif()
 

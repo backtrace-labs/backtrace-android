@@ -37,7 +37,6 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
 public class BacktraceDatabase implements Database {
 
     private final String _crashpadHandlerName = "/libcrashpad_handler.so";
-    private final String _crashpadDatabasePathPrefix = "/crashpad";
 
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;

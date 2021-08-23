@@ -1,0 +1,79 @@
+src/common/md5.o: src/common/md5.cc \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/string.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/sys/cdefs.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/android/api-level.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/android/versioning.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/lib64/clang/5.0.300080/include/stddef.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/lib64/clang/5.0.300080/include/__stddef_max_align_t.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/xlocale.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/bits/strcasecmp.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/sys/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/lib64/clang/5.0.300080/include/stdint.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/stdint.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/bits/wchar_limits.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm/types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm-generic/int-ll64.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm/bitsperlong.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm-generic/bitsperlong.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/posix_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/stddef.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/compiler.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm/posix_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm-generic/posix_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/bits/pthread_types.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/strings.h \
+  /mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/android/legacy_strings_inlines.h \
+  src/common/md5.h
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/string.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/sys/cdefs.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/android/api-level.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/android/versioning.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/lib64/clang/5.0.300080/include/stddef.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/lib64/clang/5.0.300080/include/__stddef_max_align_t.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/xlocale.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/bits/strcasecmp.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/sys/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/lib64/clang/5.0.300080/include/stdint.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/stdint.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/bits/wchar_limits.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm/types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm-generic/int-ll64.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm/bitsperlong.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm-generic/bitsperlong.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/posix_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/stddef.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/linux/compiler.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm/posix_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/asm-generic/posix_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/bits/pthread_types.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/strings.h:
+
+/mnt/c/backtrace-breakpad/ndk-16b-arm/bin/../sysroot/usr/include/android/legacy_strings_inlines.h:
+
+src/common/md5.h:
