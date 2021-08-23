@@ -11,6 +11,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 # https://github.com/android/ndk/issues/596
 if (ANDROID_ABI STREQUAL "x86")
     message("Native crash reporting not supported for x86 emulator")
+elseif(ANDROID_ABI STREQUAL "x86_64" AND (NOT ANDROID_NDK_MAJOR OR ANDROID_NDK_MAJOR LESS 17))
+    message("Breakpad not supported for x86_64 emulator")
 elseif (NOT ANDROID_NDK_MAJOR)
     set(BACKEND "BREAKPAD_BACKEND")
     add_definitions(-DBREAKPAD_BACKEND)
