@@ -1,4 +1,5 @@
 #include <atomic>
+#include <cstring>
 #include <map>
 #include <mutex>
 #include <string>
@@ -377,6 +378,11 @@ namespace /* anonymous */
                                 "Client side unwinding needs to be enabled BEFORE crashpad initialization");
             return false;
         }
+
+        jboolean isCopy;
+        const char *databasePath = env->GetStringUTFChars(path, &isCopy);
+        bun_cache_dir_set(strdup(databasePath));
+        env->ReleaseStringUTFChars(path, databasePath);
 
         unwinding_mode = static_cast<UnwindingMode>((int) unwindingMode);
 
