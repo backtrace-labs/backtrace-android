@@ -31,6 +31,7 @@ endif()
 
 # Sources
 list(APPEND SOURCES backtrace-native.cpp)
+list(APPEND SOURCES backends/backend.cpp)
 list(APPEND SOURCES client-side-unwinding.cpp)
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     list(APPEND SOURCES backends/crashpad-backend.cpp)
