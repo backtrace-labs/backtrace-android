@@ -246,9 +246,13 @@ void DumpWithoutCrashBreakpad(jstring message, jboolean set_main_thread_as_fault
     dump_context context;
 
     jboolean isCopy;
-    const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
-    context.message = std::string(rawMessage);
-    env->ReleaseStringUTFChars(message, rawMessage);
+    if (message != nullptr) {
+        const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
+        context.message = std::string(rawMessage);
+        env->ReleaseStringUTFChars(message, rawMessage);
+    } else {
+        context.message = std::string();
+    }
 
     context.set_main_thread_as_faulting_thread = set_main_thread_as_faulting_thread;
     context.key = user_generated_dump_counter++;
@@ -260,7 +264,7 @@ void DumpWithoutCrashBreakpad(jstring message, jboolean set_main_thread_as_fault
 void AddAttributeBreakpad(jstring key, jstring value) {
     if (initialized == false) {
         __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android",
-                            "Breakpad integration isn't available. Please initialize the Breakpad before calling AddAttribute.");
+                            "Breakpad integration isn't available. Please initialize Breakpad before calling AddAttribute.");
         return;
     }
     JNIEnv *env = GetJniEnv();
