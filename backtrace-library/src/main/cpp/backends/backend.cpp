@@ -12,6 +12,7 @@
 
 extern std::atomic_bool initialized;
 
+extern "C" {
 bool Initialize(jstring url,
                 jstring database_path,
                 jstring handler_path,
@@ -37,7 +38,8 @@ bool Initialize(jstring url,
                                          unwindingMode);
 #else
         initialized = false;
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "No native crash reporting backend defined");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "No native crash reporting backend defined");
 #endif
     });
     return initialized;
@@ -49,7 +51,8 @@ void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thre
 #elif BREAKPAD_BACKEND
     DumpWithoutCrashBreakpad(message, set_main_thread_as_faulting_thread);
 #else
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "DumpWithoutCrash not supported on this backend");
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "DumpWithoutCrash not supported on this backend");
 #endif
 }
 
@@ -59,6 +62,8 @@ void AddAttribute(jstring key, jstring value) {
 #elif BREAKPAD_BACKEND
     AddAttributeBreakpad(key, value);
 #else
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "AddAttribute not supported on this backend");
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "AddAttribute not supported on this backend");
 #endif
+}
 }

@@ -4,6 +4,7 @@
 #include <jni.h>
 #include "client-side-unwinding.h"
 
+extern "C" {
 bool Initialize(jstring url,
                 jstring database_path,
                 jstring handler_path,
@@ -16,5 +17,6 @@ bool Initialize(jstring url,
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread);
 
 void AddAttribute(jstring key, jstring value);
+}
 
 #endif //BACKTRACE_ANDROID_BACKEND_H

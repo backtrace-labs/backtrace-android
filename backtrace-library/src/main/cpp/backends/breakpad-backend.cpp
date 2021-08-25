@@ -6,6 +6,7 @@
 #include <atomic>
 #include <mutex>
 #include <unordered_map>
+#include <libgen.h>
 #include "cacert.h"
 #include "client-side-unwinding.h"
 #include "backtrace-native.h"
@@ -18,6 +19,7 @@ extern std::mutex attribute_synchronization;
 static google_breakpad::ExceptionHandler* eh;
 static std::string upload_url_str;
 static std::map<std::string, std::string> breakpad_attributes;
+std::map<std::string, std::string> breakpad_files;
 static std::string certificate_path;
 
 static std::string dump_dir;
@@ -63,7 +65,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
 
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s.\n", upload_url_str.c_str());
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
 
     /* try to open file to read */
     bool dump_exists = false;
@@ -77,13 +79,19 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     }
 
     if (dump_exists) {
-        std::map<string, string> files;
-        files["upload_file_minidump"] = descriptor.path();
+        breakpad_files["upload_file_minidump"] = descriptor.path();
+
+        // TODO: For debugging only
+        for (auto breakpad_file : breakpad_files) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file key %s", breakpad_file.first.c_str());
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file value %s", breakpad_file.second.c_str());
+        }
+
         // Send it
         string response, error;
         bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
                                                                 breakpad_attributes,
-                                                                files,
+                                                                breakpad_files,
                                                                 "",
                                                                 "",
                                                                 certificate_path,
@@ -184,6 +192,28 @@ int InitializeBreakpad(jstring url,
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Attribute array length doesn't match. Attributes won't be available in the Crashpad integration");
+    }
+
+    // paths to file attachments
+    if (attachmentPaths != nullptr) {
+        jint attachmentsLength = env->GetArrayLength(attachmentPaths);
+        for (int attachmentIndex = 0; attachmentIndex < attachmentsLength; ++attachmentIndex) {
+            jstring jstringAttachmentPath = (jstring) env->GetObjectArrayElement(
+                    attachmentPaths,
+                    attachmentIndex);
+            jboolean isCopy;
+            const char *convertedAttachmentPath = (env)->GetStringUTFChars(
+                    jstringAttachmentPath, &isCopy);
+
+            if (!convertedAttachmentPath)
+                continue;
+
+            std::string attachmentBaseName = std::string("attachment_") + basename(convertedAttachmentPath);
+
+            breakpad_files[attachmentBaseName] = convertedAttachmentPath;
+
+            env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
+        }
     }
 
     //std::unique_ptr<google_breakpad::ExceptionHandler, cpp_deleter>(new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1), cpp_deleter());
