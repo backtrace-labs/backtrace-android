@@ -50,8 +50,10 @@ static bool dumpWithoutCrashUpload(const google_breakpad::MinidumpDescriptor& de
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Could not convert context to local dump_context");
     }
 
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
+    breakpad_files["upload_file_minidump"] = descriptor.path();
 
+#if DEBUG_HTTP_UPLOAD
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
 
     /* try to open file to read */
@@ -65,45 +67,37 @@ static bool dumpWithoutCrashUpload(const google_breakpad::MinidumpDescriptor& de
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path does not exist");
     }
 
-    if (dump_exists) {
-        breakpad_files["upload_file_minidump"] = descriptor.path();
-
-        // TODO: For debugging only
-        for (auto breakpad_file : breakpad_files) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file key %s", breakpad_file.first.c_str());
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file value %s", breakpad_file.second.c_str());
-        }
-
-        // Send it
-        string response, error;
-        bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
-                                                                local_breakpad_attributes,
-                                                                breakpad_files,
-                                                                "",
-                                                                "",
-                                                                certificate_path,
-                                                                &response,
-                                                                NULL,
-                                                                &error);
-        if (success) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                "Successfully sent the minidump file.\n");
-        } else {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                "Failed to send minidump: %s\n", error.c_str());
-        }
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response:\n");
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s\n", response.c_str());
-        return true;
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad dump callback reports failure\n");
+    for (auto breakpad_file : breakpad_files) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file key %s", breakpad_file.first.c_str());
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file value %s", breakpad_file.second.c_str());
     }
-    return false;
+#endif
+
+    // Send it
+    string response, error;
+    bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
+                                                            local_breakpad_attributes,
+                                                            breakpad_files,
+                                                            "",
+                                                            "",
+                                                            certificate_path,
+                                                            &response,
+                                                            NULL,
+                                                            &error);
+    if (!success) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Failed to send the minidump file.");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response: %s", response.c_str());
+    }
+
+    return true;
 }
 
 static bool dumpUpload(const google_breakpad::MinidumpDescriptor& descriptor) {
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
+    breakpad_files["upload_file_minidump"] = descriptor.path();
 
+#if DEBUG_HTTP_UPLOAD
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
 
     /* try to open file to read */
@@ -117,40 +111,29 @@ static bool dumpUpload(const google_breakpad::MinidumpDescriptor& descriptor) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path does not exist");
     }
 
-    if (dump_exists) {
-        breakpad_files["upload_file_minidump"] = descriptor.path();
-
-        // TODO: For debugging only
-        for (auto breakpad_file : breakpad_files) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file key %s", breakpad_file.first.c_str());
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file value %s", breakpad_file.second.c_str());
-        }
-
-        // Send it
-        string response, error;
-        bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
-                                                                breakpad_attributes,
-                                                                breakpad_files,
-                                                                "",
-                                                                "",
-                                                                certificate_path,
-                                                                &response,
-                                                                NULL,
-                                                                &error);
-        if (success) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                "Successfully sent the minidump file.\n");
-        } else {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                "Failed to send minidump: %s\n", error.c_str());
-        }
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response:\n");
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s\n", response.c_str());
-        return true;
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad dump callback reports failure\n");
+    for (auto breakpad_file : breakpad_files) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file key %s", breakpad_file.first.c_str());
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file value %s", breakpad_file.second.c_str());
     }
-    return false;
+#endif
+
+    // Send it
+    string response, error;
+    bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
+                                                            breakpad_attributes,
+                                                            breakpad_files,
+                                                            "",
+                                                            "",
+                                                            certificate_path,
+                                                            &response,
+                                                            NULL,
+                                                            &error);
+    if (!success) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Failed to send the minidump file.");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response: %s", response.c_str());
+    }
+    return true;
 };
 
 static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
@@ -165,10 +148,8 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     }
 
     if (context == nullptr) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","No context provided");
         return dumpUpload(descriptor);
     } else {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Context provided");
         return dumpWithoutCrashUpload(descriptor, context);
     }
 
@@ -177,8 +158,6 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 
 void CreateCertificateFile(const char* directory) {
     certificate_path = std::string(directory) + "/backtrace-cacert.pem";
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Certificate path: %s\n", certificate_path.c_str());
-
     FILE* f = fopen(certificate_path.c_str(), "w");
     if (f) {
         fwrite(backtrace::cacert, 1, sizeof(backtrace::cacert), f);
@@ -186,7 +165,6 @@ void CreateCertificateFile(const char* directory) {
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create certificate file");
     }
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Finished writing certificate file");
 }
 
 int InitializeBreakpad(jstring url,
@@ -283,9 +261,6 @@ int InitializeBreakpad(jstring url,
 
     env->ReleaseStringUTFChars(url, backtrace_url_cstr);
     env->ReleaseStringUTFChars(database_path, database_path_cstr);
-
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "Breakpad initialized");
 
     initialized = true;
     return initialized;
