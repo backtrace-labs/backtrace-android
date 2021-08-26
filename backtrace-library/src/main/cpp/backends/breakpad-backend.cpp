@@ -34,35 +34,74 @@ struct dump_context {
 int user_generated_dump_counter = 0;
 static std::unordered_map<int, dump_context> dump_context_map;
 
-static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
-                         void* context, bool succeeded) {
-    if (succeeded == false) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "Breakpad dump callback reports failure\n");
-    }
-
-    std::map<std::string, std::string> &local_breakpad_attributes = breakpad_attributes;
-
-    if (context == nullptr) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","No context provided");
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Context provided");
-        dump_context *local_context = static_cast<dump_context*>(context);
-        if (local_context != nullptr) {
-            local_breakpad_attributes = std::map<std::string, std::string>(breakpad_attributes);
-            if (!local_context->message.empty()) {
-                local_breakpad_attributes["error.message"] = local_context->message;
-            }
-            if (local_context->set_main_thread_as_faulting_thread) {
-                local_breakpad_attributes["_mod_faulting_tid"] = thread_id;
-            }
-            // Delete this local context when we're done
-            dump_context_map.erase(local_context->key);
-        } else {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Could not convert context to local dump_context");
+static bool dumpWithoutCrashUpload(const google_breakpad::MinidumpDescriptor& descriptor, void* context) {
+    dump_context *local_context = static_cast<dump_context*>(context);
+    std::map<std::string, std::string> local_breakpad_attributes(breakpad_attributes);
+    if (local_context != nullptr) {
+        if (!local_context->message.empty()) {
+            local_breakpad_attributes["error.message"] = local_context->message;
         }
+        if (local_context->set_main_thread_as_faulting_thread) {
+            local_breakpad_attributes["_mod_faulting_tid"] = thread_id;
+        }
+        // Delete this local context when we're done
+        dump_context_map.erase(local_context->key);
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Could not convert context to local dump_context");
     }
 
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
+
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
+
+    /* try to open file to read */
+    bool dump_exists = false;
+    FILE *file;
+    if (file = fopen(descriptor.path(), "r")) {
+        dump_exists = true;
+        fclose(file);
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path exists");
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path does not exist");
+    }
+
+    if (dump_exists) {
+        breakpad_files["upload_file_minidump"] = descriptor.path();
+
+        // TODO: For debugging only
+        for (auto breakpad_file : breakpad_files) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file key %s", breakpad_file.first.c_str());
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad file value %s", breakpad_file.second.c_str());
+        }
+
+        // Send it
+        string response, error;
+        bool success = google_breakpad::HTTPUpload::SendRequest(upload_url_str,
+                                                                local_breakpad_attributes,
+                                                                breakpad_files,
+                                                                "",
+                                                                "",
+                                                                certificate_path,
+                                                                &response,
+                                                                NULL,
+                                                                &error);
+        if (success) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Successfully sent the minidump file.\n");
+        } else {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Failed to send minidump: %s\n", error.c_str());
+        }
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response:\n");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s\n", response.c_str());
+        return true;
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad dump callback reports failure\n");
+    }
+    return false;
+}
+
+static bool dumpUpload(const google_breakpad::MinidumpDescriptor& descriptor) {
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
 
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
@@ -107,10 +146,32 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
         }
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response:\n");
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "%s\n", response.c_str());
+        return true;
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Breakpad dump callback reports failure\n");
     }
-    return succeeded;
+    return false;
+};
+
+static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
+                         void* context, bool succeeded) {
+    if (succeeded == false) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Breakpad dump callback reports failure\n");
+        return false;
+    }
+
+    std::map<std::string, std::string> local_breakpad_attributes = breakpad_attributes;
+
+    if (context == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","No context provided");
+        return dumpUpload(descriptor);
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Context provided");
+        return dumpWithoutCrashUpload(descriptor, context);
+    }
+
+    return false;
 }
 
 void CreateCertificateFile(const char* directory) {
