@@ -155,13 +155,14 @@ static bool dumpUpload(const google_breakpad::MinidumpDescriptor& descriptor) {
 
 static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
                          void* context, bool succeeded) {
-    if (succeeded == false) {
+    if (succeeded == false && descriptor.path()[0] == '\0') {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "Breakpad dump callback reports failure\n");
+                            "Breakpad dump callback reports failure, dump path string empty, cannot upload dump");
         return false;
+    } else if (succeeded == false && descriptor.path()[0] != '\0') {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Breakpad dump callback reports failure, will still try to upload dump at %s", descriptor.path());
     }
-
-    std::map<std::string, std::string> local_breakpad_attributes = breakpad_attributes;
 
     if (context == nullptr) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","No context provided");
