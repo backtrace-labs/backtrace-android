@@ -83,8 +83,11 @@ static bool map_serialize_to_file(const std::map<std::string, std::string>& m,
 static std::map<std::string, std::string> map_deserialize_from_file(const char* file_name)
 {
     FILE* f = fopen(file_name, "rb");
-    if (!f)
+    if (!f) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Deserializing attributes file failed");
         return {};
+    }
 
     std::map<std::string, std::string> m;
     while (true) {
@@ -124,8 +127,11 @@ static std::vector<std::string> get_files_pending_upload()
     std::string path = dump_dir + "/..";
     DIR* d = opendir(path.c_str());
 
-    if (!d)
+    if (!d) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not open pending files upload directory");
         return {};
+    }
 
 //    const std::regex filename_regex{R"(^(........-....-....-........-........\.dmp)\.pending)"};
     const std::regex filename_regex{R"(^(.{36}\.dmp)\.pending)"};
@@ -185,11 +191,35 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 
     rename(path, computed_result_name);
 
+#if DEBUG_BREAKPAD_DUMP_CALLBACK
+    /* try to open file to read */
+    bool dump_exists = false;
+    FILE *file;
+    if (file = fopen(computed_result_name, "r")) {
+        dump_exists = true;
+        fclose(file);
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path exists at crash time");
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path does not exist at crash time");
+    }
+#endif
+
     strcpy(computed_result_name, dump_dir.c_str());
     strcat(computed_result_name, "/../");
     strcat(computed_result_name, basename);
     strcat(computed_result_name, ".attributes");
     rename(attribute_path.c_str(), computed_result_name);
+
+#if DEBUG_BREAKPAD_DUMP_CALLBACK
+    /* try to open file to read */
+    if (file = fopen(computed_result_name, "r")) {
+        dump_exists = true;
+        fclose(file);
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Attributes file exists at crash time");
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Attributes file does not exist at crash time");
+    }
+#endif
 
     return true;
 }
@@ -204,6 +234,18 @@ static void uploadSingle(const std::string& base_name)
 #if DEBUG_BREAKPAD_UPLOAD
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "Uploading report %s\n", dump_path.c_str());
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
+
+    /* try to open file to read */
+    bool dump_exists = false;
+    FILE *file;
+    if (file = fopen(dump_path.c_str(), "r")) {
+        dump_exists = true;
+        fclose(file);
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path exists at upload time");
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","File at dump path does not exist at upload time");
+    }
 #endif
 
     breakpad_files["upload_file_minidump"] = dump_path;
@@ -222,6 +264,13 @@ static void uploadSingle(const std::string& base_name)
     if (success) {
         unlink(attributes_path.c_str());
         unlink(dump_path.c_str());
+#if DEBUG_BREAKPAD_UPLOAD
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crash dump upload response: %s", response.c_str());
+#endif
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                "Crash dump upload failed to send the minidump file.");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response: %s", response.c_str());
     }
 }
 
@@ -308,7 +357,7 @@ static bool dumpWithoutCrashCallback(const google_breakpad::MinidumpDescriptor& 
                                                             &error);
     if (!success) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "Failed to send the minidump file.");
+                            "DumpWithoutCrash upload failed to send the minidump file.");
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Response: %s", response.c_str());
     }
 
