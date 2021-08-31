@@ -1,5 +1,0 @@
-src/common/android/breakpad_getcontext.o: \
- src/common/android/breakpad_getcontext.S \
- src/common/android/ucontext_constants.h
-
-src/common/android/ucontext_constants.h:
