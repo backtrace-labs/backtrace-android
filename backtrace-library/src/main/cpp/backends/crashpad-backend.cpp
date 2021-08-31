@@ -32,12 +32,10 @@ bool InitializeCrashpad(jstring url,
 
     // path to crashpad database
     const char *filePath = env->GetStringUTFChars(database_path, 0);
-    std::string pathStr(filePath);
-    pathStr += "/crashpad";
-    FilePath db(pathStr);
+    FilePath db(filePath);
 
     if (enableClientSideUnwinding) {
-        bool success = EnableClientSideUnwinding(env, pathStr.c_str(), unwindingMode);
+        bool success = EnableClientSideUnwinding(env, filePath, unwindingMode);
         if (!success) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot enable client side unwinding");
         }

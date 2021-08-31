@@ -40,11 +40,17 @@ struct dump_context {
 static bool serialize_string(FILE* file, const std::string& s)
 {
     uint32_t len = s.size();
-    if (fwrite(&len, sizeof(len), 1, file) != 1)
+    if (fwrite(&len, sizeof(len), 1, file) != 1) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not write num bytes to file");
         return false;
+    }
 
-    if (fwrite(s.data(), 1, s.size(), file) != s.size())
+    if (fwrite(s.data(), 1, s.size(), file) != s.size()) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not write data to file");
         return false;
+    }
 
     return true;
 }
@@ -52,13 +58,22 @@ static bool serialize_string(FILE* file, const std::string& s)
 static std::string deserialize_string(FILE* file)
 {
     uint32_t len;
-    if (fread(&len, sizeof(len), 1, file) != 1)
+    if (fread(&len, sizeof(len), 1, file) != 1) {
+#if DEBUG_BREAKPAD_ATTRIBUTES
+        // We always hit this condition at the end of deserialization
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not read num bytes from file");
+#endif
         return {};
+    }
 
     std::string ret(len, '\0');
 
-    if (fread(&ret[0], 1, len, file) != len)
+    if (fread(&ret[0], 1, len, file) != len) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Could not read data from file");
         return {};
+    }
 
     return ret;
 }
@@ -67,15 +82,26 @@ static bool map_serialize_to_file(const std::map<std::string, std::string>& m,
                                   const char* file_name)
 {
     FILE* f = fopen(file_name, "wb");
-    if (!f)
+    if (!f) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Serializing attributes file failed");
         return false;
+    }
+
     for (const auto& kv : m) {
+#if DEBUG_BREAKPAD_ATTRIBUTES
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Serializing attribute with key %s and value %s", kv.first.c_str(), kv.second.c_str());
+#endif
         bool success = serialize_string(f, kv.first) && serialize_string(f, kv.second);
         if (!success) {
             fclose(f);
             return false;
         }
     }
+#if DEBUG_BREAKPAD_ATTRIBUTES
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Serialized %d attributes", m.size());
+#endif
+
     fclose(f);
     return true;
 }
@@ -97,10 +123,9 @@ static std::map<std::string, std::string> map_deserialize_from_file(const char* 
             return m;
         }
         std::string value = deserialize_string(f);
-        if (value.size() == 0) {
-            fclose(f);
-            return m;
-        }
+#if DEBUG_BREAKPAD_ATTRIBUTES
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Deserializing attribute with key %s and value %s", key.c_str(), value.c_str());
+#endif
         m.emplace(std::move(key), std::move(value));
     }
 
@@ -124,7 +149,7 @@ static const char* get_basename(const char* file_name)
 static std::vector<std::string> get_files_pending_upload()
 {
     std::vector<std::string> ret;
-    std::string path = dump_dir + "/..";
+    std::string path = dump_dir;
     DIR* d = opendir(path.c_str());
 
     if (!d) {
@@ -133,21 +158,22 @@ static std::vector<std::string> get_files_pending_upload()
         return {};
     }
 
-//    const std::regex filename_regex{R"(^(........-....-....-........-........\.dmp)\.pending)"};
     const std::regex filename_regex{R"(^(.{36}\.dmp)\.pending)"};
 
     for (struct dirent* dir = readdir(d); dir != nullptr; dir = readdir(d)) {
-
-//        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-//                            "Entry type %d, name %s\n", dir->d_type, dir->d_name);
+#if DEBUG_BREAKPAD_UPLOAD
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Entry type %d, name %s\n", dir->d_type, dir->d_name);
+#endif
         std::smatch match;
         if (!std::regex_match(std::string{dir->d_name}, match, filename_regex))
             continue;
 
         ret.push_back(match[1].str());
-
-//        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-//                            "Match %s\n", ret.back().c_str());
+#if DEBUG_BREAKPAD_UPLOAD
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Match %s\n", ret.back().c_str());
+#endif
     }
 
     return ret;
@@ -179,7 +205,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
                         "Breakpad dump dir: %s\n", dump_dir.c_str());
 #endif
     strcpy(computed_result_name, dump_dir.c_str());
-    strcat(computed_result_name, "/../");
+    strcat(computed_result_name, "/");
     strcat(computed_result_name, basename);
     strcat(computed_result_name, ".pending");
 #if DEBUG_BREAKPAD_DUMP_CALLBACK
@@ -205,7 +231,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 #endif
 
     strcpy(computed_result_name, dump_dir.c_str());
-    strcat(computed_result_name, "/../");
+    strcat(computed_result_name, "/");
     strcat(computed_result_name, basename);
     strcat(computed_result_name, ".attributes");
     rename(attribute_path.c_str(), computed_result_name);
@@ -224,12 +250,18 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     return true;
 }
 
+
 static void uploadSingle(const std::string& base_name)
 {
-    auto base_path = dump_dir + "/../" + base_name;
+    auto base_path = dump_dir + "/" + base_name;
     auto attributes_path = base_path + ".attributes";
     auto dump_path = base_path + ".pending";
     auto attributes = map_deserialize_from_file(attributes_path.c_str());
+
+#if DEBUG_BREAKPAD_ATTRIBUTES
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "Deserialized %d attributes", attributes.size());
+#endif
 
 #if DEBUG_BREAKPAD_UPLOAD
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
@@ -471,7 +503,10 @@ int InitializeBreakpad(jstring url,
     env->ReleaseStringUTFChars(database_path, database_path_cstr);
 
     attribute_path = dump_dir + "/breakpad_attributes";
-    map_serialize_to_file(breakpad_attributes, attribute_path.c_str());
+    {
+        const std::lock_guard<std::mutex> lock(attribute_synchronization);
+        map_serialize_to_file(breakpad_attributes, attribute_path.c_str());
+    }
 
     std::thread{ [=]{ uploadPending(); } }.detach();
 
