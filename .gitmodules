@@ -4,3 +4,6 @@
 [submodule "backtrace-library/src/main/cpp/libbun"]
 	path = backtrace-library/src/main/cpp/libbun
 	url = git@github.com:backtrace-labs/libbun.git
+[submodule "backtrace-library/src/main/cpp/breakpad-builds"]
+	path = backtrace-library/src/main/cpp/breakpad-builds
+	url = git@github.com:backtrace-labs/breakpad-builds.git
