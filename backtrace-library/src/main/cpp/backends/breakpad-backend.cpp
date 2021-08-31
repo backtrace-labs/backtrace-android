@@ -3,10 +3,6 @@
 #include <android/log.h>
 #include <jni.h>
 #include <stdio.h>
-#include <string>
-#include <atomic>
-#include <mutex>
-#include <unordered_map>
 #include <regex>
 #include <thread>
 #include <libgen.h>
@@ -14,31 +10,8 @@
 #include "client-side-unwinding.h"
 #include "backtrace-native.h"
 
-static constexpr size_t MAX_UPLOADS_PER_RUN = 3;
-
-extern std::string thread_id;
-extern std::atomic_bool initialized;
-extern std::mutex attribute_synchronization;
-
-//std::unique_ptr<google_breakpad::ExceptionHandler*> eh;
-static google_breakpad::ExceptionHandler* eh;
-static std::string upload_url_str;
-static std::map<std::string, std::string> breakpad_attributes;
-std::map<std::string, std::string> breakpad_files;
-static std::string certificate_path;
-
-static std::string dump_dir;
-static std::string attribute_path;
-
-struct dump_context {
-    bool set_main_thread_as_faulting_thread;
-    std::string message;
-    int key;
-};
-
-/* Purposefully making the assumption that strings will never exceed 32 bits in this scheme */
-static bool serialize_string(FILE* file, const std::string& s)
-{
+/* We assume that strings will never exceed 32 bits in this scheme */
+static bool serialize_string(FILE* file, const std::string& s) {
     uint32_t len = s.size();
     if (fwrite(&len, sizeof(len), 1, file) != 1) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
@@ -55,8 +28,7 @@ static bool serialize_string(FILE* file, const std::string& s)
     return true;
 }
 
-static std::string deserialize_string(FILE* file)
-{
+static std::string deserialize_string(FILE* file) {
     uint32_t len;
     if (fread(&len, sizeof(len), 1, file) != 1) {
 #if DEBUG_BREAKPAD_ATTRIBUTES
@@ -79,8 +51,7 @@ static std::string deserialize_string(FILE* file)
 }
 
 static bool map_serialize_to_file(const std::map<std::string, std::string>& m,
-                                  const char* file_name)
-{
+                                  const char* file_name) {
     FILE* f = fopen(file_name, "wb");
     if (!f) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
@@ -106,8 +77,7 @@ static bool map_serialize_to_file(const std::map<std::string, std::string>& m,
     return true;
 }
 
-static std::map<std::string, std::string> map_deserialize_from_file(const char* file_name)
-{
+static std::map<std::string, std::string> map_deserialize_from_file(const char* file_name) {
     FILE* f = fopen(file_name, "rb");
     if (!f) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
@@ -133,8 +103,7 @@ static std::map<std::string, std::string> map_deserialize_from_file(const char* 
     return m;
 }
 
-static const char* get_basename(const char* file_name)
-{
+static const char* get_basename(const char* file_name) {
     const char* last_dir_separator = nullptr;
 
     for (const char* current = file_name; *current; ++current) {
@@ -146,8 +115,7 @@ static const char* get_basename(const char* file_name)
     return file_name;
 }
 
-static std::vector<std::string> get_files_pending_upload()
-{
+static std::vector<std::string> get_files_pending_upload() {
     std::vector<std::string> ret;
     std::string path = dump_dir;
     DIR* d = opendir(path.c_str());
@@ -178,7 +146,6 @@ static std::vector<std::string> get_files_pending_upload()
 
     return ret;
 }
-
 
 // Keep track of dump context for user-generated Breakpad dumps
 int user_generated_dump_counter = 0;
@@ -250,9 +217,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     return true;
 }
 
-
-static void uploadSingle(const std::string& base_name)
-{
+static void uploadSingle(const std::string& base_name) {
     auto base_path = dump_dir + "/" + base_name;
     auto attributes_path = base_path + ".attributes";
     auto dump_path = base_path + ".pending";
@@ -306,8 +271,7 @@ static void uploadSingle(const std::string& base_name)
     }
 }
 
-static void uploadPending()
-{
+static void uploadPending() {
     auto pending = get_files_pending_upload();
 
     if (pending.size() > MAX_UPLOADS_PER_RUN)
@@ -520,9 +484,7 @@ void DumpWithoutCrashBreakpad(jstring message, jboolean set_main_thread_as_fault
                             "Breakpad integration isn't available. Please initialize the Breakpad integration before calling DumpWithoutCrash.");
         return;
     }
-#if 0
-    eh->WriteMinidump();
-#endif
+
     JNIEnv *env = GetJniEnv();
     if (env == nullptr) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
