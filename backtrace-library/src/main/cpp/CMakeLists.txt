@@ -24,7 +24,7 @@ else()
     add_definitions(-DCRASHPAD_BACKEND)
 endif()
 
-if (ANDROID_NDK_MAJOR GREATER_EQUAL 21 AND ANDROID_NATIVE_API_LEVEL GREATER_EQUAL 23)
+if (ANDROID_NDK_MAJOR GREATER_EQUAL 21 AND ANDROID_NATIVE_API_LEVEL GREATER_EQUAL 23 AND BACKEND)
     set(CLIENT_SIDE_UNWINDING TRUE)
     add_definitions(-DCLIENT_SIDE_UNWINDING)
 endif()
@@ -49,9 +49,6 @@ add_library(# Sets the name of the library.
 
             # Provides a relative path to your source file(s).
             ${SOURCES})
-
-# Includes
-include_directories(${PROJECT_SOURCE_DIR}/include)
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     # Crashpad Libraries
@@ -80,6 +77,9 @@ elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
 else()
     message("No native debugging backend selected")
 endif()
+
+# Includes
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 if (CLIENT_SIDE_UNWINDING)
     # Bun Libraries
