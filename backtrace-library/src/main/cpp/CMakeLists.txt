@@ -15,18 +15,14 @@ elseif(ANDROID_ABI STREQUAL "x86_64" AND (NOT ANDROID_NDK_MAJOR OR ANDROID_NDK_M
     message("Breakpad not supported for x86_64 emulator")
 elseif (NOT ANDROID_NDK_MAJOR)
     set(BACKEND "BREAKPAD_BACKEND")
-    add_definitions(-DBREAKPAD_BACKEND)
 elseif(ANDROID_NDK_MAJOR LESS 17)
     set(BACKEND "BREAKPAD_BACKEND")
-    add_definitions(-DBREAKPAD_BACKEND)
 else()
     set(BACKEND "CRASHPAD_BACKEND")
-    add_definitions(-DCRASHPAD_BACKEND)
 endif()
 
 if (ANDROID_NDK_MAJOR GREATER_EQUAL 21 AND ANDROID_NATIVE_API_LEVEL GREATER_EQUAL 23 AND BACKEND)
     set(CLIENT_SIDE_UNWINDING TRUE)
-    add_definitions(-DCLIENT_SIDE_UNWINDING)
 endif()
 
 # Sources
@@ -51,6 +47,8 @@ add_library(# Sets the name of the library.
             ${SOURCES})
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
+    target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)
+
     # Crashpad Libraries
     add_library(crashpad_client STATIC IMPORTED)
     set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
@@ -64,6 +62,8 @@ if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     # Crashpad Headers
     include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
+    target_compile_definitions(backtrace-native PRIVATE -DBREAKPAD_BACKEND)
+
     # Breakpad Libraries
     add_library(breakpad_client STATIC IMPORTED)
     set_property(TARGET breakpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/libbreakpad_client.a)
@@ -82,6 +82,8 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 if (CLIENT_SIDE_UNWINDING)
+    target_compile_definitions(backtrace-native PRIVATE -DCLIENT_SIDE_UNWINDING)
+
     # Bun Libraries
     set(LIBUNWINDSTACK_ENABLED TRUE)
     add_subdirectory(libbun)
