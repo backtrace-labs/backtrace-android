@@ -74,7 +74,7 @@ catch (e: Exception) {
 * Minimum SDK version 21 (Android 5.0)
 * Target SDK version 28 (Android 9.0)
 * Minimum NDK version 17c
-* Maximum NDK version 21
+* Maximum NDK version 22
 
 # Supported platforms
 * arm32/arm64
