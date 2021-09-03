@@ -86,7 +86,11 @@ public class BacktraceAttributes {
         this.attributes.put("application.package", this.context.getApplicationContext()
                 .getPackageName());
         this.attributes.put("application", getApplicationName());
-        this.attributes.put("version", getApplicationVersion());
+        try {
+            this.attributes.put("version", getApplicationVersion());
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -197,14 +201,9 @@ public class BacktraceAttributes {
                 .getPackageManager()).toString();
     }
 
-    public String getApplicationVersion() {
-        try {
-            return this.attributes.put("version", this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return new String();
-        }
+    public String getApplicationVersion() throws PackageManager.NameNotFoundException {
+        return this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName;
     }
 
     public Map<String, Object> getAllBacktraceAttributes() {

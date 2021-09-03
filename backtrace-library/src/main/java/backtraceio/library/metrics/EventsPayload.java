@@ -1,5 +1,7 @@
 package backtraceio.library.metrics;
 
+import android.content.pm.PackageManager;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -25,7 +27,7 @@ public abstract class EventsPayload {
         this.application = backtraceAttributes.getApplicationName();
         try {
             appVersion = backtraceAttributes.getApplicationVersion();
-        } catch (Exception e) {
+        } catch (PackageManager.NameNotFoundException e) {
             BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
             appVersion = "";
         }
