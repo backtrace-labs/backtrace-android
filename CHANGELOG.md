@@ -1,6 +1,6 @@
 # Backtrace Android Release Notes
 
-## Version 3.5.0 - 02.09.2021
+## Version 3.4.0 - 07.09.2021
 - Added support for NDK 22
 
 ## Version 3.3.0 - 15.07.2021
