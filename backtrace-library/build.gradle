@@ -42,7 +42,7 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['src/main/cpp/crashpad-builds', 'src/main/cpp/curl-builds']
+            jniLibs.srcDirs = ['src/main/cpp/crashpad-builds']
             jniLibs.includes = ['src/main/cpp/crashpad-builds/crashpad_handler']
         }
     }
