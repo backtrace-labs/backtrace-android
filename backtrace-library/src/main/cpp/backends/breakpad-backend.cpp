@@ -10,6 +10,27 @@
 #include "client-side-unwinding.h"
 #include "backtrace-native.h"
 
+static constexpr size_t MAX_UPLOADS_PER_RUN = 3;
+
+extern std::string thread_id;
+extern std::atomic_bool initialized;
+extern std::mutex attribute_synchronization;
+
+static google_breakpad::ExceptionHandler* eh;
+static std::string upload_url_str;
+static std::map<std::string, std::string> breakpad_attributes;
+static std::map<std::string, std::string> breakpad_files;
+static std::string certificate_path;
+
+static std::string dump_dir;
+static std::string attribute_path;
+
+struct dump_context {
+    bool set_main_thread_as_faulting_thread;
+    std::string message;
+    int key;
+};
+
 /* We assume that strings will never exceed 32 bits in this scheme */
 static bool serialize_string(FILE* file, const std::string& s) {
     uint32_t len = s.size();
@@ -31,7 +52,7 @@ static bool serialize_string(FILE* file, const std::string& s) {
 static std::string deserialize_string(FILE* file) {
     uint32_t len;
     if (fread(&len, sizeof(len), 1, file) != 1) {
-#if DEBUG_BREAKPAD_ATTRIBUTES
+#ifdef DEBUG_BREAKPAD_ATTRIBUTES
         // We always hit this condition at the end of deserialization
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Could not read num bytes from file");
@@ -60,7 +81,7 @@ static bool map_serialize_to_file(const std::map<std::string, std::string>& m,
     }
 
     for (const auto& kv : m) {
-#if DEBUG_BREAKPAD_ATTRIBUTES
+#ifdef DEBUG_BREAKPAD_ATTRIBUTES
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Serializing attribute with key %s and value %s", kv.first.c_str(), kv.second.c_str());
 #endif
         bool success = serialize_string(f, kv.first) && serialize_string(f, kv.second);
@@ -69,7 +90,7 @@ static bool map_serialize_to_file(const std::map<std::string, std::string>& m,
             return false;
         }
     }
-#if DEBUG_BREAKPAD_ATTRIBUTES
+#ifdef DEBUG_BREAKPAD_ATTRIBUTES
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Serialized %d attributes", m.size());
 #endif
 
@@ -93,7 +114,7 @@ static std::map<std::string, std::string> map_deserialize_from_file(const char* 
             return m;
         }
         std::string value = deserialize_string(f);
-#if DEBUG_BREAKPAD_ATTRIBUTES
+#ifdef DEBUG_BREAKPAD_ATTRIBUTES
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Deserializing attribute with key %s and value %s", key.c_str(), value.c_str());
 #endif
         m.emplace(std::move(key), std::move(value));
@@ -129,7 +150,7 @@ static std::vector<std::string> get_files_pending_upload() {
     const std::regex filename_regex{R"(^(.{36}\.dmp)\.pending)"};
 
     for (struct dirent* dir = readdir(d); dir != nullptr; dir = readdir(d)) {
-#if DEBUG_BREAKPAD_UPLOAD
+#ifdef DEBUG_BREAKPAD_UPLOAD
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Entry type %d, name %s\n", dir->d_type, dir->d_name);
 #endif
@@ -138,7 +159,7 @@ static std::vector<std::string> get_files_pending_upload() {
             continue;
 
         ret.push_back(match[1].str());
-#if DEBUG_BREAKPAD_UPLOAD
+#ifdef DEBUG_BREAKPAD_UPLOAD
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Match %s\n", ret.back().c_str());
 #endif
@@ -167,7 +188,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 
     static char computed_result_name[2048] = "";
 
-#if DEBUG_BREAKPAD_DUMP_CALLBACK
+#ifdef DEBUG_BREAKPAD_DUMP_CALLBACK
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "Breakpad dump dir: %s\n", dump_dir.c_str());
 #endif
@@ -175,7 +196,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     strcat(computed_result_name, "/");
     strcat(computed_result_name, basename);
     strcat(computed_result_name, ".pending");
-#if DEBUG_BREAKPAD_DUMP_CALLBACK
+#ifdef DEBUG_BREAKPAD_DUMP_CALLBACK
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "Breakpad dump old name: %s\n", path);
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
@@ -184,7 +205,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 
     rename(path, computed_result_name);
 
-#if DEBUG_BREAKPAD_DUMP_CALLBACK
+#ifdef DEBUG_BREAKPAD_DUMP_CALLBACK
     /* try to open file to read */
     bool dump_exists = false;
     FILE *file;
@@ -203,7 +224,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     strcat(computed_result_name, ".attributes");
     rename(attribute_path.c_str(), computed_result_name);
 
-#if DEBUG_BREAKPAD_DUMP_CALLBACK
+#ifdef DEBUG_BREAKPAD_DUMP_CALLBACK
     /* try to open file to read */
     if (file = fopen(computed_result_name, "r")) {
         dump_exists = true;
@@ -223,12 +244,12 @@ static void uploadSingle(const std::string& base_name) {
     auto dump_path = base_path + ".pending";
     auto attributes = map_deserialize_from_file(attributes_path.c_str());
 
-#if DEBUG_BREAKPAD_ATTRIBUTES
+#ifdef DEBUG_BREAKPAD_ATTRIBUTES
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "Deserialized %d attributes", attributes.size());
 #endif
 
-#if DEBUG_BREAKPAD_UPLOAD
+#ifdef DEBUG_BREAKPAD_UPLOAD
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "Uploading report %s\n", dump_path.c_str());
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
@@ -261,7 +282,7 @@ static void uploadSingle(const std::string& base_name) {
     if (success) {
         unlink(attributes_path.c_str());
         unlink(dump_path.c_str());
-#if DEBUG_BREAKPAD_UPLOAD
+#ifdef DEBUG_BREAKPAD_UPLOAD
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crash dump upload response: %s", response.c_str());
 #endif
     } else {
@@ -278,7 +299,7 @@ static void uploadPending() {
         pending.resize(MAX_UPLOADS_PER_RUN);
 
     for (const auto& name : pending) {
-#if DEBUG_BREAKPAD_UPLOAD
+#ifdef DEBUG_BREAKPAD_UPLOAD
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Uploading report %s\n", name.c_str());
 #endif
@@ -319,7 +340,7 @@ static bool dumpWithoutCrashCallback(const google_breakpad::MinidumpDescriptor& 
 
     breakpad_files["upload_file_minidump"] = descriptor.path();
 
-#if DEBUG_HTTP_UPLOAD
+#ifdef DEBUG_HTTP_UPLOAD
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Dump path: %s\n", descriptor.path());
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android","Upload URL: %s\n", upload_url_str.c_str());
 

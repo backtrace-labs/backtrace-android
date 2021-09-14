@@ -11,10 +11,6 @@
 
 #include <jni.h>
 
-// crashpad client
-using namespace base;
-static crashpad::CrashpadClient *client;
-
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
                         jstring handler_path,

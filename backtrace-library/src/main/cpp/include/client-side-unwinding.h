@@ -4,7 +4,7 @@
 #include <android/log.h>
 #include <jni.h>
 
-#if CLIENT_SIDE_UNWINDING
+#ifdef CLIENT_SIDE_UNWINDING
 // Possible modes for client side unwinding
 enum class UnwindingMode {
     INVALID = -1,

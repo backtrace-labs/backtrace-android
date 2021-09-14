@@ -4,7 +4,7 @@
 #include <atomic>
 #include <mutex>
 
-#if CRASHPAD_BACKEND
+#ifdef CRASHPAD_BACKEND
 #include "crashpad-backend.h"
 #elif BREAKPAD_BACKEND
 #include "breakpad-backend.h"
@@ -24,7 +24,7 @@ bool Initialize(jstring url,
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
-#if CRASHPAD_BACKEND
+#ifdef CRASHPAD_BACKEND
         initialized = InitializeCrashpad(url,
                                          database_path, handler_path,
                                          attributeKeys, attributeValues,
@@ -46,7 +46,7 @@ bool Initialize(jstring url,
 }
 
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread) {
-#if CRASHPAD_BACKEND
+#ifdef CRASHPAD_BACKEND
     DumpWithoutCrashCrashpad(message, set_main_thread_as_faulting_thread);
 #elif BREAKPAD_BACKEND
     DumpWithoutCrashBreakpad(message, set_main_thread_as_faulting_thread);
@@ -57,7 +57,7 @@ void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thre
 }
 
 void AddAttribute(jstring key, jstring value) {
-#if CRASHPAD_BACKEND
+#ifdef CRASHPAD_BACKEND
     AddAttributeCrashpad(key, value);
 #elif BREAKPAD_BACKEND
     AddAttributeBreakpad(key, value);

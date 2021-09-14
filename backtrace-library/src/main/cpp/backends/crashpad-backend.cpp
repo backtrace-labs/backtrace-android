@@ -7,6 +7,8 @@ extern std::string thread_id;
 extern std::atomic_bool initialized;
 extern std::mutex attribute_synchronization;
 
+static crashpad::CrashpadClient *client;
+
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
                         jstring handler_path,
@@ -15,8 +17,6 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
                         jint unwindingMode) {
-    using namespace crashpad;
-
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
@@ -32,7 +32,7 @@ bool InitializeCrashpad(jstring url,
 
     // path to crashpad database
     const char *filePath = env->GetStringUTFChars(database_path, 0);
-    FilePath db(filePath);
+    base::FilePath db(filePath);
 
     if (enableClientSideUnwinding) {
         bool success = EnableClientSideUnwinding(env, filePath, unwindingMode);
@@ -82,7 +82,7 @@ bool InitializeCrashpad(jstring url,
 
     // path to crash handler executable
     const char *handlerPath = env->GetStringUTFChars(handler_path, 0);
-    FilePath handler(handlerPath);
+    base::FilePath handler(handlerPath);
 
     // paths to file attachments
     if (attachmentPaths != nullptr) {
@@ -110,7 +110,7 @@ bool InitializeCrashpad(jstring url,
         }
     }
 
-    std::unique_ptr<CrashReportDatabase> database = CrashReportDatabase::Initialize(db);
+    std::unique_ptr<crashpad::CrashReportDatabase> database = crashpad::CrashReportDatabase::Initialize(db);
     if (database == nullptr || database->GetSettings() == NULL) {
         return false;
     }
@@ -119,7 +119,7 @@ bool InitializeCrashpad(jstring url,
     database->GetSettings()->SetUploadsEnabled(true);
 
     // Start crash handler
-    client = new CrashpadClient();
+    client = new crashpad::CrashpadClient();
 
     initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
                                               arguments);

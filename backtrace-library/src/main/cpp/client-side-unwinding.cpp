@@ -278,10 +278,13 @@ bool EnableClientSideUnwinding(JNIEnv *env, const char* path, jint unwindingMode
 
     switch (unwinding_mode) {
         case UnwindingMode::LOCAL:
+            // Fallthrough
         case UnwindingMode::LOCAL_DUMPWITHOUTCRASH:
+            // Fallthrough
         case UnwindingMode::LOCAL_CONTEXT:
             return InitializeLocalClientSideUnwinding(env);
         case UnwindingMode::REMOTE:
+            // Fallthrough
         case UnwindingMode::REMOTE_DUMPWITHOUTCRASH:
             return InitializeRemoteClientSideUnwinding(env, path);
         default:

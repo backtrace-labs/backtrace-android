@@ -4,7 +4,6 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 # Determine native crash backend
 # ANDROID_NDK_MAJOR not defined until ndk 17+
@@ -42,6 +41,8 @@ add_library(# Sets the name of the library.
 
             # Provides a relative path to your source file(s).
             ${SOURCES})
+
+target_compile_options(backtrace-native PRIVATE -std=c++14)
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)

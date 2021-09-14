@@ -11,27 +11,6 @@
 #include <unordered_map>
 #include <string>
 
-static constexpr size_t MAX_UPLOADS_PER_RUN = 3;
-
-extern std::string thread_id;
-extern std::atomic_bool initialized;
-extern std::mutex attribute_synchronization;
-
-static google_breakpad::ExceptionHandler* eh;
-static std::string upload_url_str;
-static std::map<std::string, std::string> breakpad_attributes;
-static std::map<std::string, std::string> breakpad_files;
-static std::string certificate_path;
-
-static std::string dump_dir;
-static std::string attribute_path;
-
-struct dump_context {
-    bool set_main_thread_as_faulting_thread;
-    std::string message;
-    int key;
-};
-
 int InitializeBreakpad(jstring url,
                        jstring database_path,
                        jstring handler_path,
