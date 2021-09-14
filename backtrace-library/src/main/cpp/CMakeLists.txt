@@ -42,7 +42,7 @@ add_library(# Sets the name of the library.
             # Provides a relative path to your source file(s).
             ${SOURCES})
 
-target_compile_options(backtrace-native PRIVATE -std=c++14)
+target_compile_features(backtrace-native PRIVATE cxx_std_17)
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)

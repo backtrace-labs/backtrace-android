@@ -23,7 +23,8 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              native-lib.cpp )
 
-target_compile_options(native-lib PRIVATE -fno-omit-frame-pointer -std=c++11)
+target_compile_features(native-lib PRIVATE cxx_std_11)
+target_compile_options(native-lib PRIVATE -fno-omit-frame-pointer)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
