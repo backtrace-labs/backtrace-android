@@ -72,7 +72,7 @@ catch (e: Exception) {
 
 # Supported SDKs <a name="supported-sdks"></a>
 * Minimum SDK version 21 (Android 5.0)
-* Target SDK version 28 (Android 9.0)
+* Target SDK version 30 (Android 11.0)
 * Minimum NDK version 16b
 * Maximum NDK version 22
 
@@ -531,11 +531,11 @@ To enable client side unwinding, you can call the `setupNativeIntegration` metho
 database.setupNativeIntegration(backtraceClient, credentials, true);
 ```
 
-**NOTE:** Client side unwinding is only available in NDK level 21 and API level 23+ (Android 6.0)+
-
 **NOTE:** When viewing a crash in the Backtrace Debugger, it may still show warning messages that symbols are missing from certain frames after client-side unwinding is performed. This warning is expected if these symbols are not available on the Backtrace server, and should have no impact to the end-user's ability to read the call stack.
 
 **NOTE:** Client side unwinding is only available for fatal crashes. Non-fatal Crashpad dumps you generate via `DumpWithoutCrash` for instance will not use client side unwinding.
+
+**NOTE:** Client side unwinding is only available in NDK level 17+ (i.e: Only with the Crashpad crash reporting backend)
 
 ### Unwinding Modes and Options
 

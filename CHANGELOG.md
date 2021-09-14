@@ -2,7 +2,7 @@
 
 ## Version 3.5.0 - 10.09.2021
 - Added support for native crash reporting in NDK 16b
-- Disable client side unwinding in unsupported NDK versions
+- Bug fixes and expanded supported NDK versions for client side unwinding
 
 ## Version 3.4.0 - 07.09.2021
 - Added support for NDK 22
