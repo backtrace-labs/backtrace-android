@@ -1,6 +1,6 @@
 # Backtrace Android Release Notes
 
-## Version 3.5.0 - 10.09.2021
+## Version 3.5.0 - 14.09.2021
 - Added support for native crash reporting in NDK 16b
 - Bug fixes and expanded supported NDK versions for client side unwinding
 
