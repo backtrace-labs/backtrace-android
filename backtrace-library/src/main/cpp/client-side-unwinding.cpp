@@ -59,7 +59,7 @@ buffer_create(void) {
     void *r;
     int fd;
 
-    fd = bun_memfd_create("_backtrace_buffer", MFD_CLOEXEC);
+    fd = bun_memfd_create("_backtrace_buffer");
     if (fd == -1) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                             "Could not create anonymous file for client side unwinding");
@@ -187,6 +187,10 @@ bool RemoteUnwindingHandlerDumpWithoutCrash(int signum, siginfo_t *info, ucontex
 bool InitializeLocalClientSideUnwinding(JNIEnv* env) {
     // Initialize a shared memory region.
     static const char *buffer = static_cast<char *>(buffer_create());
+    if (buffer == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create a shared memory region for client side unwinding");
+        return false;
+    }
 
     bun_buffer_init(&buf, (char*) buffer, BUFFER_SIZE);
 
@@ -206,6 +210,10 @@ bool InitializeRemoteClientSideUnwinding(JNIEnv* env, const char* path_cstr) {
 
     // Initialize a shared memory region.
     static const char *buffer = static_cast<char *>(buffer_create());
+    if (buffer == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Could not create a shared memory region for client side unwinding");
+        return false;
+    }
 
     // Initialize the BCD configuration file.
     if (bcd_config_init(&cf, &e) == -1) {
@@ -265,6 +273,8 @@ bool EnableClientSideUnwinding(JNIEnv *env, const char* path, jint unwindingMode
     }
 
     unwinding_mode = static_cast<UnwindingMode>((int) unwindingMode);
+
+    bun_cache_dir_set(path);
 
     switch (unwinding_mode) {
         case UnwindingMode::LOCAL:

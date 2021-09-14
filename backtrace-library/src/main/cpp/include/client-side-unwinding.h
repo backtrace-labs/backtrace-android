@@ -4,7 +4,7 @@
 #include <android/log.h>
 #include <jni.h>
 
-#if __NDK_MAJOR__ >= 21 && __ANDROID_API__ >= 23
+#if CLIENT_SIDE_UNWINDING
 // Possible modes for client side unwinding
 enum class UnwindingMode {
     INVALID = -1,
