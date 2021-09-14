@@ -5,36 +5,87 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+# Determine native crash backend
+# ANDROID_NDK_MAJOR not defined until ndk 17+
+# https://github.com/android/ndk/issues/596
+if (ANDROID_ABI STREQUAL "x86")
+    message("Native crash reporting not supported for x86 emulator")
+elseif(ANDROID_ABI STREQUAL "x86_64" AND (NOT ANDROID_NDK_MAJOR OR ANDROID_NDK_MAJOR LESS 17))
+    message("Breakpad not supported for x86_64 emulator")
+elseif (NOT ANDROID_NDK_MAJOR)
+    set(BACKEND "BREAKPAD_BACKEND")
+elseif(ANDROID_NDK_MAJOR LESS 17)
+    set(BACKEND "BREAKPAD_BACKEND")
+else()
+    set(BACKEND "CRASHPAD_BACKEND")
+    set(CLIENT_SIDE_UNWINDING TRUE)
+endif()
 
-add_library( # Sets the name of the library.
-             backtrace-native
+# Sources
+list(APPEND SOURCES backtrace-native.cpp)
+list(APPEND SOURCES backends/backend.cpp)
+list(APPEND SOURCES client-side-unwinding.cpp)
+if(BACKEND STREQUAL "CRASHPAD_BACKEND")
+    list(APPEND SOURCES backends/crashpad-backend.cpp)
+elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
+    list(APPEND SOURCES backends/breakpad-backend.cpp)
+else()
+    message("No native debugging backend selected")
+endif()
 
-             # Sets the library as a shared library.
-             SHARED
+add_library(# Sets the name of the library.
+            backtrace-native
 
-             # Provides a relative path to your source file(s).
-        backtrace-native.cpp)
+            # Sets the library as a shared library.
+            SHARED
 
-# Crashpad Libraries
-add_library(crashpad_client STATIC IMPORTED)
-set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
+            # Provides a relative path to your source file(s).
+            ${SOURCES})
 
-add_library(crashpad_util STATIC IMPORTED)
-set_property(TARGET crashpad_util PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/util/libcrashpad_util.a)
+target_compile_features(backtrace-native PRIVATE cxx_std_17)
 
-add_library(base STATIC IMPORTED)
-set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/third_party/mini_chromium/mini_chromium/base/libbase.a)
+if(BACKEND STREQUAL "CRASHPAD_BACKEND")
+    target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)
 
-# Crashpad Headers
-include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
+    # Crashpad Libraries
+    add_library(crashpad_client STATIC IMPORTED)
+    set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
 
-# Bun Libraries
-set(LIBUNWINDSTACK_ENABLED TRUE)
-add_subdirectory(libbun)
+    add_library(crashpad_util STATIC IMPORTED)
+    set_property(TARGET crashpad_util PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/util/libcrashpad_util.a)
+
+    add_library(base STATIC IMPORTED)
+    set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/third_party/mini_chromium/mini_chromium/base/libbase.a)
+
+    # Crashpad Headers
+    include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
+elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
+    target_compile_definitions(backtrace-native PRIVATE -DBREAKPAD_BACKEND)
+
+    # Breakpad Libraries
+    add_library(breakpad_client STATIC IMPORTED)
+    set_property(TARGET breakpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/libbreakpad_client.a)
+
+    # Curl Libraries
+    add_library(curl SHARED IMPORTED)
+    set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/curl-builds/${ANDROID_ABI}/libcurl.so)
+
+    # Breakpad Headers
+    include_directories(${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI} ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/src ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/src/common/android/include)
+else()
+    message("No native debugging backend selected")
+endif()
+
+# Includes
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+if (CLIENT_SIDE_UNWINDING)
+    target_compile_definitions(backtrace-native PRIVATE -DCLIENT_SIDE_UNWINDING)
+
+    # Bun Libraries
+    set(LIBUNWINDSTACK_ENABLED TRUE)
+    add_subdirectory(libbun)
+endif()
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -50,19 +101,28 @@ find_library( # Sets the name of the path variable.
               log
             )
 
-
-
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries( # Specifies the target library.
-                        backtrace-native
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
-                        crashpad_client
-                        crashpad_util
-                        base
-                        bun
-                     )
+list(APPEND LIBS backtrace-native)
+list(APPEND LIBS ${log-lib})
+
+if(BACKEND STREQUAL "CRASHPAD_BACKEND")
+    list(APPEND LIBS crashpad_client)
+    list(APPEND LIBS crashpad_util)
+    list(APPEND LIBS base)
+elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
+    list(APPEND LIBS breakpad_client)
+    list(APPEND LIBS curl)
+else()
+    message("No native debugging backend selected")
+endif()
+
+if (CLIENT_SIDE_UNWINDING)
+    list(APPEND LIBS bun)
+endif()
+
+target_link_libraries(${LIBS})
+
+

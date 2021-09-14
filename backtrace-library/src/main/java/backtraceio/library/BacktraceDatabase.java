@@ -187,6 +187,10 @@ public class BacktraceDatabase implements Database {
         attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
 
         String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
+        // Create the crashpad directory if it doesn't exist
+        File crashHandlerDir = new File(databasePath);
+        crashHandlerDir.mkdir();
+
         Boolean initialized = initialize(
                 minidumpSubmissionUrl,
                 databasePath,

@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 apply from: 'publish.gradle'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 340
-        versionName "3.4.0"
+        targetSdkVersion 30
+        versionCode 350
+        versionName "3.5.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -16,6 +16,9 @@ android {
             cmake {
                 cppFlags ""
             }
+        }
+        ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
 
