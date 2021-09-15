@@ -235,7 +235,7 @@ public class DeviceAttributesHelper {
             case BatteryManager.BATTERY_STATUS_CHARGING:
                 return BatteryState.CHARGING;
             case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
-                return BatteryState.UNPLAGGED;
+                return BatteryState.UNPLUGGED;
             default:
                 return BatteryState.UNKNOWN;
         }
