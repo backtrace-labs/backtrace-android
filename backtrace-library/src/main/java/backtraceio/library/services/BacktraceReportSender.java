@@ -19,6 +19,7 @@ import javax.net.ssl.X509TrustManager;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
+import backtraceio.library.common.RequestHelper;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.metrics.EventsPayload;
@@ -144,14 +145,13 @@ public class BacktraceReportSender {
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Cache-Control", "no-cache");
 
-            urlConnection.setRequestProperty("Content-Type",
-                    MultiFormRequestHelper.getContentType());
+            urlConnection.setRequestProperty("Content-Type", RequestHelper.getContentType());
 
             BacktraceLogger.d(LOG_TAG, "HttpURLConnection successfully initialized");
             DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
 
-            MultiFormRequestHelper.addJson(request, json);
-            MultiFormRequestHelper.addEndOfRequest(request);
+            RequestHelper.addJson(request, json);
+            RequestHelper.addEndOfRequest(request);
 
             request.flush();
             request.close();
@@ -169,13 +169,13 @@ public class BacktraceReportSender {
                         urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }
-
         } catch (Exception e) {
             if (errorCallback != null) {
                 BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
                 errorCallback.onEvent(e);
             }
             BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
+            BacktraceLogger.e(LOG_TAG, "Failed HTTP request URL " + serverUrl);
             result = EventsResult.OnError(payload, e, statusCode);
         } finally {
             if (urlConnection != null) {

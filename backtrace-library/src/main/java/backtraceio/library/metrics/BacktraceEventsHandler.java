@@ -78,6 +78,7 @@ public abstract class BacktraceEventsHandler extends Handler {
 
     /**
      * @param context
+     * @param baseUrl
      * @param backtraceHandlerThread
      * @param urlPrefix
      * @param universeName
@@ -87,7 +88,7 @@ public abstract class BacktraceEventsHandler extends Handler {
      * @param timeBetweenRetriesMillis - 0 will disable retry
      */
 
-    public BacktraceEventsHandler(Context context, Map<String, Object> customAttributes,
+    public BacktraceEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes,
                                   final BacktraceHandlerThread backtraceHandlerThread,
                                   String urlPrefix, String universeName, String token,
                                   Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis)
@@ -102,7 +103,7 @@ public abstract class BacktraceEventsHandler extends Handler {
         this.customAttributes = customAttributes;
         this.backtraceHandlerThread = backtraceHandlerThread;
         this.api = api;
-        this.submissionUrl = urlPrefix + "/submit?token=" + token + "&universe=" + universeName;
+        this.submissionUrl = baseUrl + "/" + urlPrefix + "/submit?token=" + token + "&universe=" + universeName;
         this.timeBetweenRetriesMillis = timeBetweenRetriesMillis;
 
         if (timeIntervalMillis != 0) {

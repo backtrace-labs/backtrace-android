@@ -50,6 +50,7 @@ public interface Api {
      * Create metrics events handler for unique events
      *
      * @param context                   The application context
+     * @param baseUrl                   Backtrace base submission url
      * @param customAttributes          Backtrace base object instance
      * @param universeName              Backtrace universe name
      * @param token                     Backtrace submission token
@@ -57,12 +58,13 @@ public interface Api {
      * @param timeBetweenRetriesMillis  Time between retries for metrics events submission retries
      * @return                          Reference to the created UniqueEventsHandler
      */
-    UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis);
+    UniqueEventsHandler enableUniqueEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis);
 
     /**
      * Create metrics events handler for summed events
      *
      * @param context                   The application context
+     * @param baseUrl                   Backtrace base submission url
      * @param customAttributes          Backtrace base object instance
      * @param universeName              Backtrace universe name
      * @param token                     Backtrace submission token
@@ -70,7 +72,7 @@ public interface Api {
      * @param timeBetweenRetriesMillis  Time between retries for metrics events submission retries
      * @return                          Reference to the created SummedEventsHandler
      */
-    SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis);
+    SummedEventsHandler enableSummedEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis);
 
     /**
      * Set the request handler for unique events

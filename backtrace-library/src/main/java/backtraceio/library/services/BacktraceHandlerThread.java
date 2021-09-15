@@ -34,13 +34,13 @@ public class BacktraceHandlerThread extends HandlerThread {
         this.start();
     }
 
-    UniqueEventsHandler createUniqueEventsHandler(Context context, Map<String, Object> customAttributes, String universeName, String token, Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        this.mUniqueEventsHandler = new UniqueEventsHandler(context, customAttributes, this, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
+    UniqueEventsHandler createUniqueEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        this.mUniqueEventsHandler = new UniqueEventsHandler(context, baseUrl, customAttributes, this, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
         return mUniqueEventsHandler;
     }
 
-    SummedEventsHandler createSummedEventsHandler(Context context, Map<String, Object> customAttributes, String universeName, String token, Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        this.mSummedEventsHandler = new SummedEventsHandler(context, customAttributes, this, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
+    SummedEventsHandler createSummedEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        this.mSummedEventsHandler = new SummedEventsHandler(context, baseUrl, customAttributes, this, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
         return mSummedEventsHandler;
     }
 

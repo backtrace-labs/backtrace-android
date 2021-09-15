@@ -147,8 +147,8 @@ public final class BacktraceMetrics implements Metrics {
 
     @Override
     public void startMetricsEventHandlers(Api backtraceApi) {
-        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, customAttributes, universe, token, timeIntervalMillis, timeBetweenRetriesMillis);
-        summedEventsHandler = backtraceApi.enableSummedEvents(context, customAttributes, universe, token, timeIntervalMillis, timeBetweenRetriesMillis);
+        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, baseUrl, customAttributes, universe, token, timeIntervalMillis, timeBetweenRetriesMillis);
+        summedEventsHandler = backtraceApi.enableSummedEvents(context, baseUrl, customAttributes, universe, token, timeIntervalMillis, timeBetweenRetriesMillis);
     }
 
     void setStartupUniqueEventName(String StartupUniqueEventName) {
@@ -175,11 +175,13 @@ public final class BacktraceMetrics implements Metrics {
         return this.baseUrl;
     }
 
+    // TODO: Finish implementation
     void setIgnoreSslValidation(boolean ignoreSslValidation) {
         // RequestHandler.ignoreSslValidation = value;
         // this.ignoreSslValidation = ignoreSslValidation;
     }
 
+    // TODO: Finish implementation
     boolean getIgnoreSslValidation() {
         // return RequestHandler.IgnoreSslValidation;
         // return this.IgnoreSslValidation;

@@ -19,8 +19,8 @@ public abstract class EventsPayload {
     @SerializedName("appversion")
     private final String appVersion;
 
-    @SerializedName("dropped_events")
-    private int droppedEvents;
+    @SerializedName("metadata")
+    private EventsMetadata eventsMetadata;
 
     public EventsPayload(BacktraceAttributes backtraceAttributes, int droppedEvents) {
         String appVersion;
@@ -32,14 +32,14 @@ public abstract class EventsPayload {
             appVersion = "";
         }
         this.appVersion = appVersion;
-        this.droppedEvents = droppedEvents;
+        this.eventsMetadata = new EventsMetadata(droppedEvents);
     }
 
     public void setDroppedEvents(int droppedEvents) {
-        this.droppedEvents = droppedEvents;
+        this.eventsMetadata.setDroppedEvents(droppedEvents);
     }
 
-    public int getDroppedEvents() { return this.droppedEvents; }
+    public int getDroppedEvents() { return this.eventsMetadata.getDroppedEvents(); }
 
     public abstract ConcurrentLinkedDeque<Event> getEvents();
 }

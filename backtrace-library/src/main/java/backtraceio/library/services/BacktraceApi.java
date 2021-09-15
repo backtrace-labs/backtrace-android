@@ -117,13 +117,13 @@ public class BacktraceApi implements Api {
     }
 
     @Override
-    public UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        return threadSender.createUniqueEventsHandler(context, customAttributes, universeName, token, this, timeIntervalMillis, timeBetweenRetriesMillis);
+    public UniqueEventsHandler enableUniqueEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        return threadSender.createUniqueEventsHandler(context, baseUrl, customAttributes, universeName, token, this, timeIntervalMillis, timeBetweenRetriesMillis);
     }
 
     @Override
-    public SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        return threadSender.createSummedEventsHandler(context, customAttributes, universeName, token, this, timeIntervalMillis, timeBetweenRetriesMillis);
+    public SummedEventsHandler enableSummedEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        return threadSender.createSummedEventsHandler(context, baseUrl, customAttributes, universeName, token, this, timeIntervalMillis, timeBetweenRetriesMillis);
     }
 
     /**

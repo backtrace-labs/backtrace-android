@@ -17,11 +17,11 @@ public class SummedEventsHandler extends BacktraceEventsHandler {
 
     private final static String urlPrefix = "summed-events";
 
-    public SummedEventsHandler(Context context, Map<String, Object> customAttributes,
+    public SummedEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes,
                                final BacktraceHandlerThread backtraceHandlerThread,
                                String universeName, String token,
                                Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        super(context, customAttributes, backtraceHandlerThread, urlPrefix, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
+        super(context, baseUrl, customAttributes, backtraceHandlerThread, urlPrefix, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
     }
 
     @Override
