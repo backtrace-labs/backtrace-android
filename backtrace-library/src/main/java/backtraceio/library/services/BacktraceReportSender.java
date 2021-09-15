@@ -118,11 +118,10 @@ public class BacktraceReportSender {
      * @param serverUrl             server http address to which the request will be sent
      * @param json                  message wih information about events
      * @param payload               information about events
-     * @param ignoreSslValidation   disable ssl validation for this request
      * @param errorCallback         event that will be executed after receiving an error from the server
      * @return information from the server about the result of processing the request
      */
-    public static EventsResult sendEvents(String serverUrl, String json, EventsPayload payload, boolean ignoreSslValidation, OnServerErrorEventListener errorCallback) {
+    public static EventsResult sendEvents(String serverUrl, String json, EventsPayload payload, OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
         EventsResult result;
         int statusCode = -1;
@@ -130,10 +129,6 @@ public class BacktraceReportSender {
         try {
             URL url = new URL(serverUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
-
-            if (ignoreSslValidation) {
-                BacktraceReportSender.ignoreSslValidation(urlConnection);
-            }
 
             urlConnection.setRequestMethod("POST");
             urlConnection.setUseCaches(false);
@@ -218,47 +213,5 @@ public class BacktraceReportSender {
         }
         br.close();
         return responseSB.toString();
-    }
-
-    // https://stackoverflow.com/questions/35548162/how-to-bypass-ssl-certificate-validation-in-android-app
-    private static void ignoreSslValidation(HttpURLConnection urlConnection) {
-        if (!(urlConnection instanceof HttpsURLConnection)) {
-            BacktraceLogger.e(LOG_TAG, "Cannot disable ssl validation, not an HttpsURLConnection instance");
-            return;
-        }
-
-        HttpsURLConnection localUrlConnection = (HttpsURLConnection) urlConnection;
-
-        // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-            public void checkClientTrusted(X509Certificate[] certs, String authType) {
-            }
-            public void checkServerTrusted(X509Certificate[] certs, String authType) {
-            }
-        }
-        };
-
-        // Install the all-trusting trust manager
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            localUrlConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-            // Create all-trusting host name verifier
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
-
-            // Install the all-trusting host verifier
-            localUrlConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (Exception e) {
-            BacktraceLogger.e(LOG_TAG, "Could not disable ssl validation");
-            return;
-        }
     }
 }

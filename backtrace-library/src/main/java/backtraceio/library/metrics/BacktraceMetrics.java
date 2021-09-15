@@ -79,11 +79,6 @@ public final class BacktraceMetrics implements Metrics {
     private RequestHandler requestHandler = null;
 
     /**
-     * Should http client ignore ssl validation?
-     */
-    private boolean ignoreSslValidation;
-
-    /**
      * Unique Events handler
      */
     public UniqueEventsHandler uniqueEventsHandler;
@@ -173,19 +168,6 @@ public final class BacktraceMetrics implements Metrics {
 
     String getBaseUrl() {
         return this.baseUrl;
-    }
-
-    // TODO: Finish implementation
-    void setIgnoreSslValidation(boolean ignoreSslValidation) {
-        // RequestHandler.ignoreSslValidation = value;
-        // this.ignoreSslValidation = ignoreSslValidation;
-    }
-
-    // TODO: Finish implementation
-    boolean getIgnoreSslValidation() {
-        // return RequestHandler.IgnoreSslValidation;
-        // return this.IgnoreSslValidation;
-        return false;
     }
 
     @SuppressWarnings("unchecked, rawtypes")

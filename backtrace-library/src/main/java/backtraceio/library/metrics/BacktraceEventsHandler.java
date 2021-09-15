@@ -151,7 +151,7 @@ public abstract class BacktraceEventsHandler extends Handler {
         } else {
             BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
             String json = BacktraceSerializeHelper.toJson(input.payload);
-            result = BacktraceReportSender.sendEvents(submissionUrl, json, input.payload, false, input.serverErrorEventListener);
+            result = BacktraceReportSender.sendEvents(submissionUrl, json, input.payload, input.serverErrorEventListener);
         }
 
         if (input.eventsOnServerResponseEventListener != null) {
