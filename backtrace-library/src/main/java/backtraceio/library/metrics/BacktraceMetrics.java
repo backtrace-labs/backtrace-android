@@ -166,7 +166,7 @@ public final class BacktraceMetrics implements Metrics {
         this.baseUrl = baseUrl;
     }
 
-    String getBaseUrl() {
+    public String getBaseUrl() {
         return this.baseUrl;
     }
 

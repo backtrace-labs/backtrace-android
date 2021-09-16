@@ -1,12 +1,14 @@
 package backtraceio.library.base;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.BacktraceCredentials;
@@ -23,6 +25,7 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.Metrics;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.metrics.BacktraceMetrics;
 import backtraceio.library.metrics.EventsOnServerResponseEventListener;
 import backtraceio.library.metrics.EventsRequestHandler;
@@ -524,6 +527,17 @@ public class BacktraceBase implements Client {
      * @param timeBetweenRetriesMillis  Maximum time between retries in milliseconds
      */
     public void enableMetrics(String baseUrl, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        // For tracking crash-free sessions we need to add
+        // application.session and application.version to Backtrace attributes
+        String sessionId = UUID.randomUUID().toString();
+        this.attributes.put("application.session", sessionId);
+        try {
+            this.attributes.put("application.version", this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            BacktraceLogger.e(LOG_TAG, "Could not resolve package version information for Backtrace metrics");
+        }
+
         metrics = new BacktraceMetrics(context, attributes, baseUrl, universeName, token, timeIntervalMillis, timeBetweenRetriesMillis);
         metrics.startMetricsEventHandlers(backtraceApi);
         metrics.sendStartupEvent();

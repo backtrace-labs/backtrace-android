@@ -70,14 +70,6 @@ public class BacktraceClientMetricsTest {
         BacktraceLogger.setLevel(LogLevel.DEBUG);
     }
 
-    @After
-    public void cleanUp() {
-
-    }
-
-    //@Test
-    //public void testUploadSummedEventsOnly()
-
     public class MockRequestHandler implements EventsRequestHandler {
         public int numAttempts = 0;
         public int errorCode = 200;
@@ -208,7 +200,7 @@ public class BacktraceClientMetricsTest {
         // When no events in queue request handler should not be called
         backtraceClient.sendMetrics();
         try {
-            sleep(100);
+            sleep(200);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -218,7 +210,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.addUniqueEvent(uniqueAttributeName[0]);
         backtraceClient.sendMetrics();
         try {
-            sleep(100);
+            sleep(200);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -289,7 +281,7 @@ public class BacktraceClientMetricsTest {
     public void try3TimesOn503AndDropSummedEventsIfMaxNumEventsReached() {
         final Waiter waiter = new Waiter();
 
-        final int timeBetweenRetriesMillis = 10;
+        final int timeBetweenRetriesMillis = 20;
         backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0, timeBetweenRetriesMillis);
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.errorCode = 503;
@@ -349,8 +341,6 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void tryOnceOnHttpError() {
-        final int timeBetweenRetriesMillis = 10;
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0, timeBetweenRetriesMillis);
 
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.errorCode = 404;
@@ -382,16 +372,13 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.addUniqueEvent(uniqueAttributeName[0]);
-        backtraceClient.addSummedEvent(summedEventName);
-        assertEquals(1, backtraceClient.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.getUniqueEvents().size());
-        backtraceClient.sendMetrics();
+        // Enabling metrics will automatically send startup events
+        final int timeBetweenRetriesMillis = 10;
+        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0, timeBetweenRetriesMillis);
 
         for (int i = 0; i < BacktraceMetrics.maxNumberOfAttempts; i++) {
             try {
-                sleep(timeBetweenRetriesMillis * (long) Math.pow(10, i));
+                sleep(timeBetweenRetriesMillis * (long) Math.pow(timeBetweenRetriesMillis, i));
             } catch (Exception e) {
                 fail(e.toString());
             }
@@ -406,7 +393,7 @@ public class BacktraceClientMetricsTest {
         // We will drop summed events in the case of a non-recoverable server error
         assertEquals(0, backtraceClient.getSummedEvents().size());
         // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.getUniqueEvents().size());
+        assertEquals(1, backtraceClient.getUniqueEvents().size());
     }
 
     @Test
@@ -618,7 +605,7 @@ public class BacktraceClientMetricsTest {
                 JSONObject json;
                 try {
                     json = new JSONObject(eventsPayloadJsonString);
-                    assertEquals("guid", json.getJSONArray("unique_events").getJSONObject(0).getString("unique"));
+                    assertEquals("guid", json.getJSONArray("unique_events").getJSONObject(0).getJSONArray("unique").get(0));
                     assertNotNull(json.getJSONArray("unique_events").getJSONObject(0).getJSONObject("attributes").getString("guid"));
                 } catch (Exception e) {
                     fail(e.toString());
@@ -948,5 +935,18 @@ public class BacktraceClientMetricsTest {
         backtraceClient.sendMetrics();
 
         assertEquals(expectedValue, backtraceClient.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+    }
+
+    @Test
+    public void testDefaultUrl() {
+        BacktraceMetrics metrics = new BacktraceMetrics(context, null, BacktraceMetrics.defaultBaseUrl, universeName, token, 0, 0);
+        assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
+    }
+
+    @Test
+    public void testCustomUrl() {
+        String customUrl = "https://my.custom.url";
+        BacktraceMetrics metrics = new BacktraceMetrics(context, null, customUrl, universeName, token, 0, 0);
+        assertEquals(customUrl, metrics.getBaseUrl());
     }
 }
