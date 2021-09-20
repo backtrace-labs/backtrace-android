@@ -8,6 +8,7 @@ import java.util.Map;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
 
@@ -17,11 +18,9 @@ public class UniqueEventsHandler extends BacktraceEventsHandler {
 
     private final static String urlPrefix = "unique-events";
 
-    public UniqueEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes,
-                               final BacktraceHandlerThread backtraceHandlerThread,
-                               String universeName, String token,
-                               Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        super(context, baseUrl, customAttributes, backtraceHandlerThread, urlPrefix, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
+    public UniqueEventsHandler(Context context, Map<String, Object> customAttributes,
+                               Api api, final BacktraceHandlerThread backtraceHandlerThread, BacktraceMetricsSettings settings) {
+        super(context, customAttributes, api, backtraceHandlerThread, urlPrefix, settings);
     }
 
     @Override

@@ -19,6 +19,7 @@ import backtraceio.library.metrics.SummedEventsPayload;
 import backtraceio.library.metrics.UniqueEventsHandler;
 import backtraceio.library.metrics.UniqueEventsPayload;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceMetricsSettings;
 
 /**
  * Backtrace Api class that allows to send data to Backtrace endpoints
@@ -117,13 +118,13 @@ public class BacktraceApi implements Api {
     }
 
     @Override
-    public UniqueEventsHandler enableUniqueEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        return threadSender.createUniqueEventsHandler(context, baseUrl, customAttributes, universeName, token, this, timeIntervalMillis, timeBetweenRetriesMillis);
+    public UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
+        return threadSender.createUniqueEventsHandler(context, customAttributes, this, settings);
     }
 
     @Override
-    public SummedEventsHandler enableSummedEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        return threadSender.createSummedEventsHandler(context, baseUrl, customAttributes, universeName, token, this, timeIntervalMillis, timeBetweenRetriesMillis);
+    public SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
+        return threadSender.createSummedEventsHandler(context, customAttributes, this, settings);
     }
 
     /**

@@ -3,12 +3,10 @@ package backtraceio.library;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import net.jodah.concurrentunit.Waiter;
 
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +26,7 @@ import backtraceio.library.metrics.EventsPayload;
 import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.EventsResult;
 import backtraceio.library.metrics.UniqueEvent;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -58,6 +57,11 @@ public class BacktraceClientMetricsTest {
     static {
         System.loadLibrary("backtrace-native");
     }
+
+    /**
+     * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
+     * For best results run under low CPU load and low memory utilization conditions.
+     */
 
     @Before
     public void setUp() {
@@ -93,7 +97,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void disableAutoSend() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockRequestHandler);
 
@@ -110,7 +114,7 @@ public class BacktraceClientMetricsTest {
     public void uploadSummedEventsManual() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setSummedEventsRequestHandler(mockRequestHandler);
 
@@ -151,7 +155,7 @@ public class BacktraceClientMetricsTest {
     public void uploadUniqueEventsManual() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockRequestHandler);
 
@@ -188,7 +192,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotUploadWhenNoEventsAvailable() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         // Clear startup event
         ConcurrentLinkedDeque<UniqueEvent> uniqueEvents = backtraceClient.getUniqueEvents();
@@ -200,7 +204,7 @@ public class BacktraceClientMetricsTest {
         // When no events in queue request handler should not be called
         backtraceClient.sendMetrics();
         try {
-            sleep(200);
+            sleep(1000);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -210,7 +214,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.addUniqueEvent(uniqueAttributeName[0]);
         backtraceClient.sendMetrics();
         try {
-            sleep(200);
+            sleep(1000);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -222,7 +226,7 @@ public class BacktraceClientMetricsTest {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 10;
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0, timeBetweenRetriesMillis);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.errorCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -282,7 +286,7 @@ public class BacktraceClientMetricsTest {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 20;
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0, timeBetweenRetriesMillis);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.errorCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -374,7 +378,7 @@ public class BacktraceClientMetricsTest {
 
         // Enabling metrics will automatically send startup events
         final int timeBetweenRetriesMillis = 10;
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0, timeBetweenRetriesMillis);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
         for (int i = 0; i < BacktraceMetrics.maxNumberOfAttempts; i++) {
             try {
@@ -401,7 +405,7 @@ public class BacktraceClientMetricsTest {
         final int maximumNumberOfEvents = 3;
         final int numberOfTestEventsToAdd = 10;
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
         backtraceClient.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockRequestHandler);
@@ -430,7 +434,7 @@ public class BacktraceClientMetricsTest {
         final int maximumNumberOfEvents = 3;
         final Waiter waiter = new Waiter();
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
         backtraceClient.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockRequestHandler);
@@ -467,7 +471,7 @@ public class BacktraceClientMetricsTest {
         final int maximumNumberOfEvents = 3;
         final Waiter waiter = new Waiter();
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
         backtraceClient.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockRequestHandler);
@@ -504,7 +508,7 @@ public class BacktraceClientMetricsTest {
     public void uploadEventsAutomatic() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 200);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 100));
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -554,7 +558,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotUploadEventsAutomaticBeforeTime() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 100);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 100));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.setUniqueEventsRequestHandler(mockRequestHandler);
 
@@ -635,7 +639,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         try {
             waiter.await(1000, 2);
@@ -654,7 +658,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void addAndStoreSummedEvent() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertTrue(backtraceClient.addSummedEvent(summedEventName));
         assertEquals(1, backtraceClient.getSummedEvents().size());
@@ -665,7 +669,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void addSummedEventWithAttributes() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
             put("foo", "bar");
@@ -680,7 +684,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void shouldNotAddNullSummedEvent() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertFalse(backtraceClient.addSummedEvent(null));
         assertEquals(0, backtraceClient.getSummedEvents().size());
@@ -688,7 +692,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void shouldNotAddEmptySummedEvent() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertFalse(backtraceClient.addSummedEvent(""));
         assertEquals(0, backtraceClient.getSummedEvents().size());
@@ -696,7 +700,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void addAndStoreUniqueEvent() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertTrue(backtraceClient.addUniqueEvent(uniqueAttributeName[0]));
         // Account for the startup unique event
@@ -719,7 +723,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void addAndStoreUniqueEventNullAttributes() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertTrue(backtraceClient.addUniqueEvent(uniqueAttributeName[0], null));
         // Account for the startup unique event
@@ -742,7 +746,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void addAndStoreUniqueEventWithAttributes() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
             put("foo", "bar");
@@ -769,7 +773,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotAddUniqueEventIfUniqueAttributeNotDefined() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertFalse(backtraceClient.addUniqueEvent("undefined-attribute"));
         // Account for the startup unique event
@@ -778,7 +782,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doAddUniqueEventIfUniqueAttributeDefinedInCustomAttributes() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         final String expectedKey = "foo";
         final String expectedValue = "bar";
@@ -796,7 +800,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotAddNullUniqueEvent() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertFalse(backtraceClient.addUniqueEvent(null));
         // Account for the startup unique event
@@ -805,7 +809,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotAddUniqueEventEmptyString() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertFalse(backtraceClient.addUniqueEvent(""));
         // Account for the startup unique event
@@ -814,7 +818,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void uniqueAttributesPerEventDoNotMutate() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue1 = "bar";
@@ -836,7 +840,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void uniqueEventWithCustomAttributeExistsEvenIfCustomAttributeDeletedLater() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
@@ -851,7 +855,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void uniqueEventUpdateTimestamp() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         assertTrue(backtraceClient.addUniqueEvent(uniqueAttributeName[0]));
 
@@ -873,7 +877,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void uniqueEventUpdateAttributes() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
@@ -895,7 +899,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void uniqueEventEmptyAttributeValueShouldNotOverridePreviousValueOnUpdate() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
@@ -917,7 +921,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void uniqueEventNullAttributeValueShouldNotOverridePreviousValueOnUpdate() {
-        backtraceClient.enableMetrics(defaultBaseUrl, universeName, token, 0);
+        backtraceClient.enableMetrics(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
@@ -939,14 +943,14 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void testDefaultUrl() {
-        BacktraceMetrics metrics = new BacktraceMetrics(context, null, BacktraceMetrics.defaultBaseUrl, universeName, token, 0, 0);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, null, new BacktraceMetricsSettings(universeName, token));
         assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
     }
 
     @Test
     public void testCustomUrl() {
         String customUrl = "https://my.custom.url";
-        BacktraceMetrics metrics = new BacktraceMetrics(context, null, customUrl, universeName, token, 0, 0);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, null, new BacktraceMetricsSettings(universeName, token, customUrl));
         assertEquals(customUrl, metrics.getBaseUrl());
     }
 }

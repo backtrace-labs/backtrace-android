@@ -17,6 +17,7 @@ import backtraceio.library.metrics.SummedEventsHandler;
 import backtraceio.library.metrics.SummedEventsPayload;
 import backtraceio.library.metrics.UniqueEventsHandler;
 import backtraceio.library.metrics.UniqueEventsPayload;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.BacktraceResult;
 
 public class BacktraceHandlerThread extends HandlerThread {
@@ -34,13 +35,13 @@ public class BacktraceHandlerThread extends HandlerThread {
         this.start();
     }
 
-    UniqueEventsHandler createUniqueEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        this.mUniqueEventsHandler = new UniqueEventsHandler(context, baseUrl, customAttributes, this, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
+    UniqueEventsHandler createUniqueEventsHandler(Context context, Map<String, Object> customAttributes, Api api, BacktraceMetricsSettings settings) {
+        this.mUniqueEventsHandler = new UniqueEventsHandler(context, customAttributes, api, this, settings);
         return mUniqueEventsHandler;
     }
 
-    SummedEventsHandler createSummedEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        this.mSummedEventsHandler = new SummedEventsHandler(context, baseUrl, customAttributes, this, universeName, token, api, timeIntervalMillis, timeBetweenRetriesMillis);
+    SummedEventsHandler createSummedEventsHandler(Context context, Map<String, Object> customAttributes, Api api, BacktraceMetricsSettings settings) {
+        this.mSummedEventsHandler = new SummedEventsHandler(context, customAttributes, api, this, settings);
         return mSummedEventsHandler;
     }
 

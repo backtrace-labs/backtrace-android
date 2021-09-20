@@ -11,6 +11,7 @@ import backtraceio.library.common.BacktraceMathHelper;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.services.BacktraceHandlerThread;
 import backtraceio.library.services.BacktraceReportSender;
 
@@ -78,20 +79,14 @@ public abstract class BacktraceEventsHandler extends Handler {
 
     /**
      * @param context
-     * @param baseUrl
+     * @param api
      * @param backtraceHandlerThread
      * @param urlPrefix
-     * @param universeName
-     * @param token
-     * @param api
-     * @param timeIntervalMillis - 0 will disable auto-send
-     * @param timeBetweenRetriesMillis - 0 will disable retry
+     * @param settings
      */
 
-    public BacktraceEventsHandler(Context context, String baseUrl, Map<String, Object> customAttributes,
-                                  final BacktraceHandlerThread backtraceHandlerThread,
-                                  String urlPrefix, String universeName, String token,
-                                  Api api, final long timeIntervalMillis, int timeBetweenRetriesMillis)
+    public BacktraceEventsHandler(Context context, Map<String, Object> customAttributes,
+                                  Api api, final BacktraceHandlerThread backtraceHandlerThread, String urlPrefix, BacktraceMetricsSettings settings)
     {
         // This should always have a nonnull looper because BacktraceHandlerThread starts in the
         // constructor and getLooper blocks until the looper is ready if the thread is started
@@ -103,8 +98,10 @@ public abstract class BacktraceEventsHandler extends Handler {
         this.customAttributes = customAttributes;
         this.backtraceHandlerThread = backtraceHandlerThread;
         this.api = api;
-        this.submissionUrl = baseUrl + "/" + urlPrefix + "/submit?token=" + token + "&universe=" + universeName;
-        this.timeBetweenRetriesMillis = timeBetweenRetriesMillis;
+        this.submissionUrl = settings.getBaseUrl() + "/" + urlPrefix + "/submit?token=" + settings.getToken() + "&universe=" + settings.getUniverseName();
+        this.timeBetweenRetriesMillis = settings.getTimeBetweenRetriesMillis();
+
+        long timeIntervalMillis = settings.getTimeIntervalMillis();
 
         if (timeIntervalMillis != 0) {
             final BacktraceEventsHandler handler = this;

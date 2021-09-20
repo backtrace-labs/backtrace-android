@@ -13,6 +13,7 @@ import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEventsHandler;
 import backtraceio.library.metrics.UniqueEventsHandler;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceMetricsSettings;
 
 /**
  * API sender interface
@@ -50,29 +51,21 @@ public interface Api {
      * Create metrics events handler for unique events
      *
      * @param context                   The application context
-     * @param baseUrl                   Backtrace base submission url
      * @param customAttributes          Backtrace base object instance
-     * @param universeName              Backtrace universe name
-     * @param token                     Backtrace submission token
-     * @param timeIntervalMillis        Time between metrics events submissions
-     * @param timeBetweenRetriesMillis  Time between retries for metrics events submission retries
+     * @param settings
      * @return                          Reference to the created UniqueEventsHandler
      */
-    UniqueEventsHandler enableUniqueEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis);
+    UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings);
 
     /**
      * Create metrics events handler for summed events
      *
      * @param context                   The application context
-     * @param baseUrl                   Backtrace base submission url
      * @param customAttributes          Backtrace base object instance
-     * @param universeName              Backtrace universe name
-     * @param token                     Backtrace submission token
-     * @param timeIntervalMillis        Time between metrics events submissions
-     * @param timeBetweenRetriesMillis  Time between retries for metrics events submission retries
+     * @param settings
      * @return                          Reference to the created SummedEventsHandler
      */
-    SummedEventsHandler enableSummedEvents(Context context, String baseUrl, Map<String, Object> customAttributes, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis);
+    SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings);
 
     /**
      * Set the request handler for unique events

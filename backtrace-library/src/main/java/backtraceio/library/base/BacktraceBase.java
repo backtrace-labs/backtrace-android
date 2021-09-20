@@ -32,6 +32,7 @@ import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEvent;
 import backtraceio.library.metrics.UniqueEvent;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -480,53 +481,9 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable backtrace metrics support
-     * @param universeName  Backtrace universe name
-     * @param token         Backtrace submission token
+     * @param settings  Backtrace metrics settings
      */
-    public void enableMetrics(String universeName, String token) {
-        enableMetrics(BacktraceMetrics.defaultBaseUrl, universeName, token);
-    }
-
-    /**
-     * Enable backtrace metrics support
-     * @param baseUrl       Base URL to send metrics
-     * @param universeName  Backtrace universe name
-     * @param token         Backtrace submission token
-     */
-    public void enableMetrics(String baseUrl, String universeName, String token) {
-        enableMetrics(baseUrl, universeName, token, BacktraceMetrics.defaultTimeIntervalMillis);
-    }
-
-    /**
-     * Enable backtrace metrics support
-     * @param universeName          Backtrace universe name
-     * @param token                 Backtrace submission token
-     * @param timeIntervalMillis    Time interval between metrics auto-send events, 0 disables auto-send
-     */
-    public void enableMetrics(String universeName, String token, long timeIntervalMillis) {
-        enableMetrics(BacktraceMetrics.defaultBaseUrl, universeName, token, timeIntervalMillis);
-    }
-
-    /**
-     * Enable backtrace metrics support
-     * @param baseUrl               Base URL to send metrics
-     * @param universeName          Backtrace universe name
-     * @param token                 Backtrace submission token
-     * @param timeIntervalMillis    Time interval between metrics auto-send events, 0 disables auto-send
-     */
-    public void enableMetrics(String baseUrl, String universeName, String token, long timeIntervalMillis) {
-        enableMetrics(baseUrl, universeName, token, timeIntervalMillis, BacktraceMetrics.defaultTimeBetweenRetriesMillis);
-    }
-
-    /**
-     * Enable backtrace metrics support
-     * @param baseUrl                   Base URL to send metrics
-     * @param universeName              Backtrace universe name
-     * @param token                     Backtrace submission token
-     * @param timeIntervalMillis        Time interval between metrics auto-send events, 0 disables auto-send
-     * @param timeBetweenRetriesMillis  Maximum time between retries in milliseconds
-     */
-    public void enableMetrics(String baseUrl, String universeName, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+    public void enableMetrics(BacktraceMetricsSettings settings) {
         // For tracking crash-free sessions we need to add
         // application.session and application.version to Backtrace attributes
         String sessionId = UUID.randomUUID().toString();
@@ -538,7 +495,7 @@ public class BacktraceBase implements Client {
             BacktraceLogger.e(LOG_TAG, "Could not resolve package version information for Backtrace metrics");
         }
 
-        metrics = new BacktraceMetrics(context, attributes, baseUrl, universeName, token, timeIntervalMillis, timeBetweenRetriesMillis);
+        metrics = new BacktraceMetrics(context, attributes, settings);
         metrics.startMetricsEventHandlers(backtraceApi);
         metrics.sendStartupEvent();
     }

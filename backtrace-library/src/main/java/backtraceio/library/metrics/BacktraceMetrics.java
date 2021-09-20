@@ -11,6 +11,7 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 
 public final class BacktraceMetrics implements Metrics {
@@ -64,11 +65,6 @@ public final class BacktraceMetrics implements Metrics {
     public final static int maxTimeBetweenRetriesMillis = 5 * 60 * 1000;
 
     /**
-     * Submission url
-     */
-    private String baseUrl;
-
-    /**
      * Default submission url
      */
     public final static String defaultBaseUrl = "https://events.backtrace.io/api";
@@ -89,16 +85,6 @@ public final class BacktraceMetrics implements Metrics {
     public SummedEventsHandler summedEventsHandler;
 
     /**
-     * How often we will send data to Backtrace
-     */
-    private final long timeIntervalMillis;
-
-    /**
-     * Base time between retries
-     */
-    private final int timeBetweenRetriesMillis;
-
-    /**
      * Custom attributes provided by the user to BacktraceBase
      */
     protected Map<String, Object> customAttributes;
@@ -109,41 +95,26 @@ public final class BacktraceMetrics implements Metrics {
     protected Context context;
 
     /**
-     * The Backtrace submission token
+     * Backtrace metrics settings
      */
-    private final String token;
-
-    /**
-     * The Backtrace universe associated with the collected metrics
-     */
-    private final String universe;
+    protected BacktraceMetricsSettings settings;
 
     /**
      * Create new Backtrace metrics instance
      * @param context                   Application context
      * @param customAttributes          Backtrace client
-     * @param baseUrl                   Events submission base URL
-     * @param universe                  Backtrace universe
-     * @param token                     Backtrace submission token
-     * @param timeIntervalMillis        Time interval between metrics submissions in ms, 0 disables auto-send
-     * @param timeBetweenRetriesMillis  Base time between retries in ms, 0 disables retry
+     * @param settings
      */
-    public BacktraceMetrics(Context context, Map<String, Object> customAttributes,
-                            String baseUrl,
-                            String universe, String token, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+    public BacktraceMetrics(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
         this.context = context;
-        this.baseUrl = baseUrl;
         this.customAttributes = customAttributes;
-        this.timeIntervalMillis = timeIntervalMillis;
-        this.token = token;
-        this.universe = universe;
-        this.timeBetweenRetriesMillis = timeBetweenRetriesMillis;
+        this.settings = settings;
     }
 
     @Override
     public void startMetricsEventHandlers(Api backtraceApi) {
-        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, baseUrl, customAttributes, universe, token, timeIntervalMillis, timeBetweenRetriesMillis);
-        summedEventsHandler = backtraceApi.enableSummedEvents(context, baseUrl, customAttributes, universe, token, timeIntervalMillis, timeBetweenRetriesMillis);
+        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, customAttributes, settings);
+        summedEventsHandler = backtraceApi.enableSummedEvents(context, customAttributes, settings);
     }
 
     void setStartupUniqueEventName(String StartupUniqueEventName) {
@@ -162,12 +133,8 @@ public final class BacktraceMetrics implements Metrics {
         return this.maximumEvents;
     }
 
-    void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
     public String getBaseUrl() {
-        return this.baseUrl;
+        return this.settings.getBaseUrl();
     }
 
     @SuppressWarnings("unchecked, rawtypes")
