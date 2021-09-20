@@ -54,9 +54,10 @@ catch (e: Exception) {
 6. [Using Backtrace library](#using-backtrace)
 7. [File attachments](#file-attachments)
 8. [Breadcrumbs](#breadcrumbs)
-9. [Working with NDK applications](#working_with_ndk)
-10. [Working with Proguard](#working_with_proguard)
-11. [Documentation](#documentation)
+9. [Error-Free Metrics](#metrics)
+10. [Working with NDK applications](#working_with_ndk)
+11. [Working with Proguard](#working_with_proguard)
+12. [Documentation](#documentation)
 
 
 # Features Summary <a name="features-summary"></a>
@@ -496,6 +497,20 @@ bool success = Backtrace::AddBreadcrumb(env,
 
 ## Breadcrumbs Best Practices
 - Don't make calls to `addBreadcrumb` from performance-critical code paths.
+
+# Error-Free Metrics <a name="metrics"></a>
+Error free metrics can be used to answer the following questions:
+- How many of your unique users (i.e: unique device IDs) using your app are experiencing errors/crashes?
+- How many application sessions (i.e: individual application sessions from startup till shutdown/exit) of your app are experiencing errors/crashes?
+
+The web UI allows you to track those metrics at-a-glance as well as in detail (what kinds of errors/crashes are most common?, etc.).
+
+## Enabling Error-Free Metrics
+```java
+// Enable metrics
+BacktraceMetricsSettings metricsSettings = new BacktraceMetricsSettings("<my_universe_name>", "<my_submission_token>");
+backtraceClient.enableMetrics(metricsSettings);
+```
 
 # Working with NDK applications <a name="working_with_ndk"></a>
 
