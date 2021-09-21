@@ -65,6 +65,8 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionBreadcrumbs() {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
+        // Account for mandatory configuration breadcrumb
+        backtraceClient.setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -93,8 +95,8 @@ public class BacktraceClientBreadcrumbsTest {
                         assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                         // We log one breadcrumb by default, the breadcrumb configuration
-                        /*assertEquals(1L,
-                                backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));*/
+                        assertEquals(1L,
+                                backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                         waiter.resume();
                     }
@@ -112,6 +114,8 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionBreadcrumbsAddBreadcrumb() {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
+        // Account for mandatory configuration breadcrumb
+        backtraceClient.setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -152,8 +156,8 @@ public class BacktraceClientBreadcrumbsTest {
                             assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                             // After adding a new breadcrumb, we should have incremented the breadcrumbs.lastId
-                            /*assertEquals(2L,
-                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));*/
+                            assertEquals(2L,
+                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
                         }
@@ -169,6 +173,8 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionBreadcrumbsClearBreadcrumb() {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
+        // Account for mandatory configuration breadcrumb
+        backtraceClient.setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -202,8 +208,8 @@ public class BacktraceClientBreadcrumbsTest {
                             assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                             // After adding new breadcrumbs, we should have incremented the breadcrumbs.lastId
-                            /*assertEquals(2L,
-                                    (long) backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId") - lastIdBase);*/
+                            assertEquals(3L,
+                                    (long) backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
                         }
@@ -240,8 +246,8 @@ public class BacktraceClientBreadcrumbsTest {
                             assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
                             // Since we cleared, we should only have the configuration breadcrumb
-                            /*assertEquals(1L,
-                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));*/
+                            assertEquals(1L,
+                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
                         }

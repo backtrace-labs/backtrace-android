@@ -21,16 +21,14 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
 
     private static transient String LOG_TAG = BacktraceBroadcastReceiver.class.getSimpleName();
 
-    public BacktraceBroadcastReceiver(@NonNull BacktraceBreadcrumbs backtraceBreadcrumbs)
-    {
+    public BacktraceBroadcastReceiver(@NonNull BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        if (action == null)
-        {
+        if (action == null) {
             BacktraceLogger.e(LOG_TAG, "Null action received. This is a bug");
             return;
         }

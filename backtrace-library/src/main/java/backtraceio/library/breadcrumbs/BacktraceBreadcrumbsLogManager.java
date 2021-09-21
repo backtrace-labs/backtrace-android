@@ -80,6 +80,14 @@ public class BacktraceBreadcrumbsLogManager {
         return success;
     }
 
+    /**
+     * NOTE: This should only be used for testing
+     * @param breadcrumbId
+     */
+    public void setCurrentBreadcrumbId(long breadcrumbId) {
+        this.breadcrumbId = breadcrumbId;
+    }
+
     public long getCurrentBreadcrumbId() {
         return breadcrumbId;
     }

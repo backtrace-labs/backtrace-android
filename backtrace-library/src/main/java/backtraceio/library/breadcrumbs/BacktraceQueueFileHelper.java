@@ -68,7 +68,7 @@ public class BacktraceQueueFileHelper {
             breadcrumbStore.add(bytes);
         } catch (Exception ex) {
             BacktraceLogger.w(LOG_TAG, "Exception: " + ex.getMessage() +
-                    "\nWhen adding breadcrumb: "  + new String(bytes, StandardCharsets.UTF_8));
+                    "\nWhen adding breadcrumb: " + new String(bytes, StandardCharsets.UTF_8));
             return false;
         }
 

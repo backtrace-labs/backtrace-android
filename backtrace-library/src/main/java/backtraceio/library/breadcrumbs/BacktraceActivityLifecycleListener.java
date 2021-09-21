@@ -10,8 +10,7 @@ public class BacktraceActivityLifecycleListener implements Application.ActivityL
 
     private BacktraceBreadcrumbs backtraceBreadcrumbs;
 
-    public BacktraceActivityLifecycleListener(BacktraceBreadcrumbs backtraceBreadcrumbs)
-    {
+    public BacktraceActivityLifecycleListener(BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;
     }
 
