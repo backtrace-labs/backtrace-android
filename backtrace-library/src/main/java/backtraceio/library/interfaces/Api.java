@@ -50,25 +50,26 @@ public interface Api {
     /**
      * Create metrics events handler for unique events
      *
-     * @param context                   The application context
-     * @param customAttributes          Backtrace base object instance
+     * @param context          The application context
+     * @param customAttributes Backtrace base object instance
      * @param settings
-     * @return                          Reference to the created UniqueEventsHandler
+     * @return Reference to the created UniqueEventsHandler
      */
     UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings);
 
     /**
      * Create metrics events handler for summed events
      *
-     * @param context                   The application context
-     * @param customAttributes          Backtrace base object instance
+     * @param context          The application context
+     * @param customAttributes Backtrace base object instance
      * @param settings
-     * @return                          Reference to the created SummedEventsHandler
+     * @return Reference to the created SummedEventsHandler
      */
     SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings);
 
     /**
      * Set the request handler for unique events
+     *
      * @param eventsRequestHandler
      */
     void setUniqueEventsRequestHandler(EventsRequestHandler eventsRequestHandler);
@@ -82,6 +83,7 @@ public interface Api {
 
     /**
      * Set the request handler for summed events
+     *
      * @param eventsRequestHandler
      */
     void setSummedEventsRequestHandler(EventsRequestHandler eventsRequestHandler);

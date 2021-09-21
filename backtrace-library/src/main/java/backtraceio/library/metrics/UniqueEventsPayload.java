@@ -11,8 +11,8 @@ public final class UniqueEventsPayload extends EventsPayload {
     private ConcurrentLinkedDeque<Event> uniqueEvents;
 
     protected UniqueEventsPayload(BacktraceAttributes backtraceAttributes, ConcurrentLinkedDeque<Event> events, int droppedEvents) {
-       super(backtraceAttributes, droppedEvents);
-       this.uniqueEvents = events;
+        super(backtraceAttributes, droppedEvents);
+        this.uniqueEvents = events;
     }
 
     public ConcurrentLinkedDeque<Event> getEvents() {

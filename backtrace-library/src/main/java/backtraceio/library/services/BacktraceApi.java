@@ -146,8 +146,7 @@ public class BacktraceApi implements Api {
         } else if (payload instanceof SummedEventsPayload) {
             input = new BacktraceHandlerInputEvents(payload, this.summedEventsServerResponse,
                     this.onServerError, this.summedEventsRequestHandler);
-        }
-        else {
+        } else {
             BacktraceLogger.e(LOG_TAG, "sendEventsPayload not implemented for payload of type " + payload.getClass());
             return;
         }

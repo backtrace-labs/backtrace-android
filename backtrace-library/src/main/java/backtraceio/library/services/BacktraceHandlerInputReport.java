@@ -30,9 +30,9 @@ public class BacktraceHandlerInputReport extends BacktraceHandlerInput {
      * @param requestHandler              event callback which will be executed instead of default sending report to Backtrace server
      */
     BacktraceHandlerInputReport(BacktraceData data,
-                          OnServerResponseEventListener serverResponseEventListener,
-                          OnServerErrorEventListener serverErrorEventListener,
-                          RequestHandler requestHandler) {
+                                OnServerResponseEventListener serverResponseEventListener,
+                                OnServerErrorEventListener serverErrorEventListener,
+                                RequestHandler requestHandler) {
         super(serverErrorEventListener);
         this.data = data;
         this.serverResponseEventListener = serverResponseEventListener;

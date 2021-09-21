@@ -7,15 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.cert.X509Certificate;
 import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
@@ -115,10 +107,10 @@ public class BacktraceReportSender {
     /**
      * Send HTTP request for certain url server with information about events
      *
-     * @param serverUrl             server http address to which the request will be sent
-     * @param json                  message wih information about events
-     * @param payload               information about events
-     * @param errorCallback         event that will be executed after receiving an error from the server
+     * @param serverUrl     server http address to which the request will be sent
+     * @param json          message wih information about events
+     * @param payload       information about events
+     * @param errorCallback event that will be executed after receiving an error from the server
      * @return information from the server about the result of processing the request
      */
     public static EventsResult sendEvents(String serverUrl, String json, EventsPayload payload, OnServerErrorEventListener errorCallback) {

@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;

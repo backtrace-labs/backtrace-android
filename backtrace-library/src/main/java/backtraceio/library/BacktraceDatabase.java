@@ -254,7 +254,7 @@ public class BacktraceDatabase implements Database {
                     return;
                 }
 
-                if(backtraceDatabaseContext.isEmpty()) {
+                if (backtraceDatabaseContext.isEmpty()) {
                     BacktraceLogger.d(LOG_TAG, "Timer - database is empty (no records): " +
                             dateTimeNow);
                     return;

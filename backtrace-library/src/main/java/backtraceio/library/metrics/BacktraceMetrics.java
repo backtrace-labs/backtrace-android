@@ -101,8 +101,9 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Create new Backtrace metrics instance
-     * @param context                   Application context
-     * @param customAttributes          Backtrace client
+     *
+     * @param context          Application context
+     * @param customAttributes Backtrace client
      * @param settings
      */
     public BacktraceMetrics(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
@@ -177,6 +178,7 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Add a unique event to the next Backtrace Metrics request
+     *
      * @param attributeName Attribute name
      * @return true if success
      */
@@ -186,13 +188,13 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Add a unique event to the next Backtrace Metrics request
+     *
      * @param attributeName Attribute name
      * @param attributes    Event attributes
      * @return true if success
      */
     public boolean addUniqueEvent(String attributeName, Map<String, Object> attributes) {
-        if (!shouldProcessEvent(attributeName))
-        {
+        if (!shouldProcessEvent(attributeName)) {
             BacktraceLogger.w(LOG_TAG, "Skipping report: Reached store limit or event has empty name.");
             return false;
         }
@@ -211,8 +213,7 @@ public final class BacktraceMetrics implements Metrics {
 
         // validate if unique event attribute is available and
         // prevent undefined attributes
-        if (localAttributes.get(attributeName) == null || localAttributes.get(attributeName).toString().trim().isEmpty())
-        {
+        if (localAttributes.get(attributeName) == null || localAttributes.get(attributeName).toString().trim().isEmpty()) {
             BacktraceLogger.w(LOG_TAG, "Attribute name for Unique Event is not available in attribute scope");
             return false;
         }
@@ -255,6 +256,7 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Get number of stored events
+     *
      * @return number of stored events
      */
     public int count() {
@@ -263,6 +265,7 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Add a summed event to the next Backtrace Metrics request
+     *
      * @param metricGroupName
      * @return true if success
      */
@@ -272,13 +275,13 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Add a summed event to the next Backtrace Metrics request
+     *
      * @param metricGroupName
      * @param attributes
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
-        if (!shouldProcessEvent(metricGroupName))
-        {
+        if (!shouldProcessEvent(metricGroupName)) {
             BacktraceLogger.w(LOG_TAG, "Skipping report: Reached store limit or event has empty name.");
             return false;
         }
@@ -300,6 +303,7 @@ public final class BacktraceMetrics implements Metrics {
 
     /**
      * Determine if Backtrace Metrics can add next event to store
+     *
      * @param name event name
      * @return true if we should process this event, otherwise false
      */

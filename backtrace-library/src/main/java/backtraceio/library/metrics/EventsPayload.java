@@ -39,7 +39,9 @@ public abstract class EventsPayload {
         this.eventsMetadata.setDroppedEvents(droppedEvents);
     }
 
-    public int getDroppedEvents() { return this.eventsMetadata.getDroppedEvents(); }
+    public int getDroppedEvents() {
+        return this.eventsMetadata.getDroppedEvents();
+    }
 
     public abstract ConcurrentLinkedDeque<Event> getEvents();
 }

@@ -15,7 +15,7 @@ public abstract class BacktraceHandlerInput {
     /**
      * Initialize new instance of BacktraceHandlerInput
      *
-     * @param serverErrorEventListener    event callback that will be executed after receiving an error from the server
+     * @param serverErrorEventListener event callback that will be executed after receiving an error from the server
      */
     protected BacktraceHandlerInput(OnServerErrorEventListener serverErrorEventListener) {
         this.serverErrorEventListener = serverErrorEventListener;

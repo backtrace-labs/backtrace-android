@@ -15,5 +15,7 @@ public class EventsMetadata {
         this.droppedEvents = droppedEvents;
     }
 
-    public int getDroppedEvents() { return this.droppedEvents; }
+    public int getDroppedEvents() {
+        return this.droppedEvents;
+    }
 }

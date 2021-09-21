@@ -1,4 +1,4 @@
 package backtraceio.library.watchdog;
 
-public class BacktraceWatchdogTimeoutException extends Exception{
+public class BacktraceWatchdogTimeoutException extends Exception {
 }

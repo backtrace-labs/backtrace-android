@@ -25,10 +25,10 @@ public class BacktraceHandlerInputEvents extends BacktraceHandlerInput {
     /**
      * Initialize new instance of BacktraceHandlerInput
      *
-     * @param payload                               a message containing information about the error and the device
-     * @param eventsOnServerResponseEventListener   event callback that will be executed after receiving a response from the server
-     * @param serverErrorEventListener              event callback that will be executed after receiving an error from the server
-     * @param eventsRequestHandler                  event callback which will be executed instead of default sending report to Backtrace server
+     * @param payload                             a message containing information about the error and the device
+     * @param eventsOnServerResponseEventListener event callback that will be executed after receiving a response from the server
+     * @param serverErrorEventListener            event callback that will be executed after receiving an error from the server
+     * @param eventsRequestHandler                event callback which will be executed instead of default sending report to Backtrace server
      */
     public BacktraceHandlerInputEvents(EventsPayload payload,
                                        EventsOnServerResponseEventListener eventsOnServerResponseEventListener,

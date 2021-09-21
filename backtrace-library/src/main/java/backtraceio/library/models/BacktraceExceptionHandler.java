@@ -28,7 +28,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
-    public static void setCustomAttributes(Map<String, Object> attributes){
+    public static void setCustomAttributes(Map<String, Object> attributes) {
         BacktraceExceptionHandler.customAttributes = attributes;
     }
 

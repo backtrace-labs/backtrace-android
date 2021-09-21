@@ -44,7 +44,7 @@ public class UniqueEvent extends Event {
             for (String key : attributes.keySet()) {
                 Object value = attributes.get(key);
                 if (value != null && !value.toString().trim().isEmpty()) {
-                       this.attributes.put(key, value);
+                    this.attributes.put(key, value);
                 }
             }
         }

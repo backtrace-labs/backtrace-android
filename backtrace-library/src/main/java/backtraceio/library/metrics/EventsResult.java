@@ -46,9 +46,9 @@ public class EventsResult {
     /**
      * Create new instance of BacktraceResult
      *
-     * @param payload metrics events payload
-     * @param message message
-     * @param status  result status eg. ok, server error
+     * @param payload    metrics events payload
+     * @param message    message
+     * @param status     result status eg. ok, server error
      * @param statusCode HTTP status code
      */
     public EventsResult(EventsPayload payload, String message, BacktraceResultStatus status, int statusCode) {
@@ -83,6 +83,7 @@ public class EventsResult {
 
     /**
      * Set the HTTP status code
+     *
      * @param statusCode HTTP status code to set
      */
     public void setStatusCode(int statusCode) {

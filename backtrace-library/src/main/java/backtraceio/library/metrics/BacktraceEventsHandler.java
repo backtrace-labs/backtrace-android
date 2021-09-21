@@ -86,8 +86,7 @@ public abstract class BacktraceEventsHandler extends Handler {
      */
 
     public BacktraceEventsHandler(Context context, Map<String, Object> customAttributes,
-                                  Api api, final BacktraceHandlerThread backtraceHandlerThread, String urlPrefix, BacktraceMetricsSettings settings)
-    {
+                                  Api api, final BacktraceHandlerThread backtraceHandlerThread, String urlPrefix, BacktraceMetricsSettings settings) {
         // This should always have a nonnull looper because BacktraceHandlerThread starts in the
         // constructor and getLooper blocks until the looper is ready if the thread is started
         super(backtraceHandlerThread.getLooper());
@@ -159,11 +158,9 @@ public abstract class BacktraceEventsHandler extends Handler {
         int statusCode = result.getStatusCode();
         if (statusCode == 200) {
             onRequestCompleted();
-        }
-        else if (statusCode > 501 && statusCode != 505) {
+        } else if (statusCode > 501 && statusCode != 505) {
             numRetries++;
-            if (numRetries >= BacktraceMetrics.maxNumberOfAttempts || timeBetweenRetriesMillis == 0)
-            {
+            if (numRetries >= BacktraceMetrics.maxNumberOfAttempts || timeBetweenRetriesMillis == 0) {
                 onMaximumAttemptsReached(input.payload.getEvents());
                 return;
             }
@@ -179,8 +176,7 @@ public abstract class BacktraceEventsHandler extends Handler {
         }
     }
 
-    protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<Event> events)
-    {
+    protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<Event> events) {
         return;
     }
 

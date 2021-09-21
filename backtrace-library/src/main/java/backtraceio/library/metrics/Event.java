@@ -16,12 +16,13 @@ public abstract class Event {
         return this.timestamp;
     }
 
-    public Map<String, Object> getAttributes() { return this.attributes; }
+    public Map<String, Object> getAttributes() {
+        return this.attributes;
+    }
 
     public abstract String getName();
 
-    public Event(long timestamp)
-    {
+    public Event(long timestamp) {
         this.timestamp = timestamp;
     }
 }

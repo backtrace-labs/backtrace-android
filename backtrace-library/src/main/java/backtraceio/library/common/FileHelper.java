@@ -47,10 +47,9 @@ public class FileHelper {
                 continue;
             }
 
-            if (!isPathToInternalStorage(context, path))
-            {
+            if (!isPathToInternalStorage(context, path)) {
                 Log.d(LOG_TAG, String.format("Passed path is path to external storage %s", path));
-                if(!PermissionHelper.isPermissionForReadExternalStorageGranted(context)){
+                if (!PermissionHelper.isPermissionForReadExternalStorageGranted(context)) {
                     Log.e(LOG_TAG, "Permission READ_EXTERNAL_STORAGE is not granted.");
                     continue;
                 }

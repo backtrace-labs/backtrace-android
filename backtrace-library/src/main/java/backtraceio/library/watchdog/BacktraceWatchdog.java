@@ -38,6 +38,7 @@ public class BacktraceWatchdog {
 
     /**
      * Set event that will be executed instead of the default sending of the error information to the Backtrace console
+     *
      * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
      */
     public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
@@ -100,7 +101,7 @@ public class BacktraceWatchdog {
      *
      * @param thread  thread which should be monitored
      * @param timeout time in milliseconds after which we consider the thread to be blocked
-     * @param delay time delay in milliseconds after which the thread should be monitored
+     * @param delay   time delay in milliseconds after which the thread should be monitored
      */
     public void registerThread(Thread thread, int timeout, int delay) {
         threadsIdWatcher.put(thread, new BacktraceThreadWatcher(timeout, delay));

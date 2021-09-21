@@ -14,7 +14,7 @@ class BacktraceWatchdogShared {
      * @param thread                          thread that has been blocked
      * @param backtraceClient                 Instance of BacktraceClient
      * @param onApplicationNotRespondingEvent Event which will be executed instead of default handling ANR error
-     * @param LOG_TAG log tag that facilitates analysis during debugging
+     * @param LOG_TAG                         log tag that facilitates analysis during debugging
      */
     static void sendReportCauseBlockedThread(BacktraceClient backtraceClient, Thread thread, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, String LOG_TAG) {
         BacktraceWatchdogTimeoutException exception = new BacktraceWatchdogTimeoutException();

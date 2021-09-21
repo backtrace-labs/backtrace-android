@@ -107,8 +107,8 @@ public class BacktraceDatabaseRecord {
     /**
      * Get valid BacktraceData from current record
      *
-     * @return valid BacktraceData object
      * @param context
+     * @return valid BacktraceData object
      */
     public BacktraceData getBacktraceData(Context context) {
         if (this.record != null) {

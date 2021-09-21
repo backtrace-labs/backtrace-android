@@ -164,7 +164,7 @@ public class BacktraceBase implements Client {
      * @param context          context of current state of the application
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
-     * @param attachments File attachment paths to consider for reports
+     * @param attachments      File attachment paths to consider for reports
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, List<String> attachments) {
@@ -190,7 +190,7 @@ public class BacktraceBase implements Client {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      * @param attributes       additional information about current application
-     * @param attachments File attachment paths to consider for reports
+     * @param attachments      File attachment paths to consider for reports
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes, List<String> attachments) {
@@ -262,6 +262,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     *
      * @param enableClientSideUnwinding Enable client side unwinding
      */
     public void enableNativeIntegration(boolean enableClientSideUnwinding) {
@@ -270,6 +271,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     *
      * @param enableClientSideUnwinding Enable client side unwinding
      * @param unwindingMode             Unwinding mode to use for client side unwinding
      */
@@ -340,7 +342,8 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
-     * @param context   context of current state of the application
+     *
+     * @param context context of current state of the application
      * @return true if we successfully enabled breadcrumbs
      */
     public boolean enableBreadcrumbs(Context context) {
@@ -349,11 +352,12 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
+     *
      * @param context                   context of current state of the application
-     * @param maxBreadcrumbLogSizeBytes    breadcrumb log size limit in bytes, should be a power of 2
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
-     *          breadcrumbs will always be enabled
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
      * @return true if we successfully enabled breadcrumbs
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context,
                                      int maxBreadcrumbLogSizeBytes) {
@@ -362,11 +366,12 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
-     * @param context                   context of current state of the application
-     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
-     *          breadcrumbs will always be enabled
+     *
+     * @param context                 context of current state of the application
+     * @param breadcrumbTypesToEnable a set containing which breadcrumb types to enable
      * @return true if we successfully enabled breadcrumbs
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
@@ -375,12 +380,13 @@ public class BacktraceBase implements Client {
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
+     *
      * @param context                   context of current state of the application
      * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
-     * @param maxBreadcrumbLogSizeBytes    breadcrumb log size limit in bytes, should be a power of 2
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
-     *          breadcrumbs will always be enabled
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
      * @return true if we successfully enabled breadcrumbs
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
@@ -397,8 +403,9 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message a message which describes this breadcrumb (1KB max)
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message) {
         return database.getBreadcrumbs().addBreadcrumb(message);
@@ -406,9 +413,10 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param level         the severity level of this breadcrumb
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message a message which describes this breadcrumb (1KB max)
+     * @param level   the severity level of this breadcrumb
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
         return database.getBreadcrumbs().addBreadcrumb(message, level);
@@ -416,9 +424,10 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message    a message which describes this breadcrumb (1KB max)
+     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes);
@@ -426,10 +435,11 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string and attributes
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
-     * @param level         the severity level of this breadcrumb
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message    a message which describes this breadcrumb (1KB max)
+     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param level      the severity level of this breadcrumb
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, level);
@@ -437,9 +447,10 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param type          broadly describes the category of this breadcrumb
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message a message which describes this breadcrumb (1KB max)
+     * @param type    broadly describes the category of this breadcrumb
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
         return database.getBreadcrumbs().addBreadcrumb(message, type);
@@ -447,10 +458,11 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired level and type with the provided message string
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param type          broadly describes the category of this breadcrumb
-     * @param level         the severity level of this breadcrumb
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message a message which describes this breadcrumb (1KB max)
+     * @param type    broadly describes the category of this breadcrumb
+     * @param level   the severity level of this breadcrumb
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         return database.getBreadcrumbs().addBreadcrumb(message, type, level);
@@ -458,10 +470,11 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string and attributes
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
-     * @param type          broadly describes the category of this breadcrumb
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message    a message which describes this breadcrumb (1KB max)
+     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param type       broadly describes the category of this breadcrumb
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, type);
@@ -469,19 +482,25 @@ public class BacktraceBase implements Client {
 
     /**
      * Add a breadcrumb of the desired level and type with the provided message string and attributes
-     * @param message       a message which describes this breadcrumb (1KB max)
-     * @param attributes    key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
-     * @param type          broadly describes the category of this breadcrumb
-     * @param level         the severity level of this breadcrumb
-     * @return              true if the breadcrumb was successfully added
+     *
+     * @param message    a message which describes this breadcrumb (1KB max)
+     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param type       broadly describes the category of this breadcrumb
+     * @param level      the severity level of this breadcrumb
+     * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
     }
 
+    public void setCurrentBreadcrumbId(long breadcrumbId) {
+        database.getBreadcrumbs().setCurrentBreadcrumbId(breadcrumbId);
+    }
+
     /**
      * Enable backtrace metrics support
-     * @param settings  Backtrace metrics settings
+     *
+     * @param settings Backtrace metrics settings
      */
     public void enableMetrics(BacktraceMetricsSettings settings) {
         // For tracking crash-free sessions we need to add
@@ -495,9 +514,14 @@ public class BacktraceBase implements Client {
             BacktraceLogger.e(LOG_TAG, "Could not resolve package version information for Backtrace metrics");
         }
 
-        metrics = new BacktraceMetrics(context, attributes, settings);
-        metrics.startMetricsEventHandlers(backtraceApi);
-        metrics.sendStartupEvent();
+        try {
+            metrics = new BacktraceMetrics(context, attributes, settings);
+            metrics.startMetricsEventHandlers(backtraceApi);
+            metrics.sendStartupEvent();
+        } catch (Exception e) {
+            metrics = null;
+            BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
+        }
     }
 
     public boolean addUniqueEvent(String attributeName) {
@@ -551,6 +575,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Force a native crash report and minidump submission
+     *
      * @param message
      */
     public native void dumpWithoutCrash(String message);

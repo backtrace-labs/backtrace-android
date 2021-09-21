@@ -203,7 +203,7 @@ public class BacktraceAttributes {
 
     public String getApplicationVersion() throws PackageManager.NameNotFoundException {
         return this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName;
+                .getPackageInfo(this.context.getPackageName(), 0).versionName;
     }
 
     public Map<String, Object> getAllBacktraceAttributes() {

@@ -1,5 +1,7 @@
 package backtraceio.library.common;
 
+import static android.content.Context.ACTIVITY_SERVICE;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
@@ -26,8 +28,6 @@ import backtraceio.library.enums.GpsStatus;
 import backtraceio.library.enums.LocationStatus;
 import backtraceio.library.enums.NfcStatus;
 import backtraceio.library.enums.WifiStatus;
-
-import static android.content.Context.ACTIVITY_SERVICE;
 
 /**
  * Helper class for extract a device attributes
