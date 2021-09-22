@@ -121,7 +121,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -162,7 +161,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -237,7 +235,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(mockUniqueRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -248,7 +245,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -297,7 +293,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(mockUniqueRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -308,7 +303,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -357,7 +351,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(mockUniqueRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -368,7 +361,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -413,7 +405,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -442,7 +433,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -479,7 +469,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
@@ -565,7 +554,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                //Assert.assertEquals(resultMessage, result.message);
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertNotEquals(0, eventsPayloadJson.length());
