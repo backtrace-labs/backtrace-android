@@ -21,7 +21,7 @@ public class BacktraceMetricsSettings {
      * @param baseUrl      Base URL to send metrics
      */
     public BacktraceMetricsSettings(String universeName, String token, String baseUrl) {
-        this(universeName, token, baseUrl, BacktraceMetrics.defaultTimeIntervalMillis);
+        this(universeName, token, baseUrl, BacktraceMetrics.defaultTimeIntervalMs);
     }
 
     /**
@@ -44,7 +44,7 @@ public class BacktraceMetricsSettings {
      * @param timeIntervalMillis Time interval between metrics auto-send events, 0 disables auto-send
      */
     public BacktraceMetricsSettings(String universeName, String token, String baseUrl, long timeIntervalMillis) {
-        this(universeName, token, baseUrl, timeIntervalMillis, BacktraceMetrics.defaultTimeBetweenRetriesMillis);
+        this(universeName, token, baseUrl, timeIntervalMillis, BacktraceMetrics.defaultTimeBetweenRetriesMs);
     }
 
     /**

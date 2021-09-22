@@ -182,7 +182,7 @@ public abstract class BacktraceEventsHandler extends Handler {
         final int jitterFraction = 1;
         final int backoffBase = 10;
         double value = timeBetweenRetriesMillis * Math.pow(backoffBase, numRetries - 1);
-        double retryLower = BacktraceMathHelper.clamp(value, 0, BacktraceMetrics.maxTimeBetweenRetriesMillis);
+        double retryLower = BacktraceMathHelper.clamp(value, 0, BacktraceMetrics.maxTimeBetweenRetriesMs);
         double retryUpper = retryLower + retryLower * jitterFraction;
         return (long) BacktraceMathHelper.uniform(retryLower, retryUpper);
     }

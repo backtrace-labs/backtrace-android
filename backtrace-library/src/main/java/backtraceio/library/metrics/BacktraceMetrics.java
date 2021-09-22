@@ -27,7 +27,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Default time interval in milliseconds
      */
-    public final static long defaultTimeIntervalMillis = defaultTimeIntervalInMin * 60 * 1000;
+    public final static long defaultTimeIntervalMs = defaultTimeIntervalInMin * 60 * 1000;
 
     /**
      * Default unique event name that will be generated on app startup
@@ -56,14 +56,14 @@ public final class BacktraceMetrics implements Metrics {
     public final static int maxNumberOfAttempts = 3;
 
     /**
-     * Default time between retries in seconds
+     * Default time between retries in milliseconds
      */
-    public final static int defaultTimeBetweenRetriesMillis = 10000;
+    public final static int defaultTimeBetweenRetriesMs = 10000;
 
     /**
-     * Maximum time between requests in minutes
+     * Maximum time between requests in milliseconds
      */
-    public final static int maxTimeBetweenRetriesMillis = 5 * 60 * 1000;
+    public final static int maxTimeBetweenRetriesMs = 5 * 60 * 1000;
 
     /**
      * Default submission url
