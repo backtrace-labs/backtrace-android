@@ -18,6 +18,7 @@ import backtraceio.library.metrics.EventsPayload;
 import backtraceio.library.metrics.EventsResult;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.models.types.HttpException;
 
 /**
@@ -149,9 +150,7 @@ public class BacktraceReportSender {
             BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + Integer.toString(statusCode));
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = BacktraceSerializeHelper.fromJson(getResponse(urlConnection), EventsResult.class);
-                result.setEventsPayload(payload);
-                result.setStatusCode(statusCode);
+                result = new EventsResult(payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);
             } else {
                 String message = getResponse(urlConnection);
                 message = (message == null || message.equals("")) ?
