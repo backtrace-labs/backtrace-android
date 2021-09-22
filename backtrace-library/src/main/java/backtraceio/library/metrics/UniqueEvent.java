@@ -35,7 +35,7 @@ public class UniqueEvent extends Event {
             return this.name.get(0);
         }
         BacktraceLogger.e(LOG_TAG, "Unique Event name must not be null or empty");
-        return new String();
+        return "";
     }
 
     void update(long timestamp, Map<String, Object> attributes) {
