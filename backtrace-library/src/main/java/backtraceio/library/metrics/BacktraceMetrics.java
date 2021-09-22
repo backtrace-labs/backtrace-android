@@ -119,8 +119,8 @@ public final class BacktraceMetrics implements Metrics {
         summedEventsHandler = backtraceApi.enableSummedEvents(context, customAttributes, settings);
     }
 
-    void setStartupUniqueEventName(String StartupUniqueEventName) {
-        this.startupUniqueEventName = StartupUniqueEventName;
+    void setStartupUniqueEventName(String startupUniqueEventName) {
+        this.startupUniqueEventName = startupUniqueEventName;
     }
 
     String getStartupUniqueEventName() {
