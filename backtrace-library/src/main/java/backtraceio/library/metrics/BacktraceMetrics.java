@@ -43,7 +43,7 @@ public final class BacktraceMetrics implements Metrics {
      * Maximum number of events in store. If number of events in store hit the limit
      * BacktraceMetrics instance will send data to Backtrace.
      */
-    private int maximumEvents = 350;
+    private int maximumNumberOfEvents = 350;
 
     /**
      * Name of the summed event that will be generated on app startup
@@ -125,14 +125,6 @@ public final class BacktraceMetrics implements Metrics {
 
     String getStartupUniqueEventName() {
         return this.startupUniqueEventName;
-    }
-
-    void setMaximumEvents(int MaximumEvents) {
-        this.maximumEvents = MaximumEvents;
-    }
-
-    int getMaximumEvents() {
-        return this.maximumEvents;
     }
 
     public String getBaseUrl() {
@@ -235,7 +227,7 @@ public final class BacktraceMetrics implements Metrics {
         UniqueEvent uniqueEvent = new UniqueEvent(attributeName, System.currentTimeMillis() / 1000, localAttributes);
         uniqueEventsHandler.events.addLast(uniqueEvent);
 
-        if (count() == maximumEvents) {
+        if (count() == maximumNumberOfEvents) {
             uniqueEventsHandler.send();
             summedEventsHandler.send();
         }
@@ -251,9 +243,9 @@ public final class BacktraceMetrics implements Metrics {
      */
     @Override
     public void setMaximumNumberOfEvents(int maximumNumberOfEvents) {
-        this.maximumEvents = maximumNumberOfEvents;
-        uniqueEventsHandler.setMaxNumEvents(maximumNumberOfEvents);
-        summedEventsHandler.setMaxNumEvents(maximumNumberOfEvents);
+        this.maximumNumberOfEvents = maximumNumberOfEvents;
+        uniqueEventsHandler.setMaximumNumberOfEvents(maximumNumberOfEvents);
+        summedEventsHandler.setMaximumNumberOfEvents(maximumNumberOfEvents);
     }
 
     /**
@@ -295,7 +287,7 @@ public final class BacktraceMetrics implements Metrics {
 
         SummedEvent summedEvent = new SummedEvent(metricGroupName, System.currentTimeMillis() / 1000, localAttributes);
         summedEventsHandler.events.addLast(summedEvent);
-        if (count() == maximumEvents) {
+        if (count() == maximumNumberOfEvents) {
             uniqueEventsHandler.send();
             summedEventsHandler.send();
         }
@@ -310,6 +302,6 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if we should process this event, otherwise false
      */
     private boolean shouldProcessEvent(String name) {
-        return !(BacktraceStringHelper.isNullOrEmpty(name)) && (maximumEvents == 0 || (count() + 1 <= maximumEvents));
+        return !(BacktraceStringHelper.isNullOrEmpty(name)) && (maximumNumberOfEvents == 0 || (count() + 1 <= maximumNumberOfEvents));
     }
 }

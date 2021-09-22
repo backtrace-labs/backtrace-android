@@ -32,14 +32,14 @@ public abstract class BacktraceEventsHandler extends Handler {
      * Maximum number of events in store. If number of events in store hit the limit
      * BacktraceMetrics instance will send data to Backtrace.
      */
-    private int maxNumEvents = 350;
+    private int maximumNumberOfEvents = 350;
 
-    public void setMaxNumEvents(int maxNumEvents) {
-        this.maxNumEvents = maxNumEvents;
+    public void setMaximumNumberOfEvents(int maximumNumberOfEvents) {
+        this.maximumNumberOfEvents = maximumNumberOfEvents;
     }
 
-    public int getMaxNumEvents() {
-        return this.maxNumEvents;
+    public int getMaximumNumberOfEvents() {
+        return this.maximumNumberOfEvents;
     }
 
     /**

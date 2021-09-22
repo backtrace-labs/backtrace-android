@@ -58,7 +58,7 @@ public class SummedEventsHandler extends BacktraceEventsHandler {
 
     @Override
     protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<Event> events) {
-        if (this.events.size() + events.size() < getMaxNumEvents()) {
+        if (this.events.size() + events.size() < getMaximumNumberOfEvents()) {
             for (Event event : events) {
                 this.events.addFirst(event);
             }
