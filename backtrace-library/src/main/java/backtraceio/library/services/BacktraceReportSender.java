@@ -27,6 +27,8 @@ public class BacktraceReportSender {
 
     private static final String LOG_TAG = BacktraceReportSender.class.getSimpleName();
 
+    private static final int CHUNK_SIZE = 128 * 1024;
+
     /**
      * Send HTTP request for certain url server with information about device, error, attachments
      *
@@ -51,7 +53,7 @@ public class BacktraceReportSender {
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
 
-            urlConnection.setChunkedStreamingMode(128 * 1024);
+            urlConnection.setChunkedStreamingMode(CHUNK_SIZE);
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Cache-Control", "no-cache");
 
@@ -128,7 +130,7 @@ public class BacktraceReportSender {
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
 
-            urlConnection.setChunkedStreamingMode(128 * 1024);
+            urlConnection.setChunkedStreamingMode(CHUNK_SIZE);
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Cache-Control", "no-cache");
 
