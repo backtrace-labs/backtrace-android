@@ -219,6 +219,10 @@ public class BacktraceClientMetricsTest {
         assertEquals(1, mockRequestHandler.numAttempts);
     }
 
+    /**
+     * NOTE: This test is especially brittle, don't be suspicious unless it fails consistently
+     * For best results run under low CPU load and low memory utilization conditions.
+     */
     @Test
     public void try3TimesOn503() {
         final Waiter waiter = new Waiter();
