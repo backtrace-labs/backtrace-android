@@ -512,11 +512,13 @@ BacktraceMetricsSettings metricsSettings = new BacktraceMetricsSettings("<my_uni
 backtraceClient.enableMetrics(metricsSettings);
 ```
 
+**NOTE:** Please enable metrics BEFORE enabling native integration
+
 # Working with NDK applications <a name="working_with_ndk"></a>
 
 ## Enabling native integration
 
-If you would like to capture NDK Crashes you can use the `BacktraceDatabase` `setupNativeIntegration` method.
+If you would like to capture NDK Crashes you can use the `BacktraceDatabase` `setupNativeIntegration` method. In general this should be the final step in setting up your Backtrace client to ensure all attributes and file attachment paths are captured properly by the native crash handler.
 
 ```java
 database.setupNativeIntegration(backtraceClient, credentials);
