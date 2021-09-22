@@ -30,13 +30,6 @@ public class EventsResult {
     private int statusCode = -1;
 
     /**
-     * Create new instance of EventsResult
-     */
-    public EventsResult() {
-
-    }
-
-    /**
      * Create new instance of BacktraceResult
      *
      * @param payload    metrics events payload
@@ -55,7 +48,6 @@ public class EventsResult {
         this.eventsPayload = eventsPayload;
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
     public EventsPayload getEventsPayload() {
         return eventsPayload;
     }
