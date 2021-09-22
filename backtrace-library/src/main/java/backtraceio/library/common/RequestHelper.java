@@ -9,6 +9,7 @@ public class RequestHelper {
     private static final transient String LOG_TAG = RequestHelper.class.getSimpleName();
 
     private static final String CRLF = "\r\n";
+    private static final String ENCODING = "utf-8";
 
     /**
      * Get Content-Type of request
@@ -32,7 +33,7 @@ public class RequestHelper {
             return;
         }
 
-        byte[] bytes = json.getBytes("utf-8");
+        byte[] bytes = json.getBytes(ENCODING);
         outputStream.write(bytes);
     }
 

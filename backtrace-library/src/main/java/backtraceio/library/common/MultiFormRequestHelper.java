@@ -17,6 +17,7 @@ public class MultiFormRequestHelper {
     private static final String BOUNDARY = "*****";
     private static final String CRLF = "\r\n";
     private static final String TWO_HYPHENS = "--";
+    private static final String ENCODING = "utf-8";
 
     /**
      * Get Content-Type of request
@@ -60,7 +61,7 @@ public class MultiFormRequestHelper {
         outputStream.write((MultiFormRequestHelper.getFileInfo("upload_file")).getBytes());
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
 
-        byte[] bytes = json.getBytes("utf-8");
+        byte[] bytes = json.getBytes(ENCODING);
         outputStream.write(bytes);
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
     }
