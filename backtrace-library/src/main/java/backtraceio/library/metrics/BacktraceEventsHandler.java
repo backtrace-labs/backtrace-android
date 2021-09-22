@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 
+import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -51,11 +52,6 @@ public abstract class BacktraceEventsHandler extends Handler {
      * List of events in the event queue
      */
     protected ConcurrentLinkedDeque<Event> events = new ConcurrentLinkedDeque<Event>();
-
-    /**
-     * Number of retry attempts
-     */
-    protected int numRetries = 0;
 
     /**
      * Http client
@@ -120,10 +116,10 @@ public abstract class BacktraceEventsHandler extends Handler {
     public abstract void sendStartupEvent(String eventName);
 
     public void send() {
-        sendEvents(events, 0);
+        sendEvents(events);
     }
 
-    private void sendEvents(ConcurrentLinkedDeque<Event> events, int attempts) {
+    private void sendEvents(ConcurrentLinkedDeque<Event> events) {
         if (events == null) {
             return;
         }
@@ -159,10 +155,8 @@ public abstract class BacktraceEventsHandler extends Handler {
         }
 
         int statusCode = result.getStatusCode();
-        if (statusCode == 200) {
-            onRequestCompleted();
-        } else if (statusCode > 501 && statusCode != 505) {
-            numRetries++;
+        if (statusCode > HttpURLConnection.HTTP_NOT_IMPLEMENTED && statusCode != HttpURLConnection.HTTP_VERSION) {
+            int numRetries = ++input.payload.numRetries;
             if (numRetries >= BacktraceMetrics.maxNumberOfAttempts || timeBetweenRetriesMillis == 0) {
                 onMaximumAttemptsReached(input.payload.getEvents());
                 return;
@@ -192,10 +186,5 @@ public abstract class BacktraceEventsHandler extends Handler {
         double retryLower = BacktraceMathHelper.clamp(value, 0, BacktraceMetrics.maxTimeBetweenRetriesMillis);
         double retryUpper = retryLower + retryLower * jitterFraction;
         return (long) BacktraceMathHelper.uniform(retryLower, retryUpper);
-    }
-
-    private void onRequestCompleted() {
-        numRetries = 0;
-        return;
     }
 }

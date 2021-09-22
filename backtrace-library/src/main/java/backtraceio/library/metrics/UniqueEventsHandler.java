@@ -59,7 +59,7 @@ public class UniqueEventsHandler extends BacktraceEventsHandler {
                     attributes);
         }
 
-        UniqueEventsPayload payload = new UniqueEventsPayload(backtraceAttributes, events, numRetries);
+        UniqueEventsPayload payload = new UniqueEventsPayload(backtraceAttributes, events, 0);
         return payload;
     }
 }

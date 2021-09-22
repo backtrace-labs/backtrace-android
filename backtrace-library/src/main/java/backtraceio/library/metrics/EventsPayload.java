@@ -22,6 +22,8 @@ public abstract class EventsPayload {
     @SerializedName("metadata")
     private EventsMetadata eventsMetadata;
 
+    public transient int numRetries = 0;
+
     public EventsPayload(BacktraceAttributes backtraceAttributes, int droppedEvents) {
         String appVersion;
         this.application = backtraceAttributes.getApplicationName();

@@ -51,7 +51,7 @@ public class SummedEventsHandler extends BacktraceEventsHandler {
         }
         events.clear();
 
-        SummedEventsPayload payload = new SummedEventsPayload(backtraceAttributes, eventsCopy, numRetries);
+        SummedEventsPayload payload = new SummedEventsPayload(backtraceAttributes, eventsCopy, 0);
 
         return payload;
     }
