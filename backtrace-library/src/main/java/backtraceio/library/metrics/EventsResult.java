@@ -10,13 +10,6 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 public class EventsResult {
 
     /**
-     * Object identifier
-     */
-    @SerializedName("_rxid")
-    @SuppressWarnings({"UnusedDeclaration"})
-    public String rxId;
-
-    /**
      * Message
      */
     public String message;
