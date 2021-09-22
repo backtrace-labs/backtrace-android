@@ -131,7 +131,6 @@ public abstract class BacktraceEventsHandler extends Handler {
             api.sendEventsPayload(payload);
         } catch (Exception e) {
             BacktraceLogger.e(LOG_TAG, "Could not create events payload for metrics submission");
-            return;
         }
     }
 
