@@ -73,7 +73,7 @@ public abstract class BacktraceEventsHandler extends Handler {
     protected final Map<String, Object> customAttributes;
 
     /**
-     * The application context
+     * The application context. We need this in our derived classes to get the BacktraceAttributes
      */
     protected final Context context;
 
