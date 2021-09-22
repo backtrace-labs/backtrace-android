@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
@@ -213,7 +214,8 @@ public final class BacktraceMetrics implements Metrics {
 
         // validate if unique event attribute is available and
         // prevent undefined attributes
-        if (localAttributes.get(attributeName) == null || localAttributes.get(attributeName).toString().trim().isEmpty()) {
+        Object value = localAttributes.get(attributeName);
+        if (!BacktraceStringHelper.isObjectValidString(value)) {
             BacktraceLogger.w(LOG_TAG, "Attribute name for Unique Event is not available in attribute scope");
             return false;
         }
@@ -308,6 +310,6 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if we should process this event, otherwise false
      */
     private boolean shouldProcessEvent(String name) {
-        return !(name == null || name.trim().isEmpty()) && (maximumEvents == 0 || (count() + 1 <= maximumEvents));
+        return !(BacktraceStringHelper.isNullOrEmpty(name)) && (maximumEvents == 0 || (count() + 1 <= maximumEvents));
     }
 }

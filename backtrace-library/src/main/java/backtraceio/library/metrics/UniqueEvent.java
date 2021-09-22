@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class UniqueEvent extends Event {
@@ -43,7 +44,7 @@ public class UniqueEvent extends Event {
         if (attributes != null) {
             for (String key : attributes.keySet()) {
                 Object value = attributes.get(key);
-                if (value != null && !value.toString().trim().isEmpty()) {
+                if (BacktraceStringHelper.isObjectValidString(value)) {
                     this.attributes.put(key, value);
                 }
             }

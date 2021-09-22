@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
@@ -32,7 +33,7 @@ public class UniqueEventsHandler extends BacktraceEventsHandler {
         attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
         Object value = attributes.get(eventName);
-        if (value != null && !value.toString().trim().isEmpty()) {
+        if (BacktraceStringHelper.isObjectValidString(value)) {
             events.addLast(new UniqueEvent(eventName, System.currentTimeMillis() / 1000, attributes));
         }
         send();
