@@ -89,6 +89,9 @@ public abstract class BacktraceEventsHandler extends Handler {
                                   Api api, final BacktraceHandlerThread backtraceHandlerThread, String urlPrefix, BacktraceMetricsSettings settings) {
         // This should always have a nonnull looper because BacktraceHandlerThread starts in the
         // constructor and getLooper blocks until the looper is ready if the thread is started
+        //
+        // We cannot cache the looper here since the super call has to go first (i.e: before
+        // declaring and assigning a Looper variable)
         super(backtraceHandlerThread.getLooper());
         if (backtraceHandlerThread.getLooper() == null) {
             throw new NullPointerException("Expected nonnull looper, this should not happen");
