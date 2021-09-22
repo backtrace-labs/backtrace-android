@@ -18,7 +18,11 @@ public class UniqueEvent extends Event {
     private List<String> name;
 
     UniqueEvent(String name) {
-        this(name, System.currentTimeMillis() / 1000, new HashMap<String, Object>());
+        this(name, new HashMap<String, Object>());
+    }
+
+    UniqueEvent(String name, Map<String, Object> attributes) {
+        this(name, System.currentTimeMillis() / 1000, attributes);
     }
 
     UniqueEvent(String name, long timestamp, Map<String, Object> attributes) {
