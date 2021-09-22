@@ -50,7 +50,7 @@ public abstract class BacktraceEventsHandler extends Handler {
     /**
      * List of events in the event queue
      */
-    ConcurrentLinkedDeque<Event> events = new ConcurrentLinkedDeque<Event>();
+    protected ConcurrentLinkedDeque<Event> events = new ConcurrentLinkedDeque<Event>();
 
     /**
      * Number of retry attempts
