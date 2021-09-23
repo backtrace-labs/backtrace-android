@@ -131,10 +131,7 @@ public class BacktraceReportSender {
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
 
-            urlConnection.setChunkedStreamingMode(CHUNK_SIZE);
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
-            urlConnection.setRequestProperty("Cache-Control", "no-cache");
-
             urlConnection.setRequestProperty("Content-Type", RequestHelper.getContentType());
 
             BacktraceLogger.d(LOG_TAG, "HttpURLConnection successfully initialized");
