@@ -8,12 +8,7 @@ import java.util.Map;
 public final class SummedEvent extends Event {
 
     @SerializedName("metric_group")
-    private String name;
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
+    private final String name;
 
     SummedEvent(String name) {
         this(name, System.currentTimeMillis() / 1000, new HashMap<String, Object>());
@@ -27,6 +22,11 @@ public final class SummedEvent extends Event {
 
     SummedEvent(SummedEvent summedEvent) {
         this(summedEvent.name, summedEvent.timestamp, summedEvent.attributes);
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     public void addAttributes(Map<String, Object> attributes) {

@@ -1,12 +1,9 @@
 package backtraceio.library.metrics;
 
-import android.content.pm.PackageManager;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.BacktraceAttributes;
 
 public abstract class EventsPayload {
@@ -19,30 +16,23 @@ public abstract class EventsPayload {
     @SerializedName("appversion")
     private final String appVersion;
 
+    public transient int numRetries = 0;
+
     @SerializedName("metadata")
     private EventsMetadata eventsMetadata;
 
-    public transient int numRetries = 0;
-
     public EventsPayload(BacktraceAttributes backtraceAttributes, int droppedEvents) {
-        String appVersion;
         this.application = backtraceAttributes.getApplicationName();
-        try {
-            appVersion = backtraceAttributes.getApplicationVersion();
-        } catch (PackageManager.NameNotFoundException e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
-            appVersion = "";
-        }
-        this.appVersion = appVersion;
+        this.appVersion = backtraceAttributes.getApplicationVersionOrEmpty();
         this.eventsMetadata = new EventsMetadata(droppedEvents);
-    }
-
-    public void setDroppedEvents(int droppedEvents) {
-        this.eventsMetadata.setDroppedEvents(droppedEvents);
     }
 
     public int getDroppedEvents() {
         return this.eventsMetadata.getDroppedEvents();
+    }
+
+    public void setDroppedEvents(int droppedEvents) {
+        this.eventsMetadata.setDroppedEvents(droppedEvents);
     }
 
     public abstract ConcurrentLinkedDeque<Event> getEvents();

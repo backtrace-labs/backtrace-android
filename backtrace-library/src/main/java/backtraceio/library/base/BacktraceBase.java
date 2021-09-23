@@ -45,31 +45,11 @@ import backtraceio.library.services.BacktraceApi;
  */
 public class BacktraceBase implements Client {
 
+    private static final transient String LOG_TAG = BacktraceBase.class.getSimpleName();
+
     static {
         System.loadLibrary("backtrace-native");
     }
-
-    private static transient String LOG_TAG = BacktraceBase.class.getSimpleName();
-
-    public native void crash();
-
-    /**
-     * Instance of BacktraceApi that allows to send data to Backtrace API
-     */
-    private Api backtraceApi;
-
-    private void setBacktraceApi(Api backtraceApi) {
-        this.backtraceApi = backtraceApi;
-        if (this.database != null) {
-            this.database.setApi(this.backtraceApi);
-        }
-    }
-
-    private final BacktraceCredentials credentials;
-    /**
-     * Application context
-     */
-    protected Context context;
 
     /**
      * Backtrace database instance
@@ -85,6 +65,22 @@ public class BacktraceBase implements Client {
      * File attachments to attach to crashes and reports.
      */
     public final List<String> attachments;
+    private final BacktraceCredentials credentials;
+
+    /**
+     * Backtrace metrics instance
+     */
+    private Metrics metrics = null;
+
+    /**
+     * Application context
+     */
+    protected Context context;
+
+    /**
+     * Instance of BacktraceApi that allows to send data to Backtrace API
+     */
+    private Api backtraceApi;
 
     /**
      * Event which will be executed before sending data to Backtrace API
@@ -95,11 +91,6 @@ public class BacktraceBase implements Client {
      * Is Proguard symbolication enabled? We have to inform the Backtrace API
      */
     private boolean isProguardEnabled = false;
-
-    /**
-     * Backtrace metrics instance
-     */
-    private Metrics metrics = null;
 
     /**
      * Initialize new client instance with BacktraceCredentials
@@ -251,6 +242,15 @@ public class BacktraceBase implements Client {
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
+    }
+
+    public native void crash();
+
+    private void setBacktraceApi(Api backtraceApi) {
+        this.backtraceApi = backtraceApi;
+        if (this.database != null) {
+            this.database.setApi(this.backtraceApi);
+        }
     }
 
     /**

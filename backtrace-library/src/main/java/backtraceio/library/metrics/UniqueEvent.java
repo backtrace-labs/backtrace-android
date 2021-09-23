@@ -15,7 +15,7 @@ public class UniqueEvent extends Event {
     private final static transient String LOG_TAG = UniqueEvent.class.getSimpleName();
 
     @SerializedName("unique")
-    private List<String> name;
+    private final List<String> name;
 
     UniqueEvent(String name) {
         this(name, new HashMap<String, Object>());

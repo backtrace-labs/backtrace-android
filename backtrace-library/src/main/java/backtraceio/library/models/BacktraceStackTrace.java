@@ -9,17 +9,17 @@ import backtraceio.library.logger.BacktraceLogger;
  */
 public class BacktraceStackTrace {
 
-    private static transient String LOG_TAG = BacktraceStackTrace.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceStackTrace.class.getSimpleName();
 
     /**
      * Current exception
      */
-    private Exception exception;
+    private final Exception exception;
 
     /**
      * Collection of stacktrace elements
      */
-    private ArrayList<BacktraceStackFrame> stackFrames = new ArrayList<>();
+    private final ArrayList<BacktraceStackFrame> stackFrames = new ArrayList<>();
 
     /**
      * Create new instance of BacktraceStackTrace object

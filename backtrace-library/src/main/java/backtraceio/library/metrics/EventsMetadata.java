@@ -11,11 +11,11 @@ public class EventsMetadata {
         this.droppedEvents = droppedEvents;
     }
 
-    public void setDroppedEvents(int droppedEvents) {
-        this.droppedEvents = droppedEvents;
-    }
-
     public int getDroppedEvents() {
         return this.droppedEvents;
+    }
+
+    public void setDroppedEvents(int droppedEvents) {
+        this.droppedEvents = droppedEvents;
     }
 }

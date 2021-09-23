@@ -3,6 +3,12 @@ package backtraceio.library.models;
 import backtraceio.library.metrics.BacktraceMetrics;
 
 public class BacktraceMetricsSettings {
+    private final String universe;
+    private final String token;
+    private final String baseUrl;
+    private final long timeIntervalMillis;
+    private final int timeBetweenRetriesMillis;
+
     /**
      * Backtrace metrics settings
      *
@@ -64,31 +70,21 @@ public class BacktraceMetricsSettings {
         this.timeBetweenRetriesMillis = timeBetweenRetriesMillis;
     }
 
-    private String universe;
-
     public String getUniverseName() {
         return universe;
     }
-
-    private String token;
 
     public String getToken() {
         return token;
     }
 
-    private String baseUrl;
-
     public String getBaseUrl() {
         return baseUrl;
     }
 
-    private long timeIntervalMillis;
-
     public long getTimeIntervalMillis() {
         return timeIntervalMillis;
     }
-
-    private int timeBetweenRetriesMillis;
 
     public int getTimeBetweenRetriesMillis() {
         return timeBetweenRetriesMillis;

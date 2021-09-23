@@ -72,7 +72,7 @@ public class BacktraceReportSender {
             request.close();
 
             int statusCode = urlConnection.getResponseCode();
-            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + Integer.toString(statusCode));
+            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 result = BacktraceSerializeHelper.backtraceResultFromJson(
@@ -144,7 +144,7 @@ public class BacktraceReportSender {
             request.close();
 
             statusCode = urlConnection.getResponseCode();
-            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + Integer.toString(statusCode));
+            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 result = new EventsResult(payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);

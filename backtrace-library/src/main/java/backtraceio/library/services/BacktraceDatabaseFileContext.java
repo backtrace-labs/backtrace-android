@@ -15,7 +15,7 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
 public class BacktraceDatabaseFileContext implements DatabaseFileContext {
 
-    private static transient String LOG_TAG = BacktraceDatabaseFileContext.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceDatabaseFileContext.class.getSimpleName();
 
     private final String _databasePath;
     private final long _maxDatabaseSize;

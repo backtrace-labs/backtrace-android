@@ -7,11 +7,11 @@ import android.util.Log;
  */
 public class BacktraceLogger {
 
+    private static final String BASE_TAG = "BacktraceLogger: ";
     /**
      * Level from which all information is logged
      */
     private static LogLevel logLevel = LogLevel.OFF;
-    private static final String BASE_TAG = "BacktraceLogger: ";
 
     /**
      * set logging level from which all messages should be logged to the console

@@ -17,9 +17,8 @@ import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceBroadcastReceiver extends BroadcastReceiver {
 
-    private BacktraceBreadcrumbs backtraceBreadcrumbs;
-
-    private static transient String LOG_TAG = BacktraceBroadcastReceiver.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceBroadcastReceiver.class.getSimpleName();
+    private final BacktraceBreadcrumbs backtraceBreadcrumbs;
 
     public BacktraceBroadcastReceiver(@NonNull BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;

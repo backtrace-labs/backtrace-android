@@ -14,7 +14,7 @@ public class BacktraceWatchdog {
     private final static transient String LOG_TAG = BacktraceWatchdog.class.getSimpleName();
     private final BacktraceClient backtraceClient;
     private final boolean sendException;
-    private Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
+    private final Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
 
     /**
      * Event which will be executed instead of default handling ANR error
@@ -76,7 +76,7 @@ public class BacktraceWatchdog {
             }
 
             BacktraceLogger.w(LOG_TAG, String.format("Thread %s %s  might be hung, timestamp: %s",
-                    Long.toString(currentThread.getId()), currentThread.getName(), now_str));
+                    currentThread.getId(), currentThread.getName(), now_str));
 
             // Otherwise, the thread has not made forward progress.
             // Determine whether the timeout has been exceeded.

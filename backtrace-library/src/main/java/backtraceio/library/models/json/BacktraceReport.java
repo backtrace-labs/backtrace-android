@@ -184,16 +184,6 @@ public class BacktraceReport {
         }
     }
 
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-        return toBacktraceData(context, clientAttributes, false);
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
-        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
-        return backtraceData;
-    }
-
     /**
      * Concat two dictionaries with attributes
      *
@@ -210,5 +200,15 @@ public class BacktraceReport {
         }
         reportAttributes.putAll(attributes);
         return reportAttributes;
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
+        return toBacktraceData(context, clientAttributes, false);
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
+        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
+        return backtraceData;
     }
 }

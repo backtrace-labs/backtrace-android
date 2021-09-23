@@ -28,12 +28,12 @@ public class BacktraceApi implements Api {
 
     private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
 
-    private transient BacktraceHandlerThread threadSender;
+    private final transient BacktraceHandlerThread threadSender;
 
     /**
      * URL to report submission endpoint
      */
-    private String reportSubmissionUrl;
+    private final String reportSubmissionUrl;
 
     /**
      * URL to unique events endpoint
@@ -75,23 +75,6 @@ public class BacktraceApi implements Api {
      */
     private EventsOnServerResponseEventListener summedEventsServerResponse = null;
 
-    @Override
-    public void setUniqueEventsRequestHandler(EventsRequestHandler uniqueEventsRequestHandler) {
-        this.uniqueEventsRequestHandler = uniqueEventsRequestHandler;
-    }
-
-    public void setSummedEventsRequestHandler(EventsRequestHandler summedEventsRequestHandler) {
-        this.summedEventsRequestHandler = summedEventsRequestHandler;
-    }
-
-    public void setUniqueEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
-        this.uniqueEventsServerResponse = callback;
-    }
-
-    public void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
-        this.summedEventsServerResponse = callback;
-    }
-
     /**
      * Create a new instance of Backtrace API
      *
@@ -107,6 +90,23 @@ public class BacktraceApi implements Api {
 
         threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(),
                 this.reportSubmissionUrl);
+    }
+
+    @Override
+    public void setUniqueEventsRequestHandler(EventsRequestHandler uniqueEventsRequestHandler) {
+        this.uniqueEventsRequestHandler = uniqueEventsRequestHandler;
+    }
+
+    public void setSummedEventsRequestHandler(EventsRequestHandler summedEventsRequestHandler) {
+        this.summedEventsRequestHandler = summedEventsRequestHandler;
+    }
+
+    public void setUniqueEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
+        this.uniqueEventsServerResponse = callback;
+    }
+
+    public void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
+        this.summedEventsServerResponse = callback;
     }
 
     public void setOnServerError(OnServerErrorEventListener onServerError) {

@@ -1,7 +1,5 @@
 package backtraceio.library.metrics;
 
-import com.google.gson.annotations.SerializedName;
-
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 /**
@@ -44,14 +42,6 @@ public class EventsResult {
         this.statusCode = statusCode;
     }
 
-    public void setEventsPayload(EventsPayload eventsPayload) {
-        this.eventsPayload = eventsPayload;
-    }
-
-    public EventsPayload getEventsPayload() {
-        return eventsPayload;
-    }
-
     /**
      * Set result when error occurs while sending data to API
      *
@@ -66,13 +56,12 @@ public class EventsResult {
                 statusCode);
     }
 
-    /**
-     * Set the HTTP status code
-     *
-     * @param statusCode HTTP status code to set
-     */
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public EventsPayload getEventsPayload() {
+        return eventsPayload;
+    }
+
+    public void setEventsPayload(EventsPayload eventsPayload) {
+        this.eventsPayload = eventsPayload;
     }
 
     /**
@@ -80,5 +69,14 @@ public class EventsResult {
      */
     public int getStatusCode() {
         return this.statusCode;
+    }
+
+    /**
+     * Set the HTTP status code
+     *
+     * @param statusCode HTTP status code to set
+     */
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 }

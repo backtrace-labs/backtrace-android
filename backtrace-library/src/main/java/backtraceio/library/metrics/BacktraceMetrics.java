@@ -17,8 +17,6 @@ import backtraceio.library.models.json.BacktraceAttributes;
 
 public final class BacktraceMetrics implements Metrics {
 
-    private static final transient String LOG_TAG = BacktraceMetrics.class.getSimpleName();
-
     /**
      * Default time interval in min
      */
@@ -28,27 +26,6 @@ public final class BacktraceMetrics implements Metrics {
      * Default time interval in milliseconds
      */
     public final static long defaultTimeIntervalMs = defaultTimeIntervalInMin * 60 * 1000;
-
-    /**
-     * Default unique event name that will be generated on app startup
-     */
-    public final String defaultUniqueEventName = "guid";
-
-    /**
-     * Name of the unique event that will be generated on app startup
-     */
-    private String startupUniqueEventName = defaultUniqueEventName;
-
-    /**
-     * Maximum number of events in store. If number of events in store hit the limit
-     * BacktraceMetrics instance will send data to Backtrace.
-     */
-    private int maximumNumberOfEvents = 350;
-
-    /**
-     * Name of the summed event that will be generated on app startup
-     */
-    private final String startupSummedEventName = "Application Launches";
 
     /**
      * Maximum number of attempts
@@ -70,10 +47,17 @@ public final class BacktraceMetrics implements Metrics {
      */
     public final static String defaultBaseUrl = "https://events.backtrace.io/api";
 
+    private static final transient String LOG_TAG = BacktraceMetrics.class.getSimpleName();
+
     /**
-     * User custom request method
+     * Default unique event name that will be generated on app startup
      */
-    private RequestHandler requestHandler = null;
+    public final String defaultUniqueEventName = "guid";
+
+    /**
+     * Name of the summed event that will be generated on app startup
+     */
+    private final String startupSummedEventName = "Application Launches";
 
     /**
      * Unique Events handler
@@ -101,6 +85,22 @@ public final class BacktraceMetrics implements Metrics {
     protected BacktraceMetricsSettings settings;
 
     /**
+     * Name of the unique event that will be generated on app startup
+     */
+    private String startupUniqueEventName = defaultUniqueEventName;
+
+    /**
+     * Maximum number of events in store. If number of events in store hit the limit
+     * BacktraceMetrics instance will send data to Backtrace.
+     */
+    private int maximumNumberOfEvents = 350;
+
+    /**
+     * User custom request method
+     */
+    private RequestHandler requestHandler = null;
+
+    /**
      * Create new Backtrace metrics instance
      *
      * @param context          Application context
@@ -119,12 +119,12 @@ public final class BacktraceMetrics implements Metrics {
         summedEventsHandler = backtraceApi.enableSummedEvents(context, customAttributes, settings);
     }
 
-    void setStartupUniqueEventName(String startupUniqueEventName) {
-        this.startupUniqueEventName = startupUniqueEventName;
-    }
-
     String getStartupUniqueEventName() {
         return this.startupUniqueEventName;
+    }
+
+    void setStartupUniqueEventName(String startupUniqueEventName) {
+        this.startupUniqueEventName = startupUniqueEventName;
     }
 
     public String getBaseUrl() {

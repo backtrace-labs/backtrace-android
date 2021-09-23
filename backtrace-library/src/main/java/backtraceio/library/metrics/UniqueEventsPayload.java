@@ -8,7 +8,7 @@ import backtraceio.library.models.json.BacktraceAttributes;
 
 public final class UniqueEventsPayload extends EventsPayload {
     @SerializedName("unique_events")
-    private ConcurrentLinkedDeque<Event> uniqueEvents;
+    private final ConcurrentLinkedDeque<Event> uniqueEvents;
 
     protected UniqueEventsPayload(BacktraceAttributes backtraceAttributes, ConcurrentLinkedDeque<Event> events, int droppedEvents) {
         super(backtraceAttributes, droppedEvents);

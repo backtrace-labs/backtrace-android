@@ -12,6 +12,10 @@ public abstract class Event {
     @SerializedName("attributes")
     protected Map<String, Object> attributes;
 
+    public Event(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public long getTimestamp() {
         return this.timestamp;
     }
@@ -21,8 +25,4 @@ public abstract class Event {
     }
 
     public abstract String getName();
-
-    public Event(long timestamp) {
-        this.timestamp = timestamp;
-    }
 }

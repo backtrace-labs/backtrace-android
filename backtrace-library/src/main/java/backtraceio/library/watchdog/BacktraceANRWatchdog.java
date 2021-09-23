@@ -32,14 +32,17 @@ public class BacktraceANRWatchdog extends Thread {
      * Enable debug mode - errors will not be sent if the debugger is connected
      */
     private final boolean debug;
+
     /**
      * Handler for UI Thread - used to check if the thread is not blocked
      */
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
     /**
      * Maximum time in milliseconds after which should check if the main thread is not hanged
      */
-    private int timeout;
+    private final int timeout;
+
     /**
      * Event which will be executed instead of default handling ANR error
      */

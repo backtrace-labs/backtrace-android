@@ -33,7 +33,7 @@ import backtraceio.library.enums.WifiStatus;
  * Helper class for extract a device attributes
  */
 public class DeviceAttributesHelper {
-    private Context context;
+    private final Context context;
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;

@@ -21,15 +21,14 @@ public class ThreadInformation {
      */
     @SerializedName("fault")
     @SuppressWarnings({"UnusedDeclaration"})
-    private Boolean fault;
-
+    private final Boolean fault;
 
     /**
      * Current thread stacktrace
      */
     @SerializedName("stack")
     @SuppressWarnings({"UnusedDeclaration"})
-    private ArrayList<BacktraceStackFrame> stack;
+    private final ArrayList<BacktraceStackFrame> stack;
 
     /**
      * Create new instance of ThreadInformation

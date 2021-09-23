@@ -20,6 +20,11 @@ public class BacktraceDatabaseRecord {
     private static transient final String LOG_TAG = BacktraceDatabaseRecord.class.getSimpleName();
 
     /**
+     * Path to database directory
+     */
+    private transient final String _path;
+
+    /**
      * Id
      */
     @SerializedName("Id")
@@ -31,14 +36,15 @@ public class BacktraceDatabaseRecord {
     public transient boolean locked = false;
 
     /**
+     * record writer
+     */
+    transient DatabaseRecordWriter RecordWriter;
+
+    /**
      * Path to json stored all information about current record
      */
     @SerializedName("RecordName")
     private String recordPath;
-
-    public String getRecordPath() {
-        return recordPath;
-    }
 
     /**
      * Path to a diagnostic data json
@@ -46,19 +52,11 @@ public class BacktraceDatabaseRecord {
     @SerializedName("DataPath")
     private String diagnosticDataPath;
 
-    public String getDiagnosticDataPath() {
-        return diagnosticDataPath;
-    }
-
     /**
      * Path to Backtrace Report json
      */
     @SerializedName("ReportPath")
     private String reportPath;
-
-    public String getReportPath() {
-        return reportPath;
-    }
 
     /**
      * Total size of record
@@ -66,29 +64,10 @@ public class BacktraceDatabaseRecord {
     @SerializedName("Size")
     private long size;
 
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
     /**
      * Stored record
      */
     private transient BacktraceData record;
-
-    /**
-     * Path to database directory
-     */
-    private transient final String _path;
-
-    /**
-     * record writer
-     */
-    transient DatabaseRecordWriter RecordWriter;
-
 
     BacktraceDatabaseRecord() {
         this._path = "";
@@ -102,6 +81,42 @@ public class BacktraceDatabaseRecord {
         this.record = data;
         this._path = path;
         RecordWriter = new BacktraceDatabaseRecordWriter(path);
+    }
+
+    /**
+     * Read single record from file
+     *
+     * @param file current file
+     * @return saved database record
+     */
+    public static BacktraceDatabaseRecord readFromFile(File file) {
+        BacktraceLogger.d(LOG_TAG, "Reading JSON from passed file");
+        String json = FileHelper.readFile(file);
+        if (json == null || json.equals("")) {
+            BacktraceLogger.w(LOG_TAG, "JSON from passed file is null or empty");
+            return null;
+        }
+        return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
+    }
+
+    public String getRecordPath() {
+        return recordPath;
+    }
+
+    public String getDiagnosticDataPath() {
+        return diagnosticDataPath;
+    }
+
+    public String getReportPath() {
+        return reportPath;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 
     /**
@@ -240,21 +255,5 @@ public class BacktraceDatabaseRecord {
             BacktraceLogger.e(LOG_TAG, "Can not unlock record");
         }
         return false;
-    }
-
-    /**
-     * Read single record from file
-     *
-     * @param file current file
-     * @return saved database record
-     */
-    public static BacktraceDatabaseRecord readFromFile(File file) {
-        BacktraceLogger.d(LOG_TAG, "Reading JSON from passed file");
-        String json = FileHelper.readFile(file);
-        if (json == null || json.equals("")) {
-            BacktraceLogger.w(LOG_TAG, "JSON from passed file is null or empty");
-            return null;
-        }
-        return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
     }
 }

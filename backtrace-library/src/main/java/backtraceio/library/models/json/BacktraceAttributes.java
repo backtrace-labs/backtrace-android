@@ -14,13 +14,16 @@ import java.util.Locale;
 import java.util.Map;
 
 import backtraceio.library.BuildConfig;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
+import backtraceio.library.logger.BacktraceLogger;
 
 /**
  * Class instance to get a built-in attributes from current application
  */
 public class BacktraceAttributes {
+    private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
 
     /**
      * Get built-in primitive attributes
@@ -30,12 +33,12 @@ public class BacktraceAttributes {
     /**
      * Get built-in complex attributes
      */
-    private Map<String, Object> complexAttributes = new HashMap<>();
+    private final Map<String, Object> complexAttributes = new HashMap<>();
 
     /**
      * Application context
      */
-    private Context context;
+    private final Context context;
 
     /**
      * Create instance of Backtrace Attribute
@@ -86,10 +89,9 @@ public class BacktraceAttributes {
         this.attributes.put("application.package", this.context.getApplicationContext()
                 .getPackageName());
         this.attributes.put("application", getApplicationName());
-        try {
-            this.attributes.put("version", getApplicationVersion());
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+        String version = getApplicationVersionOrEmpty();
+        if (!BacktraceStringHelper.isNullOrEmpty(version)) {
+            this.attributes.put("version", version);
         }
     }
 
@@ -201,9 +203,15 @@ public class BacktraceAttributes {
                 .getPackageManager()).toString();
     }
 
-    public String getApplicationVersion() throws PackageManager.NameNotFoundException {
-        return this.context.getPackageManager()
-                .getPackageInfo(this.context.getPackageName(), 0).versionName;
+    public String getApplicationVersionOrEmpty() {
+        try {
+            return this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public Map<String, Object> getAllBacktraceAttributes() {

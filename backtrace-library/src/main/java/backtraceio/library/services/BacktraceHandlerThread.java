@@ -22,10 +22,10 @@ import backtraceio.library.models.BacktraceResult;
 
 public class BacktraceHandlerThread extends HandlerThread {
 
-    private static transient String LOG_TAG = BacktraceHandlerThread.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceHandlerThread.class.getSimpleName();
 
     private BacktraceHandler mHandler;
-    private String url;
+    private final String url;
     private UniqueEventsHandler mUniqueEventsHandler;
     private SummedEventsHandler mSummedEventsHandler;
 

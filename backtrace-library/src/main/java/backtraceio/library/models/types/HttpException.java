@@ -42,15 +42,6 @@ public class HttpException extends Exception {
     }
 
     /**
-     * Set HTTP status code
-     *
-     * @param httpStatus received HTTP status code
-     */
-    private void setHttpStatus(int httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
-    /**
      * Return HTTP status code
      *
      * @return HTTP status code
@@ -58,5 +49,14 @@ public class HttpException extends Exception {
     @SuppressWarnings("unused")
     public int getHttpStatus() {
         return httpStatus;
+    }
+
+    /**
+     * Set HTTP status code
+     *
+     * @param httpStatus received HTTP status code
+     */
+    private void setHttpStatus(int httpStatus) {
+        this.httpStatus = httpStatus;
     }
 }

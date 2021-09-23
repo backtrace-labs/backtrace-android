@@ -23,35 +23,19 @@ public abstract class BacktraceEventsHandler extends Handler {
     protected final BacktraceHandlerThread backtraceHandlerThread;
 
     /**
-     * Number of events in the queue
+     * User provided custom attributes
      */
-    public int getCount() {
-        return events.size();
-    }
+    protected final Map<String, Object> customAttributes;
 
     /**
-     * Maximum number of events in store. If number of events in store hit the limit
-     * BacktraceMetrics instance will send data to Backtrace.
+     * The application context. We need this in our derived classes to get the BacktraceAttributes
      */
-    private int maximumNumberOfEvents = 350;
-
-    public void setMaximumNumberOfEvents(int maximumNumberOfEvents) {
-        this.maximumNumberOfEvents = maximumNumberOfEvents;
-    }
-
-    public int getMaximumNumberOfEvents() {
-        return this.maximumNumberOfEvents;
-    }
+    protected final Context context;
 
     /**
      * Time between retries if metrics submission fails
      */
     private final int timeBetweenRetriesMillis;
-
-    /**
-     * List of events in the event queue
-     */
-    protected ConcurrentLinkedDeque<Event> events = new ConcurrentLinkedDeque<Event>();
 
     /**
      * Http client
@@ -64,14 +48,15 @@ public abstract class BacktraceEventsHandler extends Handler {
     private final String submissionUrl;
 
     /**
-     * User provided custom attributes
+     * List of events in the event queue
      */
-    protected final Map<String, Object> customAttributes;
+    protected ConcurrentLinkedDeque<Event> events = new ConcurrentLinkedDeque<Event>();
 
     /**
-     * The application context. We need this in our derived classes to get the BacktraceAttributes
+     * Maximum number of events in store. If number of events in store hit the limit
+     * BacktraceMetrics instance will send data to Backtrace.
      */
-    protected final Context context;
+    private int maximumNumberOfEvents = 350;
 
     /**
      * @param context
@@ -111,6 +96,21 @@ public abstract class BacktraceEventsHandler extends Handler {
                 }
             }, timeIntervalMillis);
         }
+    }
+
+    /**
+     * Number of events in the queue
+     */
+    public int getCount() {
+        return events.size();
+    }
+
+    public int getMaximumNumberOfEvents() {
+        return this.maximumNumberOfEvents;
+    }
+
+    public void setMaximumNumberOfEvents(int maximumNumberOfEvents) {
+        this.maximumNumberOfEvents = maximumNumberOfEvents;
     }
 
     public abstract void sendStartupEvent(String eventName);

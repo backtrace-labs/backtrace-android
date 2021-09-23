@@ -13,16 +13,16 @@ public class BacktraceQueueFileHelper {
     /**
      * The base directory of the breadcrumb logs
      */
-    private String breadcrumbLogDirectory;
+    private final String breadcrumbLogDirectory;
 
     /**
      * The breadcrumb storage file
      */
-    private QueueFile breadcrumbStore;
+    private final QueueFile breadcrumbStore;
 
     private final String LOG_TAG = BacktraceQueueFileHelper.class.getSimpleName();
 
-    private int maxQueueFileSizeBytes;
+    private final int maxQueueFileSizeBytes;
 
     // This minimum file size comes from QueueFile::INITIAL_LENGTH
     private final int minimumQueueFileSizeBytes = 4096;
