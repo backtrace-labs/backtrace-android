@@ -34,7 +34,7 @@ public class UniqueEventsHandler extends BacktraceEventsHandler {
 
         Object value = attributes.get(eventName);
         if (BacktraceStringHelper.isObjectValidString(value)) {
-            events.addLast(new UniqueEvent(eventName, System.currentTimeMillis() / 1000, attributes));
+            events.addLast(new UniqueEvent(eventName, attributes));
         }
         send();
     }
