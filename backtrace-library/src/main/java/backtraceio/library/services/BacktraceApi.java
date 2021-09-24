@@ -132,24 +132,24 @@ public class BacktraceApi implements Api {
      *
      * @param data diagnostic data
      */
+    @Override
     public void send(BacktraceData data, OnServerResponseEventListener callback) {
         BacktraceHandlerInputReport input = new BacktraceHandlerInputReport(data, callback,
                 this.onServerError, this.requestHandler);
         threadSender.sendReport(input);
     }
 
-    public void sendEventsPayload(EventsPayload payload) {
-        BacktraceHandlerInputEvents input;
-        if (payload instanceof UniqueEventsPayload) {
-            input = new BacktraceHandlerInputEvents(payload, this.uniqueEventsServerResponse,
-                    this.onServerError, this.uniqueEventsRequestHandler);
-        } else if (payload instanceof SummedEventsPayload) {
-            input = new BacktraceHandlerInputEvents(payload, this.summedEventsServerResponse,
-                    this.onServerError, this.summedEventsRequestHandler);
-        } else {
-            BacktraceLogger.e(LOG_TAG, "sendEventsPayload not implemented for payload of type " + payload.getClass());
-            return;
-        }
-        threadSender.send(input);
+    @Override
+    public void sendEventsPayload(UniqueEventsPayload payload) {
+        BacktraceHandlerInputEvents input = new BacktraceHandlerInputEvents(payload, this.uniqueEventsServerResponse,
+                this.onServerError, this.uniqueEventsRequestHandler);
+        threadSender.sendUniqueEvents(input);
+    }
+
+    @Override
+    public void sendEventsPayload(SummedEventsPayload payload) {
+        BacktraceHandlerInputEvents input = new BacktraceHandlerInputEvents(payload, this.summedEventsServerResponse,
+                this.onServerError, this.summedEventsRequestHandler);
+        threadSender.sendSummedEvents(input);
     }
 }

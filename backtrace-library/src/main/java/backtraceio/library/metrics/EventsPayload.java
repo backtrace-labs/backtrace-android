@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.models.json.BacktraceAttributes;
 
-public abstract class EventsPayload {
+public abstract class EventsPayload<T extends Event> {
 
     private static transient String LOG_TAG = EventsPayload.class.getSimpleName();
 
@@ -21,9 +21,9 @@ public abstract class EventsPayload {
     @SerializedName("metadata")
     private EventsMetadata eventsMetadata;
 
-    public EventsPayload(BacktraceAttributes backtraceAttributes, int droppedEvents) {
-        this.application = backtraceAttributes.getApplicationName();
-        this.appVersion = backtraceAttributes.getApplicationVersionOrEmpty();
+    public EventsPayload(String application, String appVersion, int droppedEvents) {
+        this.application = application;
+        this.appVersion = appVersion;
         this.eventsMetadata = new EventsMetadata(droppedEvents);
     }
 
@@ -35,5 +35,5 @@ public abstract class EventsPayload {
         this.eventsMetadata.setDroppedEvents(droppedEvents);
     }
 
-    public abstract ConcurrentLinkedDeque<Event> getEvents();
+    public abstract ConcurrentLinkedDeque<T> getEvents();
 }

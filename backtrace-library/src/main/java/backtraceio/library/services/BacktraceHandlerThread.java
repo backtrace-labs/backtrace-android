@@ -51,28 +51,22 @@ public class BacktraceHandlerThread extends HandlerThread {
         mHandler = new BacktraceHandler(this.getLooper(), this.url);
     }
 
-    void sendReport(BacktraceHandlerInputReport data) {
-        send(data);
-    }
-
-    void send(BacktraceHandlerInput data) {
+    Message createMessage(BacktraceHandlerInput data) {
         Message message = new Message();
         message.obj = data;
-        if (data instanceof BacktraceHandlerInputReport) {
-            mHandler.sendMessage(message);
-        } else if (data instanceof BacktraceHandlerInputEvents) {
-            if (((BacktraceHandlerInputEvents) data).payload instanceof UniqueEventsPayload &&
-                    mUniqueEventsHandler != null) {
-                mUniqueEventsHandler.sendMessage(message);
-            } else if (((BacktraceHandlerInputEvents) data).payload instanceof SummedEventsPayload &&
-                    mSummedEventsHandler != null) {
-                mSummedEventsHandler.sendMessage(message);
-            } else {
-                BacktraceLogger.e(LOG_TAG, "BacktraceHandlerInput payload of type " + ((BacktraceHandlerInputEvents) data).payload.getClass().toString() + " not handled");
-            }
-        } else {
-            BacktraceLogger.e(LOG_TAG, "BacktraceHandlerInput of type " + data.getClass().toString() + " not handled");
-        }
+        return message;
+    }
+
+    void sendReport(BacktraceHandlerInputReport data) {
+        mHandler.sendMessage(createMessage(data));
+    }
+
+    void sendUniqueEvents(BacktraceHandlerInputEvents data) {
+        mUniqueEventsHandler.sendMessage(createMessage(data));
+    }
+
+    void sendSummedEvents(BacktraceHandlerInputEvents data) {
+        mSummedEventsHandler.sendMessage(createMessage(data));
     }
 
     private class BacktraceHandler extends Handler {

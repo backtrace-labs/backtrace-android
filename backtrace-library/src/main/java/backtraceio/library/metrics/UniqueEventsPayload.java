@@ -6,16 +6,17 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.models.json.BacktraceAttributes;
 
-public final class UniqueEventsPayload extends EventsPayload {
+public final class UniqueEventsPayload extends EventsPayload<UniqueEvent> {
     @SerializedName("unique_events")
-    private final ConcurrentLinkedDeque<Event> uniqueEvents;
+    private final ConcurrentLinkedDeque<UniqueEvent> uniqueEvents;
 
-    protected UniqueEventsPayload(BacktraceAttributes backtraceAttributes, ConcurrentLinkedDeque<Event> events, int droppedEvents) {
-        super(backtraceAttributes, droppedEvents);
+    protected UniqueEventsPayload(ConcurrentLinkedDeque<UniqueEvent> events, String application, String appVersion, int droppedEvents) {
+        super(application, appVersion, droppedEvents);
         this.uniqueEvents = events;
     }
 
-    public ConcurrentLinkedDeque<Event> getEvents() {
+    @Override
+    public ConcurrentLinkedDeque<UniqueEvent> getEvents() {
         return this.uniqueEvents;
     }
 }

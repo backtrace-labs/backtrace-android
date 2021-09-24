@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
@@ -13,7 +14,7 @@ import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
 
-public class UniqueEventsHandler extends BacktraceEventsHandler {
+public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
 
     private final static transient String LOG_TAG = UniqueEventsHandler.class.getSimpleName();
 
@@ -40,26 +41,24 @@ public class UniqueEventsHandler extends BacktraceEventsHandler {
     }
 
     @Override
-    protected EventsPayload getEventsPayload() {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+    protected UniqueEventsPayload getEventsPayload() {
+        Map<String, Object> attributes = getAttributes();
 
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
-        attributes.putAll(backtraceAttributes.getAllBacktraceAttributes());
-
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
-
-        for (Event event : events) {
-            if (!(event instanceof UniqueEvent)) {
-                BacktraceLogger.e(LOG_TAG, "Cannot convert stored event to UniqueEvent");
-                continue;
-            }
-
-            ((UniqueEvent) event).update(System.currentTimeMillis() / 1000,
-                    attributes);
+        for (UniqueEvent event : events) {
+            event.update(System.currentTimeMillis() / 1000, attributes);
         }
 
-        UniqueEventsPayload payload = new UniqueEventsPayload(backtraceAttributes, events, 0);
+        UniqueEventsPayload payload = new UniqueEventsPayload(events, application, appVersion, 0);
         return payload;
+    }
+
+    @Override
+    protected void sendEvents(ConcurrentLinkedDeque<UniqueEvent> events) {
+        UniqueEventsPayload payload = getEventsPayload();
+        api.sendEventsPayload(payload);
+    }
+    @Override
+    protected void sendEventsPayload(EventsPayload<UniqueEvent> payload) {
+        api.sendEventsPayload((UniqueEventsPayload) payload);
     }
 }

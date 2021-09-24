@@ -11,7 +11,9 @@ import backtraceio.library.metrics.EventsOnServerResponseEventListener;
 import backtraceio.library.metrics.EventsPayload;
 import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEventsHandler;
+import backtraceio.library.metrics.SummedEventsPayload;
 import backtraceio.library.metrics.UniqueEventsHandler;
+import backtraceio.library.metrics.UniqueEventsPayload;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceMetricsSettings;
 
@@ -28,11 +30,18 @@ public interface Api {
     void send(BacktraceData data, OnServerResponseEventListener callback);
 
     /**
-     * Send a Backtrace metrics events payload to Backtrace events submission API
+     * Send a Backtrace unique events payload to Backtrace events submission API
      *
-     * @param payload metrics events payload
+     * @param payload unique events payload
      */
-    void sendEventsPayload(EventsPayload payload);
+    void sendEventsPayload(UniqueEventsPayload payload);
+
+    /**
+     * Send a Backtrace summed events payload to Backtrace events submission API
+     *
+     * @param payload summed events payload
+     */
+    void sendEventsPayload(SummedEventsPayload payload);
 
     /**
      * Set an event executed when received bad request, unauthorized request or other information

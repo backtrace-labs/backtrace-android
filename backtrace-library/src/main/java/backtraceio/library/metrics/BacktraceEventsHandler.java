@@ -10,13 +10,15 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceMathHelper;
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
+import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
 import backtraceio.library.services.BacktraceReportSender;
 
-public abstract class BacktraceEventsHandler extends Handler {
+public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
     private final static transient String LOG_TAG = BacktraceEventsHandler.class.getSimpleName();
 
@@ -40,7 +42,7 @@ public abstract class BacktraceEventsHandler extends Handler {
     /**
      * Http client
      */
-    private final Api api;
+    protected final Api api;
 
     /**
      * Submission url
@@ -50,7 +52,7 @@ public abstract class BacktraceEventsHandler extends Handler {
     /**
      * List of events in the event queue
      */
-    protected ConcurrentLinkedDeque<Event> events = new ConcurrentLinkedDeque<Event>();
+    protected ConcurrentLinkedDeque<T> events = new ConcurrentLinkedDeque<T>();
 
     /**
      * Maximum number of events in store. If number of events in store hit the limit
@@ -59,13 +61,24 @@ public abstract class BacktraceEventsHandler extends Handler {
     private int maximumNumberOfEvents = 350;
 
     /**
+     * The application name
+     */
+    protected String application;
+
+    /**
+     * The application version
+     */
+    protected String appVersion;
+
+    /**
+     * Create BacktraceEventsHandler instance
+     *
      * @param context
      * @param api
      * @param backtraceHandlerThread
      * @param urlPrefix
      * @param settings
      */
-
     public BacktraceEventsHandler(Context context, Map<String, Object> customAttributes,
                                   Api api, final BacktraceHandlerThread backtraceHandlerThread, String urlPrefix, BacktraceMetricsSettings settings) {
         // This should always have a nonnull looper because BacktraceHandlerThread starts in the
@@ -85,6 +98,10 @@ public abstract class BacktraceEventsHandler extends Handler {
         this.timeBetweenRetriesMillis = settings.getTimeBetweenRetriesMillis();
 
         long timeIntervalMillis = settings.getTimeIntervalMillis();
+
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null);
+        this.application = backtraceAttributes.getApplicationName();
+        this.appVersion = backtraceAttributes.getApplicationVersionOrEmpty();
 
         if (timeIntervalMillis != 0) {
             final BacktraceEventsHandler handler = this;
@@ -116,23 +133,18 @@ public abstract class BacktraceEventsHandler extends Handler {
     public abstract void sendStartupEvent(String eventName);
 
     public void send() {
-        sendEvents(events);
-    }
-
-    private void sendEvents(ConcurrentLinkedDeque<Event> events) {
         if (events == null) {
             return;
         }
         if (events.size() == 0) {
             return;
         }
-        try {
-            EventsPayload payload = getEventsPayload();
-            api.sendEventsPayload(payload);
-        } catch (Exception e) {
-            BacktraceLogger.e(LOG_TAG, "Could not create events payload for metrics submission");
-        }
+        sendEvents(events);
     }
+
+    protected abstract void sendEvents(ConcurrentLinkedDeque<T> events);
+
+    protected abstract void sendEventsPayload(EventsPayload<T> payload);
 
     @Override
     public void handleMessage(Message msg) {
@@ -164,19 +176,29 @@ public abstract class BacktraceEventsHandler extends Handler {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    EventsPayload payload = input.payload;
+                    EventsPayload<T> payload = input.payload;
                     payload.setDroppedEvents(numRetries);
-                    api.sendEventsPayload(payload);
+                    sendEventsPayload(payload);
                 }
             }, calculateNextRetryTime(numRetries));
         }
     }
 
-    protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<Event> events) {
+    protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<T> events) {
         return;
     }
 
-    protected abstract EventsPayload getEventsPayload();
+    protected Map<String, Object> getAttributes() {
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
+        Map<String, Object> attributes = backtraceAttributes.getAllBacktraceAttributes();
+
+        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
+        attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+
+        return attributes;
+    }
+
+    protected abstract EventsPayload<T> getEventsPayload();
 
     private long calculateNextRetryTime(int numRetries) {
         final int jitterFraction = 1;

@@ -131,26 +131,12 @@ public final class BacktraceMetrics implements Metrics {
         return this.settings.getBaseUrl();
     }
 
-    @SuppressWarnings("unchecked, rawtypes")
     public ConcurrentLinkedDeque<UniqueEvent> getUniqueEvents() {
-        for (Event event : uniqueEventsHandler.events) {
-            if (!(event instanceof UniqueEvent)) {
-                BacktraceLogger.e(LOG_TAG, "UniqueEventsHandler contains an event of type " + event.getClass() + " this is a bug");
-                return new ConcurrentLinkedDeque<>();
-            }
-        }
-        return (ConcurrentLinkedDeque) this.uniqueEventsHandler.events;
+        return this.uniqueEventsHandler.events;
     }
 
-    @SuppressWarnings("unchecked, rawtypes")
     public ConcurrentLinkedDeque<SummedEvent> getSummedEvents() {
-        for (Event event : summedEventsHandler.events) {
-            if (!(event instanceof SummedEvent)) {
-                BacktraceLogger.e(LOG_TAG, "SummedEventsHandler contains an event of type " + event.getClass() + " this is a bug");
-                return new ConcurrentLinkedDeque<>();
-            }
-        }
-        return (ConcurrentLinkedDeque) this.summedEventsHandler.events;
+        return this.summedEventsHandler.events;
     }
 
     /**
@@ -212,12 +198,7 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
         // skip already defined unique events
-        for (Event event : uniqueEventsHandler.events) {
-            if (!(event instanceof UniqueEvent)) {
-                BacktraceLogger.e(LOG_TAG, "An event which is not a UniqueEvent found in UniqueEvents queue, this should not happen");
-                continue;
-            }
-            UniqueEvent uniqueEvent = (UniqueEvent) event;
+        for (UniqueEvent uniqueEvent : uniqueEventsHandler.events) {
             if (uniqueEvent.getName().equals(attributeName)) {
                 BacktraceLogger.w(LOG_TAG, "Already defined unique event with this attribute name, skipping");
                 return false;

@@ -12,7 +12,7 @@ import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
 
-public class SummedEventsHandler extends BacktraceEventsHandler {
+public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
 
     private final static transient String LOG_TAG = SummedEventsHandler.class.getSimpleName();
 
@@ -31,35 +31,37 @@ public class SummedEventsHandler extends BacktraceEventsHandler {
     }
 
     @Override
-    protected EventsPayload getEventsPayload() {
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
-        Map<String, Object> attributes = backtraceAttributes.getAllBacktraceAttributes();
+    protected SummedEventsPayload getEventsPayload() {
+        Map<String, Object> attributes = getAttributes();
 
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+        ConcurrentLinkedDeque<SummedEvent> eventsCopy = new ConcurrentLinkedDeque<>();
 
-        ConcurrentLinkedDeque<Event> eventsCopy = new ConcurrentLinkedDeque<>();
-
-        for (Event event : events) {
-            if (!(event instanceof SummedEvent)) {
-                BacktraceLogger.e(LOG_TAG, "Cannot convert stored event to SummedEvent");
-                continue;
-            }
-
-            ((SummedEvent) event).addAttributes(attributes);
+        for (SummedEvent event : events) {
+            event.addAttributes(attributes);
             eventsCopy.addLast(new SummedEvent((SummedEvent) event));
         }
         events.clear();
 
-        SummedEventsPayload payload = new SummedEventsPayload(backtraceAttributes, eventsCopy, 0);
+        SummedEventsPayload payload = new SummedEventsPayload(eventsCopy, application, appVersion, 0);
 
         return payload;
     }
 
     @Override
-    protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<Event> events) {
+    protected void sendEvents(ConcurrentLinkedDeque<SummedEvent> events) {
+        SummedEventsPayload payload = getEventsPayload();
+        api.sendEventsPayload(payload);
+    }
+
+    @Override
+    protected void sendEventsPayload(EventsPayload<SummedEvent> payload) {
+        api.sendEventsPayload((SummedEventsPayload) payload);
+    }
+
+    @Override
+    protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<SummedEvent> events) {
         if (this.events.size() + events.size() < getMaximumNumberOfEvents()) {
-            for (Event event : events) {
+            for (SummedEvent event : events) {
                 this.events.addFirst(event);
             }
         }
