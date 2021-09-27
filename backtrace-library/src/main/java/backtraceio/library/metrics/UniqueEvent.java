@@ -14,6 +14,9 @@ public class UniqueEvent extends Event {
 
     private final static transient String LOG_TAG = UniqueEvent.class.getSimpleName();
 
+    /**
+     * Unique events API spec requires unique events to be a JSON array, but we still treat it as a single string
+     */
     @SerializedName("unique")
     private final List<String> name;
 
@@ -33,7 +36,9 @@ public class UniqueEvent extends Event {
         }};
     }
 
-    // The spec specifies name as a JSON array but we don't change the interface yet
+    /**
+     * Unique events API spec requires unique events to be a JSON array, but we still treat it as a single string
+     */
     @Override
     public String getName() {
         if (this.name != null && this.name.size() > 0) {
