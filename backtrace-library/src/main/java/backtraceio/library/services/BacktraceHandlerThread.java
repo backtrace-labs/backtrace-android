@@ -14,9 +14,7 @@ import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.metrics.BacktraceHandlerInputEvents;
 import backtraceio.library.metrics.SummedEventsHandler;
-import backtraceio.library.metrics.SummedEventsPayload;
 import backtraceio.library.metrics.UniqueEventsHandler;
-import backtraceio.library.metrics.UniqueEventsPayload;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.BacktraceResult;
 

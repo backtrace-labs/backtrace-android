@@ -8,7 +8,6 @@ import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.metrics.EventsOnServerResponseEventListener;
-import backtraceio.library.metrics.EventsPayload;
 import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEventsHandler;
 import backtraceio.library.metrics.SummedEventsPayload;

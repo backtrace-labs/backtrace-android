@@ -1,5 +1,8 @@
 package backtraceio.library;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import android.content.Context;
 import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
@@ -22,9 +25,6 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -85,7 +85,7 @@ public class BacktraceClientEventsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(null, data.attributes.get(attributeKey).toString(),
+                return new BacktraceResult(null, data.attributes.get(attributeKey),
                         BacktraceResultStatus.Ok);
             }
         };

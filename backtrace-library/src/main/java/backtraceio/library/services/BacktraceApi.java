@@ -12,7 +12,6 @@ import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.metrics.BacktraceHandlerInputEvents;
 import backtraceio.library.metrics.EventsOnServerResponseEventListener;
-import backtraceio.library.metrics.EventsPayload;
 import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEventsHandler;
 import backtraceio.library.metrics.SummedEventsPayload;

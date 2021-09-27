@@ -15,7 +15,7 @@ import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceBreadcrumbs implements Breadcrumbs {
 
-    private static transient String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
 
     /**
      * Which breadcrumb types are enabled?
@@ -154,7 +154,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * NOTE: This should only be used for testing
-     * @param breadcrumbId  Will force set the current breadcrumb ID
+     *
+     * @param breadcrumbId Will force set the current breadcrumb ID
      */
     @Override
     public void setCurrentBreadcrumbId(long breadcrumbId) {
@@ -329,6 +330,6 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     }
 
     public String getBreadcrumbLogPath() {
-        return this.breadcrumbLogDirectory + "/" + this.breadcrumbLogFileName;
+        return this.breadcrumbLogDirectory + "/" + breadcrumbLogFileName;
     }
 }

@@ -8,7 +8,7 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceActivityLifecycleListener implements Application.ActivityLifecycleCallbacks {
 
-    private BacktraceBreadcrumbs backtraceBreadcrumbs;
+    private final BacktraceBreadcrumbs backtraceBreadcrumbs;
 
     public BacktraceActivityLifecycleListener(BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;

@@ -1,5 +1,10 @@
 package backtraceio.library;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -24,11 +29,6 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 
 @RunWith(AndroidJUnit4.class)
 public class SettingAttributesTest {
@@ -50,7 +50,7 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void createBacktraceClientWithContextAndCredentials(){
+    public void createBacktraceClientWithContextAndCredentials() {
         // GIVEN
         BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials);
         // WHEN
@@ -63,7 +63,7 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void createBacktraceClientWithContextCredentialsAndDatabaseSettings(){
+    public void createBacktraceClientWithContextCredentialsAndDatabaseSettings() {
         // GIVEN
         BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, new BacktraceDatabaseSettings("/"));
         // WHEN
@@ -76,9 +76,9 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void createBacktraceClientWithContextCredentialsAndDatabase(){
+    public void createBacktraceClientWithContextCredentialsAndDatabase() {
         // GIVEN
-        BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase)null);
+        BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null);
         // WHEN
         Map<String, Object> attributes = client.getAttributes();
         int size = attributes.size();
@@ -89,7 +89,7 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void createBacktraceClientWithContextCredentialsAndAttributes(){
+    public void createBacktraceClientWithContextCredentialsAndAttributes() {
         // GIVEN
         BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, this.clientAttributes);
         // WHEN
@@ -103,7 +103,7 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void createBacktraceClientWithContextCredentialsDatabaseSettingsAndAttributes(){
+    public void createBacktraceClientWithContextCredentialsDatabaseSettingsAndAttributes() {
         // GIVEN
         BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, new BacktraceDatabaseSettings("/"), this.clientAttributes);
         // WHEN
@@ -117,9 +117,9 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void createBacktraceClientWithContextCredentialsDatabaseAndAttributes(){
+    public void createBacktraceClientWithContextCredentialsDatabaseAndAttributes() {
         // GIVEN
-        BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase)null, this.clientAttributes);
+        BacktraceClient client = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null, this.clientAttributes);
         // WHEN
         Map<String, Object> attributes = client.getAttributes();
         int size = attributes.size();
@@ -134,7 +134,7 @@ public class SettingAttributesTest {
     public void checkIfAttributesAreInBacktraceData() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        BacktraceClient backtraceClient = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase)null, this.clientAttributes);
+        BacktraceClient backtraceClient = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null, this.clientAttributes);
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
@@ -163,7 +163,7 @@ public class SettingAttributesTest {
     }
 
     @Test
-    public void checkIfAttributesAreSettingWellInUnhandledExceptionHandler(){
+    public void checkIfAttributesAreSettingWellInUnhandledExceptionHandler() {
 //      GIVEN
         final Waiter waiter = new Waiter();
         final String exceptionMessage = "expected!";

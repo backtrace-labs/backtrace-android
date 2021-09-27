@@ -4,8 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.models.json.BacktraceAttributes;
-
 public final class UniqueEventsPayload extends EventsPayload<UniqueEvent> {
     @SerializedName("unique_events")
     private final ConcurrentLinkedDeque<UniqueEvent> uniqueEvents;

@@ -1,5 +1,11 @@
 package backtraceio.library.breadcrumbs;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
+
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -19,16 +25,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-
 @RunWith(AndroidJUnit4.class)
 public class BacktraceBreadcrumbsTest {
     public Context context;
     public BacktraceBreadcrumbs backtraceBreadcrumbs;
+
     static {
         System.loadLibrary("backtrace-native");
     }
@@ -36,7 +37,7 @@ public class BacktraceBreadcrumbsTest {
     @Before
     public void setUp() {
         this.context = InstrumentationRegistry.getContext();
-        
+
         backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
         backtraceBreadcrumbs.enableBreadcrumbs(context);
     }
@@ -331,8 +332,8 @@ public class BacktraceBreadcrumbsTest {
                 assertEquals("info", parsedBreadcrumb.get("level"));
                 // Timestamp should be convertible to a long
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
-                assertTrue(((int)parsedBreadcrumb.get("id")) > 450);
-                assertTrue((int)parsedBreadcrumb.get("id") <= 1000);
+                assertTrue(((int) parsedBreadcrumb.get("id")) > 450);
+                assertTrue((int) parsedBreadcrumb.get("id") <= 1000);
             }
 
         } catch (Exception ex) {
@@ -416,7 +417,7 @@ public class BacktraceBreadcrumbsTest {
                 assertEquals("info", parsedBreadcrumb.get("level"));
                 // Timestamp should be convertible to a long
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
-                assertTrue(((int)parsedBreadcrumb.get("id")) > 45);
+                assertTrue(((int) parsedBreadcrumb.get("id")) > 45);
             }
 
         } catch (Exception ex) {

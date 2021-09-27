@@ -2,14 +2,12 @@ package backtraceio.library.metrics;
 
 import android.content.Context;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
@@ -57,6 +55,7 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
         UniqueEventsPayload payload = getEventsPayload();
         api.sendEventsPayload(payload);
     }
+
     @Override
     protected void sendEventsPayload(EventsPayload<UniqueEvent> payload) {
         api.sendEventsPayload((UniqueEventsPayload) payload);

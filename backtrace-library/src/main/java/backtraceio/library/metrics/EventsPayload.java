@@ -4,11 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.models.json.BacktraceAttributes;
-
 public abstract class EventsPayload<T extends Event> {
 
-    private static transient String LOG_TAG = EventsPayload.class.getSimpleName();
+    private static final transient String LOG_TAG = EventsPayload.class.getSimpleName();
 
     @SerializedName("application")
     private final String application;
@@ -19,7 +17,7 @@ public abstract class EventsPayload<T extends Event> {
     public transient int numRetries = 0;
 
     @SerializedName("metadata")
-    private EventsMetadata eventsMetadata;
+    private final EventsMetadata eventsMetadata;
 
     public EventsPayload(String application, String appVersion, int droppedEvents) {
         this.application = application;

@@ -1,15 +1,12 @@
 package backtraceio.library.base;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -25,14 +22,9 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.Metrics;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.metrics.BacktraceMetrics;
 import backtraceio.library.metrics.EventsOnServerResponseEventListener;
-import backtraceio.library.metrics.EventsRequestHandler;
-import backtraceio.library.metrics.SummedEvent;
-import backtraceio.library.metrics.UniqueEvent;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -70,7 +62,7 @@ public class BacktraceBase implements Client {
     /**
      * Backtrace metrics instance
      */
-    private Metrics metrics = null;
+    public Metrics metrics = null;
 
     /**
      * Application context
@@ -242,6 +234,7 @@ public class BacktraceBase implements Client {
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
+        this.metrics = new BacktraceMetrics(context, attributes, backtraceApi);
     }
 
     public native void crash();
@@ -320,24 +313,6 @@ public class BacktraceBase implements Client {
      */
     public void setOnRequestHandler(RequestHandler requestHandler) {
         this.backtraceApi.setRequestHandler(requestHandler);
-    }
-
-    /**
-     * Custom request handler for sending Backtrace unique events to server
-     *
-     * @param eventsRequestHandler object with method which will be executed
-     */
-    public void setUniqueEventsRequestHandler(EventsRequestHandler eventsRequestHandler) {
-        backtraceApi.setUniqueEventsRequestHandler(eventsRequestHandler);
-    }
-
-    /**
-     * Custom request handler for sending Backtrace summed events to server
-     *
-     * @param eventsRequestHandler object with method which will be executed
-     */
-    public void setSummedEventsRequestHandler(EventsRequestHandler eventsRequestHandler) {
-        backtraceApi.setSummedEventsRequestHandler(eventsRequestHandler);
     }
 
     /**
@@ -495,78 +470,6 @@ public class BacktraceBase implements Client {
 
     public void setCurrentBreadcrumbId(long breadcrumbId) {
         database.getBreadcrumbs().setCurrentBreadcrumbId(breadcrumbId);
-    }
-
-    /**
-     * Enable backtrace metrics support
-     *
-     * @param settings Backtrace metrics settings
-     */
-    public void enableMetrics(BacktraceMetricsSettings settings) {
-        // For tracking crash-free sessions we need to add
-        // application.session and application.version to Backtrace attributes
-        String sessionId = UUID.randomUUID().toString();
-        this.attributes.put("application.session", sessionId);
-        try {
-            this.attributes.put("application.version", this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve package version information for Backtrace metrics");
-        }
-
-        try {
-            metrics = new BacktraceMetrics(context, attributes, settings);
-            metrics.startMetricsEventHandlers(backtraceApi);
-            metrics.sendStartupEvent();
-        } catch (Exception e) {
-            metrics = null;
-            BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
-        }
-    }
-
-    public boolean addUniqueEvent(String attributeName) {
-        return metrics.addUniqueEvent(attributeName);
-    }
-
-    public boolean addUniqueEvent(String attributeName, Map<String, Object> attributes) {
-        return metrics.addUniqueEvent(attributeName, attributes);
-    }
-
-    public boolean addSummedEvent(String metricGroupName) {
-        return metrics.addSummedEvent(metricGroupName);
-    }
-
-    public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
-        return metrics.addSummedEvent(metricGroupName, attributes);
-    }
-
-    public ConcurrentLinkedDeque<UniqueEvent> getUniqueEvents() {
-        return metrics.getUniqueEvents();
-    }
-
-    public ConcurrentLinkedDeque<SummedEvent> getSummedEvents() {
-        return metrics.getSummedEvents();
-    }
-
-    public int getEventsCount() {
-        return metrics.count();
-    }
-
-    /**
-     * Manually send metrics
-     */
-    public void sendMetrics() {
-        metrics.send();
-    }
-
-    /**
-     * Set maximum number of metrics events to store. Additional events will be dropped. When
-     * events are added
-     *
-     * @param maximumNumberOfEvents
-     */
-    public void setMaximumNumberOfEvents(int maximumNumberOfEvents) {
-        metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
     }
 
     public void nativeCrash() {

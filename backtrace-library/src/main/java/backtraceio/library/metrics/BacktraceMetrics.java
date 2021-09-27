@@ -1,9 +1,12 @@
 package backtraceio.library.metrics;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceStringHelper;
@@ -72,7 +75,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Custom attributes provided by the user to BacktraceBase
      */
-    protected Map<String, Object> customAttributes;
+    protected Map<String, Object> customReportAttributes;
 
     /**
      * The application context
@@ -82,7 +85,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Backtrace metrics settings
      */
-    protected BacktraceMetricsSettings settings;
+    protected BacktraceMetricsSettings settings = null;
 
     /**
      * Name of the unique event that will be generated on app startup
@@ -98,45 +101,67 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * User custom request method
      */
-    private RequestHandler requestHandler = null;
+    private final RequestHandler requestHandler = null;
+
+    /**
+     * Backtrace API class for metrics sending
+     */
+    private final Api backtraceApi;
 
     /**
      * Create new Backtrace metrics instance
      *
-     * @param context          Application context
-     * @param customAttributes Backtrace client
-     * @param settings
+     * @param context                Application context
+     * @param customReportAttributes Backtrace client custom report attributes (must be nonnull)
+     * @param backtraceApi           Backtrace API for metrics sending
      */
-    public BacktraceMetrics(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
+    public BacktraceMetrics(Context context, @NonNull Map<String, Object> customReportAttributes, Api backtraceApi) {
         this.context = context;
-        this.customAttributes = customAttributes;
+        this.customReportAttributes = customReportAttributes;
+        this.backtraceApi = backtraceApi;
+    }
+
+    /**
+     * Enable metrics
+     *
+     * @param settings for Backtrace metrics
+     */
+    public void enable(BacktraceMetricsSettings settings) {
         this.settings = settings;
+        // For tracking crash-free sessions we need to add
+        // application.session and application.version to Backtrace attributes
+        String sessionId = UUID.randomUUID().toString();
+        this.customReportAttributes.put("application.session", sessionId);
+        try {
+            this.customReportAttributes.put("application.version", this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            BacktraceLogger.e(LOG_TAG, "Could not resolve package version information for Backtrace metrics");
+        }
+
+        try {
+            startMetricsEventHandlers(backtraceApi);
+            sendStartupEvent();
+        } catch (Exception e) {
+            BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
+        }
     }
 
-    @Override
-    public void startMetricsEventHandlers(Api backtraceApi) {
-        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, customAttributes, settings);
-        summedEventsHandler = backtraceApi.enableSummedEvents(context, customAttributes, settings);
+    private void startMetricsEventHandlers(Api backtraceApi) {
+        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, customReportAttributes, settings);
+        summedEventsHandler = backtraceApi.enableSummedEvents(context, customReportAttributes, settings);
     }
 
-    String getStartupUniqueEventName() {
+    protected String getStartupUniqueEventName() {
         return this.startupUniqueEventName;
     }
 
-    void setStartupUniqueEventName(String startupUniqueEventName) {
+    public void setStartupUniqueEventName(String startupUniqueEventName) {
         this.startupUniqueEventName = startupUniqueEventName;
     }
 
     public String getBaseUrl() {
         return this.settings.getBaseUrl();
-    }
-
-    public ConcurrentLinkedDeque<UniqueEvent> getUniqueEvents() {
-        return this.uniqueEventsHandler.events;
-    }
-
-    public ConcurrentLinkedDeque<SummedEvent> getSummedEvents() {
-        return this.summedEventsHandler.events;
     }
 
     /**
@@ -184,7 +209,7 @@ public final class BacktraceMetrics implements Metrics {
             localAttributes.putAll(attributes);
         }
 
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
         localAttributes.putAll(backtraceAttributes.getAllBacktraceAttributes());
 
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
@@ -274,6 +299,32 @@ public final class BacktraceMetrics implements Metrics {
         }
 
         return true;
+    }
+
+    public ConcurrentLinkedDeque<UniqueEvent> getUniqueEvents() {
+        return this.uniqueEventsHandler.events;
+    }
+
+    public ConcurrentLinkedDeque<SummedEvent> getSummedEvents() {
+        return this.summedEventsHandler.events;
+    }
+
+    /**
+     * Custom request handler for sending Backtrace unique events to server
+     *
+     * @param eventsRequestHandler object with method which will be executed
+     */
+    public void setUniqueEventsRequestHandler(EventsRequestHandler eventsRequestHandler) {
+        backtraceApi.setUniqueEventsRequestHandler(eventsRequestHandler);
+    }
+
+    /**
+     * Custom request handler for sending Backtrace summed events to server
+     *
+     * @param eventsRequestHandler object with method which will be executed
+     */
+    public void setSummedEventsRequestHandler(EventsRequestHandler eventsRequestHandler) {
+        backtraceApi.setSummedEventsRequestHandler(eventsRequestHandler);
     }
 
     /**

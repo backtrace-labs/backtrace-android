@@ -15,7 +15,7 @@ public class BacktraceBreadcrumbsLogManager {
 
     private long breadcrumbId = System.currentTimeMillis();
 
-    private BacktraceQueueFileHelper backtraceQueueFileHelper;
+    private final BacktraceQueueFileHelper backtraceQueueFileHelper;
 
     /**
      * We truncate messages longer than this
@@ -82,6 +82,7 @@ public class BacktraceBreadcrumbsLogManager {
 
     /**
      * NOTE: This should only be used for testing
+     *
      * @param breadcrumbId
      */
     public void setCurrentBreadcrumbId(long breadcrumbId) {

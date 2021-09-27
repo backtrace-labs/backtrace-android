@@ -3,10 +3,19 @@ package backtraceio.library.interfaces;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEvent;
 import backtraceio.library.metrics.UniqueEvent;
+import backtraceio.library.models.BacktraceMetricsSettings;
 
 public interface Metrics {
+
+    /**
+     * Enable metrics
+     *
+     * @param settings for Backtrace metrics
+     */
+    void enable(BacktraceMetricsSettings settings);
 
     /**
      * Send all outgoing messages (unique and summed) currently queued
@@ -77,13 +86,6 @@ public interface Metrics {
     ConcurrentLinkedDeque<SummedEvent> getSummedEvents();
 
     /**
-     * Create the unique events handler for the Backtrace API
-     *
-     * @param backtraceApi API to create the unique events handler for
-     */
-    void startMetricsEventHandlers(Api backtraceApi);
-
-    /**
      * Set the maximum number of events to store. Once the maximum is hit we will send events to
      * the API
      *
@@ -103,4 +105,18 @@ public interface Metrics {
      * Send the startup event
      */
     void sendStartupEvent();
+
+    /**
+     * Custom request handler for sending Backtrace unique events to server
+     *
+     * @param eventsRequestHandler object with method which will be executed
+     */
+    void setUniqueEventsRequestHandler(EventsRequestHandler eventsRequestHandler);
+
+    /**
+     * Custom request handler for sending Backtrace summed events to server
+     *
+     * @param eventsRequestHandler object with method which will be executed
+     */
+    void setSummedEventsRequestHandler(EventsRequestHandler eventsRequestHandler);
 }

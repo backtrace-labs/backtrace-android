@@ -5,11 +5,8 @@ import android.content.Context;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
-import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
 
 public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {

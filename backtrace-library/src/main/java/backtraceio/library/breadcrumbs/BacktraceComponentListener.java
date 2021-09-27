@@ -11,7 +11,7 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceComponentListener implements ComponentCallbacks2 {
 
-    private BacktraceBreadcrumbs backtraceBreadcrumbs;
+    private final BacktraceBreadcrumbs backtraceBreadcrumbs;
 
     public BacktraceComponentListener(BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;

@@ -4,8 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.models.json.BacktraceAttributes;
-
 public class SummedEventsPayload extends EventsPayload<SummedEvent> {
     @SerializedName("summed_events")
     private final ConcurrentLinkedDeque<SummedEvent> summedEvents;

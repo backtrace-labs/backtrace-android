@@ -159,7 +159,8 @@ public interface Breadcrumbs {
 
     /**
      * NOTE: This should only be used for testing
-     * @param breadcrumbId  Will force set the current breadcrumb ID
+     *
+     * @param breadcrumbId Will force set the current breadcrumb ID
      */
     void setCurrentBreadcrumbId(long breadcrumbId);
 }
