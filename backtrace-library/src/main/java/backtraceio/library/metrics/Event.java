@@ -2,7 +2,10 @@ package backtraceio.library.metrics;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import backtraceio.library.common.BacktraceStringHelper;
 
 public abstract class Event {
 
@@ -25,4 +28,25 @@ public abstract class Event {
     }
 
     public abstract String getName();
+
+    protected void addAttributesImpl(Map<String, Object> attributes) {
+        if (attributes == null) {
+            return;
+        }
+
+        Map<String, Object> attributesNoEmpty = new HashMap<String, Object>();
+
+        for (String key : attributes.keySet()) {
+            Object value = attributes.get(key);
+            if (BacktraceStringHelper.isObjectValidString(value)) {
+                attributesNoEmpty.put(key, value);
+            }
+        }
+
+        if (this.attributes == null) {
+            this.attributes = attributesNoEmpty;
+        } else {
+            this.attributes.putAll(attributesNoEmpty);
+        }
+    }
 }

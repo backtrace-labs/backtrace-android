@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
@@ -26,7 +27,7 @@ public class BacktraceReport {
     /**
      * UTC timestamp in seconds
      */
-    public long timestamp = System.currentTimeMillis() / 1000;
+    public long timestamp = BacktraceBase.getTimestampSeconds();
 
     /**
      * Get information about report type. If value is true the BacktraceReport has an error

@@ -308,7 +308,7 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testQueueFileRollover() {
-        int numIterations = 1000;
+        final int numIterations = 1000;
         // Account for mandatory configuration breadcrumb
         backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
 
@@ -333,7 +333,7 @@ public class BacktraceBreadcrumbsTest {
                 // Timestamp should be convertible to a long
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
                 assertTrue(((int) parsedBreadcrumb.get("id")) > 450);
-                assertTrue((int) parsedBreadcrumb.get("id") <= 1000);
+                assertTrue((int) parsedBreadcrumb.get("id") <= numIterations);
             }
 
         } catch (Exception ex) {

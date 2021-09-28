@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.logger.BacktraceLogger;
 
@@ -25,7 +26,7 @@ public class UniqueEvent extends Event {
     }
 
     UniqueEvent(String name, Map<String, Object> attributes) {
-        this(name, System.currentTimeMillis() / 1000, attributes);
+        this(name, BacktraceBase.getTimestampSeconds(), attributes);
     }
 
     UniqueEvent(String name, long timestamp, Map<String, Object> attributes) {
@@ -41,7 +42,7 @@ public class UniqueEvent extends Event {
      */
     @Override
     public String getName() {
-        if (this.name != null && this.name.size() > 0) {
+        if (this.name != null && this.name.size() > 0 && !BacktraceStringHelper.isNullOrEmpty(this.name.get(0))) {
             return this.name.get(0);
         }
         BacktraceLogger.e(LOG_TAG, "Unique Event name must not be null or empty");
@@ -50,13 +51,6 @@ public class UniqueEvent extends Event {
 
     void update(long timestamp, Map<String, Object> attributes) {
         this.timestamp = timestamp;
-        if (attributes != null) {
-            for (String key : attributes.keySet()) {
-                Object value = attributes.get(key);
-                if (BacktraceStringHelper.isObjectValidString(value)) {
-                    this.attributes.put(key, value);
-                }
-            }
-        }
+        addAttributesImpl(attributes);
     }
 }

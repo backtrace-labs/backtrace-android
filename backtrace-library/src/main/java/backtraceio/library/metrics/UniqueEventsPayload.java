@@ -8,8 +8,8 @@ public final class UniqueEventsPayload extends EventsPayload<UniqueEvent> {
     @SerializedName("unique_events")
     private final ConcurrentLinkedDeque<UniqueEvent> uniqueEvents;
 
-    protected UniqueEventsPayload(ConcurrentLinkedDeque<UniqueEvent> events, String application, String appVersion, int droppedEvents) {
-        super(application, appVersion, droppedEvents);
+    protected UniqueEventsPayload(ConcurrentLinkedDeque<UniqueEvent> events, String application, String appVersion) {
+        super(application, appVersion);
         this.uniqueEvents = events;
     }
 

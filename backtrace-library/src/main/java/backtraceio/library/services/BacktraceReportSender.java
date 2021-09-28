@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.List;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.common.RequestHelper;
 import backtraceio.library.events.OnServerErrorEventListener;
@@ -81,7 +82,7 @@ public class BacktraceReportSender {
                 result.setBacktraceReport(report);
             } else {
                 String message = getResponse(urlConnection);
-                message = (message == null || message.equals("")) ?
+                message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                         urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }
@@ -150,7 +151,7 @@ public class BacktraceReportSender {
                 result = new EventsResult(payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);
             } else {
                 String message = getResponse(urlConnection);
-                message = (message == null || message.equals("")) ?
+                message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                         urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }

@@ -39,7 +39,7 @@ public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
         }
         events.clear();
 
-        SummedEventsPayload payload = new SummedEventsPayload(eventsCopy, application, appVersion, 0);
+        SummedEventsPayload payload = new SummedEventsPayload(eventsCopy, application, appVersion);
 
         return payload;
     }

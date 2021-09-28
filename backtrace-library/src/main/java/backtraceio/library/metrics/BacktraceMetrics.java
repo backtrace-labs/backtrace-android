@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.events.RequestHandler;
@@ -199,21 +200,11 @@ public final class BacktraceMetrics implements Metrics {
      */
     public boolean addUniqueEvent(String attributeName, Map<String, Object> attributes) {
         if (!shouldProcessEvent(attributeName)) {
-            BacktraceLogger.w(LOG_TAG, "Skipping report: Reached store limit or event has empty name.");
+            BacktraceLogger.w(LOG_TAG, "Skipping report");
             return false;
         }
 
-        Map<String, Object> localAttributes = new HashMap<String, Object>();
-
-        if (attributes != null) {
-            localAttributes.putAll(attributes);
-        }
-
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
-        localAttributes.putAll(backtraceAttributes.getAllBacktraceAttributes());
-
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        localAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+        Map<String, Object> localAttributes = createLocalAttributes(attributes);
 
         // validate if unique event attribute is available and
         // prevent undefined attributes
@@ -230,7 +221,7 @@ public final class BacktraceMetrics implements Metrics {
             }
         }
 
-        UniqueEvent uniqueEvent = new UniqueEvent(attributeName, System.currentTimeMillis() / 1000, localAttributes);
+        UniqueEvent uniqueEvent = new UniqueEvent(attributeName, BacktraceBase.getTimestampSeconds(), localAttributes);
         uniqueEventsHandler.events.addLast(uniqueEvent);
 
         if (count() == maximumNumberOfEvents) {
@@ -282,7 +273,7 @@ public final class BacktraceMetrics implements Metrics {
      */
     public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
         if (!shouldProcessEvent(metricGroupName)) {
-            BacktraceLogger.w(LOG_TAG, "Skipping report: Reached store limit or event has empty name.");
+            BacktraceLogger.w(LOG_TAG, "Skipping report");
             return false;
         }
 
@@ -291,7 +282,7 @@ public final class BacktraceMetrics implements Metrics {
             localAttributes.putAll(attributes);
         }
 
-        SummedEvent summedEvent = new SummedEvent(metricGroupName, System.currentTimeMillis() / 1000, localAttributes);
+        SummedEvent summedEvent = new SummedEvent(metricGroupName, BacktraceBase.getTimestampSeconds(), localAttributes);
         summedEventsHandler.events.addLast(summedEvent);
         if (count() == maximumNumberOfEvents) {
             uniqueEventsHandler.send();
@@ -334,6 +325,31 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if we should process this event, otherwise false
      */
     private boolean shouldProcessEvent(String name) {
-        return !(BacktraceStringHelper.isNullOrEmpty(name)) && (maximumNumberOfEvents == 0 || (count() + 1 <= maximumNumberOfEvents));
+        if (BacktraceStringHelper.isNullOrEmpty(name)) {
+            BacktraceLogger.e(LOG_TAG, "Cannot process event, attribute name is null or empty");
+            return false;
+        }
+        if (maximumNumberOfEvents > 0 && (count() + 1 > maximumNumberOfEvents)) {
+            BacktraceLogger.e(LOG_TAG, "Cannot process event, reached maximum number of events: " + maximumNumberOfEvents + " events count: " + count());
+            return false;
+        }
+
+        return true;
+    }
+
+    private Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
+        Map<String, Object> localAttributes = new HashMap<String, Object>();
+
+        if (attributes != null) {
+            localAttributes.putAll(attributes);
+        }
+
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
+        localAttributes.putAll(backtraceAttributes.getAllBacktraceAttributes());
+
+        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
+        localAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+
+        return localAttributes;
     }
 }

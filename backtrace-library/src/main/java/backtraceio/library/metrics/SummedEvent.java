@@ -5,13 +5,19 @@ import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtraceio.library.base.BacktraceBase;
+
 public final class SummedEvent extends Event {
 
     @SerializedName("metric_group")
     private final String name;
 
     SummedEvent(String name) {
-        this(name, System.currentTimeMillis() / 1000, new HashMap<String, Object>());
+        this(name, new HashMap<String, Object>());
+    }
+
+    SummedEvent(String name, Map<String, Object> attributes) {
+        this(name, BacktraceBase.getTimestampSeconds(), attributes);
     }
 
     SummedEvent(String name, long timestamp, Map<String, Object> attributes) {
@@ -30,8 +36,6 @@ public final class SummedEvent extends Event {
     }
 
     public void addAttributes(Map<String, Object> attributes) {
-        if (attributes != null) {
-            this.attributes.putAll(attributes);
-        }
+        addAttributesImpl(attributes);
     }
 }

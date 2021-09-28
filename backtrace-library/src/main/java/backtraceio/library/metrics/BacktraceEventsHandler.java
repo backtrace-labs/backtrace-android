@@ -94,7 +94,7 @@ public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         this.customAttributes = customAttributes;
         this.backtraceHandlerThread = backtraceHandlerThread;
         this.api = api;
-        this.submissionUrl = settings.getBaseUrl() + "/" + urlPrefix + "/submit?token=" + settings.getToken() + "&universe=" + settings.getUniverseName();
+        this.submissionUrl = settings.getSubmissionUrl(urlPrefix);
         this.timeBetweenRetriesMillis = settings.getTimeBetweenRetriesMillis();
 
         long timeIntervalMillis = settings.getTimeIntervalMillis();
@@ -133,10 +133,7 @@ public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
     public abstract void sendStartupEvent(String eventName);
 
     public void send() {
-        if (events == null) {
-            return;
-        }
-        if (events.size() == 0) {
+        if (events == null || events.size() == 0) {
             return;
         }
         sendEvents(events);
@@ -149,39 +146,14 @@ public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
     @Override
     public void handleMessage(Message msg) {
         final BacktraceHandlerInputEvents input = (BacktraceHandlerInputEvents) msg.obj;
-        EventsResult result;
-
-        if (input.eventsRequestHandler != null) {
-            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
-            result = input.eventsRequestHandler.onRequest(input.payload);
-        } else {
-            BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
-            String json = BacktraceSerializeHelper.toJson(input.payload);
-            result = BacktraceReportSender.sendEvents(submissionUrl, json, input.payload, input.serverErrorEventListener);
-        }
+        EventsResult result = getEventsResult(input);
 
         if (input.eventsOnServerResponseEventListener != null) {
             BacktraceLogger.d(LOG_TAG, "Processing result using custom event");
             input.eventsOnServerResponseEventListener.onEvent(result);
         }
 
-        int statusCode = result.getStatusCode();
-        if (statusCode > HttpURLConnection.HTTP_NOT_IMPLEMENTED && statusCode != HttpURLConnection.HTTP_VERSION) {
-            int numRetries = ++input.payload.numRetries;
-            if (numRetries >= BacktraceMetrics.maxNumberOfAttempts || timeBetweenRetriesMillis == 0) {
-                onMaximumAttemptsReached(input.payload.getEvents());
-                return;
-            }
-            final BacktraceEventsHandler handler = this;
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    EventsPayload<T> payload = input.payload;
-                    payload.setDroppedEvents(numRetries);
-                    sendEventsPayload(payload);
-                }
-            }, calculateNextRetryTime(numRetries));
-        }
+        retrySendEvents(input, result.getStatusCode());
     }
 
     protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<T> events) {
@@ -207,5 +179,39 @@ public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         double retryLower = BacktraceMathHelper.clamp(value, 0, BacktraceMetrics.maxTimeBetweenRetriesMs);
         double retryUpper = retryLower + retryLower * jitterFraction;
         return (long) BacktraceMathHelper.uniform(retryLower, retryUpper);
+    }
+
+    private EventsResult getEventsResult(BacktraceHandlerInputEvents input) {
+        EventsResult result;
+
+        if (input.eventsRequestHandler != null) {
+            BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
+            result = input.eventsRequestHandler.onRequest(input.payload);
+        } else {
+            BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
+            String json = BacktraceSerializeHelper.toJson(input.payload);
+            result = BacktraceReportSender.sendEvents(submissionUrl, json, input.payload, input.serverErrorEventListener);
+        }
+
+        return result;
+    }
+
+    private void retrySendEvents(BacktraceHandlerInputEvents input, int statusCode) {
+        if (statusCode > HttpURLConnection.HTTP_NOT_IMPLEMENTED && statusCode != HttpURLConnection.HTTP_VERSION) {
+            int numRetries = ++input.payload.numRetries;
+            if (numRetries >= BacktraceMetrics.maxNumberOfAttempts || timeBetweenRetriesMillis == 0) {
+                onMaximumAttemptsReached(input.payload.getEvents());
+                return;
+            }
+            final BacktraceEventsHandler handler = this;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    EventsPayload<T> payload = input.payload;
+                    payload.setDroppedEvents(numRetries);
+                    sendEventsPayload(payload);
+                }
+            }, calculateNextRetryTime(numRetries));
+        }
     }
 }

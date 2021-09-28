@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
@@ -92,7 +93,7 @@ public class BacktraceDatabaseRecord {
     public static BacktraceDatabaseRecord readFromFile(File file) {
         BacktraceLogger.d(LOG_TAG, "Reading JSON from passed file");
         String json = FileHelper.readFile(file);
-        if (json == null || json.equals("")) {
+        if (BacktraceStringHelper.isNullOrEmpty(json)) {
             BacktraceLogger.w(LOG_TAG, "JSON from passed file is null or empty");
             return null;
         }

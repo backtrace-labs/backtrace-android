@@ -8,8 +8,8 @@ public class SummedEventsPayload extends EventsPayload<SummedEvent> {
     @SerializedName("summed_events")
     private final ConcurrentLinkedDeque<SummedEvent> summedEvents;
 
-    protected SummedEventsPayload(ConcurrentLinkedDeque<SummedEvent> events, String application, String appVersion, int droppedEvents) {
-        super(application, appVersion, droppedEvents);
+    protected SummedEventsPayload(ConcurrentLinkedDeque<SummedEvent> events, String application, String appVersion) {
+        super(application, appVersion);
         this.summedEvents = events;
     }
 

@@ -560,4 +560,11 @@ public class BacktraceBase implements Client {
     public void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
         backtraceApi.setSummedEventsOnServerResponse(callback);
     }
+
+    /**
+     * Get timestamp in seconds
+     */
+    public static long getTimestampSeconds() {
+        return System.currentTimeMillis() / 1000;
+    }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
@@ -43,10 +44,10 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
         Map<String, Object> attributes = getAttributes();
 
         for (UniqueEvent event : events) {
-            event.update(System.currentTimeMillis() / 1000, attributes);
+            event.update(BacktraceBase.getTimestampSeconds(), attributes);
         }
 
-        UniqueEventsPayload payload = new UniqueEventsPayload(events, application, appVersion, 0);
+        UniqueEventsPayload payload = new UniqueEventsPayload(events, application, appVersion);
         return payload;
     }
 

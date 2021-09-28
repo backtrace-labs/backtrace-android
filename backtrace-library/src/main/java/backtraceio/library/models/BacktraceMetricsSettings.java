@@ -89,4 +89,8 @@ public class BacktraceMetricsSettings {
     public int getTimeBetweenRetriesMillis() {
         return timeBetweenRetriesMillis;
     }
+
+    public String getSubmissionUrl(String urlPrefix) {
+        return this.getBaseUrl() + "/" + urlPrefix + "/submit?token=" + this.getToken() + "&universe=" + this.getUniverseName();
+    }
 }

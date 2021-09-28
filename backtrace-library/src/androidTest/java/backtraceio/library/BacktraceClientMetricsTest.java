@@ -76,7 +76,7 @@ public class BacktraceClientMetricsTest {
 
     public class MockRequestHandler implements EventsRequestHandler {
         public int numAttempts = 0;
-        public int errorCode = 200;
+        public int statusCode = 200;
         public String lastEventPayloadJson;
 
         @Override
@@ -86,12 +86,12 @@ public class BacktraceClientMetricsTest {
             numAttempts++;
 
             BacktraceResultStatus status;
-            if (errorCode == 200) {
+            if (statusCode == 200) {
                 status = BacktraceResultStatus.Ok;
             } else {
                 status = BacktraceResultStatus.ServerError;
             }
-            return new EventsResult(data, eventsPayloadJson, status, errorCode);
+            return new EventsResult(data, eventsPayloadJson, status, statusCode);
         }
     }
 
@@ -230,9 +230,9 @@ public class BacktraceClientMetricsTest {
         final int timeBetweenRetriesMillis = 10;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
-        mockUniqueRequestHandler.errorCode = 503;
+        mockUniqueRequestHandler.statusCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
-        mockSummedRequestHandler.errorCode = 503;
+        mockSummedRequestHandler.statusCode = 503;
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         backtraceClient.metrics.setSummedEventsRequestHandler(mockSummedRequestHandler);
 
@@ -288,9 +288,9 @@ public class BacktraceClientMetricsTest {
         final int timeBetweenRetriesMillis = 20;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(universeName, token, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
-        mockUniqueRequestHandler.errorCode = 503;
+        mockUniqueRequestHandler.statusCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
-        mockSummedRequestHandler.errorCode = 503;
+        mockSummedRequestHandler.statusCode = 503;
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         backtraceClient.metrics.setSummedEventsRequestHandler(mockSummedRequestHandler);
 
@@ -345,11 +345,11 @@ public class BacktraceClientMetricsTest {
     public void tryOnceOnHttpError() {
 
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
-        mockUniqueRequestHandler.errorCode = 404;
+        mockUniqueRequestHandler.statusCode = 404;
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
 
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
-        mockSummedRequestHandler.errorCode = 404;
+        mockSummedRequestHandler.statusCode = 404;
         backtraceClient.metrics.setSummedEventsRequestHandler(mockSummedRequestHandler);
 
         backtraceClient.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
@@ -854,11 +854,14 @@ public class BacktraceClientMetricsTest {
         assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
         long previousTimestamp = backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
 
+        // Wait 1 second so that the timestamp will update on the next send.
+        // Timestamp granularity is 1 second
         try {
             sleep(1000);
         } catch (Exception e) {
             fail(e.toString());
         }
+
         // Force update
         backtraceClient.metrics.send();
 
@@ -931,20 +934,5 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.send();
 
         assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-    }
-
-    @Test
-    public void testDefaultUrl() {
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null);
-        metrics.enable(new BacktraceMetricsSettings(universeName, token));
-        assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
-    }
-
-    @Test
-    public void testCustomUrl() {
-        String customUrl = "https://my.custom.url";
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null);
-        metrics.enable(new BacktraceMetricsSettings(universeName, token, customUrl));
-        assertEquals(customUrl, metrics.getBaseUrl());
     }
 }

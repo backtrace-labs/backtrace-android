@@ -28,7 +28,7 @@ public class RequestHelper {
      * @throws IOException
      */
     public static void addJson(OutputStream outputStream, String json) throws IOException {
-        if (json == null || json.isEmpty()) {
+        if (BacktraceStringHelper.isNullOrEmpty(json)) {
             BacktraceLogger.w(LOG_TAG, "JSON is null or empty");
             return;
         }

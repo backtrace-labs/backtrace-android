@@ -19,10 +19,10 @@ public abstract class EventsPayload<T extends Event> {
     @SerializedName("metadata")
     private final EventsMetadata eventsMetadata;
 
-    public EventsPayload(String application, String appVersion, int droppedEvents) {
+    public EventsPayload(String application, String appVersion) {
         this.application = application;
         this.appVersion = appVersion;
-        this.eventsMetadata = new EventsMetadata(droppedEvents);
+        this.eventsMetadata = new EventsMetadata(0);
     }
 
     public int getDroppedEvents() {
