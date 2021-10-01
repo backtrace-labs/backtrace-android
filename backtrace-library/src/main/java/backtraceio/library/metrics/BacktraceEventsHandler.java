@@ -87,8 +87,8 @@ public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         // We cannot cache the looper here since the super call has to go first (i.e: before
         // declaring and assigning a Looper variable)
         super(backtraceHandlerThread.getLooper());
-        if (backtraceHandlerThread.getLooper() == null) {
-            throw new NullPointerException("Expected nonnull looper, this should not happen");
+        if (!backtraceHandlerThread.isAlive()) {
+            throw new NullPointerException("Handler thread is not alive, this should not happen");
         }
         this.context = context;
         this.customAttributes = customAttributes;
@@ -162,7 +162,7 @@ public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
     protected Map<String, Object> getAttributes() {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
-        Map<String, Object> attributes = backtraceAttributes.getAllBacktraceAttributes();
+        Map<String, Object> attributes = backtraceAttributes.getAllAttributes();
 
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
         attributes.putAll(deviceAttributesHelper.getDeviceAttributes());

@@ -468,10 +468,6 @@ public class BacktraceBase implements Client {
         return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
     }
 
-    public void setCurrentBreadcrumbId(long breadcrumbId) {
-        database.getBreadcrumbs().setCurrentBreadcrumbId(breadcrumbId);
-    }
-
     public void nativeCrash() {
         crash();
     }
@@ -541,30 +537,5 @@ public class BacktraceBase implements Client {
                 report.attachmentPaths.add(path);
             }
         }
-    }
-
-    /**
-     * Custom callback to be executed on server response to a unique events submission request
-     *
-     * @param callback object with method which will be executed
-     */
-    public void setUniqueEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
-        backtraceApi.setUniqueEventsOnServerResponse(callback);
-    }
-
-    /**
-     * Custom callback to be executed on server response to a summed events submission request
-     *
-     * @param callback object with method which will be executed
-     */
-    public void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
-        backtraceApi.setSummedEventsOnServerResponse(callback);
-    }
-
-    /**
-     * Get timestamp in seconds
-     */
-    public static long getTimestampSeconds() {
-        return System.currentTimeMillis() / 1000;
     }
 }

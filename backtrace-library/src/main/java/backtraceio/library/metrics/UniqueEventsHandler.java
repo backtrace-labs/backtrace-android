@@ -5,10 +5,11 @@ import android.content.Context;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
+import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.services.BacktraceHandlerThread;
@@ -27,16 +28,18 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
     @Override
     public void sendStartupEvent(String eventName) {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
-        Map<String, Object> attributes = backtraceAttributes.getAllBacktraceAttributes();
+        Map<String, Object> attributes = backtraceAttributes.getAllAttributes();
 
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
         attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
         Object value = attributes.get(eventName);
-        if (BacktraceStringHelper.isObjectValidString(value)) {
+        if (BacktraceStringHelper.isObjectNotNullOrNotEmptyString(value)) {
             events.addLast(new UniqueEvent(eventName, attributes));
+            send();
+        } else {
+            BacktraceLogger.e(LOG_TAG, "Startup unique event is empty, this should not happen");
         }
-        send();
     }
 
     @Override
@@ -44,7 +47,7 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
         Map<String, Object> attributes = getAttributes();
 
         for (UniqueEvent event : events) {
-            event.update(BacktraceBase.getTimestampSeconds(), attributes);
+            event.update(BacktraceTimeHelper.getTimestampSeconds(), attributes);
         }
 
         UniqueEventsPayload payload = new UniqueEventsPayload(events, application, appVersion);

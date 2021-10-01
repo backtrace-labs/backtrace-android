@@ -33,24 +33,24 @@ public class BacktraceStringHelperTest {
     @Test
     public void testObjectIsNull() {
         Object nullObject = null;
-        assertFalse(BacktraceStringHelper.isObjectValidString(nullObject));
+        assertFalse(BacktraceStringHelper.isObjectNotNullOrNotEmptyString(nullObject));
     }
 
     @Test
     public void testObjectIsEmptyString() {
         Object emptyString = "";
-        assertFalse(BacktraceStringHelper.isObjectValidString(emptyString));
+        assertFalse(BacktraceStringHelper.isObjectNotNullOrNotEmptyString(emptyString));
     }
 
     @Test
     public void testObjectIsValidString() {
         Object someString = "foo";
-        assertTrue(BacktraceStringHelper.isObjectValidString(someString));
+        assertTrue(BacktraceStringHelper.isObjectNotNullOrNotEmptyString(someString));
     }
 
     @Test
     public void testObjectIsConvertibleToString() {
         Object someString = new Integer(1);
-        assertTrue(BacktraceStringHelper.isObjectValidString(someString));
+        assertTrue(BacktraceStringHelper.isObjectNotNullOrNotEmptyString(someString));
     }
 }

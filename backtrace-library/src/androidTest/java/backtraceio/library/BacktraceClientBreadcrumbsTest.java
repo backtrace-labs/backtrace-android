@@ -65,7 +65,7 @@ public class BacktraceClientBreadcrumbsTest {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
         // Account for mandatory configuration breadcrumb
-        backtraceClient.setCurrentBreadcrumbId(1);
+        backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -114,7 +114,7 @@ public class BacktraceClientBreadcrumbsTest {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
         // Account for mandatory configuration breadcrumb
-        backtraceClient.setCurrentBreadcrumbId(1);
+        backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -173,7 +173,7 @@ public class BacktraceClientBreadcrumbsTest {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
         // Account for mandatory configuration breadcrumb
-        backtraceClient.setCurrentBreadcrumbId(1);
+        backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {

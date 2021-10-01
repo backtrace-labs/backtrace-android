@@ -19,6 +19,7 @@ import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceMetricsSettings;
@@ -35,10 +36,6 @@ public class BacktraceMetricsTest {
     private final String token = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
     private final String universeName = "testing-universe-name";
 
-    static {
-        System.loadLibrary("backtrace-native");
-    }
-
     /**
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
      * For best results run under low CPU load and low memory utilization conditions.
@@ -47,7 +44,7 @@ public class BacktraceMetricsTest {
     @Before
     public void setUp() {
         context = InstrumentationRegistry.getContext();
-        credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+        credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
         BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
@@ -71,14 +68,14 @@ public class BacktraceMetricsTest {
         Map<String, Object> attributes = new HashMap<String, Object>() {{
             put("foo", "bar");
         }};
-        uniqueEvent.update(BacktraceBase.getTimestampSeconds(), attributes);
+        uniqueEvent.update(BacktraceTimeHelper.getTimestampSeconds(), attributes);
         assertEquals("bar", uniqueEvent.getAttributes().get("foo"));
     }
 
     @Test
     public void testDefaultUrl() {
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null);
-        metrics.enable(new BacktraceMetricsSettings(universeName, token));
+        metrics.enable(new BacktraceMetricsSettings(credentials));
         TestCase.assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
     }
 
@@ -86,7 +83,7 @@ public class BacktraceMetricsTest {
     public void testCustomUrl() {
         String customUrl = "https://my.custom.url";
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null);
-        metrics.enable(new BacktraceMetricsSettings(universeName, token, customUrl));
+        metrics.enable(new BacktraceMetricsSettings(credentials, customUrl));
         TestCase.assertEquals(customUrl, metrics.getBaseUrl());
     }
 }

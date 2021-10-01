@@ -3,6 +3,7 @@ package backtraceio.library.interfaces;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import backtraceio.library.metrics.EventsOnServerResponseEventListener;
 import backtraceio.library.metrics.EventsRequestHandler;
 import backtraceio.library.metrics.SummedEvent;
 import backtraceio.library.metrics.UniqueEvent;
@@ -119,4 +120,18 @@ public interface Metrics {
      * @param eventsRequestHandler object with method which will be executed
      */
     void setSummedEventsRequestHandler(EventsRequestHandler eventsRequestHandler);
+
+    /**
+     * Custom callback to be executed on server response to a unique events submission request
+     *
+     * @param callback object with method which will be executed
+     */
+    void setUniqueEventsOnServerResponse(EventsOnServerResponseEventListener callback);
+
+    /**
+     * Custom callback to be executed on server response to a summed events submission request
+     *
+     * @param callback object with method which will be executed
+     */
+    void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback);
 }

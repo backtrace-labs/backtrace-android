@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
+import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
@@ -133,12 +133,9 @@ public final class BacktraceMetrics implements Metrics {
         // application.session and application.version to Backtrace attributes
         String sessionId = UUID.randomUUID().toString();
         this.customReportAttributes.put("application.session", sessionId);
-        try {
-            this.customReportAttributes.put("application.version", this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve package version information for Backtrace metrics");
-        }
+
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null);
+        this.customReportAttributes.put("application.version", backtraceAttributes.getApplicationVersionOrEmpty());
 
         try {
             startMetricsEventHandlers(backtraceApi);
@@ -209,7 +206,7 @@ public final class BacktraceMetrics implements Metrics {
         // validate if unique event attribute is available and
         // prevent undefined attributes
         Object value = localAttributes.get(attributeName);
-        if (!BacktraceStringHelper.isObjectValidString(value)) {
+        if (!BacktraceStringHelper.isObjectNotNullOrNotEmptyString(value)) {
             BacktraceLogger.w(LOG_TAG, "Attribute name for Unique Event is not available in attribute scope");
             return false;
         }
@@ -221,7 +218,7 @@ public final class BacktraceMetrics implements Metrics {
             }
         }
 
-        UniqueEvent uniqueEvent = new UniqueEvent(attributeName, BacktraceBase.getTimestampSeconds(), localAttributes);
+        UniqueEvent uniqueEvent = new UniqueEvent(attributeName, BacktraceTimeHelper.getTimestampSeconds(), localAttributes);
         uniqueEventsHandler.events.addLast(uniqueEvent);
 
         if (count() == maximumNumberOfEvents) {
@@ -282,7 +279,7 @@ public final class BacktraceMetrics implements Metrics {
             localAttributes.putAll(attributes);
         }
 
-        SummedEvent summedEvent = new SummedEvent(metricGroupName, BacktraceBase.getTimestampSeconds(), localAttributes);
+        SummedEvent summedEvent = new SummedEvent(metricGroupName, BacktraceTimeHelper.getTimestampSeconds(), localAttributes);
         summedEventsHandler.events.addLast(summedEvent);
         if (count() == maximumNumberOfEvents) {
             uniqueEventsHandler.send();
@@ -345,11 +342,29 @@ public final class BacktraceMetrics implements Metrics {
         }
 
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
-        localAttributes.putAll(backtraceAttributes.getAllBacktraceAttributes());
+        localAttributes.putAll(backtraceAttributes.getAllAttributes());
 
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
         localAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
         return localAttributes;
+    }
+
+    /**
+     * Custom callback to be executed on server response to a unique events submission request
+     *
+     * @param callback object with method which will be executed
+     */
+    public void setUniqueEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
+        backtraceApi.setUniqueEventsOnServerResponse(callback);
+    }
+
+    /**
+     * Custom callback to be executed on server response to a summed events submission request
+     *
+     * @param callback object with method which will be executed
+     */
+    public void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback) {
+        backtraceApi.setSummedEventsOnServerResponse(callback);
     }
 }

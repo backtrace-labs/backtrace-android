@@ -214,7 +214,7 @@ public class BacktraceAttributes {
         return "";
     }
 
-    public Map<String, Object> getAllBacktraceAttributes() {
+    public Map<String, Object> getAllAttributes() {
         Map<String, Object> attributes = new HashMap<String, Object>();
         attributes.putAll(this.attributes);
         attributes.putAll(this.complexAttributes);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.common.BacktraceTimeHelper;
 
 public final class SummedEvent extends Event {
 
@@ -17,13 +18,13 @@ public final class SummedEvent extends Event {
     }
 
     SummedEvent(String name, Map<String, Object> attributes) {
-        this(name, BacktraceBase.getTimestampSeconds(), attributes);
+        this(name, BacktraceTimeHelper.getTimestampSeconds(), attributes);
     }
 
     SummedEvent(String name, long timestamp, Map<String, Object> attributes) {
         super(timestamp);
         this.name = name;
-        this.attributes = attributes;
+        addAttributesImpl(attributes);
     }
 
     SummedEvent(SummedEvent summedEvent) {

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
+import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class UniqueEvent extends Event {
@@ -26,15 +27,15 @@ public class UniqueEvent extends Event {
     }
 
     UniqueEvent(String name, Map<String, Object> attributes) {
-        this(name, BacktraceBase.getTimestampSeconds(), attributes);
+        this(name, BacktraceTimeHelper.getTimestampSeconds(), attributes);
     }
 
     UniqueEvent(String name, long timestamp, Map<String, Object> attributes) {
         super(timestamp);
-        this.attributes = attributes;
         this.name = new ArrayList<String>() {{
             add(name);
         }};
+        addAttributesImpl(attributes);
     }
 
     /**

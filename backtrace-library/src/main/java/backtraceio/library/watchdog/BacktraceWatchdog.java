@@ -75,7 +75,7 @@ public class BacktraceWatchdog {
                 continue;
             }
 
-            BacktraceLogger.w(LOG_TAG, String.format("Thread %s %s  might be hung, timestamp: %s",
+            BacktraceLogger.w(LOG_TAG, String.format("Thread %d %s  might be hung, timestamp: %s",
                     currentThread.getId(), currentThread.getName(), now_str));
 
             // Otherwise, the thread has not made forward progress.

@@ -1,5 +1,6 @@
 package backtraceio.library.models;
 
+import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.metrics.BacktraceMetrics;
 
 public class BacktraceMetricsSettings {
@@ -15,56 +16,52 @@ public class BacktraceMetricsSettings {
      * @param universeName Backtrace universe name
      * @param token        Backtrace submission token
      */
-    public BacktraceMetricsSettings(String universeName, String token) {
-        this(universeName, token, BacktraceMetrics.defaultBaseUrl);
+    public BacktraceMetricsSettings(BacktraceCredentials credentials) {
+        this(credentials, BacktraceMetrics.defaultBaseUrl);
     }
 
     /**
      * Backtrace metrics settings
      *
-     * @param universeName Backtrace universe name
-     * @param token        Backtrace submission token
-     * @param baseUrl      Base URL to send metrics
+     * @param credentials   Backtrace API credentials
+     * @param baseUrl       Base URL to send metrics
      */
-    public BacktraceMetricsSettings(String universeName, String token, String baseUrl) {
-        this(universeName, token, baseUrl, BacktraceMetrics.defaultTimeIntervalMs);
+    public BacktraceMetricsSettings(BacktraceCredentials credentials, String baseUrl) {
+        this(credentials, baseUrl, BacktraceMetrics.defaultTimeIntervalMs);
     }
 
     /**
      * Backtrace metrics settings
      *
-     * @param universeName       Backtrace universe name
-     * @param token              Backtrace submission token
+     * @param credentials   Backtrace API credentials
      * @param timeIntervalMillis Time interval between metrics auto-send events, 0 disables auto-send
      */
-    public BacktraceMetricsSettings(String universeName, String token, long timeIntervalMillis) {
-        this(universeName, token, BacktraceMetrics.defaultBaseUrl, timeIntervalMillis);
+    public BacktraceMetricsSettings(BacktraceCredentials credentials, long timeIntervalMillis) {
+        this(credentials, BacktraceMetrics.defaultBaseUrl, timeIntervalMillis);
     }
 
     /**
      * Backtrace metrics settings
      *
-     * @param universeName       Backtrace universe name
-     * @param token              Backtrace submission token
+     * @param credentials   Backtrace API credentials
      * @param baseUrl            Base URL to send metrics
      * @param timeIntervalMillis Time interval between metrics auto-send events, 0 disables auto-send
      */
-    public BacktraceMetricsSettings(String universeName, String token, String baseUrl, long timeIntervalMillis) {
-        this(universeName, token, baseUrl, timeIntervalMillis, BacktraceMetrics.defaultTimeBetweenRetriesMs);
+    public BacktraceMetricsSettings(BacktraceCredentials credentials, String baseUrl, long timeIntervalMillis) {
+        this(credentials, baseUrl, timeIntervalMillis, BacktraceMetrics.defaultTimeBetweenRetriesMs);
     }
 
     /**
      * Backtrace metrics settings
      *
-     * @param universeName             Backtrace universe name
-     * @param token                    Backtrace submission token
+     * @param credentials   Backtrace API credentials
      * @param baseUrl                  Base URL to send metrics
      * @param timeIntervalMillis       Time interval between metrics auto-send events, 0 disables auto-send
      * @param timeBetweenRetriesMillis Maximum time between retries in milliseconds
      */
-    public BacktraceMetricsSettings(String universeName, String token, String baseUrl, long timeIntervalMillis, int timeBetweenRetriesMillis) {
-        this.universe = universeName;
-        this.token = token;
+    public BacktraceMetricsSettings(BacktraceCredentials credentials, String baseUrl, long timeIntervalMillis, int timeBetweenRetriesMillis) {
+        this.universe = credentials.getUniverseName();
+        this.token = credentials.getSubmissionToken();
         this.baseUrl = baseUrl;
         this.timeIntervalMillis = timeIntervalMillis;
         this.timeBetweenRetriesMillis = timeBetweenRetriesMillis;

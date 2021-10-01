@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
@@ -27,7 +28,7 @@ public class BacktraceReport {
     /**
      * UTC timestamp in seconds
      */
-    public long timestamp = BacktraceBase.getTimestampSeconds();
+    public long timestamp = BacktraceTimeHelper.getTimestampSeconds();
 
     /**
      * Get information about report type. If value is true the BacktraceReport has an error

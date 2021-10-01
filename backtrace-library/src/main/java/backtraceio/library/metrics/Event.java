@@ -38,7 +38,7 @@ public abstract class Event {
 
         for (String key : attributes.keySet()) {
             Object value = attributes.get(key);
-            if (BacktraceStringHelper.isObjectValidString(value)) {
+            if (BacktraceStringHelper.isObjectNotNullOrNotEmptyString(value)) {
                 attributesNoEmpty.put(key, value);
             }
         }

@@ -5,7 +5,11 @@ public class BacktraceStringHelper {
         return (input == null || input.trim().isEmpty());
     }
 
-    public static boolean isObjectValidString(Object input) {
-        return (input != null && !input.toString().trim().isEmpty());
+    public static boolean isObjectNotNullOrNotEmptyString(Object input) {
+        if (input instanceof String) {
+            return (input != null && !input.toString().trim().isEmpty());
+        } else {
+            return (input != null);
+        }
     }
 }
