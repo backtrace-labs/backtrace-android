@@ -508,8 +508,8 @@ The web UI allows you to track those metrics at-a-glance as well as in detail (w
 ## Enabling Error-Free Metrics
 ```java
 // Enable metrics
-BacktraceMetricsSettings metricsSettings = new BacktraceMetricsSettings("<my_universe_name>", "<my_submission_token>");
-backtraceClient.enableMetrics(metricsSettings);
+BacktraceMetricsSettings metricsSettings = new BacktraceMetricsSettings(backtraceCredentials);
+backtraceClient.metrics.enable(metricsSettings);
 ```
 
 **NOTE:** Please enable metrics BEFORE enabling native integration
