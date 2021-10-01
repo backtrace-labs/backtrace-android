@@ -1,4 +1,4 @@
-package backtraceio.library.metrics;
+package backtraceio.library.models.metrics;
 
 import backtraceio.library.models.types.BacktraceResultStatus;
 

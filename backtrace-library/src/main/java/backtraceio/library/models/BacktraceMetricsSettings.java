@@ -1,7 +1,7 @@
 package backtraceio.library.models;
 
 import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.metrics.BacktraceMetrics;
+import backtraceio.library.services.BacktraceMetrics;
 
 public class BacktraceMetricsSettings {
     private final String universe;

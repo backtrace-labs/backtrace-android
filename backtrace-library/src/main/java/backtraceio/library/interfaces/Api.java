@@ -7,12 +7,12 @@ import java.util.Map;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
-import backtraceio.library.metrics.EventsOnServerResponseEventListener;
-import backtraceio.library.metrics.EventsRequestHandler;
-import backtraceio.library.metrics.SummedEventsHandler;
-import backtraceio.library.metrics.SummedEventsPayload;
-import backtraceio.library.metrics.UniqueEventsHandler;
-import backtraceio.library.metrics.UniqueEventsPayload;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
+import backtraceio.library.services.SummedEventsHandler;
+import backtraceio.library.models.metrics.SummedEventsPayload;
+import backtraceio.library.services.UniqueEventsHandler;
+import backtraceio.library.models.metrics.UniqueEventsPayload;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceMetricsSettings;
 

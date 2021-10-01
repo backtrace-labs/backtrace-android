@@ -1,7 +1,9 @@
-package backtraceio.library.metrics;
+package backtraceio.library.services;
 
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.events.OnServerErrorEventListener;
-import backtraceio.library.services.BacktraceHandlerInput;
+import backtraceio.library.models.metrics.EventsPayload;
 
 /**
  * Class represents Backtrace events that will be sent to BacktraceHandlerThread

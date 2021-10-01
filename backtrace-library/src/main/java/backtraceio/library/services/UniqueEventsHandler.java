@@ -1,4 +1,4 @@
-package backtraceio.library.metrics;
+package backtraceio.library.services;
 
 import android.content.Context;
 
@@ -12,7 +12,9 @@ import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
-import backtraceio.library.services.BacktraceHandlerThread;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.UniqueEvent;
+import backtraceio.library.models.metrics.UniqueEventsPayload;
 
 public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
 

@@ -25,12 +25,12 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
-import backtraceio.library.metrics.BacktraceMetrics;
-import backtraceio.library.metrics.EventsOnServerResponseEventListener;
-import backtraceio.library.metrics.EventsPayload;
-import backtraceio.library.metrics.EventsRequestHandler;
-import backtraceio.library.metrics.EventsResult;
-import backtraceio.library.metrics.UniqueEvent;
+import backtraceio.library.services.BacktraceMetrics;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.events.EventsRequestHandler;
+import backtraceio.library.models.metrics.EventsResult;
+import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.types.BacktraceResultStatus;
 

@@ -1,4 +1,4 @@
-package backtraceio.library.metrics;
+package backtraceio.library.services;
 
 import android.content.Context;
 
@@ -7,7 +7,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.models.BacktraceMetricsSettings;
-import backtraceio.library.services.BacktraceHandlerThread;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.SummedEvent;
+import backtraceio.library.models.metrics.SummedEventsPayload;
 
 public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
 

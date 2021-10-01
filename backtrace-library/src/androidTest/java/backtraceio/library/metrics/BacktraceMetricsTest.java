@@ -18,11 +18,13 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceMetricsSettings;
+import backtraceio.library.services.BacktraceMetrics;
+import backtraceio.library.models.metrics.SummedEvent;
+import backtraceio.library.models.metrics.UniqueEvent;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceMetricsTest {

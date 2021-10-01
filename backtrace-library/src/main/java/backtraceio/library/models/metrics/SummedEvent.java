@@ -1,11 +1,10 @@
-package backtraceio.library.metrics;
+package backtraceio.library.models.metrics;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceTimeHelper;
 
 public final class SummedEvent extends Event {
@@ -13,21 +12,21 @@ public final class SummedEvent extends Event {
     @SerializedName("metric_group")
     private final String name;
 
-    SummedEvent(String name) {
+    public SummedEvent(String name) {
         this(name, new HashMap<String, Object>());
     }
 
-    SummedEvent(String name, Map<String, Object> attributes) {
+    public SummedEvent(String name, Map<String, Object> attributes) {
         this(name, BacktraceTimeHelper.getTimestampSeconds(), attributes);
     }
 
-    SummedEvent(String name, long timestamp, Map<String, Object> attributes) {
+    public SummedEvent(String name, long timestamp, Map<String, Object> attributes) {
         super(timestamp);
         this.name = name;
         addAttributesImpl(attributes);
     }
 
-    SummedEvent(SummedEvent summedEvent) {
+    public SummedEvent(SummedEvent summedEvent) {
         this(summedEvent.name, summedEvent.timestamp, summedEvent.attributes);
     }
 

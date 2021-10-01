@@ -1,4 +1,7 @@
-package backtraceio.library.metrics;
+package backtraceio.library.events;
+
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
 
 /**
  * Interface definition for a callback to be invoked instead of default request to Backtrace API

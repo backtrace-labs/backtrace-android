@@ -1,7 +1,6 @@
-package backtraceio.library.metrics;
+package backtraceio.library.services;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
 import java.util.HashMap;
@@ -12,12 +11,16 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
+import backtraceio.library.models.metrics.SummedEvent;
+import backtraceio.library.models.metrics.UniqueEvent;
 
 public final class BacktraceMetrics implements Metrics {
 

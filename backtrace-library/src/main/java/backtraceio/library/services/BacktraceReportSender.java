@@ -15,17 +15,17 @@ import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.common.RequestHelper;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.metrics.EventsPayload;
-import backtraceio.library.metrics.EventsResult;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.models.types.HttpException;
 
 /**
  * Class for sending and processing HTTP request
  */
-public class BacktraceReportSender {
+class BacktraceReportSender {
 
     private static final String LOG_TAG = BacktraceReportSender.class.getSimpleName();
 

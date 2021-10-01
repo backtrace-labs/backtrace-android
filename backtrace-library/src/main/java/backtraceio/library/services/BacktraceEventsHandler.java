@@ -1,4 +1,4 @@
-package backtraceio.library.metrics;
+package backtraceio.library.services;
 
 import android.content.Context;
 import android.os.Handler;
@@ -15,10 +15,11 @@ import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
-import backtraceio.library.services.BacktraceHandlerThread;
-import backtraceio.library.services.BacktraceReportSender;
+import backtraceio.library.models.metrics.Event;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
 
-public abstract class BacktraceEventsHandler<T extends Event> extends Handler {
+abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
     private final static transient String LOG_TAG = BacktraceEventsHandler.class.getSimpleName();
 

@@ -3,10 +3,11 @@ package backtraceio.library.interfaces;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.metrics.EventsOnServerResponseEventListener;
-import backtraceio.library.metrics.EventsRequestHandler;
-import backtraceio.library.metrics.SummedEvent;
-import backtraceio.library.metrics.UniqueEvent;
+import backtraceio.library.services.BacktraceMetrics;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
+import backtraceio.library.models.metrics.SummedEvent;
+import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.models.BacktraceMetricsSettings;
 
 public interface Metrics {
@@ -62,7 +63,7 @@ public interface Metrics {
      *                        be configured on the server side as well.
      *                        Please refer to the online documentation at https://support.backtrace.io
      * @return true if added successfully, otherwise false.
-     * @see backtraceio.library.metrics.BacktraceMetrics#send()
+     * @see BacktraceMetrics#send()
      */
     boolean addSummedEvent(String metricGroupName);
 
@@ -75,7 +76,7 @@ public interface Metrics {
      * @param attributes      Custom attributes to add. Will be merged with the default
      *                        attributes, with attribute values provided here overriding any defaults.
      * @return true if added successfully, otherwise false.
-     * @see backtraceio.library.metrics.BacktraceMetrics#send()
+     * @see BacktraceMetrics#send()
      */
     boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes);
 

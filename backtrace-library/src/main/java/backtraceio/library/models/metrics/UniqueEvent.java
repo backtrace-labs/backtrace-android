@@ -1,4 +1,4 @@
-package backtraceio.library.metrics;
+package backtraceio.library.models.metrics;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.logger.BacktraceLogger;
@@ -22,15 +21,15 @@ public class UniqueEvent extends Event {
     @SerializedName("unique")
     private final List<String> name;
 
-    UniqueEvent(String name) {
+    public UniqueEvent(String name) {
         this(name, new HashMap<String, Object>());
     }
 
-    UniqueEvent(String name, Map<String, Object> attributes) {
+    public UniqueEvent(String name, Map<String, Object> attributes) {
         this(name, BacktraceTimeHelper.getTimestampSeconds(), attributes);
     }
 
-    UniqueEvent(String name, long timestamp, Map<String, Object> attributes) {
+    public UniqueEvent(String name, long timestamp, Map<String, Object> attributes) {
         super(timestamp);
         this.name = new ArrayList<String>() {{
             add(name);
@@ -50,7 +49,7 @@ public class UniqueEvent extends Event {
         return "";
     }
 
-    void update(long timestamp, Map<String, Object> attributes) {
+    public void update(long timestamp, Map<String, Object> attributes) {
         this.timestamp = timestamp;
         addAttributesImpl(attributes);
     }
