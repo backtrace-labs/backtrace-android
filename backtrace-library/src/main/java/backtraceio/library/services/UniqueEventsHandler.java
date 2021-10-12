@@ -36,6 +36,10 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
         attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
         Object value = attributes.get(eventName);
+        if (value == null) {
+            BacktraceLogger.e(LOG_TAG, "Startup unique event does not exist within attributes, this should not happen");
+        }
+
         if (BacktraceStringHelper.isObjectNotNullOrNotEmptyString(value)) {
             events.addLast(new UniqueEvent(eventName, attributes));
             send();
