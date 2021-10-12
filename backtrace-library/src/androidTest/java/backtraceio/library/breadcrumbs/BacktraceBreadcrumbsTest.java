@@ -309,6 +309,7 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testQueueFileRollover() {
         final int numIterations = 1000;
+        final int firstBreadcrumbIndexAfterRollover = 932;
         // Account for mandatory configuration breadcrumb
         backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
 
@@ -332,7 +333,7 @@ public class BacktraceBreadcrumbsTest {
                 assertEquals("info", parsedBreadcrumb.get("level"));
                 // Timestamp should be convertible to a long
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
-                assertTrue(((int) parsedBreadcrumb.get("id")) > 450);
+                assertTrue(((int) parsedBreadcrumb.get("id")) > firstBreadcrumbIndexAfterRollover);
                 assertTrue((int) parsedBreadcrumb.get("id") <= numIterations);
             }
 
