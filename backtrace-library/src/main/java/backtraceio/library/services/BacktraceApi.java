@@ -1,9 +1,5 @@
 package backtraceio.library.services;
 
-import android.content.Context;
-
-import java.util.Map;
-
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -13,7 +9,6 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.metrics.SummedEventsPayload;
 import backtraceio.library.models.metrics.UniqueEventsPayload;
 
@@ -114,13 +109,13 @@ public class BacktraceApi implements Api {
     }
 
     @Override
-    public UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
-        return threadSender.createUniqueEventsHandler(context, customAttributes, this, settings);
+    public UniqueEventsHandler enableUniqueEvents(BacktraceMetrics backtraceMetrics) {
+        return threadSender.createUniqueEventsHandler(backtraceMetrics, this);
     }
 
     @Override
-    public SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings) {
-        return threadSender.createSummedEventsHandler(context, customAttributes, this, settings);
+    public SummedEventsHandler enableSummedEvents(BacktraceMetrics backtraceMetrics) {
+        return threadSender.createSummedEventsHandler(backtraceMetrics, this);
     }
 
     /**

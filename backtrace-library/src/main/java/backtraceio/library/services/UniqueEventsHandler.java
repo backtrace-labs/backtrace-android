@@ -1,17 +1,10 @@
 package backtraceio.library.services;
 
-import android.content.Context;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceMetricsSettings;
-import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.models.metrics.UniqueEventsPayload;
@@ -22,14 +15,14 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
 
     private final static String urlPrefix = "unique-events";
 
-    public UniqueEventsHandler(Context context, Map<String, Object> customAttributes,
-                               Api api, final BacktraceHandlerThread backtraceHandlerThread, BacktraceMetricsSettings settings) {
-        super(context, customAttributes, api, backtraceHandlerThread, urlPrefix, settings);
+    public UniqueEventsHandler(BacktraceMetrics backtraceMetrics,
+                               Api api, final BacktraceHandlerThread backtraceHandlerThread) {
+        super(backtraceMetrics, api, backtraceHandlerThread, urlPrefix);
     }
 
     @Override
     protected UniqueEventsPayload getEventsPayload() {
-        Map<String, Object> attributes = getAttributes();
+        Map<String, Object> attributes = backtraceMetrics.createLocalAttributes(null);
 
         for (UniqueEvent event : events) {
             event.update(BacktraceTimeHelper.getTimestampSeconds(), attributes);

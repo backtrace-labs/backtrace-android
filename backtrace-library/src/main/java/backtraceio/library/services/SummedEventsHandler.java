@@ -1,12 +1,9 @@
 package backtraceio.library.services;
 
-import android.content.Context;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.interfaces.Api;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.SummedEventsPayload;
@@ -17,14 +14,14 @@ public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
 
     private final static String urlPrefix = "summed-events";
 
-    public SummedEventsHandler(Context context, Map<String, Object> customAttributes,
-                               Api api, final BacktraceHandlerThread backtraceHandlerThread, BacktraceMetricsSettings settings) {
-        super(context, customAttributes, api, backtraceHandlerThread, urlPrefix, settings);
+    public SummedEventsHandler(BacktraceMetrics backtraceMetrics,
+                               Api api, final BacktraceHandlerThread backtraceHandlerThread) {
+        super(backtraceMetrics, api, backtraceHandlerThread, urlPrefix);
     }
 
     @Override
     protected SummedEventsPayload getEventsPayload() {
-        Map<String, Object> attributes = getAttributes();
+        Map<String, Object> attributes = backtraceMetrics.createLocalAttributes(null);
 
         ConcurrentLinkedDeque<SummedEvent> eventsCopy = new ConcurrentLinkedDeque<>();
 

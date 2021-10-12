@@ -1,20 +1,16 @@
 package backtraceio.library.interfaces;
 
-import android.content.Context;
-
-import java.util.Map;
-
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
-import backtraceio.library.events.EventsOnServerResponseEventListener;
-import backtraceio.library.events.EventsRequestHandler;
-import backtraceio.library.services.SummedEventsHandler;
-import backtraceio.library.models.metrics.SummedEventsPayload;
-import backtraceio.library.services.UniqueEventsHandler;
-import backtraceio.library.models.metrics.UniqueEventsPayload;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceMetricsSettings;
+import backtraceio.library.models.metrics.SummedEventsPayload;
+import backtraceio.library.models.metrics.UniqueEventsPayload;
+import backtraceio.library.services.BacktraceMetrics;
+import backtraceio.library.services.SummedEventsHandler;
+import backtraceio.library.services.UniqueEventsHandler;
 
 /**
  * API sender interface
@@ -58,22 +54,18 @@ public interface Api {
     /**
      * Create metrics events handler for unique events
      *
-     * @param context          The application context
-     * @param customAttributes Backtrace base object instance
-     * @param settings
+     * @param backtraceMetrics  Backtrace metrics object
      * @return Reference to the created UniqueEventsHandler
      */
-    UniqueEventsHandler enableUniqueEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings);
+    UniqueEventsHandler enableUniqueEvents(BacktraceMetrics backtraceMetrics);
 
     /**
      * Create metrics events handler for summed events
      *
-     * @param context          The application context
-     * @param customAttributes Backtrace base object instance
-     * @param settings
+     * @param backtraceMetrics  Backtrace metrics object
      * @return Reference to the created SummedEventsHandler
      */
-    SummedEventsHandler enableSummedEvents(Context context, Map<String, Object> customAttributes, BacktraceMetricsSettings settings);
+    SummedEventsHandler enableSummedEvents(BacktraceMetrics backtraceMetrics);
 
     /**
      * Set the request handler for unique events

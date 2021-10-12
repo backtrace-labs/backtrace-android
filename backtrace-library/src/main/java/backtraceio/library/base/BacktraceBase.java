@@ -22,7 +22,6 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.Metrics;
-import backtraceio.library.services.BacktraceMetrics;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -30,6 +29,7 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
+import backtraceio.library.services.BacktraceMetrics;
 
 /**
  * Base Backtrace Android client

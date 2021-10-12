@@ -142,8 +142,8 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     private void startMetricsEventHandlers(Api backtraceApi) {
-        uniqueEventsHandler = backtraceApi.enableUniqueEvents(context, customReportAttributes, settings);
-        summedEventsHandler = backtraceApi.enableSummedEvents(context, customReportAttributes, settings);
+        uniqueEventsHandler = backtraceApi.enableUniqueEvents(this);
+        summedEventsHandler = backtraceApi.enableSummedEvents(this);
     }
 
     protected String getStartupUniqueEventName() {
@@ -332,7 +332,7 @@ public final class BacktraceMetrics implements Metrics {
         return true;
     }
 
-    private Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
+    protected Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
         Map<String, Object> localAttributes = new HashMap<String, Object>();
 
         if (attributes != null) {

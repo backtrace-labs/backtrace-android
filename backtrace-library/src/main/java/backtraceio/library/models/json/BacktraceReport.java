@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;

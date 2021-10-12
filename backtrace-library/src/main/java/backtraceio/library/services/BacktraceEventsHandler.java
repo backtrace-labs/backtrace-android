@@ -1,19 +1,15 @@
 package backtraceio.library.services;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 
 import java.net.HttpURLConnection;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceMathHelper;
 import backtraceio.library.common.BacktraceSerializeHelper;
-import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.metrics.Event;
 import backtraceio.library.models.metrics.EventsPayload;
@@ -26,14 +22,9 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
     protected final BacktraceHandlerThread backtraceHandlerThread;
 
     /**
-     * User provided custom attributes
+     * Backtrace metrics object
      */
-    protected final Map<String, Object> customAttributes;
-
-    /**
-     * The application context. We need this in our derived classes to get the BacktraceAttributes
-     */
-    protected final Context context;
+    protected final BacktraceMetrics backtraceMetrics;
 
     /**
      * Time between retries if metrics submission fails
@@ -73,15 +64,15 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
     /**
      * Create BacktraceEventsHandler instance
-     *
-     * @param context
-     * @param api
-     * @param backtraceHandlerThread
-     * @param urlPrefix
-     * @param settings
+     * @param backtraceMetrics          Backtrace metrics object
+     * @param api                       Backtrace API object
+     * @param backtraceHandlerThread    Backtrace handler thread object
+     * @param urlPrefix                 Url routing prefix for metrics
      */
-    public BacktraceEventsHandler(Context context, Map<String, Object> customAttributes,
-                                  Api api, final BacktraceHandlerThread backtraceHandlerThread, String urlPrefix, BacktraceMetricsSettings settings) {
+    public BacktraceEventsHandler(BacktraceMetrics backtraceMetrics,
+                                  Api api,
+                                  final BacktraceHandlerThread backtraceHandlerThread,
+                                  String urlPrefix) {
         // This should always have a nonnull looper because BacktraceHandlerThread starts in the
         // constructor and getLooper blocks until the looper is ready if the thread is started
         //
@@ -91,16 +82,15 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         if (!backtraceHandlerThread.isAlive()) {
             throw new NullPointerException("Handler thread is not alive, this should not happen");
         }
-        this.context = context;
-        this.customAttributes = customAttributes;
+        this.backtraceMetrics = backtraceMetrics;
         this.backtraceHandlerThread = backtraceHandlerThread;
         this.api = api;
-        this.submissionUrl = settings.getSubmissionUrl(urlPrefix);
-        this.timeBetweenRetriesMillis = settings.getTimeBetweenRetriesMillis();
+        this.submissionUrl = backtraceMetrics.settings.getSubmissionUrl(urlPrefix);
+        this.timeBetweenRetriesMillis = backtraceMetrics.settings.getTimeBetweenRetriesMillis();
 
-        long timeIntervalMillis = settings.getTimeIntervalMillis();
+        long timeIntervalMillis = backtraceMetrics.settings.getTimeIntervalMillis();
 
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null);
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(backtraceMetrics.context, null, null);
         this.application = backtraceAttributes.getApplicationName();
         this.appVersion = backtraceAttributes.getApplicationVersionOrEmpty();
 
@@ -157,16 +147,6 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
     protected void onMaximumAttemptsReached(ConcurrentLinkedDeque<T> events) {
         return;
-    }
-
-    protected Map<String, Object> getAttributes() {
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
-        Map<String, Object> attributes = backtraceAttributes.getAllAttributes();
-
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
-
-        return attributes;
     }
 
     protected abstract EventsPayload<T> getEventsPayload();
