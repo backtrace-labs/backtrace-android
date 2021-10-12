@@ -20,15 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
-import backtraceio.library.services.BacktraceMetrics;
-import backtraceio.library.events.EventsOnServerResponseEventListener;
-import backtraceio.library.models.metrics.EventsPayload;
-import backtraceio.library.events.EventsRequestHandler;
-import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.BacktraceMetricsSettings;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.services.BacktraceMetrics;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientSummedEventTest {
@@ -108,6 +108,25 @@ public class BacktraceClientSummedEventTest {
         assertFalse(mockRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(1, mockRequestHandler.numAttempts);
         assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
+    }
+
+    @Test
+    public void doNotUploadWhenNoEventsAvailable() {
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+
+        MockRequestHandler mockRequestHandler = new MockRequestHandler();
+        backtraceClient.metrics.setSummedEventsRequestHandler(mockRequestHandler);
+
+        backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+            @Override
+            public void onEvent(EventsResult result) {
+                fail("Should not upload event");
+            }
+        });
+
+        // When no events in queue request handler should not be called
+        backtraceClient.metrics.send();
+        assertEquals(0, mockRequestHandler.numAttempts);
     }
 
     @Test

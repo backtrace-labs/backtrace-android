@@ -20,20 +20,22 @@ import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
-import backtraceio.library.services.BacktraceMetrics;
-import backtraceio.library.models.metrics.Event;
-import backtraceio.library.events.EventsOnServerResponseEventListener;
-import backtraceio.library.models.metrics.EventsPayload;
-import backtraceio.library.events.EventsRequestHandler;
-import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
+import backtraceio.library.models.metrics.Event;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
+import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.services.BacktraceMetrics;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientUniqueEventTest {
@@ -152,6 +154,29 @@ public class BacktraceClientUniqueEventTest {
         assertEquals(1, mockRequestHandler.numAttempts);
         // We will always have startup unique event GUID
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
+    }
+
+    @Test
+    public void doNotUploadWhenNoEventsAvailable() {
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+
+        // Clear startup event
+        ConcurrentLinkedDeque<UniqueEvent> uniqueEvents = backtraceClient.metrics.getUniqueEvents();
+        uniqueEvents.clear();
+
+        MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
+        backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
+
+        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+            @Override
+            public void onEvent(EventsResult result) {
+                fail("Should not upload event");
+            }
+        });
+
+        // When no events in queue request handler should not be called
+        backtraceClient.metrics.send();
+        assertEquals(0, mockUniqueRequestHandler.numAttempts);
     }
 
     @Test

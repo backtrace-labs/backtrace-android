@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static java.lang.Thread.sleep;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -20,19 +19,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.events.EventsOnServerResponseEventListener;
+import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
-import backtraceio.library.services.BacktraceMetrics;
-import backtraceio.library.events.EventsOnServerResponseEventListener;
-import backtraceio.library.models.metrics.EventsPayload;
-import backtraceio.library.events.EventsRequestHandler;
-import backtraceio.library.models.metrics.EventsResult;
-import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.models.BacktraceMetricsSettings;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.services.BacktraceMetrics;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientMetricsTest {
@@ -88,41 +84,14 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
-
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
+        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+            @Override
+            public void onEvent(EventsResult result) {
+                fail("Should not upload event");
+            }
+        });
 
         assertEquals(0, mockRequestHandler.numAttempts);
-    }
-
-    @Test
-    public void doNotUploadWhenNoEventsAvailable() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
-
-        // Clear startup event
-        ConcurrentLinkedDeque<UniqueEvent> uniqueEvents = backtraceClient.metrics.getUniqueEvents();
-        uniqueEvents.clear();
-
-        MockRequestHandler mockRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
-
-        // When no events in queue request handler should not be called
-        backtraceClient.metrics.send();
-        try {
-            sleep(1000);
-        } catch (Exception e) {
-            fail(e.toString());
-        }
-        assertEquals(0, mockRequestHandler.numAttempts);
-
-        // When at least one event is in queue request handler should be called
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
-        backtraceClient.metrics.send();
-        try {
-            sleep(1000);
-        } catch (Exception e) {
-            fail(e.toString());
-        }
-        assertEquals(1, mockRequestHandler.numAttempts);
     }
 
     /**
@@ -189,6 +158,7 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void tryOnceOnHttpError() {
+        final Waiter waiter = new Waiter();
 
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 404;
@@ -205,6 +175,7 @@ public class BacktraceClientMetricsTest {
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
+                waiter.resume();
             }
         });
 
@@ -215,6 +186,7 @@ public class BacktraceClientMetricsTest {
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
+                waiter.resume();
             }
         });
 
@@ -222,13 +194,10 @@ public class BacktraceClientMetricsTest {
         final int timeBetweenRetriesMillis = 10;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
-        for (int i = 0; i < BacktraceMetrics.maxNumberOfAttempts; i++) {
-            try {
-                sleep(timeBetweenRetriesMillis * (long) Math.pow(timeBetweenRetriesMillis, i));
-            } catch (Exception e) {
-                fail(e.toString());
-            }
-            assertEquals(1, mockUniqueRequestHandler.numAttempts);
+        try {
+            waiter.await(1000, 2);
+        } catch (Exception e) {
+            fail(e.toString());
         }
 
         assertEquals(1, mockUniqueRequestHandler.numAttempts);
@@ -302,12 +271,6 @@ public class BacktraceClientMetricsTest {
         // Account for unique events startup event
         for (int i = 0; i < maximumNumberOfEvents - 2; i++) {
             backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
-        }
-
-        try {
-            sleep(100);
-        } catch (Exception e) {
-            fail(e.toString());
         }
 
         assertEquals(0, mockRequestHandler.numAttempts);
@@ -386,12 +349,6 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         // We will always have startup unique event GUID
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
-
-        try {
-            sleep(50);
-        } catch (Exception e) {
-            fail(e.toString());
-        }
 
         assertNull(mockRequestHandler.lastEventPayloadJson);
         assertEquals(0, mockRequestHandler.numAttempts);

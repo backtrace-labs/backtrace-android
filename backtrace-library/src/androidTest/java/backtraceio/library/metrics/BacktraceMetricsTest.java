@@ -22,9 +22,9 @@ import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceMetricsSettings;
-import backtraceio.library.services.BacktraceMetrics;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
+import backtraceio.library.services.BacktraceMetrics;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceMetricsTest {
