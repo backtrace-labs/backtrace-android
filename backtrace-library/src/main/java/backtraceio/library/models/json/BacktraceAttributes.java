@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.BacktraceStringHelper;
@@ -41,6 +42,16 @@ public class BacktraceAttributes {
     private final Context context;
 
     /**
+     * Are metrics enabled?
+     */
+    private static boolean isMetricsEnabled = false;
+
+    /**
+     * Metrics session ID
+     */
+    private static String sessionId;
+
+    /**
      * Create instance of Backtrace Attribute
      *
      * @param context          application context
@@ -63,6 +74,13 @@ public class BacktraceAttributes {
         setAppInformation();
         setDeviceInformation();
         setScreenInformation();
+
+        // For tracking crash-free sessions we need to add
+        // application.session and application.version to Backtrace attributes
+        if (isMetricsEnabled) {
+            this.attributes.put("application.session", sessionId);
+            this.attributes.put("application.version", getApplicationVersionOrEmpty());
+        }
     }
 
     public Map<String, Object> getComplexAttributes() {
@@ -219,5 +237,13 @@ public class BacktraceAttributes {
         attributes.putAll(this.attributes);
         attributes.putAll(this.complexAttributes);
         return attributes;
+    }
+
+    public static void enableMetrics() {
+        BacktraceAttributes.isMetricsEnabled = true;
+
+        // Create a session ID for metrics session tracking
+        String sessionId = UUID.randomUUID().toString();
+        BacktraceAttributes.sessionId = sessionId;
     }
 }

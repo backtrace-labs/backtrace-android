@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceStringHelper;
@@ -132,13 +131,7 @@ public final class BacktraceMetrics implements Metrics {
      */
     public void enable(BacktraceMetricsSettings settings) {
         this.settings = settings;
-        // For tracking crash-free sessions we need to add
-        // application.session and application.version to Backtrace attributes
-        String sessionId = UUID.randomUUID().toString();
-        this.customReportAttributes.put("application.session", sessionId);
-
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null);
-        this.customReportAttributes.put("application.version", backtraceAttributes.getApplicationVersionOrEmpty());
+        BacktraceAttributes.enableMetrics();
 
         try {
             startMetricsEventHandlers(backtraceApi);
