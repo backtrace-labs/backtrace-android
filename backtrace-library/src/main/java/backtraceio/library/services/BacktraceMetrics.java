@@ -162,8 +162,10 @@ public final class BacktraceMetrics implements Metrics {
      * Send startup event to Backtrace
      */
     public void sendStartupEvent() {
-        uniqueEventsHandler.sendStartupEvent(startupUniqueEventName);
-        summedEventsHandler.sendStartupEvent(startupSummedEventName);
+        addUniqueEvent(startupUniqueEventName);
+        addSummedEvent(startupSummedEventName);
+        uniqueEventsHandler.send();
+        summedEventsHandler.send();
     }
 
     /**

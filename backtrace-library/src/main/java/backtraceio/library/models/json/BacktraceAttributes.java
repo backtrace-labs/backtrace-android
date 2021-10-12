@@ -79,7 +79,10 @@ public class BacktraceAttributes {
         // application.session and application.version to Backtrace attributes
         if (isMetricsEnabled) {
             this.attributes.put("application.session", sessionId);
-            this.attributes.put("application.version", getApplicationVersionOrEmpty());
+            String version = getApplicationVersionOrEmpty();
+            if (!BacktraceStringHelper.isNullOrEmpty(version)) {
+                this.attributes.put("application.version", version);
+            }
         }
     }
 

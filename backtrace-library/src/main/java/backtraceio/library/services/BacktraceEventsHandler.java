@@ -131,8 +131,6 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         this.maximumNumberOfEvents = maximumNumberOfEvents;
     }
 
-    public abstract void sendStartupEvent(String eventName);
-
     public void send() {
         if (events == null || events.size() == 0) {
             return;

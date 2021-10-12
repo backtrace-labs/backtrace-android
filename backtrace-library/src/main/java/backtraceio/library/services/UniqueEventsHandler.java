@@ -28,27 +28,6 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
     }
 
     @Override
-    public void sendStartupEvent(String eventName) {
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customAttributes);
-        Map<String, Object> attributes = backtraceAttributes.getAllAttributes();
-
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
-
-        Object value = attributes.get(eventName);
-        if (value == null) {
-            BacktraceLogger.e(LOG_TAG, "Startup unique event does not exist within attributes, this should not happen");
-        }
-
-        if (BacktraceStringHelper.isObjectNotNullOrNotEmptyString(value)) {
-            events.addLast(new UniqueEvent(eventName, attributes));
-            send();
-        } else {
-            BacktraceLogger.e(LOG_TAG, "Startup unique event is empty, this should not happen");
-        }
-    }
-
-    @Override
     protected UniqueEventsPayload getEventsPayload() {
         Map<String, Object> attributes = getAttributes();
 

@@ -23,13 +23,6 @@ public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
     }
 
     @Override
-    public void sendStartupEvent(String eventName) {
-        events.addLast(new SummedEvent(eventName));
-        send();
-        events.clear();
-    }
-
-    @Override
     protected SummedEventsPayload getEventsPayload() {
         Map<String, Object> attributes = getAttributes();
 
