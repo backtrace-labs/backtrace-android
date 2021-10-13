@@ -6,8 +6,10 @@
 extern std::string thread_id;
 extern std::atomic_bool initialized;
 extern std::mutex attribute_synchronization;
+extern std::atomic_bool disabled;
 
 static crashpad::CrashpadClient *client;
+static std::unique_ptr<crashpad::CrashReportDatabase> database;
 
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
@@ -17,6 +19,17 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
                         jint unwindingMode) {
+    // Re-enable uploads if disabled
+    if (initialized && disabled) {
+        if (database == nullptr) {
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+            return false;
+        }
+        database->GetSettings()->SetUploadsEnabled(true);
+        disabled = false;
+        return true;
+    }
+
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
@@ -110,7 +123,7 @@ bool InitializeCrashpad(jstring url,
         }
     }
 
-    std::unique_ptr<crashpad::CrashReportDatabase> database = crashpad::CrashReportDatabase::Initialize(db);
+    database = crashpad::CrashReportDatabase::Initialize(db);
     if (database == nullptr || database->GetSettings() == NULL) {
         return false;
     }
@@ -203,4 +216,14 @@ void AddAttributeCrashpad(jstring key, jstring value) {
 
     env->ReleaseStringUTFChars(key, crashpadKey);
     env->ReleaseStringUTFChars(value, crashpadValue);
+}
+
+void DisableCrashpad() {
+    if (database == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+        return;
+    }
+    // Disable automated uploads.
+    database->GetSettings()->SetUploadsEnabled(false);
+    disabled = true;
 }

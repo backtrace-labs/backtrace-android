@@ -21,27 +21,24 @@ bool Initialize(jstring url,
                 jobjectArray attachmentPaths,
                 jboolean enableClientSideUnwinding,
                 jint unwindingMode) {
-    static std::once_flag initialize_flag;
-
-    std::call_once(initialize_flag, [&] {
 #ifdef CRASHPAD_BACKEND
-        initialized = InitializeCrashpad(url,
-                                         database_path, handler_path,
-                                         attributeKeys, attributeValues,
-                                         attachmentPaths, enableClientSideUnwinding,
-                                         unwindingMode);
+    initialized = InitializeCrashpad(url,
+                                     database_path, handler_path,
+                                     attributeKeys, attributeValues,
+                                     attachmentPaths, enableClientSideUnwinding,
+                                     unwindingMode);
 #elif BREAKPAD_BACKEND
-        initialized = InitializeBreakpad(url,
-                                         database_path, handler_path,
-                                         attributeKeys, attributeValues,
-                                         attachmentPaths, enableClientSideUnwinding,
-                                         unwindingMode);
+    initialized = InitializeBreakpad(url,
+                                     database_path, handler_path,
+                                     attributeKeys, attributeValues,
+                                     attachmentPaths, enableClientSideUnwinding,
+                                     unwindingMode);
 #else
-        initialized = false;
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "No native crash reporting backend defined");
+    initialized = false;
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "No native crash reporting backend defined");
 #endif
-    });
+
     return initialized;
 }
 
@@ -64,6 +61,15 @@ void AddAttribute(jstring key, jstring value) {
 #else
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "AddAttribute not supported on this backend");
+#endif
+}
+
+void Disable() {
+#ifdef CRASHPAD_BACKEND
+    DisableCrashpad();
+#else
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "Disable not supported on this backend");
 #endif
 }
 }
