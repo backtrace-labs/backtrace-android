@@ -21,22 +21,32 @@ bool Initialize(jstring url,
                 jobjectArray attachmentPaths,
                 jboolean enableClientSideUnwinding,
                 jint unwindingMode) {
+    static std::once_flag initialize_flag;
+
+    std::call_once(initialize_flag, [&] {
 #ifdef CRASHPAD_BACKEND
-    initialized = InitializeCrashpad(url,
-                                     database_path, handler_path,
-                                     attributeKeys, attributeValues,
-                                     attachmentPaths, enableClientSideUnwinding,
-                                     unwindingMode);
+        initialized = InitializeCrashpad(url,
+                                         database_path, handler_path,
+                                         attributeKeys, attributeValues,
+                                         attachmentPaths, enableClientSideUnwinding,
+                                         unwindingMode);
 #elif BREAKPAD_BACKEND
-    initialized = InitializeBreakpad(url,
-                                     database_path, handler_path,
-                                     attributeKeys, attributeValues,
-                                     attachmentPaths, enableClientSideUnwinding,
-                                     unwindingMode);
+        initialized = InitializeBreakpad(url,
+                                         database_path, handler_path,
+                                         attributeKeys, attributeValues,
+                                         attachmentPaths, enableClientSideUnwinding,
+                                         unwindingMode);
 #else
-    initialized = false;
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "No native crash reporting backend defined");
+        initialized = false;
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "No native crash reporting backend defined");
+#endif
+    });
+
+#ifdef CRASHPAD_BACKEND
+    if (initialized) {
+        ReEnableCrashpad();
+    }
 #endif
 
     return initialized;

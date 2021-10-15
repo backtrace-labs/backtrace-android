@@ -26,4 +26,6 @@ void AddAttributeCrashpad(jstring key, jstring value);
 
 void DisableCrashpad();
 
+void ReEnableCrashpad();
+
 #endif //BACKTRACE_ANDROID_CRASHPAD_BACKEND_H
