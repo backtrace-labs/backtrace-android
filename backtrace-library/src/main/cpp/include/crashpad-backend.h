@@ -24,4 +24,8 @@ void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_fault
 
 void AddAttributeCrashpad(jstring key, jstring value);
 
+void DisableCrashpad();
+
+void ReEnableCrashpad();
+
 #endif //BACKTRACE_ANDROID_CRASHPAD_BACKEND_H

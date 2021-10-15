@@ -42,6 +42,13 @@ bool Initialize(jstring url,
                             "No native crash reporting backend defined");
 #endif
     });
+
+#ifdef CRASHPAD_BACKEND
+    if (initialized) {
+        ReEnableCrashpad();
+    }
+#endif
+
     return initialized;
 }
 
@@ -64,6 +71,15 @@ void AddAttribute(jstring key, jstring value) {
 #else
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "AddAttribute not supported on this backend");
+#endif
+}
+
+void Disable() {
+#ifdef CRASHPAD_BACKEND
+    DisableCrashpad();
+#else
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "Disable not supported on this backend");
 #endif
 }
 }
