@@ -30,7 +30,7 @@ public abstract class Event {
     public abstract String getName();
 
     protected void addAttributesImpl(Map<String, Object> attributes) {
-        if (attributes == null) {
+        if (attributes == null || attributes.size() == 0) {
             return;
         }
 

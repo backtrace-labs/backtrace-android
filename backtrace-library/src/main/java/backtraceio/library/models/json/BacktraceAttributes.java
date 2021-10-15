@@ -108,8 +108,10 @@ public class BacktraceAttributes {
         this.attributes.put("application", getApplicationName());
         String version = getApplicationVersionOrEmpty();
         if (!BacktraceStringHelper.isNullOrEmpty(version)) {
-            this.attributes.put("version", version);
+            // We want to standardize application.version attribute name
             this.attributes.put("application.version", version);
+            // But we keep version attribute name as to not break any customer workflows
+            this.attributes.put("version", version);
         }
     }
 

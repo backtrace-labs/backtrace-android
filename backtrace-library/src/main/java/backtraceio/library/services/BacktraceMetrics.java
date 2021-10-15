@@ -136,6 +136,7 @@ public final class BacktraceMetrics implements Metrics {
         try {
             startMetricsEventHandlers(backtraceApi);
             sendStartupEvent();
+            BacktraceLogger.d(LOG_TAG, "Metrics enabled");
         } catch (Exception e) {
             BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
         }
