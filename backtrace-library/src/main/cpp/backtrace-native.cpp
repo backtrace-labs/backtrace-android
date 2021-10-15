@@ -27,6 +27,8 @@ static JavaVM *javaVm;
 
 // check if native crash client is already initialized
 std::atomic_bool initialized;
+// check if native crash client is disabled
+std::atomic_bool disabled;
 std::mutex attribute_synchronization;
 std::string thread_id;
 
@@ -126,6 +128,11 @@ Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_
                                                                                    jstring message,
                                                                                    jboolean set_main_thread_as_faulting_thread) {
     DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
+}
+
+JNIEXPORT void JNICALL
+Java_backtraceio_library_BacktraceDatabase_disable(JNIEnv *env, jobject thiz) {
+    Disable();
 }
 
 }

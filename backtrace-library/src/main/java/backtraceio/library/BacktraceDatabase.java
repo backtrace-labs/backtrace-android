@@ -77,6 +77,11 @@ public class BacktraceDatabase implements Database {
                                       UnwindingMode unwindingMode);
 
     /**
+     * Disable Backtrace-native integration
+     */
+    private native void disable();
+
+    /**
      * Create disabled instance of BacktraceDatabase
      */
     public BacktraceDatabase() {
@@ -203,6 +208,14 @@ public class BacktraceDatabase implements Database {
                 unwindingMode
         );
         return initialized;
+    }
+
+    /**
+     * Disable native integration
+     */
+    @Override
+    public void disableNativeIntegration() {
+        disable();
     }
 
     @Override

@@ -271,6 +271,10 @@ public class BacktraceBase implements Client {
         this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding, unwindingMode);
     }
 
+    public void disableNativeIntegration() {
+        this.database.disableNativeIntegration();
+    }
+
     /**
      * Inform Backtrace API that we are using Proguard symbolication
      */

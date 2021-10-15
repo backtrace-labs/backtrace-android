@@ -1,7 +1,8 @@
 # Backtrace Android Release Notes
 
-## Version 3.6.0 - 21.09.2021
+## Version 3.6.0 - 22.10.2021
 - Added error-free metrics
+- Added method to disable native crash reporting
 
 ## Version 3.5.0 - 14.09.2021
 - Added support for native crash reporting in NDK 16b

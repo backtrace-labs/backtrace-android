@@ -518,10 +518,10 @@ backtraceClient.metrics.enable(metricsSettings);
 
 ## Enabling native integration
 
-If you would like to capture NDK Crashes you can use the `BacktraceDatabase` `setupNativeIntegration` method. In general this should be the final step in setting up your Backtrace client to ensure all attributes and file attachment paths are captured properly by the native crash handler.
+If you would like to capture NDK Crashes you can use the `BacktraceClient` `enableNativeIntegration` method. In general this should be the final step in setting up your Backtrace client to ensure all attributes and file attachment paths are captured properly by the native crash handler.
 
 ```java
-database.setupNativeIntegration(backtraceClient, credentials);
+backtraceClient.enableNativeIntegration();
 ```
 
 In addition, you may need to add the [extractNativeLibs](https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs) option to your AndroidManifest.xml:
@@ -533,9 +533,16 @@ In addition, you may need to add the [extractNativeLibs](https://developer.andro
 ```
 More details about [extractNativeLibs](https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs) are available from the Android documentation
 
+You can also disable (and re-enable) native integration:
+```java
+backtraceClient.disableNativeIntegration();
+```
+
 **NOTE:** If your native app is built with NDK 16b, the Breakpad native crash client will be used instead of our recommended Crashpad crash client. To avoid this please use NDK 17c+ to build your native app.
 
 **NOTE:** Breakpad crash reports are submitted on the next app startup, instead of at crash time like Crashpad crash reports
+
+**NOTE:** Breakpad does not currently support `disableNativeIntegration`
 
 ## Uploading symbols to Backtrace
 For an NDK application, debugging symbols are not available to Backtrace by default. You will need to upload the application symbols for your native code to Backtrace. You can do this by uploading the native libraries themselves, which are usually found in the .apk bundle. [Click here to learn more about symbolification](https://support.backtrace.io/hc/en-us/articles/360040517071-Symbolication-Overview)

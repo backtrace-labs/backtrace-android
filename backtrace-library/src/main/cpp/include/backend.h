@@ -17,6 +17,8 @@ bool Initialize(jstring url,
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread);
 
 void AddAttribute(jstring key, jstring value);
+
+void Disable();
 }
 
 #endif //BACKTRACE_ANDROID_BACKEND_H

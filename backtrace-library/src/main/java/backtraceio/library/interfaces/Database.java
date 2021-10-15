@@ -110,6 +110,11 @@ public interface Database {
                                    boolean enableClientSideUnwinding, UnwindingMode unwindingMode);
 
     /**
+     * Disable native crash handler
+     */
+    void disableNativeIntegration();
+
+    /**
      * Get the breadcrumbs implementation
      *
      * @return the breadcrumbs implementation for this Database, if any
