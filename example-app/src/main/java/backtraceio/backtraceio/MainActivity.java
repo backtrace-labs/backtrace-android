@@ -195,4 +195,12 @@ public class MainActivity extends AppCompatActivity {
     public void dumpWithoutCrash(View view) {
         backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
     }
+
+    public void disableNativeIntegration(View view) {
+        backtraceClient.disableNativeIntegration();
+    }
+
+    public void enableNativeIntegration(View view) {
+        backtraceClient.enableNativeIntegration();
+    }
 }

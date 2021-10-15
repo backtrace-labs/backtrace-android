@@ -99,6 +99,28 @@
         app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbsUserOnly" />
 
     <Button
+        android:id="@+id/disableNativeIntegration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Disable Native Integration"
+        android:onClick="disableNativeIntegration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendReport" />
+
+    <Button
+        android:id="@+id/enableNativeIntegration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Re-Enable Native Integration"
+        android:onClick="enableNativeIntegration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disableNativeIntegration" />
+
+    <Button
         android:id="@+id/exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,6 +129,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendReport" />
+        app:layout_constraintTop_toBottomOf="@+id/enableNativeIntegration" />
 
 </android.support.constraint.ConstraintLayout>
