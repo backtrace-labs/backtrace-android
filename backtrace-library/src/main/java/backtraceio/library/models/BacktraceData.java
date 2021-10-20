@@ -166,9 +166,6 @@ public class BacktraceData {
                 clientAttributes);
         this.attributes = backtraceAttributes.attributes;
 
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
-        this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
-
         setAnnotations(backtraceAttributes.getComplexAttributes());
     }
 

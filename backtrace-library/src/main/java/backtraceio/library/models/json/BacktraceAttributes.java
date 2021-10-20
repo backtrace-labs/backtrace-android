@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.BacktraceStringHelper;
+import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
 import backtraceio.library.logger.BacktraceLogger;
@@ -100,6 +101,9 @@ public class BacktraceAttributes {
         this.attributes.put("device.manufacturer", Build.MANUFACTURER);
 
         this.attributes.put("device.os_version", System.getProperty("os.version"));
+
+        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
+        this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
     }
 
     private void setAppInformation() {

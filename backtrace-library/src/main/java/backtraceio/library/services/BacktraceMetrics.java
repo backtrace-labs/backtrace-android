@@ -343,9 +343,6 @@ public final class BacktraceMetrics implements Metrics {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
         localAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        localAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
-
         return localAttributes;
     }
 
