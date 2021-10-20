@@ -96,7 +96,7 @@ public interface Database {
      * @param enableClientSideUnwinding Enable client side unwinding
      */
     Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
-                                          boolean enableClientSideUnwinding);
+                                   boolean enableClientSideUnwinding);
 
     /**
      * Setup native crash handler
@@ -107,7 +107,7 @@ public interface Database {
      * @param unwindingMode             Unwinding mode to use for client side unwinding
      */
     Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
-                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode);
+                                   boolean enableClientSideUnwinding, UnwindingMode unwindingMode);
 
     /**
      * Disable native crash handler

@@ -11,17 +11,14 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceComponentListener implements ComponentCallbacks2 {
 
-    private BacktraceBreadcrumbs backtraceBreadcrumbs;
+    private final BacktraceBreadcrumbs backtraceBreadcrumbs;
 
-    public BacktraceComponentListener(BacktraceBreadcrumbs backtraceBreadcrumbs)
-    {
+    public BacktraceComponentListener(BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;
     }
 
-    private String getMemoryWarningString(final int level)
-    {
-        switch (level)
-        {
+    private String getMemoryWarningString(final int level) {
+        switch (level) {
             case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
                 return "TRIM MEMORY UI HIDDEN";
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
@@ -41,10 +38,8 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         }
     }
 
-    private BacktraceBreadcrumbLevel getMemoryWarningLevel(final int level)
-    {
-        switch (level)
-        {
+    private BacktraceBreadcrumbLevel getMemoryWarningLevel(final int level) {
+        switch (level) {
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
             case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
             case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
@@ -63,14 +58,12 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         String messageString = getMemoryWarningString(level);
         BacktraceBreadcrumbLevel breadcrumbLevel = getMemoryWarningLevel(level);
         backtraceBreadcrumbs.addBreadcrumb(messageString,
-                                        BacktraceBreadcrumbType.SYSTEM,
-                                        breadcrumbLevel);
+                BacktraceBreadcrumbType.SYSTEM,
+                breadcrumbLevel);
     }
 
-    private String stringifyOrientation(final int orientation)
-    {
-        switch (orientation)
-        {
+    private String stringifyOrientation(final int orientation) {
+        switch (orientation) {
             case Configuration.ORIENTATION_LANDSCAPE:
                 return "landscape";
             case Configuration.ORIENTATION_PORTRAIT:
@@ -86,15 +79,15 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         String orientation = stringifyOrientation(newConfig.orientation);
         attributes.put("orientation", orientation);
         backtraceBreadcrumbs.addBreadcrumb("Configuration changed",
-                                        attributes,
-                                        BacktraceBreadcrumbType.SYSTEM,
-                                        BacktraceBreadcrumbLevel.INFO);
+                attributes,
+                BacktraceBreadcrumbType.SYSTEM,
+                BacktraceBreadcrumbLevel.INFO);
     }
 
     @Override
     public void onLowMemory() {
         backtraceBreadcrumbs.addBreadcrumb("Critical low memory warning!",
-                                        BacktraceBreadcrumbType.SYSTEM,
-                                        BacktraceBreadcrumbLevel.FATAL);
+                BacktraceBreadcrumbType.SYSTEM,
+                BacktraceBreadcrumbLevel.FATAL);
     }
 }

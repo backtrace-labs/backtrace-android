@@ -8,18 +8,33 @@ import android.os.Message;
 import java.util.List;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 
 public class BacktraceHandlerThread extends HandlerThread {
 
+    private static final transient String LOG_TAG = BacktraceHandlerThread.class.getSimpleName();
+
     private BacktraceHandler mHandler;
-    private String url;
+    private final String url;
+    private UniqueEventsHandler mUniqueEventsHandler;
+    private SummedEventsHandler mSummedEventsHandler;
 
     BacktraceHandlerThread(String name, String url) {
         super(name);
         this.url = url;
         this.start();
+    }
+
+    UniqueEventsHandler createUniqueEventsHandler(BacktraceMetrics backtraceMetrics, Api api) {
+        this.mUniqueEventsHandler = new UniqueEventsHandler(backtraceMetrics, api, this);
+        return mUniqueEventsHandler;
+    }
+
+    SummedEventsHandler createSummedEventsHandler(BacktraceMetrics backtraceMetrics, Api api) {
+        this.mSummedEventsHandler = new SummedEventsHandler(backtraceMetrics, api, this);
+        return mSummedEventsHandler;
     }
 
     @Override
@@ -28,11 +43,22 @@ public class BacktraceHandlerThread extends HandlerThread {
         mHandler = new BacktraceHandler(this.getLooper(), this.url);
     }
 
-    void sendReport(BacktraceHandlerInput data) {
-
+    Message createMessage(BacktraceHandlerInput data) {
         Message message = new Message();
         message.obj = data;
-        mHandler.sendMessage(message);
+        return message;
+    }
+
+    void sendReport(BacktraceHandlerInputReport data) {
+        mHandler.sendMessage(createMessage(data));
+    }
+
+    void sendUniqueEvents(BacktraceHandlerInputEvents data) {
+        mUniqueEventsHandler.sendMessage(createMessage(data));
+    }
+
+    void sendSummedEvents(BacktraceHandlerInputEvents data) {
+        mSummedEventsHandler.sendMessage(createMessage(data));
     }
 
     private class BacktraceHandler extends Handler {
@@ -46,9 +72,8 @@ public class BacktraceHandlerThread extends HandlerThread {
 
         @Override
         public void handleMessage(Message msg) {
-            BacktraceHandlerInput mInput = (BacktraceHandlerInput) msg.obj;
+            BacktraceHandlerInputReport mInput = (BacktraceHandlerInputReport) msg.obj;
             BacktraceResult result;
-
             if (mInput.requestHandler != null) {
                 BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
                 result = mInput.requestHandler.onRequest(mInput.data);
@@ -56,8 +81,7 @@ public class BacktraceHandlerThread extends HandlerThread {
                 BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
                 String json = BacktraceSerializeHelper.toJson(mInput.data);
                 List<String> attachments = mInput.data.getAttachments();
-                result = BacktraceReportSender.sendReport(url, json, attachments, mInput.data
-                                .report,
+                result = BacktraceReportSender.sendReport(url, json, attachments, mInput.data.report,
                         mInput.serverErrorEventListener);
             }
 

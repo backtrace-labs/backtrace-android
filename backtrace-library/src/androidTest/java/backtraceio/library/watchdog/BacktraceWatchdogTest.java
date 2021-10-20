@@ -18,7 +18,7 @@ import backtraceio.library.BacktraceCredentials;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceWatchdogTest {
     private Context context;
-    private BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+    private final BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     private BacktraceClient backtraceClient;
 
     @Before
@@ -66,7 +66,8 @@ public class BacktraceWatchdogTest {
         final Waiter waiter = new Waiter();
         Thread t = new Thread() {
             public void run() {
-                while(true){ }
+                while (true) {
+                }
             }
         };
         watchdog.registerThread(t, 200, 50);
@@ -74,7 +75,7 @@ public class BacktraceWatchdogTest {
         try {
             // WHEN
             Thread.sleep(300);
-            boolean result =watchdog.checkIsAnyThreadIsBlocked();
+            boolean result = watchdog.checkIsAnyThreadIsBlocked();
 
             //THEN
             Assert.assertTrue(result);
@@ -85,13 +86,14 @@ public class BacktraceWatchdogTest {
 
     @Test
     @UiThreadTest
-    public void checkIfUnregisterThreadWorksCorrectly(){
+    public void checkIfUnregisterThreadWorksCorrectly() {
         // GIVEN
         final BacktraceWatchdog watchdog = new BacktraceWatchdog(this.backtraceClient);
         final Waiter waiter = new Waiter();
         Thread t = new Thread() {
             public void run() {
-                while(true){ }
+                while (true) {
+                }
             }
         };
         watchdog.registerThread(t, 200, 50);
@@ -111,13 +113,14 @@ public class BacktraceWatchdogTest {
 
     @Test
     @UiThreadTest
-    public void checkIfDeactivateThreadWatcherWorksCorrectly(){
+    public void checkIfDeactivateThreadWatcherWorksCorrectly() {
         // GIVEN
         final BacktraceWatchdog watchdog = new BacktraceWatchdog(this.backtraceClient);
         final Waiter waiter = new Waiter();
         Thread t = new Thread() {
             public void run() {
-                while(true){ }
+                while (true) {
+                }
             }
         };
         t.start();
@@ -138,13 +141,14 @@ public class BacktraceWatchdogTest {
 
     @Test
     @UiThreadTest
-    public void checkIfActivateThreadWatcherWorksCorrectly(){
+    public void checkIfActivateThreadWatcherWorksCorrectly() {
         // GIVEN
         final Waiter waiter = new Waiter();
         final BacktraceWatchdog watchdog = new BacktraceWatchdog(this.backtraceClient);
         Thread t = new Thread() {
             public void run() {
-                while(true){ }
+                while (true) {
+                }
             }
         };
         t.start();
@@ -173,7 +177,7 @@ public class BacktraceWatchdogTest {
 
     @Test
     @UiThreadTest
-    public void checkIsCustomEventWorksCorrectly(){
+    public void checkIsCustomEventWorksCorrectly() {
         // GIVEN
         final Waiter waiter = new Waiter();
         final BacktraceWatchdog watchdog = new BacktraceWatchdog(this.backtraceClient);
@@ -185,7 +189,8 @@ public class BacktraceWatchdogTest {
         });
         Thread t = new Thread() {
             public void run() {
-                while(true){ }
+                while (true) {
+                }
             }
         };
         t.start();

@@ -1,5 +1,8 @@
 package backtraceio.library.database;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -12,15 +15,12 @@ import org.junit.runner.RunWith;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.models.json.BacktraceReport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseProguardTest {
     private Context context;
     private String dbPath;
     private BacktraceDatabase database;
-    private String testMessage = "Example test string";
+    private final String testMessage = "Example test string";
 
     @Before
     public void setUp() {

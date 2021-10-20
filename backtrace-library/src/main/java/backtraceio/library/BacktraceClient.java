@@ -101,7 +101,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param context          context of current state of the application
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
-     * @param attributes  additional information about current application
+     * @param attributes       additional information about current application
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,
                            BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
@@ -114,7 +114,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param context          context of current state of the application
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
-     * @param attributes  additional information about current application
+     * @param attributes       additional information about current application
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials,

@@ -44,15 +44,6 @@ public class BacktraceCredentials {
         return endpointUrl;
     }
 
-    /**
-     * Get an access token to Backtrace server API
-     *
-     * @return access token
-     */
-    private String getSubmissionToken() {
-        return submissionToken;
-    }
-
     private Uri getBacktraceHostUri() {
         return backtraceHostUri;
     }
@@ -89,5 +80,53 @@ public class BacktraceCredentials {
             return null;
         }
         return Uri.parse(jsonUrl);
+    }
+
+    // Using algorithm from backtrace-unity:
+    // https://github.com/backtrace-labs/backtrace-unity/blob/553aab2b39c318ff96ebed4bc739bf2c87304649/Runtime/Model/BacktraceConfiguration.cs#L290
+    public String getUniverseName() {
+        String submissionUrl = getSubmissionUrl().toString();
+        final String backtraceSubmitUrl = "https://submit.backtrace.io/";
+        if (submissionUrl.startsWith(backtraceSubmitUrl))
+        {
+            int universeIndexStart = backtraceSubmitUrl.length();
+            int universeIndexEnd = submissionUrl.indexOf('/', universeIndexStart);
+            if(universeIndexEnd == -1)
+            {
+                throw new IllegalArgumentException("Invalid Backtrace URL");
+            }
+            return submissionUrl.substring(universeIndexStart, universeIndexEnd);
+        }
+        else
+        {
+            final String backtraceDomain = "backtrace.io";
+            if (submissionUrl.indexOf(backtraceDomain) == -1)
+            {
+                throw new IllegalArgumentException("Invalid Backtrace URL");
+            }
+
+            Uri uri = Uri.parse(submissionUrl);
+            return uri.getHost().substring(0, uri.getHost().indexOf("."));
+        }
+    }
+
+    /**
+     * Get an access token to Backtrace server API
+     *
+     * @return: access token
+     * @note: Using algorithm from backtrace-unity https://github.com/backtrace-labs/backtrace-unity/blob/553aab2b39c318ff96ebed4bc739bf2c87304649/Runtime/Model/BacktraceConfiguration.cs#L320
+     */
+    public String getSubmissionToken() {
+        if (submissionToken != null)
+            return submissionToken;
+
+        final int tokenLength = 64;
+        final String tokenQueryParam = "token=";
+        String submissionUrl = getSubmissionUrl().toString();
+        String token = submissionUrl.contains("submit.backtrace.io")
+                ? submissionUrl.substring(submissionUrl.lastIndexOf("/") - tokenLength + 1, submissionUrl.lastIndexOf("/"))
+                : submissionUrl.substring(submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length(),
+                    submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length() + tokenLength - 1);
+        return token;
     }
 }

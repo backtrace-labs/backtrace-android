@@ -17,15 +17,6 @@ public class ThreadData {
     public HashMap<String, ThreadInformation> threadInformation = new HashMap<>();
 
     /**
-     * Get main thread id
-     *
-     * @return main thread id
-     */
-    public String getMainThread() {
-        return mainThread;
-    }
-
-    /**
      * Application Id for current thread.
      * This value is used in mainThreadSection in output JSON file
      */
@@ -39,6 +30,15 @@ public class ThreadData {
     public ThreadData(ArrayList<BacktraceStackFrame> exceptionStack) {
         generateCurrentThreadInformation(exceptionStack);
         processThreads();
+    }
+
+    /**
+     * Get main thread id
+     *
+     * @return main thread id
+     */
+    public String getMainThread() {
+        return mainThread;
     }
 
     /**

@@ -15,7 +15,7 @@ import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceBreadcrumbs implements Breadcrumbs {
 
-    private static transient String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
 
     /**
      * Which breadcrumb types are enabled?
@@ -44,7 +44,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     private Context context;
 
-    private static final int DEFAULT_MAX_LOG_SIZE_BYTES = 64000;
+    public static final int DEFAULT_MAX_LOG_SIZE_BYTES = 64000;
 
     String breadcrumbLogDirectory;
 
@@ -153,11 +153,22 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     }
 
     /**
+     * NOTE: This should only be used for testing
+     *
+     * @param breadcrumbId Will force set the current breadcrumb ID
+     */
+    @Override
+    public void setCurrentBreadcrumbId(long breadcrumbId) {
+        this.backtraceBreadcrumbsLogManager.setCurrentBreadcrumbId(breadcrumbId);
+    }
+
+    /**
      * Get the current breadcrumb ID (exclusive). This is useful when breadcrumbs are queued and
      * posted to an API because in the meantime before the breadcrumbs are finally posted we might
      * get more breadcrumbs which are not relevant (because they occur after queueing up the
      * breadcrumb sender). Therefore it is useful to mark the breadcrumb sender with the most
      * current breadcrumb ID at the time of queuing up the request to post the breadcrumbs.
+     *
      * @return current breadcrumb ID (exclusive)
      */
     public long getCurrentBreadcrumbId() {
@@ -166,6 +177,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
+     *
      * @param message
      * @return true if the breadcrumb was successfully added
      */
@@ -176,6 +188,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
+     *
      * @param message
      * @param level
      * @return true if the breadcrumb was successfully added
@@ -187,6 +200,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
+     *
      * @param message
      * @param attributes
      * @return true if the breadcrumb was successfully added
@@ -198,6 +212,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string and attributes
+     *
      * @param message
      * @param attributes
      * @param level
@@ -210,6 +225,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string
+     *
      * @param message
      * @param type
      * @return true if the breadcrumb was successfully added
@@ -221,6 +237,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of the desired level and type with the provided message string
+     *
      * @param message
      * @param type
      * @param level
@@ -233,6 +250,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of the desired type and level "Info" with the provided message string and attributes
+     *
      * @param message
      * @param attributes
      * @param type
@@ -245,6 +263,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Add a breadcrumb of the desired level and type with the provided message string and attributes
+     *
      * @param message
      * @param attributes
      * @param type
@@ -261,6 +280,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * If Breadcrumbs is currently enabled, process the BacktraceReport for sending the Breadcrumb logs
+     *
      * @param backtraceReport
      */
     @Override
@@ -277,10 +297,10 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Create a breadcrumb which reflects the current breadcrumb configuration
+     *
      * @return true if the breadcrumb was successfully added
      */
-    private boolean addConfigurationBreadcrumb()
-    {
+    private boolean addConfigurationBreadcrumb() {
         if (backtraceBreadcrumbsLogManager == null) {
             BacktraceLogger.e(LOG_TAG, "Could not add configuration breadcrumb, BreadcrumbsLogManager is null");
             return false;
@@ -288,8 +308,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
         Map<String, Object> attributes = new HashMap<String, Object>();
 
-        for (BacktraceBreadcrumbType enabledType : BacktraceBreadcrumbType.values())
-        {
+        for (BacktraceBreadcrumbType enabledType : BacktraceBreadcrumbType.values()) {
             if (enabledType == BacktraceBreadcrumbType.CONFIGURATION) {
                 attributes.put(enabledType.toString(), "enabled");
             }
@@ -306,12 +325,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
                 BacktraceBreadcrumbLevel.INFO);
     }
 
-    private boolean isBreadcrumbsEnabled()
-    {
+    private boolean isBreadcrumbsEnabled() {
         return enabledBreadcrumbTypes != null && !enabledBreadcrumbTypes.isEmpty();
     }
 
     public String getBreadcrumbLogPath() {
-        return this.breadcrumbLogDirectory + "/" + this.breadcrumbLogFileName;
+        return this.breadcrumbLogDirectory + "/" + breadcrumbLogFileName;
     }
 }

@@ -11,13 +11,14 @@ import backtraceio.library.logger.BacktraceLogger;
  */
 public class BacktraceStackFrame {
 
-    private static transient String LOG_TAG = BacktraceStackFrame.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceStackFrame.class.getSimpleName();
 
     /**
      * Function where exception occurs
      */
     @SerializedName("funcName")
     public String functionName;
+
     /**
      * Line number in source code where exception occurs
      */

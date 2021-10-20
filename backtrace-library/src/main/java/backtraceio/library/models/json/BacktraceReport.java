@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
@@ -26,7 +27,7 @@ public class BacktraceReport {
     /**
      * UTC timestamp in seconds
      */
-    public long timestamp = System.currentTimeMillis() / 1000;
+    public long timestamp = BacktraceTimeHelper.getTimestampSeconds();
 
     /**
      * Get information about report type. If value is true the BacktraceReport has an error
@@ -184,16 +185,6 @@ public class BacktraceReport {
         }
     }
 
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-        return toBacktraceData(context, clientAttributes, false);
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
-        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
-        return backtraceData;
-    }
-
     /**
      * Concat two dictionaries with attributes
      *
@@ -210,5 +201,15 @@ public class BacktraceReport {
         }
         reportAttributes.putAll(attributes);
         return reportAttributes;
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
+        return toBacktraceData(context, clientAttributes, false);
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
+        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
+        return backtraceData;
     }
 }

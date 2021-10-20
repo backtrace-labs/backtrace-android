@@ -1,5 +1,7 @@
 package backtraceio.library.watchdog;
 
+import static org.junit.Assert.fail;
+
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.annotation.UiThreadTest;
@@ -18,12 +20,10 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 
-import static org.junit.Assert.fail;
-
 @RunWith(AndroidJUnit4.class)
 public class BacktraceAnrTest {
     private Context context;
-    private BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+    private final BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     private BacktraceClient backtraceClient;
 
     @Before
@@ -125,7 +125,7 @@ public class BacktraceAnrTest {
 
     @Test
     @UiThreadTest
-    public void checkIsDisableWorks(){
+    public void checkIsDisableWorks() {
         // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceLogger.setLevel(LogLevel.DEBUG);

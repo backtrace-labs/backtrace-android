@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.BuildConfig;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;
@@ -24,7 +23,18 @@ import backtraceio.library.models.json.ThreadInformation;
  */
 public class BacktraceData {
 
-    private static transient String LOG_TAG = BacktraceData.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceData.class.getSimpleName();
+    /**
+     * Name of programming language/environment this error comes from.
+     */
+    @SerializedName("lang")
+    public final String lang = "java";
+
+    /**
+     * Name of the client that is sending this error report.
+     */
+    @SerializedName("agent")
+    public final String agent = "backtrace-android";
 
     /**
      * If sending a Proguard obfuscated callstack, we need
@@ -47,22 +57,10 @@ public class BacktraceData {
     public long timestamp;
 
     /**
-     * Name of programming language/environment this error comes from.
-     */
-    @SerializedName("lang")
-    public final String lang = "java";
-
-    /**
      * Version of programming language/environment this error comes from.
      */
     @SerializedName("langVersion")
     public String langVersion;
-
-    /**
-     * Name of the client that is sending this error report.
-     */
-    @SerializedName("agent")
-    public final String agent = "backtrace-android";
 
     /**
      * Version of the android library
@@ -75,12 +73,6 @@ public class BacktraceData {
      */
     @SerializedName("attributes")
     public Map<String, String> attributes;
-
-    /**
-     * Application thread details
-     */
-    @SerializedName("threads")
-    Map<String, ThreadInformation> threadInformationMap;
 
     /**
      * Get a main thread name
@@ -100,7 +92,6 @@ public class BacktraceData {
     @SerializedName("annotations")
     public Map<String, Object> annotations;
 
-
     @SerializedName("sourceCode")
     public Map<String, SourceCode> sourceCode;
 
@@ -113,6 +104,12 @@ public class BacktraceData {
      * Current application context
      */
     public transient Context context;
+
+    /**
+     * Application thread details
+     */
+    @SerializedName("threads")
+    Map<String, ThreadInformation> threadInformationMap;
 
     /**
      * Create instance of report data

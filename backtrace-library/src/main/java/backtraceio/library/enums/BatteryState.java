@@ -4,7 +4,7 @@ public enum BatteryState {
     CHARGING("Charging"),
     UNKNOWN("Unknown"),
     FULL("Full"),
-    UNPLAGGED("Unplagged");
+    UNPLUGGED("Unplugged");
 
     private final String text;
 

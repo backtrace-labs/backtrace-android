@@ -14,12 +14,11 @@ import backtraceio.library.models.json.BacktraceReport;
  */
 public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private static transient String LOG_TAG = BacktraceExceptionHandler.class.getSimpleName();
-
+    private static final transient String LOG_TAG = BacktraceExceptionHandler.class.getSimpleName();
+    private static Map<String, Object> customAttributes;
     private final Thread.UncaughtExceptionHandler rootHandler;
     private final CountDownLatch signal = new CountDownLatch(1);
-    private BacktraceClient client;
-    private static Map<String, Object> customAttributes;
+    private final BacktraceClient client;
 
     private BacktraceExceptionHandler(BacktraceClient client) {
         BacktraceLogger.d(LOG_TAG, "BacktraceExceptionHandler initialization");
@@ -28,7 +27,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
-    public static void setCustomAttributes(Map<String, Object> attributes){
+    public static void setCustomAttributes(Map<String, Object> attributes) {
         BacktraceExceptionHandler.customAttributes = attributes;
     }
 

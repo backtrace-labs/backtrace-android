@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
@@ -18,6 +19,11 @@ import backtraceio.library.models.json.BacktraceReport;
 public class BacktraceDatabaseRecord {
 
     private static transient final String LOG_TAG = BacktraceDatabaseRecord.class.getSimpleName();
+
+    /**
+     * Path to database directory
+     */
+    private transient final String _path;
 
     /**
      * Id
@@ -31,14 +37,15 @@ public class BacktraceDatabaseRecord {
     public transient boolean locked = false;
 
     /**
+     * record writer
+     */
+    transient DatabaseRecordWriter RecordWriter;
+
+    /**
      * Path to json stored all information about current record
      */
     @SerializedName("RecordName")
     private String recordPath;
-
-    public String getRecordPath() {
-        return recordPath;
-    }
 
     /**
      * Path to a diagnostic data json
@@ -46,19 +53,11 @@ public class BacktraceDatabaseRecord {
     @SerializedName("DataPath")
     private String diagnosticDataPath;
 
-    public String getDiagnosticDataPath() {
-        return diagnosticDataPath;
-    }
-
     /**
      * Path to Backtrace Report json
      */
     @SerializedName("ReportPath")
     private String reportPath;
-
-    public String getReportPath() {
-        return reportPath;
-    }
 
     /**
      * Total size of record
@@ -66,29 +65,10 @@ public class BacktraceDatabaseRecord {
     @SerializedName("Size")
     private long size;
 
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
     /**
      * Stored record
      */
     private transient BacktraceData record;
-
-    /**
-     * Path to database directory
-     */
-    private transient final String _path;
-
-    /**
-     * record writer
-     */
-    transient DatabaseRecordWriter RecordWriter;
-
 
     BacktraceDatabaseRecord() {
         this._path = "";
@@ -105,10 +85,46 @@ public class BacktraceDatabaseRecord {
     }
 
     /**
+     * Read single record from file
+     *
+     * @param file current file
+     * @return saved database record
+     */
+    public static BacktraceDatabaseRecord readFromFile(File file) {
+        BacktraceLogger.d(LOG_TAG, "Reading JSON from passed file");
+        String json = FileHelper.readFile(file);
+        if (BacktraceStringHelper.isNullOrEmpty(json)) {
+            BacktraceLogger.w(LOG_TAG, "JSON from passed file is null or empty");
+            return null;
+        }
+        return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
+    }
+
+    public String getRecordPath() {
+        return recordPath;
+    }
+
+    public String getDiagnosticDataPath() {
+        return diagnosticDataPath;
+    }
+
+    public String getReportPath() {
+        return reportPath;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    /**
      * Get valid BacktraceData from current record
      *
-     * @return valid BacktraceData object
      * @param context
+     * @return valid BacktraceData object
      */
     public BacktraceData getBacktraceData(Context context) {
         if (this.record != null) {
@@ -240,21 +256,5 @@ public class BacktraceDatabaseRecord {
             BacktraceLogger.e(LOG_TAG, "Can not unlock record");
         }
         return false;
-    }
-
-    /**
-     * Read single record from file
-     *
-     * @param file current file
-     * @return saved database record
-     */
-    public static BacktraceDatabaseRecord readFromFile(File file) {
-        BacktraceLogger.d(LOG_TAG, "Reading JSON from passed file");
-        String json = FileHelper.readFile(file);
-        if (json == null || json.equals("")) {
-            BacktraceLogger.w(LOG_TAG, "JSON from passed file is null or empty");
-            return null;
-        }
-        return BacktraceSerializeHelper.fromJson(json, BacktraceDatabaseRecord.class);
     }
 }
