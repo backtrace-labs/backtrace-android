@@ -85,6 +85,7 @@ public class BacktraceDatabase implements Database {
      * Create disabled instance of BacktraceDatabase
      */
     public BacktraceDatabase() {
+        BacktraceLogger.w(LOG_TAG, "Disabled instance of BacktraceDatabase created, native crashes won't be captured");
     }
 
     /**
@@ -266,7 +267,7 @@ public class BacktraceDatabase implements Database {
                     return;
                 }
 
-                if(backtraceDatabaseContext.isEmpty()) {
+                if (backtraceDatabaseContext.isEmpty()) {
                     BacktraceLogger.d(LOG_TAG, "Timer - database is empty (no records): " +
                             dateTimeNow);
                     return;

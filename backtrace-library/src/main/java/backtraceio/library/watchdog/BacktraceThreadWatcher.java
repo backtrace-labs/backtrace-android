@@ -9,8 +9,8 @@ package backtraceio.library.watchdog;
 public class BacktraceThreadWatcher {
     private int counter;
     private int privateCounter;
-    private int timeout;
-    private int delay;
+    private final int timeout;
+    private final int delay;
     private long lastTimestamp;
     private boolean active;
 

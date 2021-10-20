@@ -12,15 +12,19 @@ import android.view.WindowManager;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import backtraceio.library.BuildConfig;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
+import backtraceio.library.logger.BacktraceLogger;
 
 /**
  * Class instance to get a built-in attributes from current application
  */
 public class BacktraceAttributes {
+    private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
 
     /**
      * Get built-in primitive attributes
@@ -30,12 +34,22 @@ public class BacktraceAttributes {
     /**
      * Get built-in complex attributes
      */
-    private Map<String, Object> complexAttributes = new HashMap<>();
+    private final Map<String, Object> complexAttributes = new HashMap<>();
 
     /**
      * Application context
      */
-    private Context context;
+    private final Context context;
+
+    /**
+     * Are metrics enabled?
+     */
+    private static boolean isMetricsEnabled = false;
+
+    /**
+     * Metrics session ID
+     */
+    private static String sessionId;
 
     /**
      * Create instance of Backtrace Attribute
@@ -60,6 +74,12 @@ public class BacktraceAttributes {
         setAppInformation();
         setDeviceInformation();
         setScreenInformation();
+
+        // For tracking crash-free sessions we need to add
+        // application.session and application.version to Backtrace attributes
+        if (isMetricsEnabled) {
+            this.attributes.put("application.session", sessionId);
+        }
     }
 
     public Map<String, Object> getComplexAttributes() {
@@ -85,15 +105,13 @@ public class BacktraceAttributes {
     private void setAppInformation() {
         this.attributes.put("application.package", this.context.getApplicationContext()
                 .getPackageName());
-
-        this.attributes.put("application", this.context.getApplicationInfo().loadLabel(this.context
-                .getPackageManager()).toString());
-
-        try {
-            this.attributes.put("version", this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+        this.attributes.put("application", getApplicationName());
+        String version = getApplicationVersionOrEmpty();
+        if (!BacktraceStringHelper.isNullOrEmpty(version)) {
+            // We want to standardize application.version attribute name
+            this.attributes.put("application.version", version);
+            // But we keep version attribute name as to not break any customer workflows
+            this.attributes.put("version", version);
         }
     }
 
@@ -198,5 +216,36 @@ public class BacktraceAttributes {
                 this.complexAttributes.put(entry.getKey(), value);
             }
         }
+    }
+
+    public String getApplicationName() {
+        return this.context.getApplicationInfo().loadLabel(this.context
+                .getPackageManager()).toString();
+    }
+
+    public String getApplicationVersionOrEmpty() {
+        try {
+            return this.context.getPackageManager()
+                    .getPackageInfo(this.context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public Map<String, Object> getAllAttributes() {
+        Map<String, Object> attributes = new HashMap<String, Object>();
+        attributes.putAll(this.attributes);
+        attributes.putAll(this.complexAttributes);
+        return attributes;
+    }
+
+    public static void enableMetrics() {
+        BacktraceAttributes.isMetricsEnabled = true;
+
+        // Create a session ID for metrics session tracking
+        String sessionId = UUID.randomUUID().toString();
+        BacktraceAttributes.sessionId = sessionId;
     }
 }

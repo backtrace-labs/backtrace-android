@@ -17,27 +17,7 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class BacktraceDatabaseContext implements DatabaseContext {
 
-    private static transient String LOG_TAG = BacktraceDatabaseContext.class.getSimpleName();
-
-    /**
-     * Application context
-     */
-    private Context _applicationContext;
-
-    /**
-     * Database cache
-     */
-    private Map<Integer, List<BacktraceDatabaseRecord>> batchRetry = new HashMap<>();
-
-    /**
-     * Total database size on hard drive
-     */
-    private long totalSize = 0;
-
-    /**
-     * Total records in BacktraceDatabase
-     */
-    private int totalRecords = 0;
+    private static final transient String LOG_TAG = BacktraceDatabaseContext.class.getSimpleName();
 
     /**
      * Path to database directory
@@ -50,10 +30,29 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private final int _retryNumber;
 
     /**
+     * Application context
+     */
+    private final Context _applicationContext;
+
+    /**
+     * Database cache
+     */
+    private final Map<Integer, List<BacktraceDatabaseRecord>> batchRetry = new HashMap<>();
+
+    /**
+     * Total database size on hard drive
+     */
+    private long totalSize = 0;
+
+    /**
+     * Total records in BacktraceDatabase
+     */
+    private int totalRecords = 0;
+
+    /**
      * Record order
      */
-    private RetryOrder retryOrder;
-
+    private final RetryOrder retryOrder;
 
     /**
      * Initialize new instance of Backtrace Database Context

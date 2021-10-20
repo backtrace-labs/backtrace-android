@@ -1,5 +1,11 @@
 package backtraceio.library;
 
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -28,12 +34,6 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientBreadcrumbsTest {
     private Context context;
@@ -41,8 +41,7 @@ public class BacktraceClientBreadcrumbsTest {
     private BacktraceClient backtraceClient;
     private final String resultMessage = "From request handler";
 
-    static
-    {
+    static {
         System.loadLibrary("backtrace-native");
     }
 
@@ -65,6 +64,8 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionBreadcrumbs() {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
+        // Account for mandatory configuration breadcrumb
+        backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -112,6 +113,8 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionBreadcrumbsAddBreadcrumb() {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
+        // Account for mandatory configuration breadcrumb
+        backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -169,6 +172,8 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionBreadcrumbsClearBreadcrumb() {
         // GIVEN
         backtraceClient.enableBreadcrumbs(context);
+        // Account for mandatory configuration breadcrumb
+        backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
@@ -203,7 +208,7 @@ public class BacktraceClientBreadcrumbsTest {
 
                             // After adding new breadcrumbs, we should have incremented the breadcrumbs.lastId
                             assertEquals(3L,
-                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                                    (long) backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
                             waiter.resume();
                         }

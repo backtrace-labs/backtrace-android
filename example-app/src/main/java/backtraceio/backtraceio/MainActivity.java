@@ -28,7 +28,10 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceExceptionHandler;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 

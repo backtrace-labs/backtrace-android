@@ -10,11 +10,16 @@ import java.net.URL;
 import java.util.List;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
+import backtraceio.library.common.RequestHelper;
 import backtraceio.library.events.OnServerErrorEventListener;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.metrics.EventsPayload;
+import backtraceio.library.models.metrics.EventsResult;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.models.types.HttpException;
 
 /**
@@ -23,6 +28,8 @@ import backtraceio.library.models.types.HttpException;
 class BacktraceReportSender {
 
     private static final String LOG_TAG = BacktraceReportSender.class.getSimpleName();
+
+    private static final int CHUNK_SIZE = 128 * 1024;
 
     /**
      * Send HTTP request for certain url server with information about device, error, attachments
@@ -48,7 +55,7 @@ class BacktraceReportSender {
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
 
-            urlConnection.setChunkedStreamingMode(128 * 1024);
+            urlConnection.setChunkedStreamingMode(CHUNK_SIZE);
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Cache-Control", "no-cache");
 
@@ -66,7 +73,7 @@ class BacktraceReportSender {
             request.close();
 
             int statusCode = urlConnection.getResponseCode();
-            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + Integer.toString(statusCode));
+            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 result = BacktraceSerializeHelper.backtraceResultFromJson(
@@ -75,10 +82,9 @@ class BacktraceReportSender {
                 result.setBacktraceReport(report);
             } else {
                 String message = getResponse(urlConnection);
-                message = (message == null || message.equals("")) ?
+                message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                         urlConnection.getResponseMessage() : message;
-                throw new HttpException(statusCode, String.format("%s: %s",
-                        Integer.toString(statusCode), message));
+                throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }
 
         } catch (Exception e) {
@@ -96,6 +102,75 @@ class BacktraceReportSender {
                 } catch (Exception e) {
                     BacktraceLogger.e(LOG_TAG, "Disconnecting HttpUrlConnection failed", e);
                     result = BacktraceResult.OnError(report, e);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Send HTTP request for certain url server with information about events
+     *
+     * @param serverUrl     server http address to which the request will be sent
+     * @param json          message wih information about events
+     * @param payload       information about events
+     * @param errorCallback event that will be executed after receiving an error from the server
+     * @return information from the server about the result of processing the request
+     */
+    public static EventsResult sendEvents(String serverUrl, String json, EventsPayload payload, OnServerErrorEventListener errorCallback) {
+        HttpURLConnection urlConnection = null;
+        EventsResult result;
+        int statusCode = -1;
+
+        try {
+            URL url = new URL(serverUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setUseCaches(false);
+
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+
+            urlConnection.setRequestProperty("Connection", "Keep-Alive");
+            urlConnection.setRequestProperty("Content-Type", RequestHelper.getContentType());
+
+            BacktraceLogger.d(LOG_TAG, "HttpURLConnection successfully initialized");
+            DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
+
+            RequestHelper.addJson(request, json);
+            RequestHelper.addEndOfRequest(request);
+
+            request.flush();
+            request.close();
+
+            statusCode = urlConnection.getResponseCode();
+            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
+
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                result = new EventsResult(payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);
+            } else {
+                String message = getResponse(urlConnection);
+                message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
+                        urlConnection.getResponseMessage() : message;
+                throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
+            }
+        } catch (Exception e) {
+            if (errorCallback != null) {
+                BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
+                errorCallback.onEvent(e);
+            }
+            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
+            BacktraceLogger.e(LOG_TAG, "Failed HTTP request URL " + serverUrl);
+            result = EventsResult.OnError(payload, e, statusCode);
+        } finally {
+            if (urlConnection != null) {
+                try {
+                    urlConnection.disconnect();
+                    BacktraceLogger.d(LOG_TAG, "Disconnecting HttpUrlConnection successful");
+                } catch (Exception e) {
+                    BacktraceLogger.e(LOG_TAG, "Disconnecting HttpUrlConnection failed", e);
+                    result = EventsResult.OnError(payload, e, statusCode);
                 }
             }
         }

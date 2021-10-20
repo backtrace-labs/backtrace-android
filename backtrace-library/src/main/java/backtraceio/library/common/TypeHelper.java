@@ -6,6 +6,7 @@ package backtraceio.library.common;
 public class TypeHelper {
     /**
      * Check if object type is primitive - for example: int or long.
+     *
      * @param type object to check
      * @return true, if an object is primitive. Otherwise false.
      */

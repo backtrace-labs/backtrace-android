@@ -14,7 +14,7 @@ public class BacktraceWatchdog {
     private final static transient String LOG_TAG = BacktraceWatchdog.class.getSimpleName();
     private final BacktraceClient backtraceClient;
     private final boolean sendException;
-    private Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
+    private final Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
 
     /**
      * Event which will be executed instead of default handling ANR error
@@ -38,6 +38,7 @@ public class BacktraceWatchdog {
 
     /**
      * Set event that will be executed instead of the default sending of the error information to the Backtrace console
+     *
      * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
      */
     public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
@@ -74,8 +75,8 @@ public class BacktraceWatchdog {
                 continue;
             }
 
-            BacktraceLogger.w(LOG_TAG, String.format("Thread %s %s  might be hung, timestamp: %s",
-                    Long.toString(currentThread.getId()), currentThread.getName(), now_str));
+            BacktraceLogger.w(LOG_TAG, String.format("Thread %d %s  might be hung, timestamp: %s",
+                    currentThread.getId(), currentThread.getName(), now_str));
 
             // Otherwise, the thread has not made forward progress.
             // Determine whether the timeout has been exceeded.
@@ -100,7 +101,7 @@ public class BacktraceWatchdog {
      *
      * @param thread  thread which should be monitored
      * @param timeout time in milliseconds after which we consider the thread to be blocked
-     * @param delay time delay in milliseconds after which the thread should be monitored
+     * @param delay   time delay in milliseconds after which the thread should be monitored
      */
     public void registerThread(Thread thread, int timeout, int delay) {
         threadsIdWatcher.put(thread, new BacktraceThreadWatcher(timeout, delay));

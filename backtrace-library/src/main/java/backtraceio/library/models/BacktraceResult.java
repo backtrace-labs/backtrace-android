@@ -52,15 +52,6 @@ public class BacktraceResult {
         this.status = status;
     }
 
-    public void setBacktraceReport(BacktraceReport backtraceReport) {
-        this.backtraceReport = backtraceReport;
-    }
-
-    @SuppressWarnings({"UnusedDeclaration"})
-    public BacktraceReport getBacktraceReport() {
-        return backtraceReport;
-    }
-
     /**
      * Set result when error occurs while sending data to API
      *
@@ -72,5 +63,14 @@ public class BacktraceResult {
         return new BacktraceResult(
                 report, exception.getMessage(),
                 BacktraceResultStatus.ServerError);
+    }
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    public BacktraceReport getBacktraceReport() {
+        return backtraceReport;
+    }
+
+    public void setBacktraceReport(BacktraceReport backtraceReport) {
+        this.backtraceReport = backtraceReport;
     }
 }
