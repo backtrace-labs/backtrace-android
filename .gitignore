@@ -88,3 +88,4 @@ hs_err_pid*
 #NDK
 obj/
 .externalNativeBuild
+**/.cxx
