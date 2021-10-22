@@ -309,7 +309,7 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testQueueFileRollover() {
         final int numIterations = 1000;
-        final int firstBreadcrumbIndexAfterRollover = 932;
+        final int firstBreadcrumbIndexAfterRollover = 925;
         // Account for mandatory configuration breadcrumb
         backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
 

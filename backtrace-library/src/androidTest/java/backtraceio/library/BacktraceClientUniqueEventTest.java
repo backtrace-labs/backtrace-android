@@ -224,9 +224,6 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        expectedAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
-
         assertEquals(expectedAttributes.size(), backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
     }
 
@@ -246,9 +243,6 @@ public class BacktraceClientUniqueEventTest {
 
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
-
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        expectedAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
         assertEquals(expectedAttributes.size(), backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
     }
@@ -273,9 +267,6 @@ public class BacktraceClientUniqueEventTest {
 
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
-
-        DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(context);
-        expectedAttributes.putAll(deviceAttributesHelper.getDeviceAttributes());
 
         assertEquals(expectedAttributes.size() + 1, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
     }
