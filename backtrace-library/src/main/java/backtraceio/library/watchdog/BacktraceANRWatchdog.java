@@ -128,7 +128,7 @@ public class BacktraceANRWatchdog extends Thread {
                 continue;
             }
             if(reported) {
-                // skiping, because we already reported an ANR report for current ANR
+                // skipping, because we already reported an ANR report for current ANR
                 continue;
             }
             reported = true;
