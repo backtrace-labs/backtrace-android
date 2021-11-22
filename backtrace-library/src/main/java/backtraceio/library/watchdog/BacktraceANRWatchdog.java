@@ -127,7 +127,7 @@ public class BacktraceANRWatchdog extends Thread {
                         "is on and connected debugger");
                 continue;
             }
-            if(reported) {
+            if (reported) {
                 // skipping, because we already reported an ANR report for current ANR
                 continue;
             }
