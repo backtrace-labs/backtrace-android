@@ -16,6 +16,13 @@ elseif (NOT ANDROID_NDK_MAJOR)
     set(BACKEND "BREAKPAD_BACKEND")
 elseif(ANDROID_NDK_MAJOR LESS 17)
     set(BACKEND "BREAKPAD_BACKEND")
+elseif(ANDROID_NATIVE_API_LEVEL LESS 21)
+    set(BACKEND "CRASHPAD_BACKEND")
+    # 64 bit architectures will always have min API level 21
+    # https://stackoverflow.com/a/56467008
+    if (NOT ANDROID_ABI STREQUAL "armeabi-v7a")
+        set(CLIENT_SIDE_UNWINDING TRUE)
+    endif()
 else()
     set(BACKEND "CRASHPAD_BACKEND")
     set(CLIENT_SIDE_UNWINDING TRUE)

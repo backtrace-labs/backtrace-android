@@ -72,7 +72,7 @@ catch (e: Exception) {
 * Supports Breadcrumbs.
 
 # Supported SDKs <a name="supported-sdks"></a>
-* Minimum SDK version 21 (Android 5.0)
+* Minimum SDK version 16 (Android 4.1.x)
 * Target SDK version 30 (Android 11.0)
 * Minimum NDK version 16b
 * Maximum NDK version 22
@@ -560,6 +560,8 @@ database.setupNativeIntegration(backtraceClient, credentials, true);
 **NOTE:** Client side unwinding is only available for fatal crashes. Non-fatal Crashpad dumps you generate via `DumpWithoutCrash` for instance will not use client side unwinding.
 
 **NOTE:** Client side unwinding is only available in NDK level 17+ (i.e: Only with the Crashpad crash reporting backend)
+
+**NOTE:** Client side unwinding is only available in SDK level 21+ (i.e: If minSDKVersion < 21, client-side unwinding will be disabled for 32-bit arm platforms)
 
 ### Unwinding Modes and Options
 
