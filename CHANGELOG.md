@@ -4,6 +4,8 @@
 - Added error-free metrics
 - Added method to disable native crash reporting
 - Fixed Crashpad initialization failure in Samsung A20
+- Preliminary support for API 16+
+- Prevent duplicate ANR reports
 
 ## Version 3.5.0 - 14.09.2021
 - Added support for native crash reporting in NDK 16b
