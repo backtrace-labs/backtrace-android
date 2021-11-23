@@ -97,6 +97,7 @@ public class BacktraceANRWatchdog extends Thread {
      */
     @Override
     public void run() {
+        Boolean reported = false;
         while (!shouldStop && !isInterrupted()) {
             String dateTimeNow = Calendar.getInstance().getTime().toString();
             BacktraceLogger.d(LOG_TAG, "ANR WATCHDOG - " + dateTimeNow);
@@ -116,6 +117,7 @@ public class BacktraceANRWatchdog extends Thread {
             threadWatcher.tickPrivateCounter();
 
             if (threadWatcher.getCounter() == threadWatcher.getPrivateCounter()) {
+                reported = false;
                 BacktraceLogger.d(LOG_TAG, "ANR is not detected");
                 continue;
             }
@@ -125,6 +127,11 @@ public class BacktraceANRWatchdog extends Thread {
                         "is on and connected debugger");
                 continue;
             }
+            if (reported) {
+                // skipping, because we already reported an ANR report for current ANR
+                continue;
+            }
+            reported = true;
             BacktraceWatchdogShared.sendReportCauseBlockedThread(backtraceClient,
                     Looper.getMainLooper().getThread(), onApplicationNotRespondingEvent, LOG_TAG);
         }
