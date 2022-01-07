@@ -47,6 +47,7 @@ android {
         }
     }
     
+    // Needed until we migrate to AndroidX
     android {
         lintOptions {
             abortOnError false
