@@ -46,6 +46,12 @@ android {
             jniLibs.includes = ['src/main/cpp/crashpad-builds/crashpad_handler']
         }
     }
+    
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
 
 dependencies {
