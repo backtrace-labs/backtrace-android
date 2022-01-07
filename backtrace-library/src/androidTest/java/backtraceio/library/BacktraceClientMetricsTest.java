@@ -94,15 +94,11 @@ public class BacktraceClientMetricsTest {
         assertEquals(0, mockRequestHandler.numAttempts);
     }
 
-    /**
-     * NOTE: This test is especially brittle, don't be suspicious unless it fails consistently
-     * For best results run under low CPU load and low memory utilization conditions.
-     */
     @Test
     public void try3TimesOn503() {
         final Waiter waiter = new Waiter();
 
-        final int timeBetweenRetriesMillis = 10;
+        final int timeBetweenRetriesMillis = 1;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
@@ -132,12 +128,8 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
         backtraceClient.metrics.send();
 
         try {
@@ -150,10 +142,6 @@ public class BacktraceClientMetricsTest {
         assertFalse(mockUniqueRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(3, mockSummedRequestHandler.numAttempts);
         assertFalse(mockSummedRequestHandler.lastEventPayloadJson.isEmpty());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
-        // We should keep summed event since we failed to send
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
     }
 
     @Test
