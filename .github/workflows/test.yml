@@ -41,6 +41,7 @@ jobs:
       with:
         target: google_apis
         api-level: 30
+        arch: x86_64
         script: ./gradlew assembleDebug && ./gradlew test --info && ./gradlew connectedCheck
     - name: Code coverage
       run: bash <(curl -s https://codecov.io/bash)
