@@ -39,6 +39,7 @@ jobs:
     - name: Test
       uses: reactivecircus/android-emulator-runner@v2
       with:
+        target: google_apis
         api-level: 30
         script: ./gradlew assembleDebug && ./gradlew test --info && ./gradlew connectedCheck
     - name: Code coverage
