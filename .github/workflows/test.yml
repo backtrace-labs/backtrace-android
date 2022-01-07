@@ -30,6 +30,7 @@ jobs:
     - name: Checkout submodules
       uses: actions/checkout@v2
       with:
+        fetch-depth: 2
         submodules: recursive
         token: ${{ secrets.ACCESS_TOKEN }}
         persist-credentials: false
