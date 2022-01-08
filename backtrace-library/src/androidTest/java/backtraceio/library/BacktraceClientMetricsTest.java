@@ -270,7 +270,7 @@ public class BacktraceClientMetricsTest {
     public void uploadEventsAutomatic() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
