@@ -366,7 +366,7 @@ public class BacktraceClientUniqueEventTest {
         // Wait 1 second so that the timestamp will update on the next send.
         // Timestamp granularity is 1 second
         try {
-            sleep(1, TimeUnit.SECONDS);
+            sleep(1000);
         } catch (Exception e) {
             fail(e.toString());
         }
