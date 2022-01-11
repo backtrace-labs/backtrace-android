@@ -133,7 +133,7 @@ public class BacktraceClientSummedEventTest {
     public void try3TimesOn503AndDropSummedEventsIfMaxNumEventsReached() {
         final Waiter waiter = new Waiter();
 
-        final int timeBetweenRetriesMillis = 20;
+        final int timeBetweenRetriesMillis = 1;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
         mockSummedRequestHandler.statusCode = 503;

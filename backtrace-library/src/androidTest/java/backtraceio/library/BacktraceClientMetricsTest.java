@@ -179,7 +179,7 @@ public class BacktraceClientMetricsTest {
         });
 
         // Enabling metrics will automatically send startup events
-        final int timeBetweenRetriesMillis = 10;
+        final int timeBetweenRetriesMillis = 1;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
         try {
@@ -297,11 +297,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         backtraceClient.metrics.addSummedEvent(summedEventName);
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
 
         try {
             waiter.await(1000, 2);
@@ -313,9 +309,6 @@ public class BacktraceClientMetricsTest {
         assertEquals(1, mockUniqueRequestHandler.numAttempts);
         assertFalse(mockSummedRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(1, mockSummedRequestHandler.numAttempts);
-        assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
     }
 
     @Test
