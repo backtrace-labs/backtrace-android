@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
@@ -109,7 +110,7 @@ public class BacktraceClientUniqueEventTest {
         assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
 
         try {
-            waiter.await(1000);
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -145,7 +146,7 @@ public class BacktraceClientUniqueEventTest {
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
 
         try {
-            waiter.await(1000);
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -365,7 +366,7 @@ public class BacktraceClientUniqueEventTest {
         // Wait 1 second so that the timestamp will update on the next send.
         // Timestamp granularity is 1 second
         try {
-            sleep(1000);
+            sleep(1, TimeUnit.SECONDS);
         } catch (Exception e) {
             fail(e.toString());
         }

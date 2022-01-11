@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
+
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -133,7 +135,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 6);
+            waiter.await(5, TimeUnit.SECONDS, 6);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -183,7 +185,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -225,7 +227,7 @@ public class BacktraceClientMetricsTest {
         }
 
         try {
-            waiter.await(1000);
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -300,7 +302,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -390,7 +392,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -442,7 +444,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -476,7 +478,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
