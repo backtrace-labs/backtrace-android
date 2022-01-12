@@ -26,6 +26,13 @@ android {
             version "3.10.2"
         }
     }
+    
+    // Needed until we migrate to AndroidX
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
 
 dependencies {
