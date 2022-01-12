@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
+
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -94,15 +96,11 @@ public class BacktraceClientMetricsTest {
         assertEquals(0, mockRequestHandler.numAttempts);
     }
 
-    /**
-     * NOTE: This test is especially brittle, don't be suspicious unless it fails consistently
-     * For best results run under low CPU load and low memory utilization conditions.
-     */
     @Test
     public void try3TimesOn503() {
         final Waiter waiter = new Waiter();
 
-        final int timeBetweenRetriesMillis = 10;
+        final int timeBetweenRetriesMillis = 1;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
@@ -132,16 +130,12 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 6);
+            waiter.await(5, TimeUnit.SECONDS, 6);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -150,10 +144,6 @@ public class BacktraceClientMetricsTest {
         assertFalse(mockUniqueRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(3, mockSummedRequestHandler.numAttempts);
         assertFalse(mockSummedRequestHandler.lastEventPayloadJson.isEmpty());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
-        // We should keep summed event since we failed to send
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
     }
 
     @Test
@@ -191,11 +181,11 @@ public class BacktraceClientMetricsTest {
         });
 
         // Enabling metrics will automatically send startup events
-        final int timeBetweenRetriesMillis = 10;
+        final int timeBetweenRetriesMillis = 1;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -237,7 +227,7 @@ public class BacktraceClientMetricsTest {
         }
 
         try {
-            waiter.await(1000);
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -282,7 +272,7 @@ public class BacktraceClientMetricsTest {
     public void uploadEventsAutomatic() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -309,14 +299,10 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         backtraceClient.metrics.addSummedEvent(summedEventName);
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -325,9 +311,6 @@ public class BacktraceClientMetricsTest {
         assertEquals(1, mockUniqueRequestHandler.numAttempts);
         assertFalse(mockSummedRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(1, mockSummedRequestHandler.numAttempts);
-        assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
-        // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
     }
 
     @Test
@@ -409,7 +392,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -461,7 +444,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -495,7 +478,7 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 2);
+            waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
             fail(e.toString());
         }
