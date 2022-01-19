@@ -18,7 +18,7 @@ jobs:
       ANDROID_TAG: google_apis
       ADB_INSTALL_TIMEOUT: 20
     
-    runs-on: macos-latest
+    runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
 
     steps:
     - uses: actions/checkout@v2
