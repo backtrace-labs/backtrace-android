@@ -32,8 +32,15 @@ jobs:
        submodules: recursive
        token: ${{ secrets.ACCESS_TOKEN }}
        persist-credentials: false
+   
+   - name: Add Maven credentials to gradle.properties
+     run: echo "NEXUS_USERNAME=${{ secrets.NEXUS_USERNAME }}" >> gradle.properties && echo "NEXUS_PASSWORD=${{ secrets.NEXUS_PASSWORD }}" >> gradle.properties
 
    - name: Grant execute permission for gradlew
      run: chmod +x gradlew
+     env:
+       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ASCII_ARMORED_GPG_KEY }} # ASCII-armored GPG key
+       ORG_GRADLE_PROJECT_signingPassword: "" # Using empty passphrase for GPG key
+       
    - name: Upload archives
      run: ./gradlew uploadArchives
