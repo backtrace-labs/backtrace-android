@@ -1,11 +1,12 @@
 # Backtrace Android Release Notes
 
-## Version 3.6.0 - 22.10.2021
+## Version 3.6.0 - 29.1.2022
 - Added error-free metrics
 - Added method to disable native crash reporting
 - Fixed Crashpad initialization failure in Samsung A20
-- Preliminary support for API 16+
+- Support for API 16+
 - Prevent duplicate ANR reports
+- GitHub actions CICD support
 
 ## Version 3.5.0 - 14.09.2021
 - Added support for native crash reporting in NDK 16b
