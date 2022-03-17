@@ -1,7 +1,12 @@
 package backtraceio.library.watchdog;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceAttributeConsts;
+import backtraceio.library.models.json.BacktraceReport;
 
 /**
  * Used to share code used by objects that detect different types of blocked threads
@@ -23,7 +28,10 @@ class BacktraceWatchdogShared {
         if (onApplicationNotRespondingEvent != null) {
             onApplicationNotRespondingEvent.onEvent(exception);
         } else if (backtraceClient != null) {
-            backtraceClient.send(exception);
+            BacktraceReport report = new BacktraceReport(exception, new HashMap<String, Object>() {{
+                put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
+            }});
+            backtraceClient.send(report);
         }
     }
 }
