@@ -1,0 +1,46 @@
+name: Upload Archives
+
+on:
+ push:
+   tags: '[0-9]+.[0-9]+.[0-9]+*'
+ workflow_dispatch:
+
+jobs:
+ build:
+   env: 
+     ANDROID_API_LEVEL: 23
+     ANDROID_EMULATOR_LEVEL: 23
+     ANDROID_BUILD_TOOLS_VERSION: 28.0.3
+     ANDROID_TAG: google_apis
+     ADB_INSTALL_TIMEOUT: 20
+
+   runs-on: ubuntu-latest
+
+   steps:
+   - uses: actions/checkout@v2
+   - name: set up JDK 11
+     uses: actions/setup-java@v2
+     with:
+       java-version: 11.0.10
+       distribution: 'adopt'
+       cache: gradle
+
+   - name: Checkout submodules
+     uses: actions/checkout@v2
+     with:
+       fetch-depth: 2
+       submodules: recursive
+       token: ${{ secrets.ACCESS_TOKEN }}
+       persist-credentials: false
+   
+   - name: Add Maven credentials to gradle.properties
+     run: echo "NEXUS_USERNAME=${{ secrets.NEXUS_USERNAME }}" >> gradle.properties && echo "NEXUS_PASSWORD=${{ secrets.NEXUS_PASSWORD }}" >> gradle.properties
+
+   - name: Grant execute permission for gradlew
+     run: chmod +x gradlew
+       
+   - name: Upload archives
+     run: ./gradlew uploadArchives
+     env:
+       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ASCII_ARMORED_GPG_KEY }} # ASCII-armored GPG key
+       ORG_GRADLE_PROJECT_signingPassword: "" # Using empty password for GPG key

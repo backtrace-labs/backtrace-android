@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 360
-        versionName "3.6.0-rc.1"
+        versionName "3.6.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -44,6 +44,13 @@ android {
         main {
             jniLibs.srcDirs = ['src/main/cpp/crashpad-builds']
             jniLibs.includes = ['src/main/cpp/crashpad-builds/crashpad_handler']
+        }
+    }
+    
+    // Needed until we migrate to AndroidX
+    android {
+        lintOptions {
+            abortOnError false
         }
     }
 }

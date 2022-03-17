@@ -1,0 +1,50 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron:  '0 0 * * *'
+
+jobs:
+  build:
+    env: 
+      ANDROID_API_LEVEL: 23
+      ANDROID_EMULATOR_LEVEL: 23
+      ANDROID_BUILD_TOOLS_VERSION: 28.0.3
+      ANDROID_ABI: armeabi-v7a
+      ANDROID_TAG: google_apis
+      ADB_INSTALL_TIMEOUT: 20
+    
+    runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11.0.10
+        distribution: 'adopt'
+        cache: gradle
+        
+    - name: Checkout submodules
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+        submodules: recursive
+        token: ${{ secrets.ACCESS_TOKEN }}
+        persist-credentials: false
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Test
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        target: google_apis
+        api-level: 30
+        arch: x86_64
+        script: ./gradlew assembleDebug && ./gradlew test --info && ./gradlew connectedCheck
+    - name: Code coverage
+      run: bash <(curl -s https://codecov.io/bash)

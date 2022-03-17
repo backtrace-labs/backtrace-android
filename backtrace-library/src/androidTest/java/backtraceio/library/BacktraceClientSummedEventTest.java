@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
@@ -100,7 +101,7 @@ public class BacktraceClientSummedEventTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000);
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -133,7 +134,7 @@ public class BacktraceClientSummedEventTest {
     public void try3TimesOn503AndDropSummedEventsIfMaxNumEventsReached() {
         final Waiter waiter = new Waiter();
 
-        final int timeBetweenRetriesMillis = 20;
+        final int timeBetweenRetriesMillis = 1;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
         mockSummedRequestHandler.statusCode = 503;
@@ -158,7 +159,7 @@ public class BacktraceClientSummedEventTest {
         backtraceClient.metrics.send();
 
         try {
-            waiter.await(1000, 3);
+            waiter.await(5, TimeUnit.SECONDS, 3);
         } catch (Exception e) {
             fail(e.toString());
         }

@@ -1,17 +1,7 @@
 # Backtrace
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.backtrace-labs.backtrace-android/backtrace-library/badge.svg)](https://search.maven.org/artifact/com.github.backtrace-labs.backtrace-android/backtrace-library)
-[![Build Status](https://travis-ci.org/backtrace-labs/backtrace-android.png?branch=master)](https://travis-ci.org/backtrace-labs/backtrace-android)
-<!--
-[![Backtrace@release](https://img.shields.io/badge/Backtrace%40master-2.0.5-blue.svg)](https://www.nuget.org/packages/Backtrace)
- [![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp)
- -->
-
-<!--
-[![Backtrace@pre-release](https://img.shields.io/badge/Backtrace%40dev-2.0.6-blue.svg)](https://www.nuget.org/packages/Backtrace)
-[![Build status](https://ci.appveyor.com/api/projects/status/o0n9sp0ydgxb3ktu/branch/dev?svg=true)](https://ci.appveyor.com/project/konraddysput/backtrace-csharp/branch/dev)
--->
-
+![Build Status](https://github.com/backtrace-labs/backtrace-android/actions/workflows/test.yml/badge.svg)
 
 
 [Backtrace](http://backtrace.io/)'s integration with Android applications written in Java or Kotlin which allows customers to capture and report handled and unhandled java exceptions to their Backtrace instance, instantly offering the ability to prioritize and debug software errors. Backtrace also captures and reports native (JNI/NDK) handled and unhandled exceptions if [native integration is enabled](#working_with_ndk).
@@ -72,7 +62,7 @@ catch (e: Exception) {
 * Supports Breadcrumbs.
 
 # Supported SDKs <a name="supported-sdks"></a>
-* Minimum SDK version 21 (Android 5.0)
+* Minimum SDK version 16 (Android 4.1.x)
 * Target SDK version 30 (Android 11.0)
 * Minimum NDK version 16b
 * Maximum NDK version 22
@@ -560,6 +550,8 @@ database.setupNativeIntegration(backtraceClient, credentials, true);
 **NOTE:** Client side unwinding is only available for fatal crashes. Non-fatal Crashpad dumps you generate via `DumpWithoutCrash` for instance will not use client side unwinding.
 
 **NOTE:** Client side unwinding is only available in NDK level 17+ (i.e: Only with the Crashpad crash reporting backend)
+
+**NOTE:** Client side unwinding is only available in SDK level 21+ (i.e: If minSDKVersion < 21, client-side unwinding will be disabled for 32-bit arm platforms)
 
 ### Unwinding Modes and Options
 
