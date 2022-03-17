@@ -52,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         BacktraceCredentials credentials =
-                new BacktraceCredentials(
-                        "https://yolo.sp.backtrace.io:6098",
-                        "533c6e267998b8562e4b878c891bf7fc509beec7839f991bdaa1d43220d0f497"
-                );
+                new BacktraceCredentials("<endpoint-url>", "<token>");
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
@@ -80,9 +77,6 @@ public class MainActivity extends AppCompatActivity {
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
-        BacktraceExceptionHandler.enable(backtraceClient);
-
-
         final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
         try {
             Os.symlink(fileNameDateString, fileName);
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         }
         writeMyCustomFile(fileNameDateString);
 
-
+        BacktraceExceptionHandler.enable(backtraceClient);
         backtraceClient.send("test");
 
         // Enable handling of native crashes
@@ -152,15 +146,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void unhandledException(View view) throws IOException {
-//        getSaveData();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("Uncaught JVM exception :O");
-//                int[] numbers = {10, 20, 30, 40};
-//                Log.d("BacktraceCrashHelper", String.valueOf(numbers[5]));
-            }
-        }).start();
+        getSaveData();
     }
 
     public void nativeCrash(View view) {
@@ -168,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void anr(View view) throws InterruptedException {
-        Thread.sleep(anrTimeout * 10 + 2000);
+        Thread.sleep(anrTimeout + 2000);
     }
 
     public void enableBreadcrumbs(View view) {
