@@ -129,7 +129,7 @@ public class BacktraceAttributes {
             // But we keep version attribute name as to not break any customer workflows
             this.attributes.put("version", version);
         }
-//        this.attributes.put("backtrace.version", BacktraceClient.Version);
+        this.attributes.put("backtrace.version", BacktraceClient.Version);
     }
 
     /**
