@@ -184,23 +184,23 @@ public class BacktraceReport {
         if (this.exceptionTypeReport && exception != null) {
             this.classifier = exception.getClass().getCanonicalName();
         }
-        this.setErrorTypeAttribute();
+        this.setDefaultErrorTypeAttribute();
     }
 
     /**
      * Sets error.type attribute depends on the type of the report
      */
-    private void setErrorTypeAttribute() {
-        if(attributes.containsKey(BacktraceAttributeConsts.ErrorType)) {
+    private void setDefaultErrorTypeAttribute() {
+        if (attributes.containsKey(BacktraceAttributeConsts.ErrorType)) {
             // error type already set
             return;
         }
 
         attributes.put(
-            BacktraceAttributeConsts.ErrorType,
-            this.exceptionTypeReport
-                ? BacktraceAttributeConsts.HandledExceptionAttributeType
-                : BacktraceAttributeConsts.MessageAttributeType);
+                BacktraceAttributeConsts.ErrorType,
+                this.exceptionTypeReport
+                        ? BacktraceAttributeConsts.HandledExceptionAttributeType
+                        : BacktraceAttributeConsts.MessageAttributeType);
     }
 
     /**
