@@ -143,7 +143,7 @@ public class BacktraceAttributes {
         this.attributes.put("screen.width", String.valueOf(metrics.widthPixels));
         this.attributes.put("screen.height", String.valueOf(metrics.heightPixels));
         this.attributes.put("screen.dpi", String.valueOf(metrics.densityDpi));
-        if(includeDynamicAttributes == false) {
+        if (includeDynamicAttributes == false) {
             return;
         }
         this.attributes.put("screen.orientation", getScreenOrientation().toString());

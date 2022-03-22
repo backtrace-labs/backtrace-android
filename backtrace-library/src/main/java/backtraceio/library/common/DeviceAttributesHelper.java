@@ -49,7 +49,7 @@ public class DeviceAttributesHelper {
         result.put("guid", this.generateDeviceId());
         result.put("uname.sysname", "Android");
         result.put("uname.machine", System.getProperty("os.arch"));
-        if(includeDynamicAttributes == false) {
+        if (includeDynamicAttributes == false) {
             return result;
         }
         result.put("device.airplane_mode", String.valueOf(isAirplaneModeOn()));
