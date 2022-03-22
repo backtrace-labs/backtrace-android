@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;
@@ -178,12 +179,7 @@ public class BacktraceData {
         timestamp = report.timestamp;
         classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
-        try {
-            agentVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (Exception e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve package version name");
-            agentVersion = "";
-        }
+        agentVersion = BacktraceClient.Version;
     }
 
     /**

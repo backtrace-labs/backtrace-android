@@ -10,6 +10,7 @@ import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.BuildConfig;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.UnwindingMode;
@@ -38,14 +39,15 @@ public class BacktraceBase implements Client {
 
     private static final transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
-    static {
-        System.loadLibrary("backtrace-native");
-    }
-
     /**
      * Backtrace database instance
      */
     public final Database database;
+
+    /**
+     * Backtrace client version
+     */
+    public static String Version = BuildConfig.VERSION_NAME;
 
     /**
      * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API

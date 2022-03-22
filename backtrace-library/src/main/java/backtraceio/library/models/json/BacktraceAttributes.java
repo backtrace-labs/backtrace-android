@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.BacktraceClient;
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
@@ -26,6 +27,8 @@ import backtraceio.library.logger.BacktraceLogger;
  */
 public class BacktraceAttributes {
     private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
+
+    public static String LibraryVersion = null;
 
     /**
      * Get built-in primitive attributes
@@ -117,6 +120,7 @@ public class BacktraceAttributes {
             // But we keep version attribute name as to not break any customer workflows
             this.attributes.put("version", version);
         }
+        this.attributes.put("backtrace.version", BacktraceClient.Version);
     }
 
     /**
