@@ -39,6 +39,10 @@ public class BacktraceBase implements Client {
 
     private static final transient String LOG_TAG = BacktraceBase.class.getSimpleName();
 
+    static {
+        System.loadLibrary("backtrace-native");
+    }
+
     /**
      * Backtrace database instance
      */
