@@ -24,15 +24,19 @@ public class ConcatAttributesUnitTest {
 
     @Test
     public void concatAttributes_isCorrect() {
+        // 1 - backtraceReport by default adds error.type attribute
+        int expectedAttributesSize = 1 + attributes.size() + attributesReport.size();
         BacktraceReport report = new BacktraceReport("test", attributesReport, null);
         Map<String, Object> result = BacktraceReport.concatAttributes(report, attributes);
-        assertEquals(4, result.size());
+        assertEquals(5, result.size());
         assertEquals(result.get("2"), "2");
         assertEquals(result.get("4"), "4");
     }
 
     @Test
     public void concatAttributesNullParam_isCorrect() {
+        // 1 - backtraceReport by default adds error.type attribute
+        int expectedAttributesSize = 1 + attributesReport.size();
         BacktraceReport report = new BacktraceReport("test", attributesReport, null);
         Map<String, Object> result = BacktraceReport.concatAttributes(report, null);
         assertEquals(2, result.size());
@@ -41,9 +45,12 @@ public class ConcatAttributesUnitTest {
 
     @Test
     public void concatAttributesNullAttributes_isCorrect() {
+
+        // 1 - backtraceReport by default adds error.type attribute
+        int expectedAttributesSize = 1 + attributes.size();
         BacktraceReport report = new BacktraceReport("test", null, null);
         Map<String, Object> result = BacktraceReport.concatAttributes(report, attributes);
-        assertEquals(2, result.size());
+        assertEquals(expectedAttributesSize, result.size());
         assertEquals(result.get("4"), "4");
     }
 }
