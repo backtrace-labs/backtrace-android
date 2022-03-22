@@ -89,42 +89,4 @@ public class BacktraceErrorTypeAttributeTest {
             fail(ex.getMessage());
         }
     }
-
-    @Test
-    public void sendBacktraceReportWithErrorType() {
-
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-
-        final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
-            @Override
-            public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
-                        BacktraceResultStatus.Ok);
-            }
-        };
-        backtraceClient.setOnRequestHandler(rh);
-
-        // WHEN
-        backtraceClient.send("test-message", new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        String errorType = backtraceResult.getBacktraceReport().attributes.get(BacktraceAttributeConsts.ErrorType).toString();
-                        assertEquals(
-                                errorType,
-                                BacktraceAttributeConsts.HandledExceptionAttributeType);
-
-                        waiter.resume();
-                    }
-                }
-        );
-        // WAIT FOR THE RESULT FROM ANOTHER THREAD
-        try {
-            waiter.await(5, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            fail(ex.getMessage());
-        }
-    }
 }
