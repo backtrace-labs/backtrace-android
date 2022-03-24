@@ -21,6 +21,7 @@ import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.interfaces.DatabaseFileContext;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -177,7 +178,9 @@ public class BacktraceDatabase implements Database {
         // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
 
-        BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, null, client.attributes);
+        // setup default native attribtues
+        BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
+        crashpadAttributes.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.CrashAttributeType);
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
