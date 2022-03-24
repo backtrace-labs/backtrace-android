@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.BacktraceClient;
 import backtraceio.library.BuildConfig;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
@@ -61,6 +62,15 @@ public class BacktraceAttributes {
      */
     public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
             clientAttributes) {
+        this(context, report, clientAttributes, true);
+    }
+
+    public BacktraceAttributes(Context context, Map<String, Object> clientAttributes) {
+        this(context, null, clientAttributes, false);
+    }
+
+    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
+            clientAttributes, Boolean includeDynamicAttributes) {
         this.context = context;
         if (report != null) {
             this.convertReportAttributes(report);
@@ -73,8 +83,8 @@ public class BacktraceAttributes {
             BacktraceReport.concatAttributes(report, clientAttributes);
         }
         setAppInformation();
-        setDeviceInformation();
-        setScreenInformation();
+        setDeviceInformation(includeDynamicAttributes);
+        setScreenInformation(includeDynamicAttributes);
 
         // For tracking crash-free sessions we need to add
         // application.session and application.version to Backtrace attributes
@@ -90,7 +100,7 @@ public class BacktraceAttributes {
     /**
      * Set information about device eg. lang, model, brand, sdk, manufacturer, os version
      */
-    private void setDeviceInformation() {
+    private void setDeviceInformation(Boolean includeDynamicAttributes) {
         this.attributes.put("uname.version", Build.VERSION.RELEASE);
         this.attributes.put("culture", Locale.getDefault().getDisplayLanguage());
         this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug" : "Release");
@@ -103,7 +113,7 @@ public class BacktraceAttributes {
         this.attributes.put("device.os_version", System.getProperty("os.version"));
 
         DeviceAttributesHelper deviceAttributesHelper = new DeviceAttributesHelper(this.context);
-        this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes());
+        this.attributes.putAll(deviceAttributesHelper.getDeviceAttributes(includeDynamicAttributes));
     }
 
     private void setAppInformation() {
@@ -117,12 +127,13 @@ public class BacktraceAttributes {
             // But we keep version attribute name as to not break any customer workflows
             this.attributes.put("version", version);
         }
+        this.attributes.put("backtrace.version", BacktraceClient.version);
     }
 
     /**
      * Set information about screen such as screen width, height, dpi, orientation
      */
-    private void setScreenInformation() {
+    private void setScreenInformation(Boolean includeDynamicAttributes) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -130,6 +141,9 @@ public class BacktraceAttributes {
         this.attributes.put("screen.width", String.valueOf(metrics.widthPixels));
         this.attributes.put("screen.height", String.valueOf(metrics.heightPixels));
         this.attributes.put("screen.dpi", String.valueOf(metrics.densityDpi));
+        if (includeDynamicAttributes == false) {
+            return;
+        }
         this.attributes.put("screen.orientation", getScreenOrientation().toString());
         this.attributes.put("screen.brightness", String.valueOf(getScreenBrightness()));
     }

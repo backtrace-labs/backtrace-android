@@ -9,6 +9,7 @@ android {
         targetSdkVersion 30
         versionCode 360
         versionName "3.6.0"
+        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
