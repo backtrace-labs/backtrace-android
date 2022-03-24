@@ -44,13 +44,14 @@ public class DeviceAttributesHelper {
      *
      * @return device attributes
      */
-    public HashMap<String, String> getDeviceAttributes() {
+    public HashMap<String, String> getDeviceAttributes(Boolean includeDynamicAttributes) {
         HashMap<String, String> result = new HashMap<>();
         result.put("guid", this.generateDeviceId());
         result.put("uname.sysname", "Android");
         result.put("uname.machine", System.getProperty("os.arch"));
-        result.put("cpu.boottime", String.valueOf(java.lang.System.currentTimeMillis() - android.os.SystemClock
-                .elapsedRealtime()));
+        if (includeDynamicAttributes == false) {
+            return result;
+        }
         result.put("device.airplane_mode", String.valueOf(isAirplaneModeOn()));
         result.put("device.location", getLocationServiceStatus().toString());
         result.put("device.nfc.status", getNfcStatus().toString());
@@ -65,6 +66,9 @@ public class DeviceAttributesHelper {
         result.put("app.storage_used", getAppUsedStorageSize());
         result.put("battery.level", String.valueOf(getBatteryLevel()));
         result.put("battery.state", getBatteryState().toString());
+        result.put("cpu.boottime", String.valueOf(java.lang.System.currentTimeMillis() - android.os.SystemClock
+                .elapsedRealtime()));
+
         return result;
     }
 

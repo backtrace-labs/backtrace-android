@@ -97,6 +97,11 @@ public class BacktraceANRWatchdog extends Thread {
      */
     @Override
     public void run() {
+        if (debug && (Debug.isDebuggerConnected() || Debug.waitingForDebugger())) {
+            BacktraceLogger.w(LOG_TAG, "Detected a debugger connection. ANR Watchdog is disabled");
+            return;
+        }
+
         Boolean reported = false;
         while (!shouldStop && !isInterrupted()) {
             String dateTimeNow = Calendar.getInstance().getTime().toString();
@@ -122,11 +127,6 @@ public class BacktraceANRWatchdog extends Thread {
                 continue;
             }
 
-            if (debug && (Debug.isDebuggerConnected() || Debug.waitingForDebugger())) {
-                BacktraceLogger.w(LOG_TAG, "ANR detected but will be ignored because debug mode " +
-                        "is on and connected debugger");
-                continue;
-            }
             if (reported) {
                 // skipping, because we already reported an ANR report for current ANR
                 continue;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
+import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
@@ -183,6 +184,23 @@ public class BacktraceReport {
         if (this.exceptionTypeReport && exception != null) {
             this.classifier = exception.getClass().getCanonicalName();
         }
+        this.setDefaultErrorTypeAttribute();
+    }
+
+    /**
+     * Sets error.type attribute depends on the type of the report
+     */
+    private void setDefaultErrorTypeAttribute() {
+        if (attributes.containsKey(BacktraceAttributeConsts.ErrorType)) {
+            // error type already set
+            return;
+        }
+
+        attributes.put(
+                BacktraceAttributeConsts.ErrorType,
+                this.exceptionTypeReport
+                        ? BacktraceAttributeConsts.HandledExceptionAttributeType
+                        : BacktraceAttributeConsts.MessageAttributeType);
     }
 
     /**
