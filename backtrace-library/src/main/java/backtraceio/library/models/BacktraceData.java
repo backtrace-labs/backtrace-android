@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
-import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
@@ -179,7 +178,7 @@ public class BacktraceData {
         timestamp = report.timestamp;
         classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
         langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
-        agentVersion = BacktraceClient.Version;
+        agentVersion = BacktraceClient.version;
     }
 
     /**

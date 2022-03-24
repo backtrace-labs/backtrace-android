@@ -51,7 +51,7 @@ public class BacktraceBase implements Client {
     /**
      * Backtrace client version
      */
-    public static String Version = BuildConfig.VERSION_NAME;
+    public static String version = BuildConfig.VERSION_NAME;
 
     /**
      * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
