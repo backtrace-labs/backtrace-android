@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.0
+- Added error.type attribute that shows type of the report
+- Added backtrace.version attribute that shows Backtrace agent version
+
 ## Version 3.6.0 - 29.1.2022
 - Added error-free metrics
 - Added method to disable native crash reporting
