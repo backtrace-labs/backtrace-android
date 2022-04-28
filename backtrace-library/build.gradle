@@ -7,7 +7,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 360
+        versionCode 370
         versionName "3.7.0"
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
