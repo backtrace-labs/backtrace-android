@@ -1,5 +1,7 @@
 package backtraceio.library.models;
 
+import android.os.Looper;
+
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -54,7 +56,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         if (throwable instanceof Exception) {
             BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
             BacktraceReport report = new BacktraceReport((Exception) throwable, BacktraceExceptionHandler.customAttributes);
-            report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+            report.attributes.put(BacktraceAttributeConsts.ErrorType, isMainThread() ? BacktraceAttributeConsts.CrashAttributeType : BacktraceAttributeConsts.HandledExceptionAttributeType);
             this.client.send(report, callback);
             BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
         }
@@ -64,6 +66,10 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
+    }
+
+    private boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
     }
 
     private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
