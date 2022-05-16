@@ -178,7 +178,7 @@ public class SettingAttributesTest {
                         waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
                         waiter.assertEquals(customClientAttributeValue, data.report.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.report.exception.getMessage());
-                        waiter.assertEquals(data.report.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.HandledExceptionAttributeType);
+                        waiter.assertEquals(data.report.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.UnhandledExceptionAttributeType);
                         waiter.resume();
                         return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
                     }
