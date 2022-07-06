@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.BacktraceClient;
-import backtraceio.library.BuildConfig;
+//import backtraceio.library.BuildConfig;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.TypeHelper;
@@ -103,7 +103,7 @@ public class BacktraceAttributes {
     private void setDeviceInformation(Boolean includeDynamicAttributes) {
         this.attributes.put("uname.version", Build.VERSION.RELEASE);
         this.attributes.put("culture", Locale.getDefault().getDisplayLanguage());
-        this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug" : "Release");
+//        this.attributes.put("build.type", BuildConfig.DEBUG ? "Debug" : "Release");
         this.attributes.put("device.model", Build.MODEL);
         this.attributes.put("device.brand", Build.BRAND);
         this.attributes.put("device.product", Build.PRODUCT);
