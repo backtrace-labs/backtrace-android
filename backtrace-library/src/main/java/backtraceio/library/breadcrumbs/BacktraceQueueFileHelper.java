@@ -60,7 +60,7 @@ public class BacktraceQueueFileHelper {
 
             // We clear the space we need from the QueueFile first to prevent
             // the QueueFile from expanding to accommodate the new breadcrumb
-            int usedBytes = (long) this.usedBytes.invoke(breadcrumbStore);
+            long usedBytes = (long) this.usedBytes.invoke(breadcrumbStore);
             while (!breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes) {
                 breadcrumbStore.remove();
                 usedBytes = (long) this.usedBytes.invoke(breadcrumbStore);
