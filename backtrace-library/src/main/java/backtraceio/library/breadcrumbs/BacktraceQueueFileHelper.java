@@ -38,10 +38,6 @@ public class BacktraceQueueFileHelper {
         // QueueFile pre-allocates a file of a certain size and fills with empty data,
         // so normal File operations will not give us an accurate count of the bytes
         // in the file. Therefore we expose the private method QueueFile::usedBytes.
-        // Note!
-        // In the 1.2.3 version we use, the usedBytes is int, not long, and the 
-        // implementation is synchronized thus safe for multithreaded access.
-        // see https://github.com/square/tape/blob/tape-parent-1.2.3/tape/src/main/java/com/squareup/tape/QueueFile.java
         usedBytes = QueueFile.class.getDeclaredMethod("usedBytes");
         usedBytes.setAccessible(true);
 
@@ -63,6 +59,10 @@ public class BacktraceQueueFileHelper {
 
             // We clear the space we need from the QueueFile first to prevent
             // the QueueFile from expanding to accommodate the new breadcrumb
+            // Note!
+            // In the 1.2.3 version we use, the usedBytes is int, not long, and the 
+            // implementation is synchronized thus safe for multithreaded access.
+            // see https://github.com/square/tape/blob/tape-parent-1.2.3/tape/src/main/java/com/squareup/tape/QueueFile.java
             int usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
             while (!breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes) {
                 breadcrumbStore.remove();
