@@ -63,10 +63,10 @@ public class BacktraceQueueFileHelper {
             // In the 1.2.3 version we use, the usedBytes is int, not long, and the 
             // implementation is synchronized thus safe for multithreaded access.
             // see https://github.com/square/tape/blob/tape-parent-1.2.3/tape/src/main/java/com/squareup/tape/QueueFile.java
-            int usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
-            while (!breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes) {
+            for (int usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
+                 !breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes;
+                 usedBytes = (int) this.usedBytes.invoke(breadcrumbStore)) {
                 breadcrumbStore.remove();
-                usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
             }
 
             breadcrumbStore.add(bytes);
