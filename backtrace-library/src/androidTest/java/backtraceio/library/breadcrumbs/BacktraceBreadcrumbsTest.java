@@ -340,7 +340,7 @@ public class BacktraceBreadcrumbsTest {
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
                 final int id = (int) parsedBreadcrumb.get("id");
                 assertTrue(String.format("Breadcrumb ID %s was higher than the expected numIterations %s",
-                        parsedBreadcrumb.get("id"), numIterations), id <= numIterations);
+                        id, numIterations), id <= numIterations);
             }
 
         } catch (Exception ex) {
