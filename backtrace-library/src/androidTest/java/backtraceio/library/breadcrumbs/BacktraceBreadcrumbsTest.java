@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -308,8 +310,8 @@ public class BacktraceBreadcrumbsTest {
 
     @Test
     public void testQueueFileRollover() {
+        // Should reach the max of 64kB around breadcrumb 925
         final int numIterations = 1000;
-        final int firstBreadcrumbIndexAfterRollover = 925;
         // Account for mandatory configuration breadcrumb
         backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
 
@@ -322,9 +324,12 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            long breadcrumbsFileSize = Files.size(Paths.get(backtraceBreadcrumbs.getBreadcrumbLogPath()));
+            assertTrue(String.format("Size of breadcrumbs file (%s) not close enough to a full breadcrumb file (%s)", breadcrumbsFileSize, 64 * 1024),
+                    breadcrumbsFileSize > 63 * 1024);
 
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
+            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
             for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
                 JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -333,8 +338,9 @@ public class BacktraceBreadcrumbsTest {
                 assertEquals("info", parsedBreadcrumb.get("level"));
                 // Timestamp should be convertible to a long
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
-                assertTrue(((int) parsedBreadcrumb.get("id")) > firstBreadcrumbIndexAfterRollover);
-                assertTrue((int) parsedBreadcrumb.get("id") <= numIterations);
+                final int id = (int) parsedBreadcrumb.get("id");
+                assertTrue(String.format("Breadcrumb ID %s was higher than the expected numIterations %s",
+                        id, numIterations), id <= numIterations);
             }
 
         } catch (Exception ex) {
