@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
+import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceResult;
@@ -177,6 +178,7 @@ public class SettingAttributesTest {
                         waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
                         waiter.assertEquals(customClientAttributeValue, data.report.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.report.exception.getMessage());
+                        waiter.assertEquals(data.report.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.UnhandledExceptionAttributeType);
                         waiter.resume();
                         return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
                     }

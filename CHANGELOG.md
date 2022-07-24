@@ -1,6 +1,9 @@
 # Backtrace Android Release Notes
 
-## Version 3.7.0
+## Version 3.7.1 - 14.06.2022
+- Error type "crash" only on unhandled exceptions from main thread for other threads - error type will be "unhandled exception"
+
+## Version 3.7.0 - 28.04.2022
 - Added error.type attribute that shows type of the report
 - Added backtrace.version attribute that shows Backtrace agent version
 
@@ -38,7 +41,7 @@
 - Backtrace Android allows to capture native crashes from Android NDK code. To enable NDK crashes exception handler use `setupNativeIntegration` method and pass backtraceClient with credentials.
 
 ```java
-        database.setupNativeIntegration(backtraceClient, credentials);
+database.setupNativeIntegration(backtraceClient, credentials);
 ```
 
 ## Version 3.0.2 - 23.01.2020
