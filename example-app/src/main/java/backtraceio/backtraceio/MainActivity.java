@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         writeMyCustomFile(fileNameDateString);
 
         BacktraceExceptionHandler.enable(backtraceClient);
-        backtraceClient.send("test");
+//        backtraceClient.send("test");
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
