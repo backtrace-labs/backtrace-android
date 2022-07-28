@@ -1,6 +1,10 @@
 apply plugin: 'com.android.library'
 
 android {
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileSdkVersion 30
 
     defaultConfig {
