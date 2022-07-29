@@ -28,7 +28,10 @@ jobs:
         submodules: recursive
         token: ${{ secrets.ACCESS_TOKEN }}
         persist-credentials: false
-    
+
+    # Install latest CMake.
+    - uses: lukka/get-cmake@latest
+      
     - name: set up JDK 11
       uses: actions/setup-java@v2
       with:
