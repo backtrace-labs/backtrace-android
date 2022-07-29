@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
-apply from: 'publish.gradle'
 
 android {
+
     compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 371
-        versionName "3.7.1"
+        versionCode 372
+        versionName "3.7.2"
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -68,3 +68,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
+apply from: 'publish.gradle'
