@@ -29,6 +29,9 @@ jobs:
         token: ${{ secrets.ACCESS_TOKEN }}
         persist-credentials: false
 
+    - name: Install CMake
+      run: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.18.1"
+
     - name: set up JDK 11
       uses: actions/setup-java@v2
       with:
@@ -41,9 +44,6 @@ jobs:
 
     - name: Write Backtrace Submission URL to local.properties
       run: echo BACKTRACE_SUBMISSION_URL=\"https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json\" > ./local.properties
-
-    - name: Install CMake
-      run: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.18.1"
       
     - name: Build and check
       run: ./gradlew assembleDebug && ./gradlew check
