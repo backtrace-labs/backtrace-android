@@ -16,7 +16,6 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
-                version "3.23.3"
             }
         }
         ndk {
@@ -39,7 +38,6 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version "3.10.2"
         }
     }
     sourceSets {
