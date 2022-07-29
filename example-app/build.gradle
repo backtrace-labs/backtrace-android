@@ -32,7 +32,17 @@ android {
         lintOptions {
             abortOnError false
         }
+        defaultConfig {
+            buildConfigField ("String", "BACKTRACE_SUBMISSION_URL", getSubmissionUrl())
+        }
     }
+}
+
+String getSubmissionUrl() {
+    def propFile = rootProject.file("./local.properties")
+    def properties = new Properties()
+    properties.load(new FileInputStream(propFile))
+    return properties.containsKey('BACKTRACE_SUBMISSION_URL') ? properties['BACKTRACE_SUBMISSION_URL'] : "null"
 }
 
 dependencies {

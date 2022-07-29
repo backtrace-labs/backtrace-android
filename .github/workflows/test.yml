@@ -39,6 +39,7 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
     - name: Test
       uses: reactivecircus/android-emulator-runner@v2
       with:
@@ -46,5 +47,12 @@ jobs:
         api-level: 30
         arch: x86_64
         script: ./gradlew assembleDebug && ./gradlew test --info && ./gradlew connectedCheck
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v1
+      with:
+        name: example-app-debug.apk
+        path: example-app/build/outputs/apk/debug/example-app-debug.apk
+
     - name: Code coverage
       run: bash <(curl -s https://codecov.io/bash)
