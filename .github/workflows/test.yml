@@ -30,7 +30,7 @@ jobs:
         persist-credentials: false
 
     - name: Install CMake
-      run: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.18.1"
+      run: echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "platform-tools" "platforms;android-29" "build-tools;27.0.3" "ndk-bundle" "ndk;24.0.8215888" "cmake;3.18.1"
 
     - name: set up JDK 11
       uses: actions/setup-java@v2
