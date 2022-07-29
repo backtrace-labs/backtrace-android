@@ -35,9 +35,12 @@ jobs:
         java-version: 11.0.10
         distribution: 'adopt'
         cache: gradle
-
+        
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
+    - name: Write Backtrace Submission URL to local.properties
+      run: echo BACKTRACE_SUBMISSION_URL=\"https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json\" > ./local.properties
 
     - name: Test
       uses: reactivecircus/android-emulator-runner@v2
