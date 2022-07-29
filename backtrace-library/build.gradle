@@ -16,7 +16,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
-                version "3.18.1+"
+                version "3.23.3"
             }
         }
         ndk {
