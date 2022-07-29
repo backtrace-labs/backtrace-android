@@ -54,18 +54,6 @@ target_compile_features(backtrace-native PRIVATE cxx_std_17)
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)
 
-    # Crashpad Libraries
-    add_library(crashpad_client STATIC IMPORTED)
-    set_property(TARGET crashpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/client/libcrashpad_client.a)
-
-    add_library(crashpad_util STATIC IMPORTED)
-    set_property(TARGET crashpad_util PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/util/libcrashpad_util.a)
-
-    add_library(base STATIC IMPORTED)
-    set_property(TARGET base PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/crashpad-builds/${ANDROID_ABI}/third_party/mini_chromium/mini_chromium/base/libbase.a)
-
-    # Crashpad Headers
-    include_directories(${PROJECT_SOURCE_DIR}/crashpad-builds/headers/ ${PROJECT_SOURCE_DIR}/crashpad-builds/headers/third_party/mini_chromium/mini_chromium/)
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DBREAKPAD_BACKEND)
 
@@ -116,9 +104,10 @@ list(APPEND LIBS backtrace-native)
 list(APPEND LIBS ${log-lib})
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
-    list(APPEND LIBS crashpad_client)
-    list(APPEND LIBS crashpad_util)
-    list(APPEND LIBS base)
+    set(CUSTOM_CRASHPAD_HANDLER_DESTINATION
+            ${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libcrashpad_handler.so)
+    add_subdirectory(crashpad)
+    target_link_libraries(backtrace-native client)
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     list(APPEND LIBS breakpad_client)
     list(APPEND LIBS curl)

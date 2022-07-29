@@ -25,11 +25,8 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
-import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -51,8 +48,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BacktraceCredentials credentials =
-                new BacktraceCredentials("<endpoint-url>", "<token>");
+        // Set this value in your local.properties
+        if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
+            backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
+        }
+
+        symlinkAndWriteFile();
+    }
+
+    /**
+     * Example of how one would link a static filename to a more dynamic one, since you can only specify
+     * the attachment to upload for a native crash once at startup
+     */
+    private void symlinkAndWriteFile() {
+        Context context = getApplicationContext();
+        final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
+        final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
+        try {
+            Os.symlink(fileNameDateString, fileName);
+        } catch (ErrnoException e) {
+            e.printStackTrace();
+        }
+        writeMyCustomFile(fileNameDateString);
+    }
+
+    private BacktraceClient initializeBacktrace(final String submissionUrl) {
+        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
@@ -68,31 +89,24 @@ public class MainActivity extends AppCompatActivity {
             put("custom.attribute", "My Custom Attribute");
         }};
 
-        final String fileName = context.getFilesDir() + "/" + "myCustomFile.txt";
-
         List<String> attachments = new ArrayList<String>(){{
-            add(fileName);
+            add(context.getFilesDir() + "/" + "myCustomFile.txt");
         }};
 
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
-        backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
-
-        final String fileNameDateString = context.getFilesDir() + "/" + "myCustomFile06_11_2021.txt";
-        try {
-            Os.symlink(fileNameDateString, fileName);
-        } catch (ErrnoException e) {
-            e.printStackTrace();
-        }
-        writeMyCustomFile(fileNameDateString);
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
         BacktraceExceptionHandler.enable(backtraceClient);
-        backtraceClient.send("test");
+        // backtraceClient.send("test");
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials));
+
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
+        return backtraceClient;
     }
 
     public native void cppCrash();
@@ -102,31 +116,31 @@ public class MainActivity extends AppCompatActivity {
     public native boolean addNativeBreadcrumbUserError();
     public native void cleanupNativeBreadcrumbHandler();
 
-    private ArrayList<String> equippedItems;
+    private List<String> equippedItems;
 
-    public ArrayList<String> getWarriorArmor()
+    public List<String> getWarriorArmor()
     {
         return new ArrayList<String>(Arrays.asList("Tough Boots", "Strong Sword", "Sturdy Shield", "Magic Wand"));
     }
 
-    int findEquipmentIndex(ArrayList<String> armor, String equipment)
+    int findEquipmentIndex(List<String> armor, String equipment)
     {
         return armor.indexOf(equipment);
     }
 
-    void removeEquipment(ArrayList<String> armor, int index)
+    void removeEquipment(List<String> armor, int index)
     {
         armor.remove(index);
     }
 
-    void equipItem(ArrayList<String> armor, int index)
+    void equipItem(List<String> armor, int index)
     {
         equippedItems.add(armor.get(index));
     }
 
     public void handledException(View view) {
         try {
-            ArrayList<String> myWarriorArmor = getWarriorArmor();
+            List<String> myWarriorArmor = getWarriorArmor();
             int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
             // I don't need a Magic Wand, I am a warrior
             removeEquipment(myWarriorArmor, magicWandIndex);
