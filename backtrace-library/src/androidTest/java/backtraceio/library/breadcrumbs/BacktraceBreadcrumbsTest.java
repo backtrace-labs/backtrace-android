@@ -19,8 +19,6 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -324,7 +322,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            long breadcrumbsFileSize = Files.size(Paths.get(backtraceBreadcrumbs.getBreadcrumbLogPath()));
+            long breadcrumbsFileSize = new File(backtraceBreadcrumbs.getBreadcrumbLogPath()).length()
             assertTrue(String.format("Size of breadcrumbs file (%s) not close enough to a full breadcrumb file (%s)", breadcrumbsFileSize, 64 * 1024),
                     breadcrumbsFileSize > 63 * 1024);
 
