@@ -322,7 +322,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            long breadcrumbsFileSize = new File(backtraceBreadcrumbs.getBreadcrumbLogPath()).length()
+            long breadcrumbsFileSize = new File(backtraceBreadcrumbs.getBreadcrumbLogPath()).length();
             assertTrue(String.format("Size of breadcrumbs file (%s) not close enough to a full breadcrumb file (%s)", breadcrumbsFileSize, 64 * 1024),
                     breadcrumbsFileSize > 63 * 1024);
 
