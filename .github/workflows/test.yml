@@ -10,15 +10,7 @@ on:
 
 jobs:
   build:
-    env: 
-      ANDROID_API_LEVEL: 23
-      ANDROID_EMULATOR_LEVEL: 23
-      ANDROID_BUILD_TOOLS_VERSION: 28.0.3
-      ANDROID_ABI: armeabi-v7a
-      ANDROID_TAG: google_apis
-      ADB_INSTALL_TIMEOUT: 20
-    
-    runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
+    runs-on: ubuntu-latest # necessary for reactivecircus/android-emulator-runner@v2
 
     steps:     
     - name: Checkout submodules
@@ -42,29 +34,47 @@ jobs:
     - name: Write to local.properties
       run: |
         echo BACKTRACE_SUBMISSION_URL=\"https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json\" > ./local.properties
-      
+
     - name: Build and check
       run: ./gradlew assembleDebug && ./gradlew check
 
     - name: Upload APK
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: example-app-debug.apk
         path: example-app/build/outputs/apk/debug/example-app-debug.apk
 
-    - name: Oldest supported emulator test
-      uses: reactivecircus/android-emulator-runner@v2
+    - uses: actions/upload-artifact@v3
       with:
-        target: google_apis
-        api-level: 21
-        arch: x86_64
-        script: ./gradlew connectedCheck
+        name: build
+        path: build/
 
-    - name: Latest emulator test
+  test:
+    runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
+    
+    strategy:
+      matrix:
+          api-level: [21, 32]
+    
+    steps:
+    - name: Checkout submodules
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+        submodules: recursive
+        token: ${{ secrets.ACCESS_TOKEN }}
+        persist-credentials: false
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: build
+        path: build/
+      
+    - name: Emulator test
       uses: reactivecircus/android-emulator-runner@v2
       with:
         target: google_apis
-        api-level: 32
+        api-level: ${{ matrix.api-level }}
         arch: x86_64
         script: ./gradlew connectedCheck
 
