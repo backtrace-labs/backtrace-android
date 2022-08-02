@@ -51,8 +51,10 @@ jobs:
 
   test:
     runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
+    needs: build
     
     strategy:
+      fail-fast: false
       matrix:
           api-level: [21, 32]
     
