@@ -42,14 +42,16 @@ jobs:
 
     # Run outside of emulator to fail fast
     - name: Build and check
-      run: ./gradlew assemble && ./gradlew check
+      run: ./gradlew assembleDebugAndroidTest && ./gradlew check
 
     - name: Upload APK
       if: matrix.api-level == '32'
       uses: actions/upload-artifact@v3
       with:
-        name: example-app-debug.apk
-        path: example-app/build/outputs/apk/debug/example-app-debug.apk
+        name: apks
+        path: |
+          example-app/build/outputs/apk/debug/example-app-debug.apk
+          example-app/build/outputs/apk/debug/androidTest/example-app-androidTest.apk
 
     - name: Emulator test
       uses: reactivecircus/android-emulator-runner@v2
