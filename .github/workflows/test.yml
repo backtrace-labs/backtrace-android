@@ -35,7 +35,7 @@ jobs:
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest check
 
-      - name: Upload APK
+      - name: Upload example-app APK
         uses: actions/upload-artifact@v3
         with:
           name: example-app-debug.apk
@@ -51,13 +51,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: backtrace-library-debug.aar
-          path: backtrace-library/build/outputs/aar/debug/backtrace-library-debug.aar
+          path: backtrace-library/build/outputs/aar/backtrace-library-debug.aar
 
       - name: Upload backtrace-library Test APK
         uses: actions/upload-artifact@v3
         with:
           name: backtrace-library-debug-androidTest.apk
-          path: backtrace-library/build/outputs/apk/debug/backtrace-library-debug-androidTest.apk
+          path: backtrace-library/build/outputs/apk/androidTest/debug/backtrace-library-debug-androidTest.apk
 
   test:
     runs-on: ubuntu-latest
@@ -83,7 +83,8 @@ jobs:
         run: curl -L https://saucelabs.github.io/saucectl/install | bash
 
       - name: Run Saucectl
-        run: saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator",platformVersion=11.0
+        run: |
+          ./bin/saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator",platformVersion=11.0
 
     #        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
     #     - name: Emulator test
