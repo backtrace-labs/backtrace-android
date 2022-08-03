@@ -51,13 +51,6 @@ jobs:
         name: example-app-debug.apk
         path: example-app/build/outputs/apk/debug/example-app*.apk
 
-    - name: Upload Test APK
-      if: matrix.api-level == '32'
-      uses: actions/upload-artifact@v3
-      with:
-        name: example-app-debug-androidTest.apk
-        path: example-app/build/outputs/apk/debug/androidTest/example-app*.apk
-
     - name: Emulator test
       uses: reactivecircus/android-emulator-runner@v2
       with:
@@ -65,6 +58,14 @@ jobs:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
         script: ./gradlew connectedCheck
+
+    # Seems to not be created until connectedCheck    
+    - name: Upload Test APK
+      if: matrix.api-level == '32'
+      uses: actions/upload-artifact@v3
+      with:
+        name: example-app-debug-androidTest.apk
+        path: example-app/build/outputs/apk/debug/androidTest/example-app*.apk
 
     - name: Code coverage
       if: matrix.api-level == '32'
