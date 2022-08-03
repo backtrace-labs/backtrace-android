@@ -82,9 +82,14 @@ jobs:
       - name: Get Saucectl
         run: curl -L https://saucelabs.github.io/saucectl/install | bash
 
+      - name: Install saucectl
+        uses: saucelabs/saucectl-run-action@v1
+        with:
+          skip-run: true
+
       - name: Run Saucectl
         run: |
-          ./bin/saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator",platformVersion=11.0
+          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator",platformVersion=11.0
 
     #        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
     #     - name: Emulator test
