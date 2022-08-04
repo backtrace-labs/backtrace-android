@@ -10,6 +10,7 @@ import android.support.test.espresso.PerformException;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,11 @@ public class ExampleInstrumentedTest {
     public ActivityTestRule<MainActivity> mActivityRule =
             new ActivityTestRule<>(MainActivity.class);
 
+    @Before
+    public void enableMetricsAndBreadcrumbs() {
+        onView(withId(R.id.enableBreadcrumbs)).perform(click());
+    }
+
     @Test
     public void useAppContext() {
         // Context of the app under test.
@@ -35,16 +41,29 @@ public class ExampleInstrumentedTest {
         assertEquals("backtraceio.backtraceio", appContext.getPackageName());
     }
 
-    @Test(expected = PerformException.class)
+    @Test
     public void dumpWithoutCrash() {
         onView(withId(R.id.dumpWithoutCrash)).perform(click());
-        onView(withId(R.id.handledException)).perform(click());
+    }
+
+    @Test(expected = PerformException.class)
+    public void unhandledException() {
         onView(withId(R.id.unhandledException)).perform(click());
     }
 
+    @Test
+    public void handledException() {
+        onView(withId(R.id.handledException)).perform(click());
+    }
+
+    @Test
+    public void anr() {
+        onView(withId(R.id.anr)).perform(click());
+    }
+
     // Will break build, obviously.
-//    @Test
-//    public void nativeCrash() {
-//        onView(withId(R.id.nativeCrash)).perform(click());
-//    }
+    //@Test
+    public void nativeCrash() {
+        onView(withId(R.id.nativeCrash)).perform(click());
+    }
 }
