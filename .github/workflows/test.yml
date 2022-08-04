@@ -97,7 +97,7 @@ jobs:
           npm install backtrace-morgue -g
           morgue --version || true
           # Todo: currently just looks 15 minutes in the past and doesn't filter at all.
-          morgue --token=${{ secrets.BACKTRACE_API_TOKEN }} --endpoint="https://yolo.sp.backtrace.io" --endpoint="https://yolo.sp.backtrace.io" list yolo/android-library --select timestamp --filter=timestamp,greater-than,`date -v -15M +%s%3` --csv=crash.csv || true
+          morgue --token=${{ secrets.BACKTRACE_API_TOKEN }} --endpoint="https://yolo.sp.backtrace.io" --endpoint="https://yolo.sp.backtrace.io" list yolo/android-library --select timestamp --filter=timestamp,greater-than,`date +%s%3N -d "15 minutes ago"` --csv=crash.csv || true
 
           if [ $(wc -l < crash.csv) -gt 0 ]; then
               echo "Success"
