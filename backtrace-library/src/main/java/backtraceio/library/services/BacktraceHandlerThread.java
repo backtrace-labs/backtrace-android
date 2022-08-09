@@ -40,7 +40,9 @@ public class BacktraceHandlerThread extends HandlerThread {
     @Override
     protected void onLooperPrepared() {
         super.onLooperPrepared();
-        mHandler = new BacktraceHandler(this.getLooper(), this.url);
+        if (mHandler == null) {
+            mHandler = new BacktraceHandler(this.getLooper(), this.url);
+        }
     }
 
     Message createMessage(BacktraceHandlerInput data) {
@@ -50,6 +52,11 @@ public class BacktraceHandlerThread extends HandlerThread {
     }
 
     void sendReport(BacktraceHandlerInputReport data) {
+        // Sometimes, sendReport gets called before the Looper is ready.
+        // getLooper will wait for the Looper to be ready: https://stackoverflow.com/questions/30300555/android-what-happens-after-a-handlerthread-is-started
+        if (mHandler == null) {
+            mHandler = new BacktraceHandler(this.getLooper(), this.url);
+        }
         mHandler.sendMessage(createMessage(data));
     }
 
