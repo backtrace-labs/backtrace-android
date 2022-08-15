@@ -39,10 +39,12 @@ android {
 }
 
 String getSubmissionUrl() {
-    def propFile = rootProject.file("./local.properties")
+    if (!rootProject.file("./local.properties").exists()) {
+        return "null"
+    }
     def properties = new Properties()
-    properties.load(new FileInputStream(propFile))
-    return properties.containsKey('BACKTRACE_SUBMISSION_URL') ? properties['BACKTRACE_SUBMISSION_URL'] : "null"
+    properties.load(rootProject.file("./local.properties").newDataInputStream())
+    return properties.containsKey('BACKTRACE_SUBMISSION_URL') ? properties['BACKTRACE_SUBMISSION_URL'] : "null"  
 }
 
 dependencies {
