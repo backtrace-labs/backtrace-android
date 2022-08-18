@@ -9,76 +9,67 @@
 ## Installation
 ### Gradle
 ```
+// provide the latest version of the Backtrace reporting library.
 dependencies {
-    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.7.1'
+    implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:<add-latest-version>'
 }
 ```
 
 ### Maven
 ```
+// provide the latest version of the Android SDK.
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
-  <version>3.7.1</version>
+  <version><add-latest-version></version>
   <type>aar</type>
 </dependency>
 ```
 
-<!-- ## Installation pre-release version <a name="prerelease-version"></a>
-### Pre-release version of `v.3.1.0` is available in the following repository: https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1018/
-Add the above url in `build.gradle` file to `repositories` section as below to allow downloading the library from our staging repository:
-```
-maven {
-    url "https://oss.sonatype.org/content/repositories/comgithubbacktrace-labs-1018/"
-}
-```
-Then you can download this library by adding to the dependencies in `build.gradle` file to `dependencies` section:
-
-```
-implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.1.0'
-```-->
-
-## Permissions
-### Internet permission
-* To send errors to the server instance you need to add permissions for Internet connection into `AndroidManifest.xml` file in your application.
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-### File access
-* To send file attachments from external storage to the server instance you need to add permissions for read external storage into `AndroidManifest.xml` file in your application.
-
-```xml
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-```
 
 ## Usage
 ### Java
 ```java
-// replace with your endpoint url and token
-BacktraceCredentials credentials = new BacktraceCredentials("<endpoint-url>", "<token>");
+// replace with your submission url 
+BacktraceCredentials credentials = new BacktraceCredentials("<submissionUrl>");
 BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
 
-try {
-    // throw exception here
-} catch (Exception exception) {
-    backtraceClient.send(new BacktraceReport(e));
-}
+// send test report
+backtraceClient.send("test");
+
+// Capture uncaught exceptions
+BacktraceExceptionHandler.enable(backtraceClient);
+
+// Enable handling of native crashes
+backtraceClient.database.setupNativeIntegration(backtraceClient, credentials, false);
+
+// Enable ANR detection
+backtraceClient.enableAnr();
+
+// Enable Crash Free metrics
+backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials));
 ```
 
 ### Kotlin
 ```kotlin
-// replace with your endpoint url and token
-val backtraceCredentials = BacktraceCredentials("<endpoint-url>", "<token>")
-val backtraceClient = BacktraceClient(applicationContext, backtraceCredentials)
+// replace with your submission url
+val credentials = BacktraceCredentials("<submissionUrl>")
+val backtraceClient = BacktraceClient(applicationContext, credentials)
 
-try {
-    // throw exception here
-}
-catch (e: Exception) {
-    backtraceClient.send(BacktraceReport(e))
-}
+// send test report
+backtraceClient.send("test")
+
+// Capture uncaught exceptions
+BacktraceExceptionHandler.enable(backtraceClient)
+
+// Enable handling of native crashes
+backtraceClient.database.setupNativeIntegration(backtraceClient, credentials, false)
+
+// Enable ANR detection
+backtraceClient.enableAnr()
+
+// Enable Crash Free metrics
+backtraceClient.metrics.enable(BacktraceMetricsSettings(credentials))
 ```
 
 ## Documentation
