@@ -54,7 +54,7 @@ implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.
 ```
 
 ## Usage
-Java
+### Java
 ```java
 // replace with your endpoint url and token
 BacktraceCredentials credentials = new BacktraceCredentials("<endpoint-url>", "<token>");
@@ -67,7 +67,7 @@ try {
 }
 ```
 
-Kotlin
+### Kotlin
 ```kotlin
 // replace with your endpoint url and token
 val backtraceCredentials = BacktraceCredentials("<endpoint-url>", "<token>")
