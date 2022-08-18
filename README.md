@@ -7,15 +7,14 @@
 [Backtrace](http://backtrace.io/)'s integration with Android applications written in Java or Kotlin allows you to capture and report handled and unhandled java exceptions so you can prioritize and debug software errors. Backtrace also captures and reports native (JNI/NDK) handled and unhandled exceptions if native integration is enabled.
 
 ## Installation
-### Download library via Gradle or Maven
-* Gradle
+### Gradle
 ```
 dependencies {
     implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:3.7.1'
 }
 ```
 
-* Maven
+### Maven
 ```
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
