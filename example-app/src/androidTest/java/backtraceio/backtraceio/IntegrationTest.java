@@ -62,14 +62,6 @@ public class IntegrationTest {
     @Test
     public void dumpWithoutCrash() {
         client.attributes.put("testName", "dumpWithoutCrash");
-        final boolean[] invoked = {false};
-        client.setOnBeforeSendEventListener(data -> {
-            invoked[0] = true;
-            assertEquals(data.attributes.get("testName"), "unhandledExceptionx");
-            return data;
-        });
-
-
         onView(withId(R.id.dumpWithoutCrash)).perform(click());
     }
 
@@ -79,7 +71,6 @@ public class IntegrationTest {
 
         final BacktraceData[] sentData = new BacktraceData[1];
         client.setOnBeforeSendEventListener(data -> {
-            System.out.println("hererererere" + data);
             sentData[0] = data;
             return data;
         });
