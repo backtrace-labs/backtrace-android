@@ -103,8 +103,6 @@ bool InitializeCrashpad(jstring url,
             std::string attachmentBaseName = basename(convertedAttachmentPath);
 
             std::string attachmentArgumentString("--attachment=");
-            attachmentArgumentString += attachmentBaseName;
-            attachmentArgumentString += "=";
             attachmentArgumentString += convertedAttachmentPath;
             arguments.push_back(attachmentArgumentString);
 
