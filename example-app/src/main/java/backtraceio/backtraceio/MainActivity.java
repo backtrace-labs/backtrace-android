@@ -34,7 +34,7 @@ import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BacktraceClient backtraceClient;
+    protected BacktraceClient backtraceClient;
 
     private final int anrTimeout = 3000;
 
