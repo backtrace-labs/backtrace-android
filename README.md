@@ -32,7 +32,7 @@ dependencies {
 ```java
 // replace with your submission url 
 BacktraceCredentials credentials = new BacktraceCredentials("<submissionUrl>");
-BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials);
+BacktraceClient backtraceClient = new BacktraceClient(getApplicationContext(), credentials, new BacktraceDatabase(context, settings));
 
 // send test report
 backtraceClient.send("test");
@@ -41,7 +41,7 @@ backtraceClient.send("test");
 BacktraceExceptionHandler.enable(backtraceClient);
 
 // Enable handling of native crashes
-backtraceClient.database.setupNativeIntegration(backtraceClient, credentials, false);
+backtraceClient.enableNativeIntegration();
 
 // Enable ANR detection
 backtraceClient.enableAnr();
@@ -54,7 +54,7 @@ backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials));
 ```kotlin
 // replace with your submission url
 val credentials = BacktraceCredentials("<submissionUrl>")
-val backtraceClient = BacktraceClient(applicationContext, credentials)
+val backtraceClient = BacktraceClient(applicationContext, credentials, BacktraceDatabase(context, settings))
 
 // send test report
 backtraceClient.send("test")
@@ -63,7 +63,7 @@ backtraceClient.send("test")
 BacktraceExceptionHandler.enable(backtraceClient)
 
 // Enable handling of native crashes
-backtraceClient.database.setupNativeIntegration(backtraceClient, credentials, false)
+backtraceClient.enableNativeIntegration()
 
 // Enable ANR detection
 backtraceClient.enableAnr()
