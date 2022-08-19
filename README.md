@@ -8,16 +8,16 @@
 
 ## Installation
 ### Gradle
-```
-// provide the latest version of the Backtrace reporting library.
+```xml
+<!-- provide the latest version of the Backtrace reporting library. -->
 dependencies {
     implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:<add-latest-version>'
 }
 ```
 
 ### Maven
-```
-// provide the latest version of the Android SDK.
+```xml
+<!-- provide the latest version of the Android SDK. -->
 <dependency>
   <groupId>com.github.backtrace-labs.backtrace-android</groupId>
   <artifactId>backtrace-library</artifactId>
