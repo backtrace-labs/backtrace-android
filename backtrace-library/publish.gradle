@@ -19,7 +19,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = VERSION_NAME
+version = ${versionName}
 group = GROUP
 
 def isReleaseBuild() {
