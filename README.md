@@ -8,8 +8,8 @@
 
 ## Installation
 ### Gradle
-```xml
-<!-- provide the latest version of the Backtrace reporting library. -->
+```groovy
+// provide the latest version of the Backtrace reporting library.
 dependencies {
     implementation 'com.github.backtrace-labs.backtrace-android:backtrace-library:<add-latest-version>'
 }
