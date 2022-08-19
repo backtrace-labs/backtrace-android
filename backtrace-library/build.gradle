@@ -4,7 +4,7 @@ plugins {
 apply plugin: 'com.android.library'
 
 androidGitVersion {
-    // this is responsible for 
+    // this is the format for generating the versionName
     // default is %tag%%-count%%-commit%%-branch%%-dirty% - removed %-dirty% because submodules tend to get dirty
     format '%tag%%-count%%-commit%%-branch%'
 }
