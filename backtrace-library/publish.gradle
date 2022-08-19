@@ -19,7 +19,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = ${versionName}
+version = android.defaultConfig.buildConfigFields["versionName"].value
 group = GROUP
 
 def isReleaseBuild() {
