@@ -19,11 +19,11 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = VERSION_NAME
+version = android.defaultConfig.buildConfigFields["VERSION_NAME"].value
 group = GROUP
 
 def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
+    return version.contains("SNAPSHOT") == false
 }
 
 def getReleaseRepositoryUrl() {
@@ -86,7 +86,7 @@ afterEvaluate { project ->
             release(MavenPublication) {
                 groupId GROUP
                 artifactId POM_ARTIFACT_ID
-                version VERSION_NAME
+                version version
                 from components.release
             }
         }
@@ -157,7 +157,7 @@ afterEvaluate { project ->
 
     publishing.publications.all { publication ->
         publication.groupId = GROUP
-        publication.version = VERSION_NAME
+        publication.version = version
 
         publication.artifact androidSourcesJar
         publication.artifact androidJavadocsJar
