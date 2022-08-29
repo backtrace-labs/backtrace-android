@@ -2,7 +2,8 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.backtrace-labs.backtrace-android/backtrace-library/badge.svg)](https://search.maven.org/artifact/com.github.backtrace-labs.backtrace-android/backtrace-library)
 ![Build Status](https://github.com/backtrace-labs/backtrace-android/actions/workflows/test.yml/badge.svg)
-
+[![javadoc](https://javadoc.io/badge2/com.github.backtrace-labs.backtrace-android/backtrace-library/javadoc.svg)](https://javadoc.io/doc/com.github.backtrace-labs.backtrace-android/backtrace-library)
+<img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="License: MIT">
 
 [Backtrace](http://backtrace.io/)'s integration with Android applications written in Java or Kotlin allows you to capture and report handled and unhandled java exceptions so you can prioritize and debug software errors. Backtrace also captures and reports native (JNI/NDK) handled and unhandled exceptions if native integration is enabled.
 
