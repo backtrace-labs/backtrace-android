@@ -36,7 +36,7 @@ public class BacktraceDatabaseRecordTest {
 
     @Before
     public void setUp() {
-        this.context = InstrumentationRegistry.getContext();
+        this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
         this.database = new BacktraceDatabase(this.context, dbPath);

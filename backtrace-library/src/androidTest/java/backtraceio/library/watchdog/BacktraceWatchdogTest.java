@@ -23,7 +23,7 @@ public class BacktraceWatchdogTest {
 
     @Before
     public void setUp() {
-        this.context = InstrumentationRegistry.getContext();
+        this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.backtraceClient = new BacktraceClient(this.context, credentials);
     }
 

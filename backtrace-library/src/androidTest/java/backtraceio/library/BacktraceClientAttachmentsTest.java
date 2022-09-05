@@ -38,7 +38,7 @@ public class BacktraceClientAttachmentsTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
 
         database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());

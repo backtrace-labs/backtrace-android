@@ -42,7 +42,7 @@ public class SettingAttributesTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         final String url = "https://backtrace.io/";
         backtraceCredentials = new BacktraceCredentials(url);
         clientAttributes = new HashMap<>();

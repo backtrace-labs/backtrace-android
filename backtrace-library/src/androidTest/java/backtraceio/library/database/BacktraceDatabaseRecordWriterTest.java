@@ -28,7 +28,7 @@ public class BacktraceDatabaseRecordWriterTest {
 
     @Before
     public void setUp() {
-        this.dbPath = InstrumentationRegistry.getContext().getFilesDir().getAbsolutePath();
+        this.dbPath = InstrumentationRegistry.getInstrumentation().getContext().getFilesDir().getAbsolutePath();
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 0, 0);
         this.databaseFileContext.clear();
         this.databaseRecordWriter = new BacktraceDatabaseRecordWriter(this.dbPath);

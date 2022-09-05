@@ -48,7 +48,7 @@ public class BacktraceClientSummedEventTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
         BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 

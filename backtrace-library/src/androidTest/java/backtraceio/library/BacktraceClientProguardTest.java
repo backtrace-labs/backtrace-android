@@ -43,7 +43,7 @@ public class BacktraceClientProguardTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     }
 

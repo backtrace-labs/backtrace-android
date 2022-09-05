@@ -47,7 +47,7 @@ public class BacktraceClientBreadcrumbsTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
 
         BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());

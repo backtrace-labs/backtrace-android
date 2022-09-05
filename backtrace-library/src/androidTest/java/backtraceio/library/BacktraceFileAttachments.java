@@ -48,7 +48,7 @@ public class BacktraceFileAttachments {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         absolutePath = context.getFilesDir().getAbsolutePath() + "/" + fileName;
         credentials = new BacktraceCredentials("", "");
         client = new BacktraceClient(context, credentials);

@@ -39,7 +39,7 @@ public class BacktraceClientEventsTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials(Uri.parse("https://submit.backtrace.io/backtrace/123/json"));
     }
 

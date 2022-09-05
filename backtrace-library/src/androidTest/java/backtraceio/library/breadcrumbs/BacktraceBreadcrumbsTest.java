@@ -36,7 +36,7 @@ public class BacktraceBreadcrumbsTest {
 
     @Before
     public void setUp() {
-        this.context = InstrumentationRegistry.getContext();
+        this.context = InstrumentationRegistry.getInstrumentation().getContext();
 
         backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
         backtraceBreadcrumbs.enableBreadcrumbs(context);
