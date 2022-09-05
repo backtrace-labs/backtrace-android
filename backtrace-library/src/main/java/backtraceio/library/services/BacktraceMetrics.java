@@ -1,7 +1,7 @@
 package backtraceio.library.services;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.events.RequestHandler;
