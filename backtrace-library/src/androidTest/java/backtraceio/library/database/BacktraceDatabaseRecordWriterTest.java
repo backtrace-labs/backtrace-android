@@ -12,9 +12,11 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecordWriter;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
@@ -60,19 +62,29 @@ public class BacktraceDatabaseRecordWriterTest {
     public void writeObject() throws Exception {
         // GIVEN
         Exception exception = new Exception("Example message");
-        String expectedResult = "{\"detail-message\":\"Example message\",\"stack-trace\":[]}";
+        StackTraceElement element = new StackTraceElement("Exception.class", "writeObject", "BacktraceDatabaseRecordWriterTest.java", 1);
+        StackTraceElement[] stackTraceElements = new StackTraceElement[1];
+        stackTraceElements[0] = element;
+
+        exception.setStackTrace(stackTraceElements);
+        exception.addSuppressed(new IllegalArgumentException("illegal-argument"));
 
         // WHEN
         String filePath = this.databaseRecordWriter.write(exception, null);
         String jsonResult = FileHelper.readFile(new File(filePath));
+        Exception exceptionResult = BacktraceSerializeHelper.fromJson(jsonResult, Exception.class);
 
-        // DEBUG
-//        if(true) {
-//            System.out.println(jsonResult);
-//            throw new Exception(jsonResult);
-//        }
         // THEN
-        assertEquals(expectedResult, jsonResult);
+        assertEquals(exception.getMessage(), exceptionResult.getMessage());
+
+        assertEquals(exception.getStackTrace().length, exceptionResult.getStackTrace().length);
+        assertEquals(exception.getStackTrace()[0].getLineNumber(), exceptionResult.getStackTrace()[0].getLineNumber());
+        assertEquals(exception.getStackTrace()[0].getFileName(), exceptionResult.getStackTrace()[0].getFileName());
+        assertEquals(exception.getStackTrace()[0].getMethodName(), exceptionResult.getStackTrace()[0].getMethodName());
+        assertEquals(exception.getStackTrace()[0].getClassName(), exceptionResult.getStackTrace()[0].getClassName());
+
+        assertEquals(exception.getSuppressed().length, exceptionResult.getSuppressed().length);
+        assertEquals(exception.getSuppressed()[0].getMessage(), exceptionResult.getSuppressed()[0].getMessage());
     }
 
     private List<File> countFiles() {
