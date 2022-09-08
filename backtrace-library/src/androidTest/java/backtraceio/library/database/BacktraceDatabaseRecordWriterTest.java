@@ -72,11 +72,6 @@ public class BacktraceDatabaseRecordWriterTest {
         String jsonResult = FileHelper.readFile(new File(filePath));
         Exception exceptionResult = BacktraceSerializeHelper.fromJson(jsonResult, Exception.class);
 
-        // DEBUG
-        if(true) {
-            System.out.println(jsonResult);
-            throw new Exception(jsonResult);
-        }
         // THEN
         assertEquals(exception.getMessage(), exceptionResult.getMessage());
 
