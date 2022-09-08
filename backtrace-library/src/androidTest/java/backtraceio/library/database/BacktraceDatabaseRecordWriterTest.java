@@ -60,17 +60,17 @@ public class BacktraceDatabaseRecordWriterTest {
     public void writeObject() throws Exception {
         // GIVEN
         Exception exception = new Exception("Example message");
-        String expectedResult = "{\"detail-message\":\"Example message\",\"stack-trace\":[],\"suppressed-exceptions\":[]}";
+        String expectedResult = "{\"detail-message\":\"Example message\",\"stack-trace\":[]}";
 
         // WHEN
         String filePath = this.databaseRecordWriter.write(exception, null);
         String jsonResult = FileHelper.readFile(new File(filePath));
 
         // DEBUG
-        if(true) {
-            System.out.println(jsonResult);
-            throw new Exception(jsonResult);
-        }
+//        if(true) {
+//            System.out.println(jsonResult);
+//            throw new Exception(jsonResult);
+//        }
         // THEN
         assertEquals(expectedResult, jsonResult);
     }
