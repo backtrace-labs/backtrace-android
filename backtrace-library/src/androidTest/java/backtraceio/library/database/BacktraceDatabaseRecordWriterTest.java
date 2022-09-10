@@ -84,7 +84,6 @@ public class BacktraceDatabaseRecordWriterTest {
         assertEquals(exception.getStackTrace()[0].getClassName(), exceptionResult.getStackTrace()[0].getClassName());
 
         assertEquals(exception.getSuppressed().length, exceptionResult.getSuppressed().length);
-        assertEquals(exception.getSuppressed()[0].getMessage(), exceptionResult.getSuppressed()[0].getMessage());
     }
 
     private List<File> countFiles() {
