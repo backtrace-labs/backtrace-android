@@ -65,9 +65,7 @@ public class BacktraceDatabaseRecordWriterTest {
         StackTraceElement element = new StackTraceElement("Exception.class", "writeObject", "BacktraceDatabaseRecordWriterTest.java", 1);
         StackTraceElement[] stackTraceElements = new StackTraceElement[1];
         stackTraceElements[0] = element;
-
         exception.setStackTrace(stackTraceElements);
-        exception.addSuppressed(new IllegalArgumentException("illegal-argument"));
 
         // WHEN
         String filePath = this.databaseRecordWriter.write(exception, null);
@@ -82,8 +80,6 @@ public class BacktraceDatabaseRecordWriterTest {
         assertEquals(exception.getStackTrace()[0].getFileName(), exceptionResult.getStackTrace()[0].getFileName());
         assertEquals(exception.getStackTrace()[0].getMethodName(), exceptionResult.getStackTrace()[0].getMethodName());
         assertEquals(exception.getStackTrace()[0].getClassName(), exceptionResult.getStackTrace()[0].getClassName());
-
-        assertEquals(exception.getSuppressed().length, exceptionResult.getSuppressed().length);
     }
 
     private List<File> countFiles() {
