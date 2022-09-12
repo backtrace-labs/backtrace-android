@@ -129,13 +129,6 @@ public class BacktraceClientSendTest {
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
-
-
-        // WHEN
-
-        String w = causedException.getMessage();
-
-        // THEN
     }
 
     @Test
