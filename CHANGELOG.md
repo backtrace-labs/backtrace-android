@@ -1,5 +1,18 @@
 # Backtrace Android Release Notes
 
+# Version 3.7.4
+- Feature: migrated to AndroidX
+
+# Version 3.7.3
+- Bug: Crashpad attachment syntax changed
+
+# Version 3.7.2
+- Bug: Fix issue rolling over Breadcrumb file
+- Feature: update gradle to latest
+- Feature: integrate crashpad via cmake
+- Improvement: Make local.properties optional
+- Improvement: Cleanup build scripts for speed
+
 ## Version 3.7.1 - 14.06.2022
 - Error type "crash" only on unhandled exceptions from main thread for other threads - error type will be "unhandled exception"
 
