@@ -88,25 +88,26 @@ public class BacktraceClientSendTest {
         stackTraceElements[0] = new StackTraceElement("BacktraceClientSendTest.class", "sendCausedException", "BacktraceClientSendTest.java", 1);
         causedException.setStackTrace(stackTraceElements);
 
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+        final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
         final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
         RequestHandler rh = data -> {
             String jsonString = BacktraceSerializeHelper.toJson(data);
 
             try {
-                JSONObject jsonObject = new JSONObject(jsonString);
-                JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
-                String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
+                // THEN
+                final JSONObject jsonObject = new JSONObject(jsonString);
+                final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
+                final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
 
                 assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
                 assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
                 assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
 
-                JSONObject firstCause = exceptionProperties.getJSONObject("cause");
+                final JSONObject firstCause = exceptionProperties.getJSONObject("cause");
                 assertEquals("java.lang.IllegalArgumentException: New Exception", firstCause.getString("detail-message"));
 
-                JSONObject secondCause = firstCause.getJSONObject("cause");
+                final JSONObject secondCause = firstCause.getJSONObject("cause");
                 assertEquals(lastExceptionExpectedMessage, secondCause.getString("detail-message"));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -120,9 +121,9 @@ public class BacktraceClientSendTest {
 
         // WHEN
         backtraceClient.send(new BacktraceReport(causedException), backtraceResult -> {
-            // THEN
             waiter.resume();
         });
+
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
