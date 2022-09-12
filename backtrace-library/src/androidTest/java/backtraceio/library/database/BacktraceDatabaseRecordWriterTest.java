@@ -2,8 +2,8 @@ package backtraceio.library.database;
 
 import static junit.framework.TestCase.assertEquals;
 
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
@@ -12,9 +12,11 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecordWriter;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
@@ -28,7 +30,7 @@ public class BacktraceDatabaseRecordWriterTest {
 
     @Before
     public void setUp() {
-        this.dbPath = InstrumentationRegistry.getContext().getFilesDir().getAbsolutePath();
+        this.dbPath = InstrumentationRegistry.getInstrumentation().getContext().getFilesDir().getAbsolutePath();
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 0, 0);
         this.databaseFileContext.clear();
         this.databaseRecordWriter = new BacktraceDatabaseRecordWriter(this.dbPath);
@@ -57,17 +59,27 @@ public class BacktraceDatabaseRecordWriterTest {
     }
 
     @Test
-    public void writeObject() throws IOException {
+    public void writeObject() throws Exception {
         // GIVEN
         Exception exception = new Exception("Example message");
-        String expectedResult = "{\"detail-message\":\"Example message\",\"stack-trace\":[],\"suppressed-exceptions\":[]}";
+        StackTraceElement element = new StackTraceElement("Exception.class", "writeObject", "BacktraceDatabaseRecordWriterTest.java", 1);
+        StackTraceElement[] stackTraceElements = new StackTraceElement[1];
+        stackTraceElements[0] = element;
+        exception.setStackTrace(stackTraceElements);
 
         // WHEN
         String filePath = this.databaseRecordWriter.write(exception, null);
         String jsonResult = FileHelper.readFile(new File(filePath));
+        Exception exceptionResult = BacktraceSerializeHelper.fromJson(jsonResult, Exception.class);
 
         // THEN
-        assertEquals(expectedResult, jsonResult);
+        assertEquals(exception.getMessage(), exceptionResult.getMessage());
+
+        assertEquals(exception.getStackTrace().length, exceptionResult.getStackTrace().length);
+        assertEquals(exception.getStackTrace()[0].getLineNumber(), exceptionResult.getStackTrace()[0].getLineNumber());
+        assertEquals(exception.getStackTrace()[0].getFileName(), exceptionResult.getStackTrace()[0].getFileName());
+        assertEquals(exception.getStackTrace()[0].getMethodName(), exceptionResult.getStackTrace()[0].getMethodName());
+        assertEquals(exception.getStackTrace()[0].getClassName(), exceptionResult.getStackTrace()[0].getClassName());
     }
 
     private List<File> countFiles() {

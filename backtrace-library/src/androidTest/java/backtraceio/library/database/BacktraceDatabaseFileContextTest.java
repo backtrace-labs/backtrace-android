@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class BacktraceDatabaseFileContextTest {
 
     @Before
     public void setUp() {
-        this.context = InstrumentationRegistry.getContext();
+        this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
         this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);

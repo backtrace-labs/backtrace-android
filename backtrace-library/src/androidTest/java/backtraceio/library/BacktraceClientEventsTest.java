@@ -5,8 +5,8 @@ import static org.junit.Assert.fail;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -39,7 +39,7 @@ public class BacktraceClientEventsTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials(Uri.parse("https://submit.backtrace.io/backtrace/123/json"));
     }
 
