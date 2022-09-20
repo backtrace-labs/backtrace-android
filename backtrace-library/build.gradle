@@ -53,6 +53,7 @@ android {
     sourceSets {
         main {
         }
+        androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
     
     // Needed until we migrate to AndroidX
