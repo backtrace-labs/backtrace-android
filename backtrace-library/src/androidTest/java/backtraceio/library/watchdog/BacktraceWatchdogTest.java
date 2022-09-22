@@ -1,9 +1,9 @@
 package backtraceio.library.watchdog;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.annotation.UiThreadTest;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.annotation.UiThreadTest;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -23,7 +23,7 @@ public class BacktraceWatchdogTest {
 
     @Before
     public void setUp() {
-        this.context = InstrumentationRegistry.getContext();
+        this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.backtraceClient = new BacktraceClient(this.context, credentials);
     }
 

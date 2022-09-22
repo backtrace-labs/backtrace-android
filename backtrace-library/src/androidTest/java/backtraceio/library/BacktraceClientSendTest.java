@@ -4,21 +4,26 @@ import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
@@ -37,7 +42,7 @@ public class BacktraceClientSendTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     }
 
@@ -66,6 +71,59 @@ public class BacktraceClientSendTest {
                 waiter.resume();
             }
         });
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void sendExceptionWithManyCause() {
+        // GIVEN
+        final String lastExceptionExpectedMessage = "New Exception";
+        final Exception causedException = new Exception(new IOException(new IllegalArgumentException(lastExceptionExpectedMessage)));
+        final StackTraceElement[] stackTraceElements = new StackTraceElement[1];
+        stackTraceElements[0] = new StackTraceElement("BacktraceClientSendTest.class", "sendCausedException", "BacktraceClientSendTest.java", 1);
+        causedException.setStackTrace(stackTraceElements);
+
+        final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+        final Waiter waiter = new Waiter();
+        final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
+        RequestHandler rh = data -> {
+            String jsonString = BacktraceSerializeHelper.toJson(data);
+
+            try {
+                // THEN
+                final JSONObject jsonObject = new JSONObject(jsonString);
+                final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
+                final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
+
+                assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
+                assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
+                assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
+
+                final JSONObject firstCause = exceptionProperties.getJSONObject("cause");
+                assertEquals("java.lang.IllegalArgumentException: New Exception", firstCause.getString("detail-message"));
+
+                final JSONObject secondCause = firstCause.getJSONObject("cause");
+                assertEquals(lastExceptionExpectedMessage, secondCause.getString("detail-message"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+
+            return new BacktraceResult(data.report, data.report.message,
+                    BacktraceResultStatus.Ok);
+        };
+        backtraceClient.setOnRequestHandler(rh);
+
+        // WHEN
+        backtraceClient.send(new BacktraceReport(causedException), backtraceResult -> {
+            waiter.resume();
+        });
+
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
