@@ -2,6 +2,7 @@
 
 ## Version 3.7.4
 - Feature: migrated to AndroidX
+- Improvement: removed READ_EXTERNAL_STORAGE permission from library AndroidManifest.xml
 
 ## Version 3.7.3
 - Bug: Crashpad attachment syntax changed
