@@ -9,8 +9,8 @@ import static org.junit.Assert.assertNull;
 import static java.lang.Thread.sleep;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
-import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.logger.BacktraceLogger;
@@ -56,7 +55,7 @@ public class BacktraceClientUniqueEventTest {
 
     @Before
     public void setUp() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
         BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
