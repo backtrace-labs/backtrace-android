@@ -30,6 +30,9 @@ jobs:
       - name: Write to local.properties
         run: |
           echo BACKTRACE_SUBMISSION_URL=\"https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json\" > ./local.properties
+          
+      - name: Set NDK version
+        run: echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager --install "ndk;19.2.5345600" --sdk_root=21 >/dev/null 2>&1
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest check
