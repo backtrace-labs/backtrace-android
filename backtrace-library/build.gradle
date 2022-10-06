@@ -11,11 +11,11 @@ androidGitVersion {
 
 android {
 
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionName androidGitVersion.name()
         versionCode androidGitVersion.code()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
