@@ -33,6 +33,12 @@ jobs:
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest check
+        
+      - name: Upload symbols.zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: native-debug-symbols.zip
+          path: example-app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
 
       - name: Upload example-app APK
         uses: actions/upload-artifact@v3
