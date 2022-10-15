@@ -415,7 +415,7 @@ public class BacktraceDatabase implements Database {
 
         for (File file : files) {
             BacktraceDatabaseRecord record = BacktraceDatabaseRecord.readFromFile(file);
-            if (!record.valid()) {
+            if (record == null || !record.valid()) {
                 record.delete();
                 continue;
             }
