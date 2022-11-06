@@ -4,6 +4,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import backtraceio.library.common.serialization.BacktraceGsonBuilder;
 import backtraceio.library.models.BacktraceResult;
 
 /**
@@ -12,32 +13,25 @@ import backtraceio.library.models.BacktraceResult;
 public class BacktraceSerializeHelper {
 
     /**
-     * Deserialize JSON into BacktraceResult object
-     *
-     * @param json JSON string which will be deserialized
-     * @return object created during deserialization of given json string
-     */
-    public static BacktraceResult backtraceResultFromJson(String json) {
-        return new Gson().fromJson(json, BacktraceResult.class);
-    }
-
-    /**
      * Serialize given object to JSON string
      *
      * @param object object which will be serialized
      * @return serialized object in JSON string format
      */
     public static String toJson(Object object) {
-        Gson gson = buildGson();
-        return gson.toJson(object);
+        return BacktraceSerializeHelper.toJson(new BacktraceGsonBuilder().buildGson(), object);
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
-        Gson gson = buildGson();
+        return BacktraceSerializeHelper.fromJson(new BacktraceGsonBuilder().buildGson(), json, type);
+    }
+
+    public static String toJson(Gson gson, Object object) {
+        return gson.toJson(object);
+    }
+
+    public static <T> T fromJson(Gson gson, String json, Class<T> type) {
         return gson.fromJson(json, type);
     }
 
-    private static Gson buildGson() {
-        return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
-    }
 }

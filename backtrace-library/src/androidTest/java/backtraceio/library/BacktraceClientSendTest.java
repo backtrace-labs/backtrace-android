@@ -182,6 +182,7 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
+
         backtraceClient.send(new BacktraceReport(this.resultMessage, this.attributes),
                 new OnServerResponseEventListener() {
                     @Override

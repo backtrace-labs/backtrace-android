@@ -3,15 +3,14 @@ package backtraceio.library.coroner;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.RequestHelper;
+import backtraceio.library.coroner.response.CoronerApiResponse;
+import backtraceio.library.coroner.serialization.CoronerResponseGsonBuilder;
 import backtraceio.library.http.HttpHelper;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.types.HttpException;
 
 class CoronerHttpClient {
@@ -35,7 +34,11 @@ class CoronerHttpClient {
         }
 
         String resultJson = HttpHelper.getResponseMessage(urlConnection);
-        return BacktraceSerializeHelper.fromJson(resultJson, CoronerApiResponse.class);
+
+        return BacktraceSerializeHelper.fromJson(
+                new CoronerResponseGsonBuilder().buildGson(),
+                resultJson,
+                CoronerApiResponse.class);
     }
 
     private HttpURLConnection prepareHttpRequest(String json) throws IOException {

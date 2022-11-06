@@ -1,9 +1,9 @@
-package backtraceio.library.coroner;
+package backtraceio.library.coroner.query;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class CoronerQueries {
+public class CoronerQueries {
     private final CoronerQueryBuilder builder;
 
     public CoronerQueries() {
@@ -15,6 +15,6 @@ class CoronerQueries {
     }
 
     public String filterByRxId(String rxId, List<String> attributes) {
-        return this.builder.build(rxId, attributes);
+        return this.builder.buildRxIdGroup(rxId, attributes);
     }
 }

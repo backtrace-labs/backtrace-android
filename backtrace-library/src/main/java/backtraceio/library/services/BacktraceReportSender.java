@@ -73,8 +73,8 @@ class BacktraceReportSender {
             BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = BacktraceSerializeHelper.backtraceResultFromJson(
-                        HttpHelper.getResponseMessage(urlConnection)
+                result = BacktraceSerializeHelper.fromJson(
+                        HttpHelper.getResponseMessage(urlConnection), BacktraceResult.class
                 );
                 result.setBacktraceReport(report);
             } else {
