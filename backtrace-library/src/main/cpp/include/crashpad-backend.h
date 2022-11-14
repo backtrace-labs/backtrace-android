@@ -28,4 +28,6 @@ void DisableCrashpad();
 
 void ReEnableCrashpad();
 
+bool IsSafeModeRequiredCrashpad(jstring database);
+
 #endif //BACKTRACE_ANDROID_CRASHPAD_BACKEND_H

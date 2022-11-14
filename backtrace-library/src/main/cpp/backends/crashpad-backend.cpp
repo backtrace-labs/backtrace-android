@@ -3,6 +3,8 @@
 #include <jni.h>
 #include <libgen.h>
 
+//#include "client/crashpad_client.h"
+
 extern std::string thread_id;
 extern std::atomic_bool initialized;
 extern std::mutex attribute_synchronization;
@@ -219,10 +221,23 @@ void ReEnableCrashpad() {
     // Re-enable uploads if disabled
     if (disabled) {
         if (database == nullptr) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Crashpad database is null, this should not happen");
             return;
         }
         database->GetSettings()->SetUploadsEnabled(true);
         disabled = false;
     }
+}
+
+bool IsSafeModeRequiredCrashpad(jstring database) {
+    JNIEnv *env = GetJniEnv();
+    base::FilePath db((env)->GetStringUTFChars(database, 0));
+    client->EnableCrashLoopDetection();
+//    return false;
+    bool is_enabled = crashpad::CrashpadClient::IsSafeModeRequired(db);
+
+    int count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
+
+    return is_enabled;
 }

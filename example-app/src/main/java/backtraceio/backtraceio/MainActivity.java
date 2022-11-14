@@ -49,9 +49,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Set this value in your local.properties
-        if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
-            backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
-        }
+        String BACKTRACE_SUBMISSION_URL = "https://submit.backtrace.io/konst-ryab/04aecb6b3da05e8d83f2a27f9b5f41352ac792428c5e5f6a94ff58d43ee14e46/json";
+//        if (BACKTRACE_SUBMISSION_URL != null) {
+            backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
+            boolean result = BacktraceClient.IsSafeModeRequiredCrashpad(".");
+//        }
+        Log.e("BacktraceAndroid", "IsSafeModeRequiredCrashpad: " + result);
 
         symlinkAndWriteFile();
     }

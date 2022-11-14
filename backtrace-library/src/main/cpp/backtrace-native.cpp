@@ -135,4 +135,12 @@ Java_backtraceio_library_BacktraceDatabase_disable(JNIEnv *env, jobject thiz) {
     Disable();
 }
 
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_base_BacktraceBase_IsSafeModeRequiredCrashpad(JNIEnv *env, jclass clazz,
+                                                                       jstring database) {
+    return IsSafeModeRequired(database);
+//    return true;
+}
+
 }
