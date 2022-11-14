@@ -43,3 +43,9 @@ jobs:
      env:
        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ASCII_ARMORED_GPG_KEY }} # ASCII-armored GPG key
        ORG_GRADLE_PROJECT_signingPassword: "" # Using empty password for GPG key
+
+   - name: Upload symbols.zip
+     uses: actions/upload-artifact@v3
+     with:
+       name: native-debug-symbols.zip
+       path: example-app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
