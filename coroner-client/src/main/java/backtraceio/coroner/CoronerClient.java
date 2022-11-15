@@ -33,12 +33,28 @@ public class CoronerClient {
     }
 
     public CoronerResponse rxIdFilter(String rxId, List<String> customAttributes) throws CoronerResponseException, CoronerHttpException, IOException {
-        List<String> attributes = Stream.concat(
-                        DEFAULT_ATTRIBUTES.stream(),
-                        customAttributes.stream())
-                .collect(Collectors.toList());
+        List<String> attributes = concatAttributes(customAttributes);
+
         String coronerQuery = this.coronerQueries.filterByRxId(rxId, attributes);
 
+        return makeRequest(coronerQuery);
+    }
+
+    public CoronerResponse errorTypeTimestampFilter(String errorType, List<String> customAttributes) throws CoronerResponseException, IOException, CoronerHttpException {
+        List<String> attributes = concatAttributes(customAttributes);
+
+        String coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, "1668443545", "1668357145", attributes);
+
+        return makeRequest(coronerQuery);
+    }
+
+    private List<String> concatAttributes(List<String> customAttributes) {
+        List<String> result = new ArrayList<>(customAttributes);
+        result.addAll(DEFAULT_ATTRIBUTES);
+        return result;
+    }
+
+    private CoronerResponse makeRequest(String coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
         CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery);
 
         if (response.error != null) {

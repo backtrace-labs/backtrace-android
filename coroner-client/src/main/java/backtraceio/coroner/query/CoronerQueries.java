@@ -14,7 +14,21 @@ public class CoronerQueries {
         return this.filterByRxId(rxId, new ArrayList<>());
     }
 
-    public String filterByRxId(String rxId, List<String> attributes) {
-        return this.builder.buildRxIdGroup(rxId, attributes);
+    public String filterByErrorTypeAndTimestamp(String errorType, String timestampMost, String timestampLeast, List<String> attributes) {
+        CoronerFiltersBuilder filtersBuilder = new CoronerFiltersBuilder();
+        filtersBuilder.addFilter(CoronerQueryFields.ERROR_TYPE, FilterOperator.EQUAL, errorType);
+        filtersBuilder.addFilter(CoronerQueryFields.TIMESTAMP, FilterOperator.AT_MOST, timestampMost + ".");
+        filtersBuilder.addFilter(CoronerQueryFields.TIMESTAMP, FilterOperator.AT_LEAST, timestampLeast + ".");
+
+        return this.builder.buildRxIdGroup(filtersBuilder.get(), attributes);
     }
+
+    public String filterByRxId(String rxId, List<String> attributes) {
+        CoronerFiltersBuilder filtersBuilder = new CoronerFiltersBuilder();
+        filtersBuilder.addFilter(CoronerQueryFields.RXID, FilterOperator.EQUAL, rxId);
+
+        return this.builder.buildRxIdGroup(filtersBuilder.get(), attributes);
+    }
+
+//    public String filterBy
 }
