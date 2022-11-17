@@ -176,13 +176,7 @@ public class MainActivity extends AppCompatActivity {
         Thread.sleep(anrTimeout + 2000);
     }
 
-    public void enableBreadcrumbs(View view) {
-        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
-        registerNativeBreadcrumbs(backtraceClient); // Order should not matter
-    }
-
-    public void enableBreadcrumbsUserOnly(View view) throws Exception {
-        EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
+    public void enableBreadcrumbs(View view) throws Exception {
         Context appContext = view.getContext().getApplicationContext();
         if (backtraceClient == null) {
             throw new Exception("BacktraceClient is null");
@@ -194,6 +188,13 @@ public class MainActivity extends AppCompatActivity {
         if (1 == 1) {
             throw new Exception("Test exception");
         }
+        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
+        registerNativeBreadcrumbs(backtraceClient); // Order should not matter
+    }
+
+    public void enableBreadcrumbsUserOnly(View view) throws Exception {
+        EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
+        Context appContext = view.getContext().getApplicationContext();
         backtraceClient.enableBreadcrumbs(appContext, breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
