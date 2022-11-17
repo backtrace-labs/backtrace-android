@@ -489,7 +489,9 @@ public class BacktraceBase implements Client {
 
     public native void dumpWithoutCrash(String message, boolean setMainThreadAsFaultingThread);
 
+    public static native boolean EnableCrashLoopDetectionCrashpad();
     public static native boolean IsSafeModeRequiredCrashpad(String database);
+    public static native int ConsecutiveCrashesCountCrashpad(String database);
 
     /**
      * Sending an exception to Backtrace API

@@ -52,9 +52,14 @@ public class MainActivity extends AppCompatActivity {
         String BACKTRACE_SUBMISSION_URL = "https://submit.backtrace.io/konst-ryab/04aecb6b3da05e8d83f2a27f9b5f41352ac792428c5e5f6a94ff58d43ee14e46/json";
 //        if (BACKTRACE_SUBMISSION_URL != null) {
             backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
-            boolean result = BacktraceClient.IsSafeModeRequiredCrashpad(".");
+
+            boolean isCLEnabled = BacktraceClient.EnableCrashLoopDetectionCrashpad();
+            boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredCrashpad(".");
+            int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountCrashpad(".");
 //        }
-        Log.e("BacktraceAndroid", "IsSafeModeRequiredCrashpad: " + result);
+        Log.e("BacktraceAndroid", "EnableCrashLoopDetectionCrashpad: " + isCLEnabled);
+        Log.e("BacktraceAndroid", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
+        Log.e("BacktraceAndroid", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
 
         symlinkAndWriteFile();
     }

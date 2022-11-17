@@ -230,14 +230,21 @@ void ReEnableCrashpad() {
     }
 }
 
+bool EnableCrashLoopDetectionCrashpad() {
+    crashpad::CrashpadClient * tmpClient = new crashpad::CrashpadClient();
+    return tmpClient->EnableCrashLoopDetection();
+}
+
 bool IsSafeModeRequiredCrashpad(jstring database) {
     JNIEnv *env = GetJniEnv();
     base::FilePath db((env)->GetStringUTFChars(database, 0));
-    client->EnableCrashLoopDetection();
-//    return false;
     bool is_enabled = crashpad::CrashpadClient::IsSafeModeRequired(db);
-
-    int count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
-
     return is_enabled;
+}
+
+int ConsecutiveCrashesCountCrashpad(jstring database) {
+    JNIEnv *env = GetJniEnv();
+    base::FilePath db((env)->GetStringUTFChars(database, 0));
+    int count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
+    return count;
 }

@@ -28,6 +28,8 @@ void DisableCrashpad();
 
 void ReEnableCrashpad();
 
+bool EnableCrashLoopDetectionCrashpad();
 bool IsSafeModeRequiredCrashpad(jstring database);
+int ConsecutiveCrashesCountCrashpad(jstring database);
 
 #endif //BACKTRACE_ANDROID_CRASHPAD_BACKEND_H
