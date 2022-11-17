@@ -27,20 +27,24 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
-
     private BacktraceClient backtraceClient;
-
+    private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
+    }
+
+    public void setOnServerResponseEventListener(OnServerResponseEventListener e) {
+        this.listener = e;
     }
 
     @Override
@@ -148,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
             // Where was that magic wand again?
             equipItem(myWarriorArmor, magicWandIndex);
         } catch (Exception e) {
-            backtraceClient.send(new BacktraceReport(e));
+            backtraceClient.send(new BacktraceReport(e), this.listener);
         }
     }
 
@@ -192,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");
-        backtraceClient.send(report);
+        backtraceClient.send(report, this.listener);
     }
 
     private void writeMyCustomFile(String filePath) {
@@ -204,6 +208,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
                 Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
         }
+    }
+
+    public BacktraceClient getBacktraceClient() {
+        return backtraceClient;
     }
 
     public void exit(View view) {
