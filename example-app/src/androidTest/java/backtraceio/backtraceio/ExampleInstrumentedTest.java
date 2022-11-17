@@ -43,7 +43,14 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
     @Before
     public void enableMetricsAndBreadcrumbs() {
-        onView(withId(R.id.enableBreadcrumbs)).perform(click());
+        try {
+            onView(withId(R.id.enableBreadcrumbs)).perform(click());
+        }
+        catch (Exception ex) {
+            System.out.println("Before enableMetricsAndBreadcrumbs");
+            System.out.println(ex.getMessage());
+            throw ex;
+        }
     }
 
     @Test
