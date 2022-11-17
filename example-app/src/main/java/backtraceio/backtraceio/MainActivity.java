@@ -187,9 +187,12 @@ public class MainActivity extends AppCompatActivity {
         if (backtraceClient == null) {
             throw new Exception("BacktraceClient is null");
         }
-        
+
         if (appContext == null) {
             throw new Exception("App context is null");
+        }
+        if (1 == 1) {
+            throw new Exception("Test exception");
         }
         backtraceClient.enableBreadcrumbs(appContext, breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
