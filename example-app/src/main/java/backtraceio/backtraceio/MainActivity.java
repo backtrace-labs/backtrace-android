@@ -2,11 +2,12 @@ package backtraceio.backtraceio;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             put("custom.attribute", "My Custom Attribute");
         }};
 
-        List<String> attachments = new ArrayList<String>(){{
+        List<String> attachments = new ArrayList<String>() {{
             add(context.getFilesDir() + "/" + "myCustomFile.txt");
         }};
 
@@ -117,29 +118,28 @@ public class MainActivity extends AppCompatActivity {
     public native void cppCrash();
 
     public native boolean registerNativeBreadcrumbs(BacktraceBase backtraceBase);
+
     public native boolean addNativeBreadcrumb();
+
     public native boolean addNativeBreadcrumbUserError();
+
     public native void cleanupNativeBreadcrumbHandler();
 
     private List<String> equippedItems;
 
-    public List<String> getWarriorArmor()
-    {
+    public List<String> getWarriorArmor() {
         return new ArrayList<String>(Arrays.asList("Tough Boots", "Strong Sword", "Sturdy Shield", "Magic Wand"));
     }
 
-    int findEquipmentIndex(List<String> armor, String equipment)
-    {
+    int findEquipmentIndex(List<String> armor, String equipment) {
         return armor.indexOf(equipment);
     }
 
-    void removeEquipment(List<String> armor, int index)
-    {
+    void removeEquipment(List<String> armor, int index) {
         armor.remove(index);
     }
 
-    void equipItem(List<String> armor, int index)
-    {
+    void equipItem(List<String> armor, int index) {
         equippedItems.add(armor.get(index));
     }
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getSaveData() throws IOException {
         // I know for sure this file is there (spoiler alert, it's not)
-        File mySaveData =  new File("mySave.sav");
+        File mySaveData = new File("mySave.sav");
         FileReader mySaveDataReader = new FileReader(mySaveData);
         char[] saveDataBuffer = new char[255];
         mySaveDataReader.read(saveDataBuffer);
@@ -181,9 +181,17 @@ public class MainActivity extends AppCompatActivity {
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
-    public void enableBreadcrumbsUserOnly(View view) {
+    public void enableBreadcrumbsUserOnly(View view) throws Exception {
         EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
-        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
+        Context appContext = view.getContext().getApplicationContext();
+        if (backtraceClient == null) {
+            throw new Exception("BacktraceClient is null");
+        }
+        
+        if (appContext == null) {
+            throw new Exception("App context is null");
+        }
+        backtraceClient.enableBreadcrumbs(appContext, breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
@@ -206,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             outputStreamWriter.write(fileData);
             outputStreamWriter.close();
         } catch (IOException e) {
-                Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
+            Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
         }
     }
 
