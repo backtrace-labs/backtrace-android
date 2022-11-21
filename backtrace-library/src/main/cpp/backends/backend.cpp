@@ -83,7 +83,7 @@ void Disable() {
 #endif
 }
 
-jboolean EnableCrashLoopDetection() {
+jboolean EnableCrashLoopDetectionBackend() {
 #ifdef CRASHPAD_BACKEND
     return EnableCrashLoopDetectionCrashpad();
 #elif BREAKPAD_BACKEND
@@ -91,7 +91,7 @@ jboolean EnableCrashLoopDetection() {
 #endif
 }
 
-jboolean IsSafeModeRequired(jstring database) {
+jboolean IsSafeModeRequiredBackend(jstring database) {
 #ifdef CRASHPAD_BACKEND
     return IsSafeModeRequiredCrashpad(database);
 #elif BREAKPAD_BACKEND
@@ -99,7 +99,7 @@ jboolean IsSafeModeRequired(jstring database) {
 #endif
 }
 
-jint ConsecutiveCrashesCount(jstring database) {
+jint ConsecutiveCrashesCountBackend(jstring database) {
 #ifdef CRASHPAD_BACKEND
     return ConsecutiveCrashesCountCrashpad(database);
 #elif BREAKPAD_BACKEND

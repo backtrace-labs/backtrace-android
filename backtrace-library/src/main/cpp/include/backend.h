@@ -20,11 +20,11 @@ void AddAttribute(jstring key, jstring value);
 
 void Disable();
 
-jboolean EnableCrashLoopDetection();
+jboolean EnableCrashLoopDetectionBackend();
 
-jboolean IsSafeModeRequired(jstring database);
+jboolean IsSafeModeRequiredBackend(jstring database);
 
-jint ConsecutiveCrashesCount(jstring database);
+jint ConsecutiveCrashesCountBackend(jstring database);
 }
 
 #endif //BACKTRACE_ANDROID_BACKEND_H

@@ -53,13 +53,20 @@ public class MainActivity extends AppCompatActivity {
 //        if (BACKTRACE_SUBMISSION_URL != null) {
             backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
 
-            boolean isCLEnabled = BacktraceClient.EnableCrashLoopDetectionCrashpad();
-            boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredCrashpad(".");
-            int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountCrashpad(".");
+        Context context = getApplicationContext();
+        String dbPath = context.getFilesDir().getAbsolutePath();
+
+        String csvPath = dbPath + "/crash_loop_detection.csv";
+        File file = new File(csvPath);
+        Log.e("Backtrace-Android", "CSV file exists: " + (file.exists() ? "TRUE" : "FALSE"));
+
+        boolean isCLEnabled = BacktraceClient.EnableCrashLoopDetectionBacktrace();
+        boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredBacktrace(dbPath);
+        int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountBacktrace(dbPath);
 //        }
-        Log.e("BacktraceAndroid", "EnableCrashLoopDetectionCrashpad: " + isCLEnabled);
-        Log.e("BacktraceAndroid", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
-        Log.e("BacktraceAndroid", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
+        Log.e("Backtrace-Android", "EnableCrashLoopDetectionCrashpad: " + isCLEnabled);
+        Log.e("Backtrace-Android", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
+        Log.e("Backtrace-Android", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
 
         symlinkAndWriteFile();
     }
