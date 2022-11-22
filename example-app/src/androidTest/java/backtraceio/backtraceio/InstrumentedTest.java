@@ -3,11 +3,9 @@ package backtraceio.backtraceio;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 
 import backtraceio.coroner.CoronerClient;
 
-@RunWith(AndroidJUnit4.class)
 public class InstrumentedTest {
     private static CoronerClient coronerClient;
 
