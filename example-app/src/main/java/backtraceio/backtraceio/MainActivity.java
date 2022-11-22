@@ -182,9 +182,7 @@ public class MainActivity extends AppCompatActivity {
         if (appContext == null) {
             throw new Exception("App context is null");
         }
-        if (1 == 1) {
-            throw new Exception("Test exception");
-        }
+
         backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
