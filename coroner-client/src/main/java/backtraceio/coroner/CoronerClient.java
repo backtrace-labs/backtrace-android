@@ -43,7 +43,7 @@ public class CoronerClient {
     public CoronerResponse errorTypeTimestampFilter(String errorType, String timestampLeast, String timestampMost, List<String> customAttributes) throws CoronerResponseException, IOException, CoronerHttpException {
         List<String> attributes = concatAttributes(customAttributes);
 
-        String coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, "1668443545", "1668357145", attributes);
+        String coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampLeast, timestampMost, attributes);
 
         return makeRequest(coronerQuery);
     }
