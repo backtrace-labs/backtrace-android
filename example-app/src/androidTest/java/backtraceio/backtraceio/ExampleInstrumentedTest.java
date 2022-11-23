@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
 
+import androidx.test.espresso.PerformException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -117,18 +118,24 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Assert.assertNotNull(response);
         Assert.assertEquals(1, response.getResultsNumber());
         String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Dump without crash", val);
+        Assert.assertEquals("DumpWithoutCrash", val);
     }
 
-    @Test
+    //@Test
     public void unhandledException() throws CoronerResponseProcessingException, InterruptedException {
         // GIVEN
         CoronerResponse response = null;
         long timestampStart = this.getSecondsTimestampNowGMT();
 
         // WHEN
-        onView(withId(R.id.unhandledException)).perform(click()); // UI action
+        // UnhandledException crashes the app, so don't actually click the button
+        // onView(withId(R.id.unhandledException)).perform(click()); // UI action
+
+        // call BacktraceExceptionHandler directly instead
+        Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), new NullPointerException());
+
         Thread.sleep(THREAD_SLEEP_TIME_MS);
+
         // THEN
         try {
             response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
@@ -145,19 +152,14 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Assert.assertEquals("Dump without crash", val);
     }
 
-//    @Test
-//    public void anr() {
-//        onView(withId(R.id.anr)).perform(click());
-//    }
-//
-//    @Test(expected = PerformException.class)
-//    public void unhandledException() {
-//        onView(withId(R.id.unhandledException)).perform(click());
-//    }
-//
-//    // Will break build, obviously.
-//    //@Test
-//    public void nativeCrash() {
-//        onView(withId(R.id.nativeCrash)).perform(click());
-//    }
+    @Test
+    public void anr() {
+        onView(withId(R.id.anr)).perform(click());
+    }
+
+    // Will break build, obviously.
+    //@Test
+    public void nativeCrash() {
+        onView(withId(R.id.nativeCrash)).perform(click());
+    }
 }
