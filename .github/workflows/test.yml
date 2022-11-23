@@ -101,29 +101,3 @@ jobs:
           # --device name=".*,platformVersion=6.0.1"
           # --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # --device name="Samsung_Galaxy_S22_Ultra_5G_backtrace_us"
-
-      - name: Run morgue
-        run: |
-          npm install backtrace-morgue --location=global
-          morgue --version || true
-          # Todo: currently just looks 15 minutes in the past and doesn't filter at all.
-          # --csv=crash.csv
-          morgue --token=${{ secrets.BACKTRACE_API_TOKEN }} --endpoint="https://yolo.sp.backtrace.io" list yolo/android-library --select timestamp --filter=timestamp,greater-than,`date +%s%3N -d "15 minutes ago"` || true
-
-#           if [ $(wc -l < crash.csv) -gt 0 ]; then
-#               echo "Success"
-#           else
-#               exit 1
-#           fi
-
-    #        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
-    #     - name: Emulator test
-    #       uses: reactivecircus/android-emulator-runner@v2
-    #       with:
-    #         target: google_apis
-    #         api-level: ${{ matrix.api-level }}
-    #         arch: x86_64
-    #         script: ./gradlew connectedCheck
-
-    #     - name: Code coverage
-    #       run: bash <(curl -s https://codecov.io/bash)
