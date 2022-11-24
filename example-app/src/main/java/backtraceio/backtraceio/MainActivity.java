@@ -54,17 +54,19 @@ public class MainActivity extends AppCompatActivity {
             backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
 
         Context context = getApplicationContext();
-        String dbPath = context.getFilesDir().getAbsolutePath();
+        String dbPath = context.getFilesDir().getAbsolutePath() + "/crashpad";
 
         String csvPath = dbPath + "/crash_loop_detection.csv";
         File file = new File(csvPath);
         Log.e("Backtrace-Android", "CSV file exists: " + (file.exists() ? "TRUE" : "FALSE"));
+        Log.e("Backtrace-Android", "DB path: " + dbPath);
+        Log.e("Backtrace-Android", "CSV path: " + csvPath);
 
-        boolean isCLEnabled = BacktraceClient.EnableCrashLoopDetectionBacktrace();
+//        boolean isCLEnabled = BacktraceClient.EnableCrashLoopDetectionBacktrace();
         boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredBacktrace(dbPath);
         int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountBacktrace(dbPath);
 //        }
-        Log.e("Backtrace-Android", "EnableCrashLoopDetectionCrashpad: " + isCLEnabled);
+//        Log.e("Backtrace-Android", "EnableCrashLoopDetectionCrashpad: " + isCLEnabled);
         Log.e("Backtrace-Android", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
         Log.e("Backtrace-Android", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
 

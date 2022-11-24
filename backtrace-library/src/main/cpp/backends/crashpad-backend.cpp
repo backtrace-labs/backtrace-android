@@ -21,6 +21,9 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
                         jint unwindingMode) {
+
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Initialize Crashpad Start");
+
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
@@ -125,8 +128,12 @@ bool InitializeCrashpad(jstring url,
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad created.");
     client->EnableCrashLoopDetection();
 
-    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
-                                              arguments);
+    initialized = client->StartHandler(handler, db, db, backtraceUrl, attributes, arguments, false, false);
+//    handler, db, db, url, annotations, arguments, false, false, {}
+//    Original
+//    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes, arguments);
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad initialized %s", (initialized ? "TRUE" : "FALSE"));
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad db: %s", filePath);
 
     env->ReleaseStringUTFChars(url, backtraceUrl);
     env->ReleaseStringUTFChars(handler_path, handlerPath);
@@ -233,19 +240,16 @@ void ReEnableCrashpad() {
 }
 
 bool EnableCrashLoopDetectionCrashpad() {
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "Inside EnableCrashLoopDetectionCrashpad");
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Inside EnableCrashLoopDetectionCrashpad");
     if (client != nullptr) {
         return client->EnableCrashLoopDetection();
     } else {
-        crashpad::CrashpadClient *tmpClient = new crashpad::CrashpadClient();
-        return tmpClient->EnableCrashLoopDetection();
+        return false;
     }
 }
 
 bool IsSafeModeRequiredCrashpad(jstring database1) {
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "Inside IsSafeModeRequiredCrashpad");
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Inside IsSafeModeRequiredCrashpad");
     JNIEnv *env = GetJniEnv();
     base::FilePath db((env)->GetStringUTFChars(database1, 0));
     bool is_enabled = crashpad::CrashpadClient::IsSafeModeRequired(db);
@@ -253,8 +257,7 @@ bool IsSafeModeRequiredCrashpad(jstring database1) {
 }
 
 int ConsecutiveCrashesCountCrashpad(jstring database1) {
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "Inside ConsecutiveCrashesCountCrashpad");
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Inside ConsecutiveCrashesCountCrashpad");
     JNIEnv *env = GetJniEnv();
     base::FilePath db((env)->GetStringUTFChars(database1, 0));
     int count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
