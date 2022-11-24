@@ -2,8 +2,6 @@ package backtraceio.coroner.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CoronerFiltersBuilder {
     private final List<CoronerFieldFilter> filters;
@@ -13,10 +11,16 @@ public class CoronerFiltersBuilder {
     }
 
     public CoronerFiltersBuilder addFilter(final String name, final FilterOperator operator, final Object value) {
-        final Optional<CoronerFieldFilter> filter = this.filters.stream().filter(x->x.getName().equals(name)).findAny();
+        CoronerFieldFilter element = null;
 
-        if(filter.isPresent()) {
-            filter.get().addValueFilter(operator, value);
+        for (CoronerFieldFilter filter : filters) {
+            if (filter.getName().equals(name)) {
+                element = filter;
+            }
+        }
+
+        if (element != null) {
+            element.addValueFilter(operator, value);
         } else {
             this.filters.add(new CoronerFieldFilter(name, operator, value));
         }
@@ -25,9 +29,13 @@ public class CoronerFiltersBuilder {
     }
 
     public String get() {
-        String result = filters.stream().map(x->x.toString()).collect(Collectors.joining(","));
+        List<String> result = new ArrayList<>();
 
-        return "{ " + result + " }";
+        for (CoronerFieldFilter filter : filters) {
+            result.add(filter.toString());
+        }
+
+        return "{ " + String.join(",", result) + " }";
     }
 
 }

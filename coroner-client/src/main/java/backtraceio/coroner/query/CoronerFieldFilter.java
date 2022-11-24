@@ -2,7 +2,6 @@ package backtraceio.coroner.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CoronerFieldFilter {
     public String name;
@@ -23,7 +22,11 @@ public class CoronerFieldFilter {
 
     @Override
     public String toString() {
-        String result = values.stream().map(x->x.toString()).collect(Collectors.joining(","));;
-        return "\"" + name + "\": [" + result + "  ]";
+        List<String> result = new ArrayList<>();
+
+        for (CoronerValueFilter value : values) {
+            result.add(value.toString());
+        }
+        return "\"" + name + "\": [" + String.join(",", result) + "  ]";
     }
 }

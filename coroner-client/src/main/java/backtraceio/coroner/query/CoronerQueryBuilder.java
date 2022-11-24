@@ -1,7 +1,7 @@
 package backtraceio.coroner.query;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 class CoronerQueryBuilder {
     private final String FOLD_HEAD = "head";
@@ -13,7 +13,7 @@ class CoronerQueryBuilder {
     }
 
     private String build(String groupName, String filters, List<String> headFolds) {
-        String folds = headFolds.stream().map(this::foldHead).collect(Collectors.joining(","));
+        String folds = joinHeadFolds(headFolds);
 
         return "{" +
                 "\"group\":[" +
@@ -24,6 +24,17 @@ class CoronerQueryBuilder {
                 "   \"limit\":" + LIMIT + "," +
                 "   \"filter\":[" + filters + "]" +
                 "}";
+    }
+
+    private String joinHeadFolds(List<String> folds) {
+        List<String> result = new ArrayList<>();
+
+        for (String fold : folds) {
+            result.add(foldHead(fold));
+        }
+
+        return String.join(",", result);
+
     }
 
     private String foldHead(String name) {
