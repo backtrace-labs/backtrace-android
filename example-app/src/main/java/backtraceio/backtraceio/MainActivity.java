@@ -142,13 +142,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void handledException(View view) {
         try {
-            List<String> myWarriorArmor = getWarriorArmor();
-            int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
-            // I don't need a Magic Wand, I am a warrior
-            removeEquipment(myWarriorArmor, magicWandIndex);
-            // Where was that magic wand again?
-            equipItem(myWarriorArmor, magicWandIndex);
-        } catch (Exception e) {
+            try {
+                List<String> myWarriorArmor = getWarriorArmor();
+                int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
+                // I don't need a Magic Wand, I am a warrior
+                removeEquipment(myWarriorArmor, magicWandIndex);
+                // Where was that magic wand again?
+                equipItem(myWarriorArmor, magicWandIndex);
+            } catch (IndexOutOfBoundsException e) {
+                throw new IndexOutOfBoundsException("Invalid index of selected element!");
+            }
+        } catch (IndexOutOfBoundsException e) {
             backtraceClient.send(new BacktraceReport(e), this.listener);
         }
     }

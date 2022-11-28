@@ -90,7 +90,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Assert.assertEquals(1, response.getResultsNumber());
 
         String resultErrorMsg = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Invalid index 3, size is 3", resultErrorMsg);
+        Assert.assertEquals("Invalid index of selected element!", resultErrorMsg);
 
         String resultClassifier = response.getAttribute(0, "classifiers", String.class);
         Assert.assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
