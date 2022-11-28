@@ -104,7 +104,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
         // WHEN
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
-        Thread.sleep(THREAD_SLEEP_TIME_MS * 3);
+        Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
 
         // THEN
         try {
