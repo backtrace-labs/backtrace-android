@@ -97,13 +97,14 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     }
 
     @Test
-    public void dumpWithoutCrash() throws CoronerResponseProcessingException {
+    public void dumpWithoutCrash() throws CoronerResponseProcessingException, InterruptedException {
         // GIVEN
         CoronerResponse response = null;
         long timestampStart = this.getSecondsTimestampNowGMT();
 
         // WHEN
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
+        Thread.sleep(THREAD_SLEEP_TIME_MS);
 
         // THEN
         try {
