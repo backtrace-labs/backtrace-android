@@ -58,18 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
         String csvPath = dbPath + "/crash_loop_detection.csv";
         File file = new File(csvPath);
-        Log.e("Backtrace-Android", "CSV file exists: " + (file.exists() ? "TRUE" : "FALSE"));
-        Log.e("Backtrace-Android", "DB path: " + dbPath);
-        Log.e("Backtrace-Android", "CSV path: " + csvPath);
+        Log.d("Backtrace-Android", "CSV file exists: " + (file.exists() ? "TRUE" : "FALSE"));
+        Log.d("Backtrace-Android", "DB path: " + dbPath);
+        Log.d("Backtrace-Android", "CSV path: " + csvPath);
 
-//        boolean isCLEnabled = BacktraceClient.EnableCrashLoopDetectionBacktrace();
-        boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredBacktrace(dbPath);
-        int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountBacktrace(dbPath);
-//        }
-//        Log.e("Backtrace-Android", "EnableCrashLoopDetectionCrashpad: " + isCLEnabled);
-        Log.e("Backtrace-Android", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
-        Log.e("Backtrace-Android", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
+        boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredBacktrace();
+        int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountBacktrace();
+        Log.d("Backtrace-Android", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
+        Log.d("Backtrace-Android", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
 
+        View viewBackground = findViewById(R.id.viewBackground);
+        if(viewBackground != null) {
+            viewBackground.setBackgroundColor(isCLSafeModeReq
+                    ? getResources().getColor(R.color.colorAccent)
+                    : getResources().getColor(R.color.colorWhite));
+        }
         symlinkAndWriteFile();
     }
 

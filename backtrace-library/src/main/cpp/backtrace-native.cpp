@@ -143,16 +143,14 @@ Java_backtraceio_library_base_BacktraceBase_EnableCrashLoopDetectionBacktrace(JN
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_backtraceio_library_base_BacktraceBase_IsSafeModeRequiredBacktrace(JNIEnv *env, jclass clazz,
-                                                                       jstring database) {
-    return IsSafeModeRequiredBackend(database);
+Java_backtraceio_library_base_BacktraceBase_IsSafeModeRequiredBacktrace(JNIEnv *env, jclass clazz) {
+    return IsSafeModeRequiredBackend();
 }
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_backtraceio_library_base_BacktraceBase_ConsecutiveCrashesCountBacktrace(JNIEnv *env, jclass clazz,
-                                                                       jstring database) {
-    return ConsecutiveCrashesCountBackend(database);
+Java_backtraceio_library_base_BacktraceBase_ConsecutiveCrashesCountBacktrace(JNIEnv *env, jclass clazz) {
+    return ConsecutiveCrashesCountBackend();
 }
 
 }

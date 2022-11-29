@@ -91,17 +91,17 @@ jboolean EnableCrashLoopDetectionBackend() {
 #endif
 }
 
-jboolean IsSafeModeRequiredBackend(jstring database) {
+jboolean IsSafeModeRequiredBackend() {
 #ifdef CRASHPAD_BACKEND
-    return IsSafeModeRequiredCrashpad(database);
+    return IsSafeModeRequiredCrashpad();
 #elif BREAKPAD_BACKEND
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "IsSafeModeRequired not supported on this backend");
 #endif
 }
 
-jint ConsecutiveCrashesCountBackend(jstring database) {
+jint ConsecutiveCrashesCountBackend() {
 #ifdef CRASHPAD_BACKEND
-    return ConsecutiveCrashesCountCrashpad(database);
+    return ConsecutiveCrashesCountCrashpad();
 #elif BREAKPAD_BACKEND
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "ConsecutiveCrashesCount not supported on this backend");
 #endif

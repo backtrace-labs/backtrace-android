@@ -22,9 +22,9 @@ void Disable();
 
 jboolean EnableCrashLoopDetectionBackend();
 
-jboolean IsSafeModeRequiredBackend(jstring database);
+jboolean IsSafeModeRequiredBackend();
 
-jint ConsecutiveCrashesCountBackend(jstring database);
+jint ConsecutiveCrashesCountBackend();
 }
 
 #endif //BACKTRACE_ANDROID_BACKEND_H
