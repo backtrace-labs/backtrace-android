@@ -19,6 +19,12 @@ void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thre
 void AddAttribute(jstring key, jstring value);
 
 void Disable();
+
+jboolean EnableCrashLoopDetectionBackend();
+
+jboolean IsSafeModeRequiredBackend();
+
+jint ConsecutiveCrashesCountBackend();
 }
 
 #endif //BACKTRACE_ANDROID_BACKEND_H

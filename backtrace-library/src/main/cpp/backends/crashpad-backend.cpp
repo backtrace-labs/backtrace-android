@@ -3,6 +3,8 @@
 #include <jni.h>
 #include <libgen.h>
 
+//#include "client/crashpad_client.h"
+
 extern std::string thread_id;
 extern std::atomic_bool initialized;
 extern std::mutex attribute_synchronization;
@@ -10,6 +12,8 @@ extern std::atomic_bool disabled;
 
 static crashpad::CrashpadClient *client;
 static std::unique_ptr<crashpad::CrashReportDatabase> database;
+
+static int consecutive_crashes_count = 0;
 
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
@@ -19,6 +23,9 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
                         jint unwindingMode) {
+
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Initialize Crashpad Start");
+
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
@@ -120,9 +127,19 @@ bool InitializeCrashpad(jstring url,
 
     // Start crash handler
     client = new crashpad::CrashpadClient();
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad created.");
+    client->EnableCrashLoopDetection();
 
-    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
-                                              arguments);
+    // Get consecutive crashes count BEFORE any handler started,
+    // as it writes extra line into CSV, what leads to getting 0 for each next ConsecutiveCrashesCount call
+    consecutive_crashes_count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad initialize - ConsecutiveCrashesCount %d", consecutive_crashes_count);
+//    initialized = client->StartHandler(handler, db, db, backtraceUrl, attributes, arguments, false, false);
+//    handler, db, db, url, annotations, arguments, false, false, {}
+//    Original
+    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes, arguments);
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad initialized %s", (initialized ? "TRUE" : "FALSE"));
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad db: %s", filePath);
 
     env->ReleaseStringUTFChars(url, backtraceUrl);
     env->ReleaseStringUTFChars(handler_path, handlerPath);
@@ -219,10 +236,28 @@ void ReEnableCrashpad() {
     // Re-enable uploads if disabled
     if (disabled) {
         if (database == nullptr) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Crashpad database is null, this should not happen");
             return;
         }
         database->GetSettings()->SetUploadsEnabled(true);
         disabled = false;
     }
+}
+
+bool EnableCrashLoopDetectionCrashpad() {
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Inside EnableCrashLoopDetectionCrashpad");
+    if (client != nullptr) {
+        return client->EnableCrashLoopDetection();
+    } else {
+        return false;
+    }
+}
+
+bool IsSafeModeRequiredCrashpad() {
+    return consecutive_crashes_count >= 5;
+}
+
+int ConsecutiveCrashesCountCrashpad() {
+    return consecutive_crashes_count;
 }

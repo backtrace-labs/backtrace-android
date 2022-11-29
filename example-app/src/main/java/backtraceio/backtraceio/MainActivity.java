@@ -49,10 +49,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Set this value in your local.properties
-        if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
-            backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
-        }
+        String BACKTRACE_SUBMISSION_URL = "https://submit.backtrace.io/konst-ryab/04aecb6b3da05e8d83f2a27f9b5f41352ac792428c5e5f6a94ff58d43ee14e46/json";
+//        if (BACKTRACE_SUBMISSION_URL != null) {
+            backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
 
+        Context context = getApplicationContext();
+        String dbPath = context.getFilesDir().getAbsolutePath() + "/crashpad";
+
+        String csvPath = dbPath + "/crash_loop_detection.csv";
+        File file = new File(csvPath);
+        Log.d("Backtrace-Android", "CSV file exists: " + (file.exists() ? "TRUE" : "FALSE"));
+        Log.d("Backtrace-Android", "DB path: " + dbPath);
+        Log.d("Backtrace-Android", "CSV path: " + csvPath);
+
+        boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequiredBacktrace();
+        int crashesCountCL = BacktraceClient.ConsecutiveCrashesCountBacktrace();
+        Log.d("Backtrace-Android", "IsSafeModeRequiredCrashpad: " + isCLSafeModeReq);
+        Log.d("Backtrace-Android", "ConsecutiveCrashesCountCrashpad: " + crashesCountCL);
+
+        View viewBackground = findViewById(R.id.viewBackground);
+        if(viewBackground != null) {
+            viewBackground.setBackgroundColor(isCLSafeModeReq
+                    ? getResources().getColor(R.color.colorAccent)
+                    : getResources().getColor(R.color.colorWhite));
+        }
         symlinkAndWriteFile();
     }
 
