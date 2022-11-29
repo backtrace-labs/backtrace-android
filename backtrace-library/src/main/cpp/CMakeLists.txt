@@ -53,6 +53,10 @@ target_compile_features(backtrace-native PRIVATE cxx_std_17)
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)
+    
+    # Curl Libraries
+    add_library(curl SHARED IMPORTED)
+    set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/curl-builds/${ANDROID_ABI}/libcurl.so)
 
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DBREAKPAD_BACKEND)
@@ -108,6 +112,7 @@ if(BACKEND STREQUAL "CRASHPAD_BACKEND")
             ${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libcrashpad_handler.so)
     add_subdirectory(crashpad)
     target_link_libraries(backtrace-native client)
+    list(APPEND LIBS curl)
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     list(APPEND LIBS breakpad_client)
     list(APPEND LIBS curl)
