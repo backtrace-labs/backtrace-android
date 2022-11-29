@@ -113,6 +113,10 @@ if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     add_subdirectory(crashpad)
     target_link_libraries(backtrace-native client)
     list(APPEND LIBS curl)
+    
+    # Add these two lines.
+    find_package(curl REQUIRED CONFIG)
+    target_link_libraries(app curl::curl_static)
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     list(APPEND LIBS breakpad_client)
     list(APPEND LIBS curl)
