@@ -53,10 +53,6 @@ target_compile_features(backtrace-native PRIVATE cxx_std_17)
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)
-    
-    # Curl Libraries
-    add_library(curl SHARED IMPORTED)
-    set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/curl-builds/${ANDROID_ABI}/libcurl.so)
 
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DBREAKPAD_BACKEND)
@@ -64,10 +60,6 @@ elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     # Breakpad Libraries
     add_library(breakpad_client STATIC IMPORTED)
     set_property(TARGET breakpad_client PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/libbreakpad_client.a)
-
-    # Curl Libraries
-    add_library(curl SHARED IMPORTED)
-    set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/curl-builds/${ANDROID_ABI}/libcurl.so)
 
     # Breakpad Headers
     include_directories(${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI} ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/src ${PROJECT_SOURCE_DIR}/breakpad-builds/${ANDROID_ABI}/src/common/android/include)
@@ -77,6 +69,10 @@ endif()
 
 # Includes
 include_directories(${PROJECT_SOURCE_DIR}/include)
+
+# Curl Libraries
+add_library(curl SHARED IMPORTED)
+set_property(TARGET curl PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/curl-builds/${ANDROID_ABI}/libcurl.so)
 
 if (CLIENT_SIDE_UNWINDING)
     target_compile_definitions(backtrace-native PRIVATE -DCLIENT_SIDE_UNWINDING)
@@ -106,18 +102,16 @@ find_library( # Sets the name of the path variable.
 
 list(APPEND LIBS backtrace-native)
 list(APPEND LIBS ${log-lib})
+list(APPEND LIBS curl)
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
     set(CUSTOM_CRASHPAD_HANDLER_DESTINATION
             ${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libcrashpad_handler.so)
     add_subdirectory(crashpad)
-    
-    # Add these two lines.
-    find_package(curl REQUIRED CONFIG)
-    target_link_libraries(backtrace-native client curl::curl_static)
+
+    target_link_libraries(backtrace-native client)
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     list(APPEND LIBS breakpad_client)
-    list(APPEND LIBS curl)
 else()
     message("No native debugging backend selected")
 endif()
