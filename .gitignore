@@ -89,3 +89,5 @@ hs_err_pid*
 obj/
 .externalNativeBuild
 **/.cxx
+
+backtrace-library/src/main/jniLibs/**
