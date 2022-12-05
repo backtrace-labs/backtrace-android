@@ -74,7 +74,6 @@ public class BacktraceDatabaseRecord {
         this._path = "";
         this.recordPath = String.format("%s-record.json", this.id);
         this.diagnosticDataPath = String.format("%s-attachment", this.id);
-        this.recordPath = String.format("%s-record.json", this.id);
     }
 
     public BacktraceDatabaseRecord(BacktraceData data, String path) {

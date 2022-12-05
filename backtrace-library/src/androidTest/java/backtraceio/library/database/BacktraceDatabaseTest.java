@@ -14,10 +14,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
@@ -194,6 +196,22 @@ public class BacktraceDatabaseTest {
         // THEN
         assertEquals(1, database.count());
         assertEquals(report2.message, database.get().iterator().next().getBacktraceData(context).report.message);
+    }
+
+    @Test
+    public void addEmptyFileAndStartDatabase() throws IOException {
+        // GIVEN
+        File file = new File(
+                new File(this.dbPath, String.format("%s-record.json", UUID.randomUUID())).getAbsolutePath()
+        );
+        file.createNewFile();
+
+        // WHEN
+        BacktraceDatabase database = new BacktraceDatabase(this.context, this.dbPath);
+        database.start();
+
+        // THEN
+        assertEquals(database.count(), 0);
     }
 
 }
