@@ -464,4 +464,8 @@ public class BacktraceDatabase implements Database {
     public long getDatabaseSize() {
         return backtraceDatabaseContext.getDatabaseSize();
     }
+
+    public static native boolean EnableCrashLoopDetection();
+    public static native boolean IsSafeModeRequired();
+    public static native int ConsecutiveCrashesCount();
 }

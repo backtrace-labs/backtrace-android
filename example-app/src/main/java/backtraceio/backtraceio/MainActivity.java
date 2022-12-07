@@ -29,6 +29,7 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -56,7 +57,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Crash Loop Detector example
-        boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequired();
+        boolean isCLSafeModeReq = BacktraceDatabase.IsSafeModeRequired();
+        int crashesCount = BacktraceDatabase.ConsecutiveCrashesCount();
+        Log.i("BacktraceAndroid", "ConsecutiveCrashesCount: " + crashesCount);
+
         View viewBackground = findViewById(R.id.viewBackground);
         if(viewBackground != null) {
             viewBackground.setBackgroundColor(isCLSafeModeReq

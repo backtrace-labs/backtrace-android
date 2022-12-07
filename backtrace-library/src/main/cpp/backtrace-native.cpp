@@ -136,17 +136,17 @@ Java_backtraceio_library_BacktraceDatabase_disable(JNIEnv *env, jobject thiz) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_backtraceio_library_base_BacktraceBase_EnableCrashLoopDetection(JNIEnv *env, jclass clazz) {
+Java_backtraceio_library_BacktraceDatabase_EnableCrashLoopDetection(JNIEnv *env, jclass clazz) {
     return EnableCrashLoopDetectionBackend();
 }
 
 JNIEXPORT jboolean JNICALL
-Java_backtraceio_library_base_BacktraceBase_IsSafeModeRequired(JNIEnv *env, jclass clazz) {
+Java_backtraceio_library_BacktraceDatabase_IsSafeModeRequired(JNIEnv *env, jclass clazz) {
     return IsSafeModeRequiredBackend();
 }
 
 JNIEXPORT int JNICALL
-Java_backtraceio_library_base_BacktraceBase_ConsecutiveCrashesCount(JNIEnv *env, jclass clazz) {
+Java_backtraceio_library_BacktraceDatabase_ConsecutiveCrashesCount(JNIEnv *env, jclass clazz) {
     return ConsecutiveCrashesCountBackend();
 }
 
