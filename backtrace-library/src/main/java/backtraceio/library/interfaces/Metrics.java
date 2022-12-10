@@ -13,11 +13,29 @@ import backtraceio.library.services.BacktraceMetrics;
 public interface Metrics {
 
     /**
+     * Enables metrics with BacktraceClient's credentials.
+     */
+    void enable();
+
+    /**
+     * Enables metrics with BacktraceClient's credentials and a custom session user identifier.
+     * @param defaultUniqueEventName custom session user identifier
+     */
+    void enable(String defaultUniqueEventName);
+    /**
      * Enable metrics
      *
      * @param settings for Backtrace metrics
      */
     void enable(BacktraceMetricsSettings settings);
+
+    /**
+     * Enable metrics
+     *
+     * @param settings for Backtrace metrics
+     * @param defaultUniqueEventName custom session user identifier
+     */
+    void enable(BacktraceMetricsSettings settings, String defaultUniqueEventName);
 
     /**
      * Send all outgoing messages (unique and summed) currently queued

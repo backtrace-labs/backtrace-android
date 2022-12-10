@@ -52,7 +52,7 @@
         android:id="@+id/dumpWithoutCrash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DumpWithoutCrash"
+        android:text="Generate sample crash report"
         android:onClick="dumpWithoutCrash"
         app:layout_constraintBottom_toTopOf="@+id/anr"
         app:layout_constraintEnd_toEndOf="parent"

@@ -124,7 +124,7 @@ public class BacktraceCredentials {
         final String tokenQueryParam = "token=";
         String submissionUrl = getSubmissionUrl().toString();
         String token = submissionUrl.contains("submit.backtrace.io")
-                ? submissionUrl.substring(submissionUrl.lastIndexOf("/") - tokenLength + 1, submissionUrl.lastIndexOf("/"))
+                ? submissionUrl.substring(submissionUrl.lastIndexOf("/") - tokenLength, submissionUrl.lastIndexOf("/"))
                 : submissionUrl.substring(submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length(),
                     submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length() + tokenLength - 1);
         return token;
