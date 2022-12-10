@@ -3,12 +3,10 @@ package backtraceio.library.services;
 import android.content.Context;
 import androidx.annotation.NonNull;
 
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
@@ -113,51 +111,24 @@ public final class BacktraceMetrics implements Metrics {
     private final Api backtraceApi;
 
     /**
-     * Backtrace API credentials
-     */
-    private final BacktraceCredentials credentials;
-
-    /**
      * Create new Backtrace metrics instance
      *
      * @param context                Application context
      * @param customReportAttributes Backtrace client custom report attributes (must be nonnull)
      * @param backtraceApi           Backtrace API for metrics sending
      */
-    public BacktraceMetrics(Context context, @NonNull Map<String, Object> customReportAttributes, Api backtraceApi, BacktraceCredentials credentials) {
+    public BacktraceMetrics(Context context, @NonNull Map<String, Object> customReportAttributes, Api backtraceApi) {
         this.context = context;
         this.customReportAttributes = customReportAttributes;
         this.backtraceApi = backtraceApi;
-        this.credentials = credentials;
     }
 
-    /**
-     * Enables metrics with BacktraceClient's credentials.
-     */
-    public void enable() {
-        enable(new BacktraceMetricsSettings(this.credentials), defaultUniqueEventName);
-    }
-
-    /**
-     * Enables metrics with BacktraceClient's credentials and overrides default unique event name.
-     */
-    public void enable(String defaultUniqueEventName) {
-        enable(new BacktraceMetricsSettings(this.credentials, defaultUniqueEventName));
-    }
     /**
      * Enable metrics
      *
      * @param settings for Backtrace metrics
      */
     public void enable(BacktraceMetricsSettings settings) {
-        enable(settings, defaultUniqueEventName);
-    }
-
-    public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
-        if(uniqueEventName == null || uniqueEventName.length() == 0) {
-            throw new IllegalArgumentException("Unique event name must be defined!");
-        }
-        setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
         BacktraceAttributes.enableMetrics();
 
