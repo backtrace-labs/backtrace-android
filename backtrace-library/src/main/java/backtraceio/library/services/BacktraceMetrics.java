@@ -1,6 +1,7 @@
 package backtraceio.library.services;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import java.security.InvalidParameterException;
@@ -111,7 +112,7 @@ public final class BacktraceMetrics implements Metrics {
      * Backtrace API class for metrics sending
      */
     private final Api backtraceApi;
-    
+
     /**
      * Backtrace API credentials
      */
@@ -144,6 +145,7 @@ public final class BacktraceMetrics implements Metrics {
     public void enable(String defaultUniqueEventName) {
         enable(new BacktraceMetricsSettings(this.credentials, defaultUniqueEventName));
     }
+
     /**
      * Enable metrics
      *
@@ -154,7 +156,7 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
-        if(uniqueEventName == null || uniqueEventName.length() == 0) {
+        if (uniqueEventName == null || uniqueEventName.length() == 0) {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
         setStartupUniqueEventName(uniqueEventName);
