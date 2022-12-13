@@ -45,7 +45,7 @@ BacktraceExceptionHandler.enable(backtraceClient);
 backtraceClient.enableAnr();
 
 // Enable Crash Free metrics
-backtraceClient.metrics.enable();
+backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials));
 ```
 
 ### Kotlin
@@ -64,7 +64,7 @@ BacktraceExceptionHandler.enable(backtraceClient)
 backtraceClient.enableAnr()
 
 // Enable Crash Free metrics
-backtraceClient.metrics.enable()
+backtraceClient.metrics.enable(BacktraceMetricsSettings(credentials))
 ```
 
 ## Documentation
