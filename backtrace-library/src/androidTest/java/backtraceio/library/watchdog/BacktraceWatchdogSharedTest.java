@@ -83,8 +83,8 @@ public class BacktraceWatchdogSharedTest {
 
     public String getANRBreadcrumb() {
         try {
-            List<String> result = BreadcrumbsReader.readBreadcrumbLogFile(dbPath);
-            JSONObject anrBreadcrumb = new JSONObject(result.get(1));
+            List<String> breadcrumbs = BreadcrumbsReader.readBreadcrumbLogFile(dbPath);
+            JSONObject anrBreadcrumb = new JSONObject(breadcrumbs.get(1));
             return anrBreadcrumb.getString("message");
         } catch (Exception e) {
             BacktraceLogger.e(BacktraceWatchdogSharedTest.class.getName(),
