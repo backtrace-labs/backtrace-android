@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 public class BacktraceCredentialsTest {
 
     private final String fakeUniverse = "universe";
-    private final String fakeToken = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
+    private final String fakeToken = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c54584";
     private final String legacyUrl = "https://" + fakeUniverse + ".sp.backtrace.io:6098/post?format=json&token=" + fakeToken;
     private final String url = "https://submit.backtrace.io/" + fakeUniverse + "/" + fakeToken + "/json";
     private final String urlPrefix = "https://" + fakeUniverse + ".sp.backtrace.io:6098";

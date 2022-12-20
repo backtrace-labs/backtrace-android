@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -341,6 +342,59 @@ public class BacktraceClientMetricsTest {
     }
 
     @Test
+    public void shouldAllowToOverrideUniqueEventName() {
+        final Waiter waiter = new Waiter();
+        final String uniqueEventAttributeName = "uniqueEventAttributeName";
+        final String uniqueEventAttributeValue = "SomeRandomText123123";
+
+        MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
+        backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
+        MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
+        backtraceClient.metrics.setSummedEventsRequestHandler(mockSummedRequestHandler);
+        backtraceClient.attributes.put(uniqueEventAttributeName, uniqueEventAttributeValue);
+
+        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+            @Override
+            public void onEvent(EventsResult result) {
+                assertEquals(0, result.getEventsPayload().getDroppedEvents());
+                String eventsPayloadJsonString = BacktraceSerializeHelper.toJson(result.getEventsPayload());
+                assertNotEquals(0, eventsPayloadJsonString.length());
+
+                JSONObject json;
+                try {
+                    json = new JSONObject(eventsPayloadJsonString);
+                    JSONObject uniqueEventJson = json.getJSONArray("unique_events").getJSONObject(0);
+                    assertEquals(uniqueEventAttributeName, uniqueEventJson.getJSONArray("unique").get(0));
+                    assertNotNull(uniqueEventJson.getJSONObject("attributes").getString("guid"));
+                } catch (Exception e) {
+                    fail(e.toString());
+                }
+
+                assertEquals(BacktraceResultStatus.Ok, result.status);
+                waiter.resume();
+            }
+        });
+
+        backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+            @Override
+            public void onEvent(EventsResult result) {
+                waiter.resume();
+            }
+        });
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0), uniqueEventAttributeName);
+
+        try {
+            waiter.await(5, TimeUnit.SECONDS, 2);
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+
+        assertFalse(mockUniqueRequestHandler.lastEventPayloadJson.isEmpty());
+        assertEquals(1, mockUniqueRequestHandler.numAttempts);
+        assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
+    }
+
+    @Test
     public void sendStartupEvent() {
         final Waiter waiter = new Waiter();
 
@@ -391,6 +445,7 @@ public class BacktraceClientMetricsTest {
 
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
+
         try {
             waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
@@ -405,6 +460,7 @@ public class BacktraceClientMetricsTest {
         assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
         assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
     }
+
 
     @Test
     public void metricsAttributesShouldChangeIfClientAttributeChanges() {
