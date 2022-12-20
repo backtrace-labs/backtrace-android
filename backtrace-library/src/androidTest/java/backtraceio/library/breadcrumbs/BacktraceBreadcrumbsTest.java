@@ -17,13 +17,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceBreadcrumbsTest {
@@ -53,7 +51,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -70,7 +68,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
             assertEquals(2, breadcrumbLogFileData.size());
 
             // First breadcrumb is configuration breadcrumb
@@ -83,7 +81,7 @@ public class BacktraceBreadcrumbsTest {
 
             // Should have cleared the breadcrumb we just read but
             // We should still have a configuration breadcrumb
-            breadcrumbLogFileData = readBreadcrumbLogFile();
+            breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
             assertEquals(1, breadcrumbLogFileData.size());
             parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
 
@@ -103,7 +101,7 @@ public class BacktraceBreadcrumbsTest {
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -126,7 +124,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -146,7 +144,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             backtraceBreadcrumbs.addBreadcrumb("Testing 1 2 3");
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -164,7 +162,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -188,7 +186,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -208,7 +206,7 @@ public class BacktraceBreadcrumbsTest {
         try {
             backtraceBreadcrumbs.addBreadcrumb(longTestMessage);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -230,7 +228,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -254,7 +252,7 @@ public class BacktraceBreadcrumbsTest {
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -283,7 +281,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb, it should be valid
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
@@ -327,7 +325,7 @@ public class BacktraceBreadcrumbsTest {
                     breadcrumbsFileSize > 63 * 1024);
 
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
             for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
                 JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -367,7 +365,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb, it should be valid
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
@@ -411,7 +409,7 @@ public class BacktraceBreadcrumbsTest {
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
             for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
@@ -445,7 +443,7 @@ public class BacktraceBreadcrumbsTest {
                 threads[i].join();
             }
 
-            List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -497,31 +495,7 @@ public class BacktraceBreadcrumbsTest {
         }
     }
 
-    public List<String> readBreadcrumbLogFile() throws IOException {
-        BacktraceBreadcrumbs breadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
-        File breadcrumbLogFile = new File(breadcrumbs.getBreadcrumbLogPath());
-
-        List<String> breadcrumbLogFileData = new ArrayList<String>();
-        FileInputStream inputStream = new FileInputStream(breadcrumbLogFile.getAbsolutePath());
-
-        // The encoding contains headers for the encoded data
-        // We just throw away lines that don't start with "timestamp
-        StringBuilder stringBuilder = new StringBuilder();
-        while (inputStream.available() > 0) {
-            char c = (char) inputStream.read();
-            if (c == '\n') {
-                String line = stringBuilder.toString();
-                if (line.matches(".*timestamp.*")) {
-                    breadcrumbLogFileData.add(line);
-                }
-                stringBuilder = new StringBuilder();
-                continue;
-            }
-            stringBuilder.append(c);
-        }
-
-        return breadcrumbLogFileData;
-    }
+    
 
     private final String longTestMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.\n" +
             "\n" +

@@ -330,7 +330,7 @@ public class BacktraceBase implements Client {
      * @return true if we successfully enabled breadcrumbs
      */
     public boolean enableBreadcrumbs(Context context) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().enableBreadcrumbs(context);
         }
         return false;
@@ -347,7 +347,7 @@ public class BacktraceBase implements Client {
      */
     public boolean enableBreadcrumbs(Context context,
                                      int maxBreadcrumbLogSizeBytes) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
         }
         return false;
@@ -364,7 +364,7 @@ public class BacktraceBase implements Client {
      */
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable);
         }
         return false;
@@ -383,7 +383,7 @@ public class BacktraceBase implements Client {
     public boolean enableBreadcrumbs(Context context,
                                      EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
                                      int maxBreadcrumbLogSizeBytes) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
         }
         return false;
@@ -393,7 +393,7 @@ public class BacktraceBase implements Client {
      * Clear breadcrumb logs
      */
     public boolean clearBreadcrumbs() {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().clearBreadcrumbs();
         }
         return false;
@@ -406,7 +406,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message);
         }
         return false;
@@ -420,7 +420,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, level);
         }
         return false;
@@ -434,7 +434,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, attributes);
         }
         return false;
@@ -449,7 +449,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, attributes, level);
         }
         return false;
@@ -463,7 +463,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, type);
         }
         return false;
@@ -478,7 +478,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, type, level);
         }
         return false;
@@ -493,7 +493,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, attributes, type);
         }
         return false;
@@ -509,7 +509,7 @@ public class BacktraceBase implements Client {
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (areBreadcrumbsEnabled()) {
+        if (isBreadcrumbsEnabled()) {
             return database.getBreadcrumbs().addBreadcrumb(message, attributes, type, level);
         }
         return false;
@@ -586,7 +586,7 @@ public class BacktraceBase implements Client {
         }
     }
 
-    private boolean areBreadcrumbsEnabled() {
+    private boolean isBreadcrumbsEnabled() {
         return database != null && database.getBreadcrumbs() != null;
     }
 }
