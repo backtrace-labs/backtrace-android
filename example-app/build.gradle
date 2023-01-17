@@ -4,7 +4,7 @@ android {
     compileSdkVersion 32
     defaultConfig {
         applicationId "backtraceio.backtraceio"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 32
         versionCode 1
         versionName "1.0"
