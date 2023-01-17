@@ -14,7 +14,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 33
         versionName androidGitVersion.name()
         versionCode androidGitVersion.code()
