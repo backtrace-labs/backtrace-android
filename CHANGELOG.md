@@ -2,6 +2,8 @@
 
 ## Version 3.7.5
 - Maintenance: Update various components to latest versions
+- Maintenance: updated crashpad to use OpenSSL instead of curl to provide compatibility with new SDKs
+- Maintenance: updated crashpad to allow overriding of report GUIDs.
 - Maintenance: CI job improvements
 - Bugfix: Handle corrupt or empty database records
 
