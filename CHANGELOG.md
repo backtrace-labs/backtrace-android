@@ -1,5 +1,10 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.5
+- Maintenance: Update various components to latest versions
+- Maintenance: CI job improvements
+- Bugfix: Handle corrupt or empty database records
+
 ## Version 3.7.4
 - Feature: migrated to AndroidX
 - Improvement: removed READ_EXTERNAL_STORAGE permission from library AndroidManifest.xml
