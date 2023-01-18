@@ -2,10 +2,10 @@ name: Run Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 11.0.10
-          distribution: 'adopt'
+          distribution: "adopt"
           cache: gradle
 
       - name: Write to local.properties
@@ -33,7 +33,7 @@ jobs:
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
-        
+
       - name: Upload symbols.zip
         uses: actions/upload-artifact@v3
         with:
@@ -71,7 +71,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-apk: [example-app-debug-androidTest.apk, backtrace-library-debug-androidTest.apk]
+        test-apk:
+          [
+            example-app-debug-androidTest.apk,
+            backtrace-library-debug-androidTest.apk,
+          ]
 
     steps:
       - name: Download APK
@@ -95,14 +99,14 @@ jobs:
       - name: Run Saucectl
         run: |
           saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
-          # newest Android version
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=12.0"
-          # oldest Android version
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=5.1"
           # recent real device
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # oldest real device (aiming for armv7 / 32bit)
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=6.0.1"
+          # newest Android version
+          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=12.0"
+          # oldest Android version
+          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=5.1"
           # --device name=".*,platformVersion=6.0.1"
           # --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # --device name="Samsung_Galaxy_S22_Ultra_5G_backtrace_us"
@@ -121,14 +125,14 @@ jobs:
 #               exit 1
 #           fi
 
-    #        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
-    #     - name: Emulator test
-    #       uses: reactivecircus/android-emulator-runner@v2
-    #       with:
-    #         target: google_apis
-    #         api-level: ${{ matrix.api-level }}
-    #         arch: x86_64
-    #         script: ./gradlew connectedCheck
+#        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
+#     - name: Emulator test
+#       uses: reactivecircus/android-emulator-runner@v2
+#       with:
+#         target: google_apis
+#         api-level: ${{ matrix.api-level }}
+#         arch: x86_64
+#         script: ./gradlew connectedCheck
 
-    #     - name: Code coverage
-    #       run: bash <(curl -s https://codecov.io/bash)
+#     - name: Code coverage
+#       run: bash <(curl -s https://codecov.io/bash)
