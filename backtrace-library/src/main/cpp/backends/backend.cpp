@@ -83,7 +83,7 @@ void Disable() {
 #endif
 }
 
-bool EnableCrashLoopDetectionBackend() {
+bool EnableCrashLoopDetection() {
 #ifdef CRASHPAD_BACKEND
     return EnableCrashLoopDetectionCrashpad();
 #elif BREAKPAD_BACKEND
@@ -91,7 +91,7 @@ bool EnableCrashLoopDetectionBackend() {
 #endif
 }
 
-bool IsSafeModeRequiredBackend() {
+bool IsSafeModeRequired() {
 #ifdef CRASHPAD_BACKEND
     return IsSafeModeRequiredCrashpad();
 #elif BREAKPAD_BACKEND
@@ -99,7 +99,7 @@ bool IsSafeModeRequiredBackend() {
 #endif
 }
 
-int ConsecutiveCrashesCountBackend() {
+int ConsecutiveCrashesCount() {
 #ifdef CRASHPAD_BACKEND
     return ConsecutiveCrashesCountCrashpad();
 #elif BREAKPAD_BACKEND
