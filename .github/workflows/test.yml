@@ -101,12 +101,12 @@ jobs:
           saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
           # recent real device
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
-          # oldest real device (aiming for armv7 / 32bit)
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=6.0.1"
           # newest Android version
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=12.0"
           # oldest Android version
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=5.1"
+          # oldest real device (aiming for armv7 / 32bit)
+          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=6.0.1"
           # --device name=".*,platformVersion=6.0.1"
           # --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # --device name="Samsung_Galaxy_S22_Ultra_5G_backtrace_us"
