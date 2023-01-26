@@ -12,7 +12,6 @@ static crashpad::CrashpadClient *client;
 static std::unique_ptr<crashpad::CrashReportDatabase> database;
 
 static int consecutive_crashes_count = 0;
-
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
                         jstring handler_path,
@@ -21,7 +20,6 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
                         jint unwindingMode) {
-
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
@@ -225,8 +223,7 @@ void ReEnableCrashpad() {
     // Re-enable uploads if disabled
     if (disabled) {
         if (database == nullptr) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                                "Crashpad database is null, this should not happen");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
             return;
         }
         database->GetSettings()->SetUploadsEnabled(true);

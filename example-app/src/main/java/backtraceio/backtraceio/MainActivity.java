@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Set this value in your local.properties
+        String BACKTRACE_SUBMISSION_URL = "https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json";
         if (BACKTRACE_SUBMISSION_URL != null) {
             backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
         }
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         // Crash Loop Detector example
         boolean isCLSafeModeReq = BacktraceDatabase.IsSafeModeRequired();
         int crashesCount = BacktraceDatabase.ConsecutiveCrashesCount();
-        Log.i("BacktraceAndroid", "ConsecutiveCrashesCount: " + crashesCount);
+        Log.i("BacktraceAndroid", String.format("ConsecutiveCrashesCount: %d", crashesCount));
 
         View viewBackground = findViewById(R.id.viewBackground);
         if(viewBackground != null) {
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     ? getResources().getColor(R.color.colorAccent)
                     : getResources().getColor(R.color.colorWhite));
         }
-        
+
         symlinkAndWriteFile();
     }
 
