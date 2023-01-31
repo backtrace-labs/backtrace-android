@@ -120,6 +120,11 @@ bool InitializeCrashpad(jstring url,
 
     // Start crash handler
     client = new crashpad::CrashpadClient();
+    std::map<std::string, std::string>::iterator guidIterator = attributes.find("guid");
+    if(guidIterator != attributes.end())
+    {
+        client->OverrideGuid(guidIterator->second);
+    }
 
     initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
                                               arguments);
