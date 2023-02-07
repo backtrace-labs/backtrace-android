@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Set this value in your local.properties
-        String BACKTRACE_SUBMISSION_URL = "https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json";
         if (BACKTRACE_SUBMISSION_URL != null) {
             backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
         }
