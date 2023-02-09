@@ -87,6 +87,7 @@ bool EnableCrashLoopDetection() {
 #ifdef CRASHPAD_BACKEND
     return EnableCrashLoopDetectionCrashpad();
 #elif BREAKPAD_BACKEND
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "EnableCrashLoopDetection not supported on this backend");
     return false;
 #endif
 }
@@ -95,6 +96,7 @@ bool IsSafeModeRequired() {
 #ifdef CRASHPAD_BACKEND
     return IsSafeModeRequiredCrashpad();
 #elif BREAKPAD_BACKEND
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "IsSafeModeRequired not supported on this backend");
     return false;
 #endif
 }
@@ -103,6 +105,7 @@ int ConsecutiveCrashesCount() {
 #ifdef CRASHPAD_BACKEND
     return ConsecutiveCrashesCountCrashpad();
 #elif BREAKPAD_BACKEND
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "ConsecutiveCrashesCount not supported on this backend");
     return 0;
 #endif
 }

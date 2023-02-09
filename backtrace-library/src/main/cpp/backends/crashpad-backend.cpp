@@ -121,11 +121,11 @@ bool InitializeCrashpad(jstring url,
 
     // Start crash handler
     client = new crashpad::CrashpadClient();
-    client->EnableCrashLoopDetection();
 
     // Get consecutive crashes count BEFORE any handler started,
     // as it writes extra line into CSV, what leads to getting 0 for each next ConsecutiveCrashesCount call
     consecutive_crashes_count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
+
     initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes, arguments);
 
     env->ReleaseStringUTFChars(url, backtraceUrl);

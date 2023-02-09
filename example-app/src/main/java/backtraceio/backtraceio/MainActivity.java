@@ -52,11 +52,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Set this value in your local.properties
-        if (BACKTRACE_SUBMISSION_URL != null) {
-            backtraceClient = initializeBacktrace(BACKTRACE_SUBMISSION_URL);
+        if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
+            backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
         }
 
         // Crash Loop Detector example
+        BacktraceDatabase.EnableCrashLoopDetection();
         boolean isCLSafeModeReq = BacktraceDatabase.IsSafeModeRequired();
         int crashesCount = BacktraceDatabase.ConsecutiveCrashesCount();
         Log.i("BacktraceAndroid", String.format("ConsecutiveCrashesCount: %d", crashesCount));
