@@ -11,6 +11,7 @@ extern std::atomic_bool disabled;
 static crashpad::CrashpadClient *client;
 static std::unique_ptr<crashpad::CrashReportDatabase> database;
 
+static int consecutive_crashes_count = 0;
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
                         jstring handler_path,
@@ -121,8 +122,11 @@ bool InitializeCrashpad(jstring url,
     // Start crash handler
     client = new crashpad::CrashpadClient();
 
-    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
-                                              arguments);
+    // Get consecutive crashes count BEFORE any handler started,
+    // as it writes extra line into CSV, what leads to getting 0 for each next ConsecutiveCrashesCount call
+    consecutive_crashes_count = crashpad::CrashpadClient::ConsecutiveCrashesCount(db);
+
+    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes, arguments);
 
     env->ReleaseStringUTFChars(url, backtraceUrl);
     env->ReleaseStringUTFChars(handler_path, handlerPath);
@@ -225,4 +229,20 @@ void ReEnableCrashpad() {
         database->GetSettings()->SetUploadsEnabled(true);
         disabled = false;
     }
+}
+
+bool EnableCrashLoopDetectionCrashpad() {
+    if (client != nullptr) {
+        return client->EnableCrashLoopDetection();
+    } else {
+        return false;
+    }
+}
+
+bool IsSafeModeRequiredCrashpad() {
+    return consecutive_crashes_count >= 5;
+}
+
+int ConsecutiveCrashesCountCrashpad() {
+    return consecutive_crashes_count;
 }

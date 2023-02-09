@@ -1,8 +1,12 @@
 package backtraceio.backtraceio;
 
+import static backtraceio.backtraceio.BuildConfig.BACKTRACE_SUBMISSION_URL;
+
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.system.ErrnoException;
 import android.system.Os;
 import android.util.Log;
@@ -27,6 +31,7 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -51,6 +56,19 @@ public class MainActivity extends AppCompatActivity {
         // Set this value in your local.properties
         if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
             backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
+        }
+
+        // Crash Loop Detector example
+        BacktraceDatabase.EnableCrashLoopDetection();
+        boolean isCLSafeModeReq = BacktraceDatabase.IsSafeModeRequired();
+        int crashesCount = BacktraceDatabase.ConsecutiveCrashesCount();
+        Log.i("BacktraceAndroid", String.format("ConsecutiveCrashesCount: %d", crashesCount));
+
+        View viewBackground = findViewById(R.id.viewBackground);
+        if (viewBackground != null) {
+            viewBackground.setBackgroundColor(isCLSafeModeReq
+                    ? getResources().getColor(R.color.colorAccent)
+                    : getResources().getColor(R.color.colorWhite));
         }
 
         symlinkAndWriteFile();
@@ -89,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             put("custom.attribute", "My Custom Attribute");
         }};
 
-        List<String> attachments = new ArrayList<String>(){{
+        List<String> attachments = new ArrayList<String>() {{
             add(context.getFilesDir() + "/" + "myCustomFile.txt");
         }};
 
@@ -113,29 +131,28 @@ public class MainActivity extends AppCompatActivity {
     public native void cppCrash();
 
     public native boolean registerNativeBreadcrumbs(BacktraceBase backtraceBase);
+
     public native boolean addNativeBreadcrumb();
+
     public native boolean addNativeBreadcrumbUserError();
+
     public native void cleanupNativeBreadcrumbHandler();
 
     private List<String> equippedItems;
 
-    public List<String> getWarriorArmor()
-    {
+    public List<String> getWarriorArmor() {
         return new ArrayList<String>(Arrays.asList("Tough Boots", "Strong Sword", "Sturdy Shield", "Magic Wand"));
     }
 
-    int findEquipmentIndex(List<String> armor, String equipment)
-    {
+    int findEquipmentIndex(List<String> armor, String equipment) {
         return armor.indexOf(equipment);
     }
 
-    void removeEquipment(List<String> armor, int index)
-    {
+    void removeEquipment(List<String> armor, int index) {
         armor.remove(index);
     }
 
-    void equipItem(List<String> armor, int index)
-    {
+    void equipItem(List<String> armor, int index) {
         equippedItems.add(armor.get(index));
     }
 
@@ -154,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getSaveData() throws IOException {
         // I know for sure this file is there (spoiler alert, it's not)
-        File mySaveData =  new File("mySave.sav");
+        File mySaveData = new File("mySave.sav");
         FileReader mySaveDataReader = new FileReader(mySaveData);
         char[] saveDataBuffer = new char[255];
         mySaveDataReader.read(saveDataBuffer);
@@ -202,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             outputStreamWriter.write(fileData);
             outputStreamWriter.close();
         } catch (IOException e) {
-                Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
+            Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
         }
     }
 
