@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
+        System.loadLibrary("backtrace-native");
     }
 
     @Override
@@ -53,16 +54,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Crash Loop Detector example
+        BacktraceClient.EnableCrashLoopDetection();
+        boolean isCLSafeModeReq = BacktraceClient.IsSafeModeRequired();
+        int crashesCount = BacktraceClient.ConsecutiveCrashesCount();
+        Log.i("BacktraceAndroid", String.format("ConsecutiveCrashesCount: %d", crashesCount));
+
         // Set this value in your local.properties
         if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
             backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
         }
 
-        // Crash Loop Detector example
-        BacktraceDatabase.EnableCrashLoopDetection();
-        boolean isCLSafeModeReq = BacktraceDatabase.IsSafeModeRequired();
-        int crashesCount = BacktraceDatabase.ConsecutiveCrashesCount();
-        Log.i("BacktraceAndroid", String.format("ConsecutiveCrashesCount: %d", crashesCount));
 
         View viewBackground = findViewById(R.id.viewBackground);
         if (viewBackground != null) {

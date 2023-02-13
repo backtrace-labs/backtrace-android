@@ -25,6 +25,28 @@ public class BacktraceClient extends BacktraceBase {
     private BacktraceANRWatchdog anrWatchdog;
 
     /**
+     * Enables Crash loop detection to verify if the application is in the crash loop.
+     */
+    public static boolean EnableCrashLoopDetection() {
+        return BacktraceDatabase.EnableCrashLoopDetection();
+    }
+
+    /**
+    * Determine if application requires a safe mode to launch.
+    */
+    public static boolean IsSafeModeRequired() {
+        return BacktraceDatabase.IsSafeModeRequired();
+    }
+    
+    /**
+     * Returns the number of consecutive application crashes 
+     */
+    public static int ConsecutiveCrashesCount() {
+        return BacktraceDatabase.ConsecutiveCrashesCount();
+    }
+
+    
+    /**
      * Initializing Backtrace client instance with BacktraceCredentials
      *
      * @param context     application context
