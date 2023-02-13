@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-         new BacktraceCredentials(submissionUrl);
+        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
