@@ -238,7 +238,7 @@ public class BacktraceBase implements Client {
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
-        this.metrics = new BacktraceMetrics(context, attributes, backtraceApi);
+        this.metrics = new BacktraceMetrics(context, attributes, backtraceApi, credentials);
     }
 
     public native void crash();
