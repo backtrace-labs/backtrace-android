@@ -95,6 +95,7 @@ jobs:
         uses: saucelabs/saucectl-run-action@v2
         with:
           skip-run: true
+          saucectl-version: v.0.130.0
 
       - name: Run Saucectl
         run: |
