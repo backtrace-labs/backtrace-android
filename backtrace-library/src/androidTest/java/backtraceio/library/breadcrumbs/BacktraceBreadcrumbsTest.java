@@ -10,6 +10,7 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -390,42 +392,37 @@ public class BacktraceBreadcrumbsTest {
     }
 
     @Test
-    public void testQueueFileRolloverCustomMax() {
+    public void testQueueFileRolloverCustomMax() throws IOException, JSONException {
         int numIterations = 100;
         // Cleanup after default BacktraceBreadcrumbs constructor
         // Because we want to create our own instance with custom parameters
         cleanUp();
 
-        try {
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(this.absolutePath);
-            backtraceBreadcrumbs.enableBreadcrumbs(context, 6400);
-            // Account for mandatory configuration breadcrumb
-            backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
+        backtraceBreadcrumbs = new BacktraceBreadcrumbs(this.absolutePath);
+        backtraceBreadcrumbs.enableBreadcrumbs(context, 6400);
+        // Account for mandatory configuration breadcrumb
+        backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
 
-            for (int i = 0; i < numIterations; i++) {
-                final long threadId = Thread.currentThread().getId();
-                Map<String, Object> attributes = new HashMap<String, Object>() {{
-                    put("From Thread", threadId);
-                }};
-                backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
-            }
+        for (int i = 0; i < numIterations; i++) {
+            final long threadId = Thread.currentThread().getId();
+            Map<String, Object> attributes = new HashMap<String, Object>() {{
+                put("From Thread", threadId);
+            }};
+            backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
+        }
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(this.absolutePath);
+        List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(this.absolutePath);
 
-            // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
-            for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
-                JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
-                assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
-                assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
-                assertEquals("manual", parsedBreadcrumb.get("type"));
-                assertEquals("info", parsedBreadcrumb.get("level"));
-                // Timestamp should be convertible to a long
-                assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
-                assertTrue(((int) parsedBreadcrumb.get("id")) > 45);
-            }
-
-        } catch (Exception ex) {
-            fail(ex.getMessage());
+        // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
+        for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
+            assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
+            assertNotNull(parsedBreadcrumb.getJSONObject("attributes").get("From Thread"));
+            assertEquals("manual", parsedBreadcrumb.get("type"));
+            assertEquals("info", parsedBreadcrumb.get("level"));
+            // Timestamp should be convertible to a long
+            assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
+            assertTrue(((int) parsedBreadcrumb.get("id")) > 45);
         }
     }
 
