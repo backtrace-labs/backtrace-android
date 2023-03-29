@@ -2,10 +2,10 @@ name: Run Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -24,18 +24,16 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 11.0.10
-          distribution: 'adopt'
+          distribution: "adopt"
           cache: gradle
 
       - name: Write to local.properties
         run: |
           echo BACKTRACE_SUBMISSION_URL=\"https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json\" > ./local.properties
-          echo BACKTRACE_CORONER_URL=\"https://yolo.sp.backtrace.io/api/query?project=android-library\" >> ./local.properties
-          echo BACKTRACE_CORONER_TOKEN=\"4d1c52a829fa4b53c3c421d163f327e6bfaa5304e756a71249174ab2e1603f8a\" >> ./local.properties
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
-        
+
       - name: Upload symbols.zip
         uses: actions/upload-artifact@v3
         with:
@@ -73,7 +71,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-apk: [example-app-debug-androidTest.apk, backtrace-library-debug-androidTest.apk]
+        test-apk:
+          [
+            example-app-debug-androidTest.apk,
+            backtrace-library-debug-androidTest.apk,
+          ]
 
     steps:
       - name: Download APK
@@ -90,21 +92,47 @@ jobs:
         run: curl -L https://saucelabs.github.io/saucectl/install | bash
 
       - name: Install saucectl
-        uses: saucelabs/saucectl-run-action@v2
+        uses: saucelabs/saucectl-run-action@v3
         with:
           skip-run: true
 
       - name: Run Saucectl
         run: |
           saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
+          # recent real device
+          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # newest Android version
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=12.0"
           # oldest Android version
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=5.1"
-          # recent real device
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # oldest real device (aiming for armv7 / 32bit)
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=6.0.1"
           # --device name=".*,platformVersion=6.0.1"
           # --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # --device name="Samsung_Galaxy_S22_Ultra_5G_backtrace_us"
+
+      - name: Run morgue
+        run: |
+          npm install backtrace-morgue --location=global
+          morgue --version || true
+          # Todo: currently just looks 15 minutes in the past and doesn't filter at all.
+          # --csv=crash.csv
+          morgue --token=${{ secrets.BACKTRACE_API_TOKEN }} --endpoint="https://yolo.sp.backtrace.io" list yolo/android-library --select timestamp --filter=timestamp,greater-than,`date +%s%3N -d "15 minutes ago"` || true
+
+#           if [ $(wc -l < crash.csv) -gt 0 ]; then
+#               echo "Success"
+#           else
+#               exit 1
+#           fi
+
+#        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
+#     - name: Emulator test
+#       uses: reactivecircus/android-emulator-runner@v2
+#       with:
+#         target: google_apis
+#         api-level: ${{ matrix.api-level }}
+#         arch: x86_64
+#         script: ./gradlew connectedCheck
+
+#     - name: Code coverage
+#       run: bash <(curl -s https://codecov.io/bash)

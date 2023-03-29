@@ -3,7 +3,7 @@
 
 # Sets the minimum version of CMake required to build the native library.
 
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.13)
 
 # Determine native crash backend
 # ANDROID_NDK_MAJOR not defined until ndk 17+
@@ -27,6 +27,9 @@ else()
     set(BACKEND "CRASHPAD_BACKEND")
     set(CLIENT_SIDE_UNWINDING TRUE)
 endif()
+
+cmake_policy(SET CMP0077 NEW)
+set(ANDROID_SSL_MODE "OPENSSL")
 
 # Sources
 list(APPEND SOURCES backtrace-native.cpp)

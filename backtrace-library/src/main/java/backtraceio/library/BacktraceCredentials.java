@@ -87,21 +87,16 @@ public class BacktraceCredentials {
     public String getUniverseName() {
         String submissionUrl = getSubmissionUrl().toString();
         final String backtraceSubmitUrl = "https://submit.backtrace.io/";
-        if (submissionUrl.startsWith(backtraceSubmitUrl))
-        {
+        if (submissionUrl.startsWith(backtraceSubmitUrl)) {
             int universeIndexStart = backtraceSubmitUrl.length();
             int universeIndexEnd = submissionUrl.indexOf('/', universeIndexStart);
-            if(universeIndexEnd == -1)
-            {
+            if (universeIndexEnd == -1) {
                 throw new IllegalArgumentException("Invalid Backtrace URL");
             }
             return submissionUrl.substring(universeIndexStart, universeIndexEnd);
-        }
-        else
-        {
+        } else {
             final String backtraceDomain = "backtrace.io";
-            if (submissionUrl.indexOf(backtraceDomain) == -1)
-            {
+            if (submissionUrl.indexOf(backtraceDomain) == -1) {
                 throw new IllegalArgumentException("Invalid Backtrace URL");
             }
 
@@ -123,10 +118,10 @@ public class BacktraceCredentials {
         final int tokenLength = 64;
         final String tokenQueryParam = "token=";
         String submissionUrl = getSubmissionUrl().toString();
-        String token = submissionUrl.contains("submit.backtrace.io")
-                ? submissionUrl.substring(submissionUrl.lastIndexOf("/") - tokenLength + 1, submissionUrl.lastIndexOf("/"))
-                : submissionUrl.substring(submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length(),
-                    submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length() + tokenLength - 1);
-        return token;
+        if (submissionUrl.contains("submit.backtrace.io")) {
+            return submissionUrl.substring(submissionUrl.lastIndexOf("/") - tokenLength, submissionUrl.lastIndexOf("/"));
+        }
+        final int tokenQueryParamStartIndex = submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length();
+        return submissionUrl.substring(tokenQueryParamStartIndex, tokenQueryParamStartIndex + tokenLength);
     }
 }

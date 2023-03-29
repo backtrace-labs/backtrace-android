@@ -104,8 +104,7 @@ public class MainActivity extends AppCompatActivity {
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
 
-        final String baseUrl = submissionUrl.contains("backtrace.sp") ? "https://events-test.backtrace.io" : "https://events.backtrace.io";
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, baseUrl));
+        backtraceClient.metrics.enable();
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
