@@ -285,7 +285,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      */
     @Override
     public void processReportBreadcrumbs(BacktraceReport backtraceReport) {
-        if (this.isBreadcrumbsEnabled() == false) {
+        if (!this.isBreadcrumbsEnabled()) {
             return;
         }
 
