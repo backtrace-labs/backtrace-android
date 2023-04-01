@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class CoronerResponse {
 
-    private static final Logger LOGGER = Logger.getLogger( CoronerResponse.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger(CoronerResponse.class.getName());
 
     @SerializedName(value = "columns_desc")
     public List<ColumnDescElement> columnsDesc;

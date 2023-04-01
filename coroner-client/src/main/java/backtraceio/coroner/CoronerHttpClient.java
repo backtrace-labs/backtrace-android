@@ -1,7 +1,6 @@
 package backtraceio.coroner;
 
 
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -9,8 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import backtraceio.coroner.common.Common;
 import backtraceio.coroner.response.CoronerApiResponse;
@@ -19,7 +18,7 @@ import backtraceio.coroner.serialization.CoronerResponseGroupDeserializer;
 import backtraceio.coroner.serialization.GsonWrapper;
 
 class CoronerHttpClient {
-    private static final Logger LOGGER = Logger.getLogger( CoronerResponseGroupDeserializer.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger(CoronerResponseGroupDeserializer.class.getName());
     private final String apiUrl;
     private final String coronerToken;
     private final String ENCODING = "utf-8";

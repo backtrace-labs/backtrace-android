@@ -9,14 +9,14 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import backtraceio.coroner.response.CoronerResponseGroup;
 
 
 public class CoronerResponseGroupDeserializer implements JsonDeserializer<CoronerResponseGroup> {
-    private static final Logger LOGGER = Logger.getLogger( CoronerResponseGroupDeserializer.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger(CoronerResponseGroupDeserializer.class.getName());
 
     @Override
     public CoronerResponseGroup deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

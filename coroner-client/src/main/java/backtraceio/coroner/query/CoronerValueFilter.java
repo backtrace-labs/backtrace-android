@@ -1,7 +1,5 @@
 package backtraceio.coroner.query;
 
-import java.util.logging.Filter;
-
 public class CoronerValueFilter {
     public FilterOperator operator;
     public Object value;
@@ -13,7 +11,7 @@ public class CoronerValueFilter {
 
     @Override
     public String toString() {
-        return  "    [" +
+        return "    [" +
                 "      \"" + operator.toString() + "\"," +
                 "      \"" + value.toString() + "\"" +
                 "    ]";
