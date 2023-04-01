@@ -25,7 +25,6 @@ class CoronerQueryBuilder {
                 "   \"filter\":[" + filters + "]" +
                 "}";
     }
-
     private String joinHeadFolds(List<String> folds) {
         List<String> result = new ArrayList<>();
 
@@ -34,13 +33,10 @@ class CoronerQueryBuilder {
         }
 
         return String.join(",", result);
-
     }
-
     private String foldHead(String name) {
         return this.fold(name, FOLD_HEAD);
     }
-
     private String fold(String name, String val) {
         return "\"" + name + "\": " +
                 "[" + "[\"" + val + "\"" + "]" + "]";

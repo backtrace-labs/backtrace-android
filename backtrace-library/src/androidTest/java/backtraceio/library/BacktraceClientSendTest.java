@@ -182,7 +182,6 @@ public class BacktraceClientSendTest {
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-
         backtraceClient.send(new BacktraceReport(this.resultMessage, this.attributes),
                 new OnServerResponseEventListener() {
                     @Override
@@ -297,7 +296,6 @@ public class BacktraceClientSendTest {
             }
         };
         backtraceClient.setOnRequestHandler(rh);
-
 
         //WHEN
         for (final String message : messages) {

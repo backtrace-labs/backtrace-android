@@ -2,7 +2,6 @@ package backtraceio.coroner.response;
 
 import backtraceio.coroner.CoronerError;
 
-
 public class CoronerApiResponse {
     public CoronerError error;
     public CoronerResponse response;

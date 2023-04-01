@@ -29,6 +29,4 @@ public class CoronerQueries {
 
         return this.builder.buildRxIdGroup(filtersBuilder.get(), attributes);
     }
-
-//    public String filterBy
 }

@@ -1,6 +1,5 @@
 package backtraceio.coroner;
 
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -22,12 +21,10 @@ class CoronerHttpClient {
     private final String apiUrl;
     private final String coronerToken;
     private final String ENCODING = "utf-8";
-
     public CoronerHttpClient(String apiUrl, String coronerToken) {
         this.apiUrl = apiUrl;
         this.coronerToken = coronerToken;
     }
-
     public CoronerApiResponse get(String json) throws CoronerHttpException, IOException {
         HttpURLConnection urlConnection = prepareHttpRequest(json);
         int statusCode = urlConnection.getResponseCode();
