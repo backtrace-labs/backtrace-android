@@ -1,7 +1,5 @@
 package backtraceio.backtraceio;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import org.junit.BeforeClass;
 
 import backtraceio.coroner.CoronerClient;
