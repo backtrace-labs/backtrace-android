@@ -30,7 +30,6 @@ import java.util.Map;
 public class BacktraceBreadcrumbsTest {
     public Context context;
     public BacktraceBreadcrumbs backtraceBreadcrumbs;
-    public String absolutePath;
 
     static {
         System.loadLibrary("backtrace-native");
