@@ -32,7 +32,6 @@ public class BacktraceAnrTest {
         this.backtraceClient = new BacktraceClient(this.context, credentials);
     }
 
-
     @Test
     @UiThreadTest
     public void checkIfANRIsDetectedCorrectly() {
