@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
 
-import androidx.test.espresso.PerformException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -26,8 +25,6 @@ import java.util.concurrent.TimeoutException;
 
 import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
-import backtraceio.library.events.OnServerResponseEventListener;
-import backtraceio.library.models.BacktraceResult;
 
 /**
  * Instrumented test, which will execute on an Android device.
