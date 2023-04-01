@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL); // Set this value in your local.properties
+        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
 
         symlinkAndWriteFile();
     }
