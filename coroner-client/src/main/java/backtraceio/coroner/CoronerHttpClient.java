@@ -21,13 +21,13 @@ class CoronerHttpClient {
     private final String apiUrl;
     private final String coronerToken;
     private final String ENCODING = "utf-8";
-    public CoronerHttpClient(String apiUrl, String coronerToken) {
+    public CoronerHttpClient(final String apiUrl, final String coronerToken) {
         this.apiUrl = apiUrl;
         this.coronerToken = coronerToken;
     }
-    public CoronerApiResponse get(String json) throws CoronerHttpException, IOException {
-        HttpURLConnection urlConnection = prepareHttpRequest(json);
-        int statusCode = urlConnection.getResponseCode();
+    public CoronerApiResponse get(final String json) throws CoronerHttpException, IOException {
+        final HttpURLConnection urlConnection = prepareHttpRequest(json);
+        final int statusCode = urlConnection.getResponseCode();
 
         if (statusCode != HttpURLConnection.HTTP_OK) {
             String message = getResponseMessage(urlConnection);
@@ -36,22 +36,22 @@ class CoronerHttpClient {
             throw new CoronerHttpException(statusCode, String.format("%s: %s", statusCode, message));
         }
 
-        String resultJson = getResponseMessage(urlConnection);
+        final String resultJson = getResponseMessage(urlConnection);
 
         return GsonWrapper.fromJson(
                 resultJson,
                 CoronerApiResponse.class);
     }
 
-    private static String getResponseMessage(HttpURLConnection urlConnection) throws IOException {
+    private static String getResponseMessage(final HttpURLConnection urlConnection) throws IOException {
         LOGGER.log(Level.INFO, "Reading response from HTTP request");
 
-        InputStream inputStream = getInputStream(urlConnection);
+        final InputStream inputStream = getInputStream(urlConnection);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(
+        final BufferedReader br = new BufferedReader(new InputStreamReader(
                 inputStream));
 
-        StringBuilder responseSB = new StringBuilder();
+        final StringBuilder responseSB = new StringBuilder();
         String line;
         while ((line = br.readLine()) != null) {
             responseSB.append(line);
@@ -60,15 +60,15 @@ class CoronerHttpClient {
         return responseSB.toString();
     }
 
-    private static InputStream getInputStream(HttpURLConnection urlConnection) throws IOException {
+    private static InputStream getInputStream(final HttpURLConnection urlConnection) throws IOException {
         if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST)
             return urlConnection.getInputStream();
         return urlConnection.getErrorStream();
     }
 
-    private HttpURLConnection prepareHttpRequest(String json) throws IOException {
-        URL url = new URL(this.apiUrl);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+    private HttpURLConnection prepareHttpRequest(final String json) throws IOException {
+        final URL url = new URL(this.apiUrl);
+        final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
         urlConnection.setRequestMethod("POST");
         urlConnection.setUseCaches(false);
@@ -82,7 +82,7 @@ class CoronerHttpClient {
 
         DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
 
-        byte[] bytes = json.getBytes(ENCODING);
+        final byte[] bytes = json.getBytes(ENCODING);
         request.write(bytes);
 
         request.flush();

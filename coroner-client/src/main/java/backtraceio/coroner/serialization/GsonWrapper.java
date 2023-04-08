@@ -8,7 +8,7 @@ import backtraceio.coroner.response.CoronerResponseGroup;
 
 public class GsonWrapper {
 
-    public static <T> T fromJson(String json, Class<T> type) {
+    public static <T> T fromJson(final String json, final Class<T> type) {
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
                 .registerTypeAdapter(CoronerResponseGroup.class, new CoronerResponseGroupDeserializer())

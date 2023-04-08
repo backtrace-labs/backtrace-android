@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CoronerFieldFilter {
-    public String name;
-    public List<CoronerValueFilter> values = new ArrayList<>();
+    public final String name;
+    public final List<CoronerValueFilter> values = new ArrayList<>();
 
-    public CoronerFieldFilter(String name, FilterOperator operator, Object value) {
+    public CoronerFieldFilter(final String name, final FilterOperator operator, final Object value) {
         this.name = name;
         this.addValueFilter(operator, value);
     }
@@ -22,7 +22,7 @@ public class CoronerFieldFilter {
 
     @Override
     public String toString() {
-        List<String> result = new ArrayList<>();
+        final List<String> result = new ArrayList<>();
 
         for (CoronerValueFilter value : values) {
             result.add(value.toString());

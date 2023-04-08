@@ -8,7 +8,7 @@ public class CoronerResponseProcessingException extends Exception {
     }
 
     @SuppressWarnings("unused")
-    public CoronerResponseProcessingException(String message) {
+    public CoronerResponseProcessingException(final String message) {
         super(message);
     }
 }

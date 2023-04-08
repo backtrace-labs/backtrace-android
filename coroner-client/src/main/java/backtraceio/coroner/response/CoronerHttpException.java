@@ -26,7 +26,7 @@ public class CoronerHttpException extends Exception {
      * @param httpStatus received HTTP status code
      */
     @SuppressWarnings("unused")
-    public CoronerHttpException(Integer httpStatus) {
+    public CoronerHttpException(final Integer httpStatus) {
         this(httpStatus, null);
     }
 
@@ -36,7 +36,7 @@ public class CoronerHttpException extends Exception {
      * @param httpStatus received HTTP status code
      * @param message    received exception message
      */
-    public CoronerHttpException(Integer httpStatus, String message) {
+    public CoronerHttpException(final Integer httpStatus, final String message) {
         super(message);
         setHttpStatus(httpStatus);
     }
@@ -56,7 +56,7 @@ public class CoronerHttpException extends Exception {
      *
      * @param httpStatus received HTTP status code
      */
-    private void setHttpStatus(int httpStatus) {
+    private void setHttpStatus(final int httpStatus) {
         this.httpStatus = httpStatus;
     }
 }

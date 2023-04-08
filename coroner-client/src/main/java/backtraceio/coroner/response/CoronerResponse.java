@@ -20,23 +20,23 @@ public class CoronerResponse {
     }
 
     @SuppressWarnings("unused")
-    public CoronerResponse(List<ColumnDescElement> columnsDesc, List<CoronerResponseGroup> values) {
+    public CoronerResponse(final List<ColumnDescElement> columnsDesc, final List<CoronerResponseGroup> values) {
         this.columnsDesc = columnsDesc;
         this.values = values;
     }
 
-    public <T> T getAttribute(int elementIndex, String name, Class<T> clazz) throws CoronerResponseProcessingException {
+    public <T> T getAttribute(final int elementIndex, final String name, final Class<T> clazz) throws CoronerResponseProcessingException {
         if (this.values == null) {
             throw new CoronerResponseProcessingException("Values property from response is null");
         }
         if (elementIndex < 0 || elementIndex > this.values.size()) {
             throw new CoronerResponseProcessingException("Incorrect element index, value should be between 0 and " + this.values.size());
         }
-        CoronerResponseGroup responseGroup = values.get(elementIndex);
+        final CoronerResponseGroup responseGroup = values.get(elementIndex);
 
-        int attributeIndex = getAttributeIndex(name);
+        final int attributeIndex = getAttributeIndex(name);
         try {
-            List<Object> results = (ArrayList<Object>) responseGroup.getAttribute(attributeIndex);
+            final List<Object> results = (ArrayList<Object>) responseGroup.getAttribute(attributeIndex);
             return clazz.cast(results.get(0));
         } catch (ClassCastException e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
@@ -48,7 +48,7 @@ public class CoronerResponse {
         return values.size();
     }
 
-    private int getAttributeIndex(String attributeName) throws CoronerResponseProcessingException {
+    private int getAttributeIndex(final String attributeName) throws CoronerResponseProcessingException {
         for (int index = 0; index < this.columnsDesc.size(); index++) {
             if (this.columnsDesc.get(index).name.equals(attributeName)) {
                 return index;

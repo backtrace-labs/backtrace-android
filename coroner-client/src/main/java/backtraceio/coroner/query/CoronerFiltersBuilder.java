@@ -29,7 +29,7 @@ public class CoronerFiltersBuilder {
     }
 
     public String get() {
-        List<String> result = new ArrayList<>();
+        final List<String> result = new ArrayList<>();
 
         for (CoronerFieldFilter filter : filters) {
             result.add(filter.toString());

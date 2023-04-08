@@ -21,39 +21,39 @@ public class CoronerClient {
             CoronerQueryFields.FOLD_CLASSIFIERS
     );
 
-    public CoronerClient(String apiUrl, String coronerToken) {
+    public CoronerClient(final String apiUrl, final String coronerToken) {
         this.coronerHttpClient = new CoronerHttpClient(apiUrl, coronerToken);
         this.coronerQueries = new CoronerQueries();
     }
 
-    public CoronerResponse rxIdFilter(String rxId) throws Exception {
+    public CoronerResponse rxIdFilter(final String rxId) throws Exception {
         return this.rxIdFilter(rxId, new ArrayList<>());
     }
 
-    public CoronerResponse rxIdFilter(String rxId, List<String> customAttributes) throws CoronerResponseException, CoronerHttpException, IOException {
-        List<String> attributes = concatAttributes(customAttributes);
+    public CoronerResponse rxIdFilter(final String rxId, final List<String> customAttributes) throws CoronerResponseException, CoronerHttpException, IOException {
+        final List<String> attributes = concatAttributes(customAttributes);
 
-        String coronerQuery = this.coronerQueries.filterByRxId(rxId, attributes);
+        final String coronerQuery = this.coronerQueries.filterByRxId(rxId, attributes);
 
         return makeRequest(coronerQuery);
     }
 
-    public CoronerResponse errorTypeTimestampFilter(String errorType, String timestampLeast, String timestampMost, List<String> customAttributes) throws CoronerResponseException, IOException, CoronerHttpException {
-        List<String> attributes = concatAttributes(customAttributes);
+    public CoronerResponse errorTypeTimestampFilter(final String errorType, final String timestampLeast, final String timestampMost, final List<String> customAttributes) throws CoronerResponseException, IOException, CoronerHttpException {
+        final List<String> attributes = concatAttributes(customAttributes);
 
         String coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampLeast, timestampMost, attributes);
 
         return makeRequest(coronerQuery);
     }
 
-    private List<String> concatAttributes(List<String> customAttributes) {
-        List<String> result = new ArrayList<>(customAttributes);
+    private List<String> concatAttributes(final List<String> customAttributes) {
+        final List<String> result = new ArrayList<>(customAttributes);
         result.addAll(DEFAULT_ATTRIBUTES);
         return result;
     }
 
-    private CoronerResponse makeRequest(String coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
-        CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery);
+    private CoronerResponse makeRequest(final String coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
+        final CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery);
 
         if (response.error != null) {
             throw new CoronerResponseException(response.getError());

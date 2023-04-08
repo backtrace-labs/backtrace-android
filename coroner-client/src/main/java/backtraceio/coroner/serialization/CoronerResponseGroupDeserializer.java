@@ -19,9 +19,9 @@ public class CoronerResponseGroupDeserializer implements JsonDeserializer<Corone
     private static final Logger LOGGER = Logger.getLogger(CoronerResponseGroupDeserializer.class.getName());
 
     @Override
-    public CoronerResponseGroup deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonArray jsonArray = json.getAsJsonArray();
-        List<Object> obj = new Gson().fromJson(jsonArray, (Type) Object.class);
+    public CoronerResponseGroup deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) throws JsonParseException {
+        final JsonArray jsonArray = json.getAsJsonArray();
+        final List<Object> obj = new Gson().fromJson(jsonArray, (Type) Object.class);
         try {
             return new CoronerResponseGroup(obj);
         } catch (Exception e) {

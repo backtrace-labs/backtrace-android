@@ -8,12 +8,12 @@ class CoronerQueryBuilder {
     private final int OFFSET = 0;
     private final int LIMIT = 1;
 
-    public String buildRxIdGroup(String filters, List<String> headFolds) {
+    public String buildRxIdGroup(final String filters, final List<String> headFolds) {
         return this.build(CoronerQueryFields.RXID, filters, headFolds);
     }
 
-    private String build(String groupName, String filters, List<String> headFolds) {
-        String folds = joinHeadFolds(headFolds);
+    private String build(final String groupName, final String filters, final List<String> headFolds) {
+        final String folds = joinHeadFolds(headFolds);
 
         return "{" +
                 "\"group\":[" +
@@ -25,8 +25,8 @@ class CoronerQueryBuilder {
                 "   \"filter\":[" + filters + "]" +
                 "}";
     }
-    private String joinHeadFolds(List<String> folds) {
-        List<String> result = new ArrayList<>();
+    private String joinHeadFolds(final List<String> folds) {
+        final List<String> result = new ArrayList<>();
 
         for (String fold : folds) {
             result.add(foldHead(fold));
@@ -34,10 +34,10 @@ class CoronerQueryBuilder {
 
         return String.join(",", result);
     }
-    private String foldHead(String name) {
+    private String foldHead(final String name) {
         return this.fold(name, FOLD_HEAD);
     }
-    private String fold(String name, String val) {
+    private String fold(final String name, final String val) {
         return "\"" + name + "\": " +
                 "[" + "[\"" + val + "\"" + "]" + "]";
     }

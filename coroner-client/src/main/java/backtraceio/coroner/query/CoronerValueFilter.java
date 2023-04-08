@@ -1,8 +1,8 @@
 package backtraceio.coroner.query;
 
 public class CoronerValueFilter {
-    public FilterOperator operator;
-    public Object value;
+    public final FilterOperator operator;
+    public final Object value;
 
     public CoronerValueFilter(final FilterOperator operator, final Object value) {
         this.operator = operator;

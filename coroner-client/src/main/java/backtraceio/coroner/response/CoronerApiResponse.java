@@ -12,7 +12,7 @@ public class CoronerApiResponse {
     }
 
     @SuppressWarnings("unused")
-    public CoronerApiResponse(CoronerError error, CoronerResponse response) {
+    public CoronerApiResponse(final CoronerError error, final CoronerResponse response) {
         this.error = error;
         this.response = response;
     }

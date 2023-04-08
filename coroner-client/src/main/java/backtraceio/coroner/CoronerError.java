@@ -10,7 +10,7 @@ public class CoronerError {
     }
 
     @SuppressWarnings("unused")
-    public CoronerError(String message, int code) {
+    public CoronerError(final String message, final int code) {
         this.message = message;
         this.code = code;
     }
