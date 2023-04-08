@@ -10,4 +10,6 @@ java {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.10'
+    testImplementation 'junit:junit:4.13.2'
+//    androidTestImplementation 'junit:junit:4.13.2'
 }
