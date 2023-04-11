@@ -11,9 +11,9 @@ public class CoronerValueFilter {
 
     @Override
     public String toString() {
-        return "    [" +
-                "      \"" + operator.toString() + "\"," +
-                "      \"" + value.toString() + "\"" +
-                "    ]";
+        return "[" +
+                " \"" + operator.toString() + "\"," +
+                " \"" + value.toString() + "\"" +
+                " ]";
     }
 }

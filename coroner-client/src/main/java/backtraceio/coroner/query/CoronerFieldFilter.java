@@ -27,6 +27,6 @@ public class CoronerFieldFilter {
         for (CoronerValueFilter value : values) {
             result.add(value.toString());
         }
-        return "\"" + name + "\": [" + String.join(",", result) + "  ]";
+        return "\"" + name + "\": [" + String.join(",", result) + "]";
     }
 }

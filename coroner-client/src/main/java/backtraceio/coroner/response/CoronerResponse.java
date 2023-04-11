@@ -13,6 +13,8 @@ public class CoronerResponse {
 
     @SerializedName(value = "columns_desc")
     public List<ColumnDescElement> columnsDesc;
+
+    @SerializedName(value = "values")
     public List<CoronerResponseGroup> values;
 
     @SuppressWarnings("unused")

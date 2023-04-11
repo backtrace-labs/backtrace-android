@@ -25,8 +25,8 @@ class CoronerHttpClient {
         this.apiUrl = apiUrl;
         this.coronerToken = coronerToken;
     }
-    public CoronerApiResponse get(final String json) throws CoronerHttpException, IOException {
-        final HttpURLConnection urlConnection = prepareHttpRequest(json);
+    public CoronerApiResponse get(final String requestJson) throws CoronerHttpException, IOException {
+        final HttpURLConnection urlConnection = prepareHttpRequest(requestJson);
         final int statusCode = urlConnection.getResponseCode();
 
         if (statusCode != HttpURLConnection.HTTP_OK) {
