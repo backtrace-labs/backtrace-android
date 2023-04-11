@@ -3,8 +3,9 @@ package backtraceio.coroner.response;
 import backtraceio.coroner.CoronerError;
 
 public class CoronerApiResponse {
-    public CoronerError error;
     public CoronerResponse response;
+    public CoronerError error;
+
 
     @SuppressWarnings("unused")
     public CoronerApiResponse() {
@@ -12,8 +13,17 @@ public class CoronerApiResponse {
     }
 
     @SuppressWarnings("unused")
-    public CoronerApiResponse(final CoronerError error, final CoronerResponse response) {
+    public CoronerApiResponse(final CoronerResponse response, final CoronerError error) {
+        this.response = response;
         this.error = error;
+    }
+
+    public CoronerResponse getResponse() {
+        return this.response;
+    }
+
+    @SuppressWarnings("unused")
+    public void setResponse(CoronerResponse response) {
         this.response = response;
     }
 
@@ -26,13 +36,5 @@ public class CoronerApiResponse {
         this.error = error;
     }
 
-    public CoronerResponse getResponse() {
-        return this.response;
-    }
-
-    @SuppressWarnings("unused")
-    public void setResponse(CoronerResponse response) {
-        this.response = response;
-    }
 }
 

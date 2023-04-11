@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import backtraceio.coroner.StringUtils;
+import backtraceio.coroner.utils.StringUtils;
 
 public class CoronerFiltersBuilderTest {
 

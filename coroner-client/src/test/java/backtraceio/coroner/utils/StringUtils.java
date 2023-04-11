@@ -1,4 +1,4 @@
-package backtraceio.coroner;
+package backtraceio.coroner.utils;
 
 public class StringUtils {
     public static String normalizeSpace(String input) {

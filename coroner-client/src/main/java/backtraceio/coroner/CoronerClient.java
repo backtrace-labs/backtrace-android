@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import backtraceio.coroner.common.HttpClient;
 import backtraceio.coroner.query.CoronerQueries;
 import backtraceio.coroner.query.CoronerQueryFields;
 import backtraceio.coroner.response.CoronerApiResponse;
@@ -13,8 +14,8 @@ import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseException;
 
 public class CoronerClient {
-    public final CoronerHttpClient coronerHttpClient;
-    public final CoronerQueries coronerQueries;
+    private final HttpClient coronerHttpClient;
+    private final CoronerQueries coronerQueries;
     private final List<String> DEFAULT_ATTRIBUTES = Arrays.asList(
             CoronerQueryFields.FOLD_CALLSTACK,
             CoronerQueryFields.FOLD_GUID,
@@ -22,11 +23,15 @@ public class CoronerClient {
     );
 
     public CoronerClient(final String apiUrl, final String coronerToken) {
-        this.coronerHttpClient = new CoronerHttpClient(apiUrl, coronerToken);
+        this(new CoronerHttpClient(apiUrl, coronerToken));
+    }
+
+    public CoronerClient(HttpClient httpClient) {
+        this.coronerHttpClient = httpClient;
         this.coronerQueries = new CoronerQueries();
     }
 
-    public CoronerResponse rxIdFilter(final String rxId) throws Exception {
+    public CoronerResponse rxIdFilter(final String rxId) throws CoronerResponseException, CoronerHttpException, IOException  {
         return this.rxIdFilter(rxId, new ArrayList<>());
     }
 

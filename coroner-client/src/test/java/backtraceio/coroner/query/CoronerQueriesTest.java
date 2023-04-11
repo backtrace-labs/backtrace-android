@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import backtraceio.coroner.StringUtils;
+import backtraceio.coroner.utils.StringUtils;
 
 public class CoronerQueriesTest {
     public CoronerQueries coronerQueries;

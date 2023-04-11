@@ -11,12 +11,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import backtraceio.coroner.common.Common;
+import backtraceio.coroner.common.HttpClient;
 import backtraceio.coroner.response.CoronerApiResponse;
 import backtraceio.coroner.response.CoronerHttpException;
 import backtraceio.coroner.serialization.CoronerResponseGroupDeserializer;
 import backtraceio.coroner.serialization.GsonWrapper;
 
-class CoronerHttpClient {
+class CoronerHttpClient implements HttpClient {
     private static final Logger LOGGER = Logger.getLogger(CoronerResponseGroupDeserializer.class.getName());
     private final String apiUrl;
     private final String coronerToken;
