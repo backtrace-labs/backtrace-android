@@ -34,8 +34,8 @@ android {
         }
         defaultConfig {
             buildConfigField ("String", "BACKTRACE_SUBMISSION_URL", getProperty("BACKTRACE_SUBMISSION_URL", "null"))
-            buildConfigField ("String", "BACKTRACE_CORONER_URL", getProperty("BACKTRACE_CORONER_URL", ""))
-            buildConfigField ("String", "BACKTRACE_CORONER_TOKEN", getProperty("BACKTRACE_CORONER_TOKEN", ""))
+            buildConfigField ("String", "BACKTRACE_CORONER_URL", getProperty("BACKTRACE_CORONER_URL", "null"))
+            buildConfigField ("String", "BACKTRACE_CORONER_TOKEN", getProperty("BACKTRACE_CORONER_TOKEN", "null"))
         }
     }
 }
