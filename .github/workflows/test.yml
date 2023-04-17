@@ -30,6 +30,8 @@ jobs:
       - name: Write to local.properties
         run: |
           echo BACKTRACE_SUBMISSION_URL=\"https://submit.backtrace.io/yolo/2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4/json\" > ./local.properties
+          echo BACKTRACE_CORONER_URL=\"https://yolo.sp.backtrace.io/api/query?project=android-library\"
+          echo BACKTRACE_CORONER_TOKEN=\"4d1c52a829fa4b53c3c421d163f327e6bfaa5304e756a71249174ab2e1603f8a\"
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check

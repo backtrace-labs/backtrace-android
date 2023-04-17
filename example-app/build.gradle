@@ -33,18 +33,20 @@ android {
             abortOnError false
         }
         defaultConfig {
-            buildConfigField ("String", "BACKTRACE_SUBMISSION_URL", getSubmissionUrl())
+            buildConfigField ("String", "BACKTRACE_SUBMISSION_URL", getProperty("BACKTRACE_SUBMISSION_URL", "null"))
+            buildConfigField ("String", "BACKTRACE_CORONER_URL", getProperty("BACKTRACE_CORONER_URL", ""))
+            buildConfigField ("String", "BACKTRACE_CORONER_TOKEN", getProperty("BACKTRACE_CORONER_TOKEN", ""))
         }
     }
 }
 
-String getSubmissionUrl() {
+String getProperty(String name, String defaultValue) {
     if (!rootProject.file("./local.properties").exists()) {
-        return "null"
+        return defaultValue
     }
     def properties = new Properties()
     properties.load(rootProject.file("./local.properties").newDataInputStream())
-    return properties.containsKey('BACKTRACE_SUBMISSION_URL') ? properties['BACKTRACE_SUBMISSION_URL'] : "null"  
+    return properties.containsKey(name) ? properties[name] : defaultValue
 }
 
 dependencies {
