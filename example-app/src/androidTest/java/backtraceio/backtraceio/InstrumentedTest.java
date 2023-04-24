@@ -13,6 +13,8 @@ public class InstrumentedTest {
     public static void init() {
         String url = BuildConfig.BACKTRACE_CORONER_URL;
         String coronerToken = BuildConfig.BACKTRACE_CORONER_TOKEN;
+
+        "test"
         coronerClient = new CoronerClient(url, coronerToken);
     }
 
