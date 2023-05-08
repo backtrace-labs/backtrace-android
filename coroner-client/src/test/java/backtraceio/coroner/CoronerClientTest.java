@@ -39,7 +39,7 @@ public class CoronerClientTest {
     }
 
     @Test
-    public void rxIdFilter() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException { // todo: replace method name
+    public void rxIdFilter() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
         // GIVEN
         final String expectedJsonQuery = readResourceFile(QUERY_CORONER_RXID_123);
         final String jsonResponse = readResourceFile(RESPONSE_RX_FILTER_CORONER_JSON);
@@ -59,7 +59,7 @@ public class CoronerClientTest {
     }
 
     @Test
-    public void rxIdFilterAttributes() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException { // todo: replace method name
+    public void rxIdFilterAttributes() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
         // GIVEN
         final String expectedJsonQuery = readResourceFile(QUERY_CORONER_RXID_123_ATTR_ERR_MSG);
         final String jsonResponse = readResourceFile(RESPONSE_RX_FILTER_CORONER_JSON);
