@@ -28,6 +28,7 @@ class BacktraceWatchdogShared {
         if (onApplicationNotRespondingEvent != null) {
             onApplicationNotRespondingEvent.onEvent(exception);
         } else if (backtraceClient != null) {
+            backtraceClient.addBreadcrumb("ANR detected - thread is blocked");
             BacktraceReport report = new BacktraceReport(exception, new HashMap<String, Object>() {{
                 put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
             }});
