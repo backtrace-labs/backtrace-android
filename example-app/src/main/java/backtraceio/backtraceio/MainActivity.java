@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     public void enableBreadcrumbs(View view) throws Exception {
         Context appContext = view.getContext().getApplicationContext();
         if (backtraceClient == null) {
-            throw new Exception("BacktraceClient is null");
+            throw new Exception("Backtrace client integration is not initialized");
         }
 
         if (appContext == null) {
