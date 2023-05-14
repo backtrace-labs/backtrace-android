@@ -62,8 +62,9 @@ class CoronerHttpClient implements HttpClient {
     }
 
     private static InputStream getInputStream(final HttpURLConnection urlConnection) throws IOException {
-        if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST)
+        if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
             return urlConnection.getInputStream();
+        }
         return urlConnection.getErrorStream();
     }
 
