@@ -49,15 +49,15 @@ class CoronerHttpClient implements HttpClient {
 
         final InputStream inputStream = getInputStream(urlConnection);
 
-        final BufferedReader br = new BufferedReader(new InputStreamReader(
+        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
                 inputStream));
 
         final StringBuilder responseSB = new StringBuilder();
         String line;
-        while ((line = br.readLine()) != null) {
+        while ((line = bufferedReader.readLine()) != null) {
             responseSB.append(line);
         }
-        br.close();
+        bufferedReader.close();
         return responseSB.toString();
     }
 
