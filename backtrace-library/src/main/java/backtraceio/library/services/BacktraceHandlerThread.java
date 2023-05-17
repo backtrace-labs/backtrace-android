@@ -83,7 +83,7 @@ public class BacktraceHandlerThread extends HandlerThread {
             BacktraceResult result;
             if (mInput.requestHandler != null) {
                 BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
-                result = mInput.requestHandler.onRequest(mInput.data);
+                result = mInput.requestHandler.onRequest(url, mInput.data);
             } else {
                 BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
                 String json = BacktraceSerializeHelper.toJson(mInput.data);
