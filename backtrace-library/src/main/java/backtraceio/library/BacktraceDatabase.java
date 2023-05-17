@@ -175,6 +175,11 @@ public class BacktraceDatabase implements Database {
         if (minidumpSubmissionUrl == null) {
             return false;
         }
+        
+        if (client.usesCustomRequestHandler()) {
+            minidumpSubmissionUrl = "";
+        }
+
         // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
 
