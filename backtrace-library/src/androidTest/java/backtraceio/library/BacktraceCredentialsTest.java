@@ -1,6 +1,7 @@
 package backtraceio.library;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.net.Uri;
@@ -82,12 +83,12 @@ public class BacktraceCredentialsTest {
     @Test
     public void generateEmptyTokenForInvalidSubmissionUrl() {
         BacktraceCredentials backtraceCredentials = new BacktraceCredentials("https://submit.backtrace.io/");
-        assertTrue(backtraceCredentials.getSubmissionToken() == null);
+        assertNull(backtraceCredentials.getSubmissionToken());
     }
 
     @Test
     public void generateEmptyTokenForInvalidLegacyUrl() {
         BacktraceCredentials backtraceCredentials = new BacktraceCredentials("https://universe.sp.backtrace.io/");
-        assertTrue(backtraceCredentials.getSubmissionToken() == null);
+        assertNull(backtraceCredentials.getSubmissionToken());
     }
 }
