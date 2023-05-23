@@ -1,8 +1,11 @@
 package backtraceio.library;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.net.Uri;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
@@ -75,5 +78,17 @@ public class BacktraceCredentialsTest {
     public void createBacktraceCredentialsWithLegacyUriAndGetSubmissionToken() {
         BacktraceCredentials backtraceCredentials = new BacktraceCredentials(Uri.parse(legacyUrl));
         assertEquals(fakeToken, backtraceCredentials.getSubmissionToken());
+    }
+
+    @Test
+    public void generateEmptyTokenForInvalidSubmissionUrl() {
+        BacktraceCredentials backtraceCredentials = new BacktraceCredentials("https://submit.backtrace.io/");
+        assertNull(backtraceCredentials.getSubmissionToken());
+    }
+
+    @Test
+    public void generateEmptyTokenForInvalidLegacyUrl() {
+        BacktraceCredentials backtraceCredentials = new BacktraceCredentials("https://universe.sp.backtrace.io/");
+        assertNull(backtraceCredentials.getSubmissionToken());
     }
 }

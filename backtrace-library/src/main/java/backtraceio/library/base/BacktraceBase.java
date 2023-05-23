@@ -567,14 +567,15 @@ public class BacktraceBase implements Client {
         return new OnServerResponseEventListener() {
             @Override
             public void onEvent(BacktraceResult backtraceResult) {
-                if (customCallback != null) {
-                    customCallback.onEvent(backtraceResult);
-                }
                 if (record != null) {
                     record.close();
                 }
                 if (backtraceResult != null && backtraceResult.status == BacktraceResultStatus.Ok) {
                     database.delete(record);
+                }
+
+                if (customCallback != null) {
+                    customCallback.onEvent(backtraceResult);
                 }
             }
         };
