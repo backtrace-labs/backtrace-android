@@ -1,5 +1,6 @@
 package backtraceio.library;
 
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -7,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import android.content.Context;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -30,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
+import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
@@ -306,6 +309,19 @@ public class BacktraceClientBreadcrumbsTest {
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
+    }
+
+    @Test
+    public void verifyBreadcrumbCallbackInvocation() {
+        backtraceClient.enableBreadcrumbs(context);
+        Breadcrumbs breadcrumbs = backtraceClient.database.getBreadcrumbs();
+
+        breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
+            assertEquals(breadcrumbs.getCurrentBreadcrumbId(), breadcrumbId);
+            return;
+        });
+
+        breadcrumbs.addBreadcrumb("test");
     }
 
     public List<String> readBreadcrumbLogFile() throws IOException {

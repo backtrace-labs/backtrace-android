@@ -9,6 +9,7 @@ import java.util.Map;
 
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.events.OnSuccessfulBreadcrumbAddEventListener;
 import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.BacktraceReport;
@@ -16,6 +17,11 @@ import backtraceio.library.models.json.BacktraceReport;
 public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     private static final transient String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
+
+    /**
+     * Event which will be executed after storing successfully breadcurmbs
+     */
+    private OnSuccessfulBreadcrumbAddEventListener onSuccessfulBreadcrumbAddEventListener = null;
 
     /**
      * Which breadcrumb types are enabled?
@@ -52,6 +58,15 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     public BacktraceBreadcrumbs(String breadcrumbLogDirectory) {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
+    }
+
+    /**
+     * Set event executed after adding a breadcrumb to the file
+     *
+     * @param eventListener object with method which will be executed
+     */
+    public void setOnSuccessfulBreadcrumbAddEventListener(OnSuccessfulBreadcrumbAddEventListener eventListener) {
+        this.onSuccessfulBreadcrumbAddEventListener = eventListener;
     }
 
     private void unregisterAutomaticBreadcrumbReceivers() {
@@ -272,10 +287,15 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      */
     @Override
     public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
-        if (this.isBreadcrumbsEnabled() && backtraceBreadcrumbsLogManager != null) {
-            return backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
+        if (!this.isEnabled() || backtraceBreadcrumbsLogManager == null) {
+            return false;
         }
-        return false;
+        boolean addResult = backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
+        if (addResult && this.onSuccessfulBreadcrumbAddEventListener != null) {
+            this.onSuccessfulBreadcrumbAddEventListener.onSuccessfulAdd(this.getCurrentBreadcrumbId());
+        }
+
+        return addResult;
     }
 
     /**
@@ -285,7 +305,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      */
     @Override
     public void processReportBreadcrumbs(BacktraceReport backtraceReport) {
-        if (!this.isBreadcrumbsEnabled()) {
+        if (!this.isEnabled()) {
             return;
         }
 
@@ -325,7 +345,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
                 BacktraceBreadcrumbLevel.INFO);
     }
 
-    private boolean isBreadcrumbsEnabled() {
+    /**
+     * Determinate if Breadcrumbs are enabled.
+     * @return true if breadcrumbs are enabled.
+     */
+    public boolean isEnabled() {
         return enabledBreadcrumbTypes != null && !enabledBreadcrumbTypes.isEmpty();
     }
 
