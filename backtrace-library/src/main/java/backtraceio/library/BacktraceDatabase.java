@@ -213,6 +213,12 @@ public class BacktraceDatabase implements Database {
                 enableClientSideUnwinding,
                 unwindingMode
         );
+
+        if (initialized && this.breadcrumbs.isEnabled()) {
+            this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
+                this.addAttribute("breadcrumbs.lastId", Long.toString((breadcrumbId)));
+            });
+        }
         return initialized;
     }
 
