@@ -177,12 +177,11 @@ public class BacktraceDatabase implements Database {
         }
         // Path to Crashpad native handler
         String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
-        File handlerPathFile = new File(handlerPath);
-        if (!handlerPathFile.exists()) {
+        if (!FileHelper.isFileExists(handlerPath)) {
             return false;
         }
 
-        // setup default native attribtues
+        // setup default native attributes
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
         crashpadAttributes.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.CrashAttributeType);
         String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
