@@ -1,5 +1,10 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.7
+- Added a new attribute to native reports - `breadcrumbs.lastId`
+- Fixed invalid `BacktraceCredentials` behavior when the user passed an invalid Backtrace URL
+- Capture invalid native crash reporting handler path in the initialize method 
+
 ## Version 3.7.6
 - Maintenance: Update various components to latest versions
 - Maintenance: Update gradle
