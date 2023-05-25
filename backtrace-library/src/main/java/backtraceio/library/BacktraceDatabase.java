@@ -31,6 +31,7 @@ import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
+import backtraceio.library.services.BacktraceNativeCrashResponseListener;
 
 /**
  * Backtrace Database
@@ -204,6 +205,11 @@ public class BacktraceDatabase implements Database {
         // Create the crashpad directory if it doesn't exist
         File crashHandlerDir = new File(databasePath);
         crashHandlerDir.mkdir();
+
+        // Check if there are still files to send if there is a custom RequestHandler
+        if (client.usesCustomRequestHandler()) {
+            BacktraceNativeCrashResponseListener.UploadMinidumps(client, databasePath);
+        }
 
         Boolean initialized = initialize(
                 minidumpSubmissionUrl,
