@@ -1,6 +1,7 @@
 package backtraceio.library.events;
 
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 
 /**
@@ -14,4 +15,6 @@ public interface RequestHandler {
      * @return response on request
      */
     BacktraceResult onRequest(String url, BacktraceData data);
+
+    BacktraceResult onNativeRequest(String url, BacktraceNativeData data);
 }
