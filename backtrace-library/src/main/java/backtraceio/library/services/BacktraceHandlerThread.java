@@ -4,12 +4,14 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import java.util.List;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 
 public class BacktraceHandlerThread extends HandlerThread {
@@ -83,7 +85,18 @@ public class BacktraceHandlerThread extends HandlerThread {
             BacktraceResult result;
             if (mInput.requestHandler != null) {
                 BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
-                result = mInput.requestHandler.onRequest(url, mInput.data);
+                boolean containsMinidump = false;
+                for (String attachment: mInput.data.getAttachments()) {
+                    if (attachment.endsWith(".dmp"))
+                        containsMinidump = true;
+                }
+                if (mInput.data.report.message == "" && containsMinidump) {
+                    BacktraceLogger.d(LOG_TAG, "Minidump report detected");
+                    result = mInput.requestHandler.onNativeRequest(
+                            url.replace("json", "minidump"),
+                            new BacktraceNativeData(mInput.data.context, mInput.data.report));
+                } else
+                    result = mInput.requestHandler.onRequest(url, mInput.data);
             } else {
                 BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
                 String json = BacktraceSerializeHelper.toJson(mInput.data);
