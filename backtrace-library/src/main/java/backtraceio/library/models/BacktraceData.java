@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.common.BacktraceConstants;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
@@ -191,5 +192,18 @@ public class BacktraceData {
         this.threadInformationMap = threadData.threadInformation;
         SourceCodeData sourceCodeData = new SourceCodeData(report.diagnosticStack);
         this.sourceCode = sourceCodeData.data.isEmpty() ? null : sourceCodeData.data;
+    }
+
+    /**
+     * Check if there is a minidump amongst the attachments
+     * @return
+     */
+    public boolean containsMinidump() {
+        for(String attachment: this.getAttachments()) {
+            if (attachment.endsWith(BacktraceConstants.MinidumpExtension)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
