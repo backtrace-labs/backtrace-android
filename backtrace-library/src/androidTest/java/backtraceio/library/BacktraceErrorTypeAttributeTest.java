@@ -20,6 +20,7 @@ import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
@@ -60,9 +61,14 @@ public class BacktraceErrorTypeAttributeTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);

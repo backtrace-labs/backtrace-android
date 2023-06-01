@@ -25,6 +25,7 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceExceptionHandler;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
@@ -138,11 +139,16 @@ public class SettingAttributesTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null, this.clientAttributes);
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 assertNotNull(data.attributes);
                 assertTrue(data.attributes.containsKey(customClientAttributeKey));
                 assertEquals(data.attributes.get(customClientAttributeKey), customClientAttributeValue);
                 return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -171,10 +177,9 @@ public class SettingAttributesTest {
         Thread customThread = new Thread(new Runnable() {
             public void run() {
                 final BacktraceClient backtraceClient = new BacktraceClient(context, backtraceCredentials);
-                backtraceClient.setOnRequestHandler(new RequestHandler() {
+                RequestHandler rh = new RequestHandler() {
                     @Override
-                    public BacktraceResult onRequest(BacktraceData data) {
-                        // THEN
+                    public BacktraceResult onRequest(String url, BacktraceData data) {
                         waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
                         waiter.assertEquals(customClientAttributeValue, data.report.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.report.exception.getMessage());
@@ -182,7 +187,13 @@ public class SettingAttributesTest {
                         waiter.resume();
                         return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
                     }
-                });
+
+                    @Override
+                    public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                        return null;
+                    }
+                };
+                backtraceClient.setOnRequestHandler(rh);
                 BacktraceExceptionHandler.enable(backtraceClient);
                 BacktraceExceptionHandler.setCustomAttributes(clientAttributes);
                 throw new ArithmeticException(exceptionMessage);

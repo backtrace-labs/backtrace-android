@@ -26,6 +26,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -149,9 +150,14 @@ public class BacktraceDatabaseTest {
         final List<Integer> requestsCounter = new ArrayList<>();
         backtraceClient.setOnRequestHandler(new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 requestsCounter.add(1);
                 waiter.resume();
+                return null;
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
                 return null;
             }
         });

@@ -27,6 +27,7 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
@@ -53,10 +54,17 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(null, data.report.exception.getMessage(),
                         BacktraceResultStatus.ServerError);
             }
+
+            // Unused method for this test
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
+            }
+
         };
         backtraceClient.setOnRequestHandler(rh);
 
@@ -91,31 +99,40 @@ public class BacktraceClientSendTest {
         final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
         final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
-        RequestHandler rh = data -> {
-            String jsonString = BacktraceSerializeHelper.toJson(data);
+        RequestHandler rh = new RequestHandler() {
+            @Override
+            public BacktraceResult onRequest(String url, BacktraceData data) {
+                String jsonString = BacktraceSerializeHelper.toJson(data);
 
-            try {
-                // THEN
-                final JSONObject jsonObject = new JSONObject(jsonString);
-                final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
-                final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
+                try {
+                    // THEN
+                    final JSONObject jsonObject = new JSONObject(jsonString);
+                    final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
+                    final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
 
-                assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
-                assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
-                assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
+                    assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
+                    assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
+                    assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
 
-                final JSONObject firstCause = exceptionProperties.getJSONObject("cause");
-                assertEquals("java.lang.IllegalArgumentException: New Exception", firstCause.getString("detail-message"));
+                    final JSONObject firstCause = exceptionProperties.getJSONObject("cause");
+                    assertEquals("java.lang.IllegalArgumentException: New Exception", firstCause.getString("detail-message"));
 
-                final JSONObject secondCause = firstCause.getJSONObject("cause");
-                assertEquals(lastExceptionExpectedMessage, secondCause.getString("detail-message"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-                fail(e.getMessage());
+                    final JSONObject secondCause = firstCause.getJSONObject("cause");
+                    assertEquals(lastExceptionExpectedMessage, secondCause.getString("detail-message"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    fail(e.getMessage());
+                }
+
+                return new BacktraceResult(data.report, data.report.message,
+                        BacktraceResultStatus.Ok);
             }
 
-            return new BacktraceResult(data.report, data.report.message,
-                    BacktraceResultStatus.Ok);
+            // Unused method for this test
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
+            }
         };
         backtraceClient.setOnRequestHandler(rh);
 
@@ -139,9 +156,14 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -174,9 +196,14 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -212,9 +239,14 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -247,9 +279,14 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -287,12 +324,16 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         final String[] messages = {"1", "2", "3"};
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-
         RequestHandler rh = new RequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
+            }
+
+            @Override
+            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
