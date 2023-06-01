@@ -48,7 +48,7 @@ public class BacktraceNativeCrashResponseListener
             BacktraceLogger.e(LOG_TAG, "Backtrace client can't be null");
             return;
         }
-        if (databasePath == "") {
+        if (databasePath.equals("")) {
             BacktraceLogger.e(LOG_TAG, "Database path cannot be null");
             return;
         }
@@ -118,7 +118,7 @@ public class BacktraceNativeCrashResponseListener
         if (from.exists()) {
             boolean success = from.renameTo(to);
             if (!success) {
-                BacktraceLogger.e(LOG_TAG, "" + "Failed to move: " + from.getAbsolutePath()
+                BacktraceLogger.e(LOG_TAG, "Failed to move: " + from.getAbsolutePath()
                         + " to: " + to.getAbsolutePath());
             } else {
                 from.delete();
