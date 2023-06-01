@@ -71,16 +71,16 @@ public class BacktraceNativeCrashResponseListener
     private static List<File> scanForNewMinidumps(String databasePath) {
         List<File> minidumps = new ArrayList<>();
         FilenameFilter minidumpFilter = (dir, name) -> name.endsWith(".dmp");
-        String[] newFiles = new File(databasePath + "/new").list(minidumpFilter);
-        String[] pendFiles = new File(databasePath + "/pending").list(minidumpFilter);
+        String[] newFiles = new File(databasePath + "/" + BacktraceConstants.NewFolder).list(minidumpFilter);
+        String[] pendFiles = new File(databasePath + "/" + BacktraceConstants.PendingFolder).list(minidumpFilter);
         if (newFiles != null) {
             for (String file : newFiles) {
-                minidumps.add(new File(databasePath + "/new/" + file));
+                minidumps.add(new File(databasePath + "/" + BacktraceConstants.NewFolder + "/" + file));
             }
         }
         if (pendFiles != null) {
             for (String file : pendFiles) {
-                minidumps.add(new File(databasePath + "/pending/" + file));
+                minidumps.add(new File(databasePath + "/" + BacktraceConstants.PendingFolder + "/" + file));
             }
         }
         return minidumps;
@@ -89,8 +89,8 @@ public class BacktraceNativeCrashResponseListener
     private static BacktraceReport createBacktraceReport(File minidump, String databasePath) {
         BacktraceReport report = new BacktraceReport("");
         report.attachmentPaths.add(minidump.getAbsolutePath());
-        String attachmentPath = databasePath + "/attachments/"
-                + minidump.getName().replace(".dmp", "");
+        String attachmentPath = databasePath + "/" + BacktraceConstants.AttachmentsFolder + "/"
+                + minidump.getName().replace(BacktraceConstants.MinidumpExtension, "");
         File attachmentsDir = new File(attachmentPath);
         if (attachmentsDir.isDirectory()) {
             for (String file: attachmentsDir.list()) {
@@ -103,12 +103,12 @@ public class BacktraceNativeCrashResponseListener
     private void moveToCompleted(String minidumpPath) {
         String regex = "/(" + BacktraceConstants.NewFolder + "|" + BacktraceConstants.PendingFolder
                 + ")/";
-        String minidumpOutputPath = minidumpPath.replaceAll(regex, "/completed/");
+        String minidumpOutputPath = minidumpPath.replaceAll(regex, "/" + BacktraceConstants.CompletedFolder + "/");
         String metaDataPath = minidumpPath.replace(BacktraceConstants.MinidumpExtension,
                 BacktraceConstants.MetadataExtension);
-        String metaDataCompletedPath = metaDataPath.replaceAll(regex, "/completed/");
+        String metaDataCompletedPath = metaDataPath.replaceAll(regex, "/" + BacktraceConstants.CompletedFolder + "/");
         if (moveFile(minidumpPath, minidumpOutputPath))
-            moveFile(metaDataPath, minidumpOutputPath);
+            moveFile(metaDataPath, metaDataCompletedPath);
     }
 
     private boolean moveFile(String fromPath, String toPath) {
