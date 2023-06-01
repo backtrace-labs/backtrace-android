@@ -50,6 +50,7 @@ public class BacktraceNativeCrashResponseListener
         }
         if (databasePath == "") {
             BacktraceLogger.e(LOG_TAG, "Database path cannot be null");
+            return;
         }
         if (instance == null) {
             instance = new BacktraceNativeCrashResponseListener();
