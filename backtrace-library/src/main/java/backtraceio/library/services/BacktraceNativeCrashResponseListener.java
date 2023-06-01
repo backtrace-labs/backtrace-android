@@ -17,12 +17,10 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 public class BacktraceNativeCrashResponseListener
         implements OnServerResponseEventListener {
-    private static transient final String LOG_TAG = BacktraceNativeCrashResponseListener.
+    private static final String LOG_TAG = BacktraceNativeCrashResponseListener.
             class.getSimpleName();
 
     private static BacktraceNativeCrashResponseListener instance;
-    private static BacktraceClient client;
-    private static String databasePath;
 
     private BacktraceNativeCrashResponseListener() {}
 
