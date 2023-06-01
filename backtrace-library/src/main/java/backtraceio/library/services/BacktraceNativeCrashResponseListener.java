@@ -6,14 +6,17 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.common.BacktraceConstants;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import kotlin.text.Regex;
 
 public class BacktraceNativeCrashResponseListener
         implements OnServerResponseEventListener {
@@ -98,29 +101,26 @@ public class BacktraceNativeCrashResponseListener
     }
 
     private void moveToCompleted(String minidumpPath) {
-        String outputPath = minidumpPath.replace("/new/", "/completed/")
-                .replace("/pending/", "/completed/");
-        File from = new File(minidumpPath);
-        File to = new File(outputPath);
+        String minidumpOutputPath = minidumpPath.replaceAll("/(new|pending)/", "/completed/");
+        String metaDataPath = minidumpPath.replace(BacktraceConstants.MinidumpExtension,
+                BacktraceConstants.MetadataExtension);
+        String metaDataCompletedPath = metaDataPath.replaceAll("/(new|pending)/", "/completed/");
+        if (moveFile(minidumpPath, minidumpOutputPath))
+            moveFile(metaDataPath, minidumpOutputPath);
+    }
+
+    private boolean moveFile(String fromPath, String toPath) {
+        File from = new File(fromPath);
         if (from.exists()) {
+            File to = new File(toPath);
             boolean success = from.renameTo(to);
-            if (!success) {
-                BacktraceLogger.e(LOG_TAG, "Failed to move minidump to completed folder: "
-                        + minidumpPath);
-            } else {
+            if (success) {
                 from.delete();
+                return true;
             }
         }
-        from = new File(minidumpPath.replace(".dmp", ".meta"));
-        to = new File(outputPath.replace(".dmp", ".meta"));
-        if (from.exists()) {
-            boolean success = from.renameTo(to);
-            if (!success) {
-                BacktraceLogger.e(LOG_TAG, "Failed to move: " + from.getAbsolutePath()
-                        + " to: " + to.getAbsolutePath());
-            } else {
-                from.delete();
-            }
-        }
+        BacktraceLogger.e(LOG_TAG, "Failed to move file to completed folder: "
+                + fromPath);
+        return false;
     }
 }
