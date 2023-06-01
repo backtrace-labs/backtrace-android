@@ -85,16 +85,11 @@ public class BacktraceHandlerThread extends HandlerThread {
             BacktraceResult result;
             if (mInput.requestHandler != null) {
                 BacktraceLogger.d(LOG_TAG, "Sending using custom request handler");
-                boolean containsMinidump = false;
-                for (String attachment: mInput.data.getAttachments()) {
-                    if (attachment.endsWith(".dmp"))
-                        containsMinidump = true;
-                }
-                if (mInput.data.report.message == "" && containsMinidump) {
+                if (mInput.data.report.message == "" && mInput.data.containsMinidump()) {
                     BacktraceLogger.d(LOG_TAG, "Minidump report detected");
                     result = mInput.requestHandler.onNativeRequest(
                             url.replace("json", "minidump"),
-                            new BacktraceNativeData(mInput.data.context, mInput.data.report));
+                            new BacktraceNativeData(mInput.data.report));
                 } else
                     result = mInput.requestHandler.onRequest(url, mInput.data);
             } else {
