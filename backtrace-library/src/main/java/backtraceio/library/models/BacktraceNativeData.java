@@ -34,7 +34,7 @@ public final class BacktraceNativeData {
         }
 
         this.report = report;
-        this.minidumpPath = minidumpPath;
+
         if (attachments.size() > 0)
             this.attachments.addAll(attachments);
     }
