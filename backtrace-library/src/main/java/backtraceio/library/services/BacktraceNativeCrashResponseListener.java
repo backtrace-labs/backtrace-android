@@ -101,10 +101,12 @@ public class BacktraceNativeCrashResponseListener
     }
 
     private void moveToCompleted(String minidumpPath) {
-        String minidumpOutputPath = minidumpPath.replaceAll("/(new|pending)/", "/completed/");
+        String regex = "/(" + BacktraceConstants.NewFolder + "|" + BacktraceConstants.PendingFolder
+                + ")/";
+        String minidumpOutputPath = minidumpPath.replaceAll(regex, "/completed/");
         String metaDataPath = minidumpPath.replace(BacktraceConstants.MinidumpExtension,
                 BacktraceConstants.MetadataExtension);
-        String metaDataCompletedPath = metaDataPath.replaceAll("/(new|pending)/", "/completed/");
+        String metaDataCompletedPath = metaDataPath.replaceAll(regex, "/completed/");
         if (moveFile(minidumpPath, minidumpOutputPath))
             moveFile(metaDataPath, minidumpOutputPath);
     }
