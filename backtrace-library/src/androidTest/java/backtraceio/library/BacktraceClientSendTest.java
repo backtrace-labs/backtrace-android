@@ -52,19 +52,12 @@ public class BacktraceClientSendTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(null, data.report.exception.getMessage(),
                         BacktraceResultStatus.ServerError);
             }
-
-            // Unused method for this test
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
-            }
-
         };
         backtraceClient.setOnRequestHandler(rh);
 
@@ -99,7 +92,7 @@ public class BacktraceClientSendTest {
         final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
         final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 String jsonString = BacktraceSerializeHelper.toJson(data);
@@ -127,12 +120,6 @@ public class BacktraceClientSendTest {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
             }
-
-            // Unused method for this test
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
-            }
         };
         backtraceClient.setOnRequestHandler(rh);
 
@@ -154,16 +141,11 @@ public class BacktraceClientSendTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -194,16 +176,11 @@ public class BacktraceClientSendTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -237,16 +214,11 @@ public class BacktraceClientSendTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -277,16 +249,11 @@ public class BacktraceClientSendTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -324,16 +291,11 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         final String[] messages = {"1", "2", "3"};
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);

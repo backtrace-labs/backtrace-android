@@ -70,7 +70,7 @@ public class BacktraceFileAttachments {
 
         // WHEN
         final List<byte[]> fileContents = new ArrayList<>();
-        client.setOnRequestHandler(new RequestHandler() {
+        client.setOnRequestHandler(new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -84,11 +84,6 @@ public class BacktraceFileAttachments {
                     return null;
                 }
                 return new BacktraceResult();
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         });
         client.send(new BacktraceReport("test", null, attachments), new
@@ -125,7 +120,7 @@ public class BacktraceFileAttachments {
         // WHEN
         final List<byte[]> fileContents = new ArrayList<>();
         final List<String> filteredAttachments = FileHelper.filterOutFiles(context, attachments);
-        client.setOnRequestHandler(new RequestHandler() {
+        client.setOnRequestHandler(new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 try {
@@ -140,11 +135,6 @@ public class BacktraceFileAttachments {
                     return null;
                 }
                 return new BacktraceResult();
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         });
         client.send(new BacktraceReport("test", null, attachments), new

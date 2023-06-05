@@ -137,18 +137,13 @@ public class SettingAttributesTest {
         // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceClient backtraceClient = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null, this.clientAttributes);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 assertNotNull(data.attributes);
                 assertTrue(data.attributes.containsKey(customClientAttributeKey));
                 assertEquals(data.attributes.get(customClientAttributeKey), customClientAttributeValue);
                 return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -177,7 +172,7 @@ public class SettingAttributesTest {
         Thread customThread = new Thread(new Runnable() {
             public void run() {
                 final BacktraceClient backtraceClient = new BacktraceClient(context, backtraceCredentials);
-                RequestHandler rh = new RequestHandler() {
+                RequestHandler rh = new TestRequestHandler() {
                     @Override
                     public BacktraceResult onRequest(String url, BacktraceData data) {
                         waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
@@ -186,11 +181,6 @@ public class SettingAttributesTest {
                         waiter.assertEquals(data.report.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.UnhandledExceptionAttributeType);
                         waiter.resume();
                         return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
-                    }
-
-                    @Override
-                    public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                        return null;
                     }
                 };
                 backtraceClient.setOnRequestHandler(rh);

@@ -49,15 +49,10 @@ public class BacktraceClientEventsTest {
         // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(null, resultMessage, BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -88,16 +83,11 @@ public class BacktraceClientEventsTest {
         final Waiter waiter = new Waiter();
 
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(null, data.attributes.get(attributeKey),
                         BacktraceResultStatus.Ok);
-            }
-
-            @Override
-            public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
-                return null;
             }
         };
         backtraceClient.setOnRequestHandler(rh);

@@ -68,9 +68,9 @@ public class BacktraceClientBreadcrumbsTest {
         backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -117,9 +117,9 @@ public class BacktraceClientBreadcrumbsTest {
         backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -176,9 +176,9 @@ public class BacktraceClientBreadcrumbsTest {
         backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -271,9 +271,9 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionNoBreadcrumbs() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(BacktraceData data) {
+            public BacktraceResult onRequest(String url, BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }

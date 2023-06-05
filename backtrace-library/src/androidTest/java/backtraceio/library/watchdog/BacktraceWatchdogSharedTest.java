@@ -24,8 +24,11 @@ import java.util.concurrent.TimeUnit;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.TestRequestHandler;
 import backtraceio.library.breadcrumbs.BreadcrumbsReader;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceWatchdogSharedTest {
@@ -58,15 +61,18 @@ public class BacktraceWatchdogSharedTest {
         backtraceClient.enableBreadcrumbs(context);
         backtraceClient.clearBreadcrumbs();
 
-        backtraceClient.setOnRequestHandler(data -> {
-            String breadcrumbPath = data.report.attachmentPaths.get(0);
+        backtraceClient.setOnRequestHandler(new TestRequestHandler() {
+            @Override
+            public BacktraceResult onRequest(String url, BacktraceData data) {
+                String breadcrumbPath = data.report.attachmentPaths.get(0);
 
-            assertTrue(breadcrumbPath.contains("bt-breadcrumbs"));
-            assertEquals(data.attributes.get("error.type"), AnrAttributeType);
-            assertEquals("ANR detected - thread is blocked", getANRBreadcrumb());
+                assertTrue(breadcrumbPath.contains("bt-breadcrumbs"));
+                assertEquals(data.attributes.get("error.type"), AnrAttributeType);
+                assertEquals("ANR detected - thread is blocked", getANRBreadcrumb());
 
-            waiter.resume();
-            return null;
+                waiter.resume();
+                return null;
+            }
         });
 
         // WHEN
