@@ -14,7 +14,7 @@ public interface RequestHandler {
      * @param data which should be send to Backtrace API
      * @return response on request
      */
-    BacktraceResult onRequest(String url, BacktraceData data);
+    BacktraceResult onRequest(BacktraceData data);
 
-    BacktraceResult onNativeRequest(String url, BacktraceNativeData data);
+    BacktraceResult onNativeRequest(BacktraceNativeData data);
 }
