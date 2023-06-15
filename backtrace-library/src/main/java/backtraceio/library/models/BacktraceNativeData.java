@@ -2,6 +2,7 @@ package backtraceio.library.models;
 
 import android.content.Context;
 import android.icu.util.Output;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,9 +35,6 @@ public final class BacktraceNativeData {
         }
 
         this.report = report;
-
-        if (attachments.size() > 0)
-            this.attachments.addAll(attachments);
     }
 
     /**
@@ -47,21 +45,37 @@ public final class BacktraceNativeData {
      */
     private void organizeAttachments(BacktraceReport report) {
         for (String file: report.attachmentPaths) {
-            if (file.endsWith(BacktraceConstants.MinidumpExtension))
+            if (file.endsWith(BacktraceConstants.MinidumpExtension)) {
                 minidumpPath = file;
-            else
+            }
+            else if (file.contains("/crashpad/")) {
                 attachments.add(file);
+            }
         }
     }
 
+    /**
+     *
+     * @return A list of attachment paths other than the minidump
+     */
     public List<String> getAttachments() {
         return attachments;
     }
 
+    /**
+     *
+     * @return The absolute path to the minidump
+     */
     public String getMinidumpPath() {
         return minidumpPath;
     }
 
+    /**
+     * Send the BacktraceNativeData to an OutputStream in a multipart form POST
+     * @param outputStream outputStream to push the post to
+     * @param boundary HTTP POST boundry for a multipart post
+     * @throws IOException
+     */
     public void postOutputStream(OutputStream outputStream, String boundary) throws IOException {
         if (outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Output stream is null");
@@ -76,6 +90,11 @@ public final class BacktraceNativeData {
         MultiFormRequestHelper.addEndOfRequest(outputStream, boundary);
     }
 
+    /**
+     * Send the BacktraceNativeData to an OutputStream in a multipart form POST
+     * @param outputStream outputStream to push the post to
+     * @throws IOException
+     */
     public void postOutputStream(OutputStream outputStream) throws IOException {
         postOutputStream(outputStream, "*****");
     }
