@@ -2,6 +2,7 @@ package backtraceio.library.common;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLConnection;
@@ -123,8 +124,7 @@ public class MultiFormRequestHelper {
             return;
         }
 
-        String fileContentType = URLConnection.guessContentTypeFromName(FileHelper
-                .getFileNameFromPath(absolutePath));
+        String fileContentType = "application/octet-stream";
 
         outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + boundry +
                 MultiFormRequestHelper.CRLF).getBytes());
@@ -132,6 +132,7 @@ public class MultiFormRequestHelper {
                 .getBytes()));
         outputStream.write(("Content-Type: " + fileContentType + MultiFormRequestHelper.CRLF)
                 .getBytes());
+        outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
         streamFile(outputStream, absolutePath);
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
     }
