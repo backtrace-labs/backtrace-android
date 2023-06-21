@@ -119,7 +119,7 @@ public class MultiFormRequestHelper {
      */
     public static void addMinidump(OutputStream outputStream, String absolutePath, String boundry)
         throws IOException {
-        if (absolutePath == null || outputStream == null) {
+        if (BacktraceStringHelper.isNullOrEmpty(absolutePath) || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
         }
@@ -150,7 +150,8 @@ public class MultiFormRequestHelper {
      */
     private static void addFile(OutputStream outputStream, String absolutePath, String boundary)
         throws IOException {
-        if (absolutePath == null || outputStream == null) {
+
+        if (BacktraceStringHelper.isNullOrEmpty(absolutePath) || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
         }
@@ -185,7 +186,7 @@ public class MultiFormRequestHelper {
      */
     public static void streamFile(OutputStream outputStream, String absolutePath) throws
             IOException {
-        if (outputStream == null || absolutePath == null) {
+        if (outputStream == null || BacktraceStringHelper.isNullOrEmpty(absolutePath)) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
         }
