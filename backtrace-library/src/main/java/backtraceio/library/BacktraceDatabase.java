@@ -208,7 +208,7 @@ public class BacktraceDatabase implements Database {
 
         // Check if there are still files to send if there is a custom RequestHandler
         if (client.usesCustomRequestHandler()) {
-            BacktraceNativeCrashResponseListener.UploadMinidumps(client, databasePath);
+            BacktraceNativeCrashResponseListener.uploadMinidumps(client, databasePath);
         }
 
         Boolean initialized = initialize(
