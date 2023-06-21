@@ -35,7 +35,7 @@ public class BacktraceNativeCrashResponseListener
             if (report != null) {
                 List<String> attachments = report.attachmentPaths;
                 for (String attachment : attachments) {
-                    if (attachment.endsWith(".dmp")) {
+                    if (attachment.endsWith(BacktraceConstants.MinidumpExtension)) {
                         moveToCompleted(attachment);
                         break;
                     }
@@ -44,7 +44,7 @@ public class BacktraceNativeCrashResponseListener
         }
     }
 
-    public static void UploadMinidumps(BacktraceBase client, String databasePath) {
+    public static void uploadMinidumps(BacktraceBase client, String databasePath) {
         if (client == null) {
             BacktraceLogger.e(LOG_TAG, "Backtrace client can't be null");
             return;
@@ -70,7 +70,7 @@ public class BacktraceNativeCrashResponseListener
 
     private static List<File> scanForNewMinidumps(String databasePath) {
         List<File> minidumps = new ArrayList<>();
-        FilenameFilter minidumpFilter = (dir, name) -> name.endsWith(".dmp");
+        FilenameFilter minidumpFilter = (dir, name) -> name.endsWith(BacktraceConstants.MinidumpExtension);
         String[] newFiles = new File(databasePath + "/" + BacktraceConstants.NewFolder).list(minidumpFilter);
         String[] pendFiles = new File(databasePath + "/" + BacktraceConstants.PendingFolder).list(minidumpFilter);
         if (newFiles != null) {

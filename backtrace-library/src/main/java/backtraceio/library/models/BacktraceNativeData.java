@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import backtraceio.library.common.BacktraceConstants;
+import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.logger.BacktraceLogger;
@@ -81,7 +82,7 @@ public final class BacktraceNativeData {
             BacktraceLogger.w(LOG_TAG, "Output stream is null");
             return;
         }
-        if (this.minidumpPath == "") {
+        if (BacktraceStringHelper.isNullOrEmpty(this.minidumpPath)) {
             BacktraceLogger.w(LOG_TAG, "No minidump to upload");
             return;
         }
