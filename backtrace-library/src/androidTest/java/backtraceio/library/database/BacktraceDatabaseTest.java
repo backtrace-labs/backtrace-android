@@ -156,11 +156,6 @@ public class BacktraceDatabaseTest {
                 waiter.resume();
                 return null;
             }
-
-            @Override
-            public BacktraceResult onNativeRequest(BacktraceNativeData data) {
-                return super.onNativeRequest(data);
-            }
         };
         backtraceClient.setOnRequestHandler(rh);
 
