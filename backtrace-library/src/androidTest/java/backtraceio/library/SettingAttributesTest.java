@@ -139,7 +139,7 @@ public class SettingAttributesTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null, this.clientAttributes);
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertNotNull(data.attributes);
                 assertTrue(data.attributes.containsKey(customClientAttributeKey));
                 assertEquals(data.attributes.get(customClientAttributeKey), customClientAttributeValue);
@@ -174,7 +174,7 @@ public class SettingAttributesTest {
                 final BacktraceClient backtraceClient = new BacktraceClient(context, backtraceCredentials);
                 RequestHandler rh = new TestRequestHandler() {
                     @Override
-                    public BacktraceResult onRequest(String url, BacktraceData data) {
+                    public BacktraceResult onRequest(BacktraceData data) {
                         waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
                         waiter.assertEquals(customClientAttributeValue, data.report.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.report.exception.getMessage());

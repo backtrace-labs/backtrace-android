@@ -57,7 +57,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
@@ -96,7 +96,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
@@ -137,7 +137,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
@@ -180,7 +180,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
@@ -224,7 +224,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
@@ -266,7 +266,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
@@ -309,7 +309,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
@@ -351,7 +351,7 @@ public class BacktraceClientProguardTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);

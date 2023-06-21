@@ -60,7 +60,7 @@ public class BacktraceClientAttachmentsTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -103,7 +103,7 @@ public class BacktraceClientAttachmentsTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }

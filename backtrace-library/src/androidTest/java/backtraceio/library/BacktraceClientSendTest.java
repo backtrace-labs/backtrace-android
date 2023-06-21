@@ -54,7 +54,7 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(null, data.report.exception.getMessage(),
                         BacktraceResultStatus.ServerError);
             }
@@ -94,7 +94,7 @@ public class BacktraceClientSendTest {
         final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 String jsonString = BacktraceSerializeHelper.toJson(data);
 
                 try {
@@ -143,7 +143,7 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
             }
@@ -178,7 +178,7 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.message,
                         BacktraceResultStatus.Ok);
             }
@@ -214,9 +214,10 @@ public class BacktraceClientSendTest {
         // GIVEN
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
+
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -251,7 +252,7 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -293,7 +294,7 @@ public class BacktraceClientSendTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }

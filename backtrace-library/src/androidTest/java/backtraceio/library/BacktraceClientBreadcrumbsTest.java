@@ -31,6 +31,7 @@ import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -70,7 +71,7 @@ public class BacktraceClientBreadcrumbsTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -119,7 +120,7 @@ public class BacktraceClientBreadcrumbsTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -178,7 +179,7 @@ public class BacktraceClientBreadcrumbsTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -273,7 +274,7 @@ public class BacktraceClientBreadcrumbsTest {
         final Waiter waiter = new Waiter();
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }

@@ -12,6 +12,7 @@ import net.jodah.concurrentunit.Waiter;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.Request;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class BacktraceClientEventsTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(null, resultMessage, BacktraceResultStatus.Ok);
             }
         };
@@ -85,7 +86,7 @@ public class BacktraceClientEventsTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         RequestHandler rh = new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(null, data.attributes.get(attributeKey),
                         BacktraceResultStatus.Ok);
             }

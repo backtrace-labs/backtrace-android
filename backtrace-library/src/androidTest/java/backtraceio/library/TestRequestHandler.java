@@ -7,11 +7,11 @@ import backtraceio.library.models.BacktraceResult;
 
 public abstract class TestRequestHandler implements RequestHandler {
 
-    public BacktraceResult onRequest(String url, BacktraceData data) {
+    public BacktraceResult onRequest(BacktraceData data) {
         return null;
     }
 
-    public BacktraceResult onNativeRequest(String url, BacktraceNativeData data) {
+    public BacktraceResult onNativeRequest(BacktraceNativeData data) {
         return null;
     }
 }
