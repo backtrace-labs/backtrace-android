@@ -63,7 +63,7 @@ public class BacktraceWatchdogSharedTest {
 
         backtraceClient.setOnRequestHandler(new TestRequestHandler() {
             @Override
-            public BacktraceResult onRequest(String url, BacktraceData data) {
+            public BacktraceResult onRequest(BacktraceData data) {
                 String breadcrumbPath = data.report.attachmentPaths.get(0);
 
                 assertTrue(breadcrumbPath.contains("bt-breadcrumbs"));
