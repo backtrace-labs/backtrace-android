@@ -61,7 +61,7 @@ public class CoronerClient {
 
     private CoronerResponse makeRequest(final JsonObject coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
         final CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery.toString());
-        System.out.println(coronerQuery.toString());
+        
         if (response.error != null) {
             throw new CoronerResponseException(response.getError());
         }

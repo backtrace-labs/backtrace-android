@@ -27,23 +27,13 @@ class CoronerQueryBuilder {
         subGroup.add(groupName);
         group.add(subGroup);
 
-
-        result.add("fold", folds);
-        result.add("group", group);
-        result.add("offset", new JsonPrimitive(OFFSET));
-        result.add("limit", new JsonPrimitive(LIMIT));
-        result.add("filter", filters);
+        result.add(Constants.FOLD, folds);
+        result.add(Constants.GROUP, group);
+        result.add(Constants.OFFSET, new JsonPrimitive(OFFSET));
+        result.add(Constants.LIMIT, new JsonPrimitive(LIMIT));
+        result.add(Constants.FILTER, filters);
 
         return result;
-//        return "{" +
-//                "\"group\":[" +
-//                "  [\"" + groupName + "\"]" +
-//                "]," +
-//                "\"fold\": {" + folds + "}," +
-//                "   \"offset\":" + OFFSET + "," +
-//                "   \"limit\":" + LIMIT + "," +
-//                "   \"filter\":[" + filters + "]" +
-//                "}";
     }
     private JsonObject joinHeadFolds(final List<String> folds) {
         final JsonObject result = new JsonObject();
