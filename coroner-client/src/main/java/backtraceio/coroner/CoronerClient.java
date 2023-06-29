@@ -1,5 +1,7 @@
 package backtraceio.coroner;
 
+import com.google.gson.JsonObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ public class CoronerClient {
     public CoronerResponse rxIdFilter(final String rxId, final List<String> customAttributes) throws CoronerResponseException, CoronerHttpException, IOException {
         final List<String> attributes = concatAttributes(customAttributes);
 
-        final String coronerQuery = this.coronerQueries.filterByRxId(rxId, attributes);
+        final JsonObject coronerQuery = this.coronerQueries.filterByRxId(rxId, attributes);
 
         return makeRequest(coronerQuery);
     }
@@ -46,7 +48,7 @@ public class CoronerClient {
     public CoronerResponse errorTypeTimestampFilter(final String errorType, final String timestampLeast, final String timestampMost, final List<String> customAttributes) throws CoronerResponseException, IOException, CoronerHttpException {
         final List<String> attributes = concatAttributes(customAttributes);
 
-        String coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampLeast, timestampMost, attributes);
+        final JsonObject coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampLeast, timestampMost, attributes);
 
         return makeRequest(coronerQuery);
     }
@@ -57,9 +59,9 @@ public class CoronerClient {
         return result;
     }
 
-    private CoronerResponse makeRequest(final String coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
-        final CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery);
-
+    private CoronerResponse makeRequest(final JsonObject coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
+        final CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery.toString());
+        System.out.println(coronerQuery.toString());
         if (response.error != null) {
             throw new CoronerResponseException(response.getError());
         }

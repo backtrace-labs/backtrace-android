@@ -1,5 +1,8 @@
 package backtraceio.coroner.query;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
 public class CoronerValueFilter {
     public final FilterOperator operator;
     public final Object value;
@@ -11,9 +14,15 @@ public class CoronerValueFilter {
 
     @Override
     public String toString() {
-        return "[" +
-                " \"" + operator.toString() + "\"," +
-                " \"" + value.toString() + "\"" +
-                " ]";
+        return this.get().toString();
+    }
+
+    public JsonElement get() {
+        JsonArray result = new JsonArray();
+
+        result.add(operator.toString());
+        result.add(value.toString());
+
+        return result;
     }
 }

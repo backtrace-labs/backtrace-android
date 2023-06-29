@@ -2,6 +2,8 @@ package backtraceio.coroner.query;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.gson.JsonArray;
+
 import org.junit.Test;
 
 import backtraceio.coroner.utils.StringUtils;
@@ -14,10 +16,10 @@ public class CoronerFiltersBuilderTest {
         final CoronerFiltersBuilder filtersBuilder = new CoronerFiltersBuilder();
 
         // WHEN
-        String result = filtersBuilder.get();
+        final JsonArray result = filtersBuilder.getJson();
 
         // THEN
-        assertEquals("{ }", StringUtils.normalizeSpace(result));
+        assertEquals("[{}]", StringUtils.normalizeSpace(result.toString()));
     }
 
     @Test
@@ -30,11 +32,11 @@ public class CoronerFiltersBuilderTest {
 
         // WHEN
         filtersBuilder.addFilter(name, operator, value);
-        final String result = filtersBuilder.get();
+        final JsonArray result = filtersBuilder.getJson();
 
         // THEN
-        final String expectedResult = "{ \"_rxid\": [[ \"equal\", \"03000000-4f0a-fd08-0000-000000000000\" ]] }";
-        assertEquals(expectedResult, result);
+        final String expectedResult = "[{\"_rxid\":[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"]]}]";
+        assertEquals(expectedResult, result.toString());
     }
 
     @Test
@@ -59,10 +61,10 @@ public class CoronerFiltersBuilderTest {
         filtersBuilder.addFilter(filter1Name, filter1Operator2, filter1Value2);
         filtersBuilder.addFilter(filter2Name, filter2Operator, filter2Value);
 
-        final String result = filtersBuilder.get();
+        final String result = filtersBuilder.getJson().toString();
 
         // THEN
-        final String expectedResult = "{ \"_rxid\": [[ \"equal\", \"03000000-4f0a-fd08-0000-000000000000\" ],[ \"at-least\", \"4f0a0000-4f0a-fd08-0000-999000999000\" ]],\"example_field\": [[ \"at-most\", \"12345678-4f0b-fdp2-0001-000094000000\" ]] }";
+        final String expectedResult = "[{\"_rxid\":[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"],[\"at-least\",\"4f0a0000-4f0a-fd08-0000-999000999000\"]],\"example_field\":[[\"at-most\",\"12345678-4f0b-fdp2-0001-000094000000\"]]}]";
         assertEquals(expectedResult, result);
     }
 }

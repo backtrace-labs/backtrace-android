@@ -1,5 +1,9 @@
 package backtraceio.coroner.query;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +24,17 @@ public class CoronerFieldFilter {
         values.add(new CoronerValueFilter(operator, value));
     }
 
-    @Override
-    public String toString() {
-        final List<String> result = new ArrayList<>();
+    public JsonArray getFilterValues() {
+        final JsonArray result = new JsonArray();
 
         for (CoronerValueFilter value : values) {
-            result.add(value.toString());
+            JsonArray filter = new JsonArray();
+
+            filter.add(new JsonPrimitive(value.operator.toString()));
+            filter.add(new JsonPrimitive(value.value.toString()));
+
+            result.add(filter);
         }
-        return "\"" + name + "\": [" + String.join(",", result) + "]";
+        return result;
     }
 }

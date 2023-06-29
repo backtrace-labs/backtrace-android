@@ -2,6 +2,8 @@ package backtraceio.coroner.query;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.gson.JsonObject;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,11 +26,11 @@ public class CoronerQueriesTest {
         String rxId = "03000000-4f0a-fd08-0000-000000000000";
 
         // WHEN
-        String result = coronerQueries.filterByRxId(rxId);
+        JsonObject result = coronerQueries.filterByRxId(rxId);
 
         // THEN
-        String expectedResult = "{\"group\":[ [\"_rxid\"]],\"fold\": {}, \"offset\":0, \"limit\":1, \"filter\":[{ \"_rxid\": [[ \"equal\", \"03000000-4f0a-fd08-0000-000000000000\" ]] }]}";
-        assertEquals(expectedResult, StringUtils.normalizeSpace(result));
+        String expectedResult = "{\"fold\":{},\"group\":[[\"_rxid\"]],\"offset\":0,\"limit\":1,\"filter\":[{\"_rxid\":[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"]]}]}";
+        assertEquals(expectedResult, StringUtils.normalizeSpace(result.toString()));
     }
 
     @Test
@@ -38,11 +40,11 @@ public class CoronerQueriesTest {
         List<String> attributes = Arrays.asList("value1", "value2");
 
         // WHEN
-        String result = coronerQueries.filterByRxId(rxId, attributes);
+        JsonObject result = coronerQueries.filterByRxId(rxId, attributes);
 
         // THEN
-        String expectedResult = "{\"group\":[ [\"_rxid\"]],\"fold\": {\"value1\": [[\"head\"]],\"value2\": [[\"head\"]]}, \"offset\":0, \"limit\":1, \"filter\":[{ \"_rxid\": [[ \"equal\", \"03000000-4f0a-fd08-0000-000000000000\" ]] }]}";
-        assertEquals(expectedResult, StringUtils.normalizeSpace(result));
+        String expectedResult = "{\"fold\":{\"value1\":[[\"head\"]],\"value2\":[[\"head\"]]},\"group\":[[\"_rxid\"]],\"offset\":0,\"limit\":1,\"filter\":[{\"_rxid\":[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"]]}]}";
+        assertEquals(expectedResult, StringUtils.normalizeSpace(result.toString()));
     }
 
     @Test
@@ -55,10 +57,10 @@ public class CoronerQueriesTest {
         final String timestampEnd = "1681943692";
 
         // WHEN
-        String result = coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampStart, timestampEnd, attributes);
+        JsonObject result = coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampStart, timestampEnd, attributes);
 
         // THEN
-        String expectedResult = "{\"group\":[ [\"_rxid\"]],\"fold\": {\"error.message\": [[\"head\"]],\"example-attribute\": [[\"head\"]]}, \"offset\":0, \"limit\":1, \"filter\":[{ \"error.type\": [[ \"equal\", \"Crash\" ]],\"timestamp\": [[ \"at-least\", \"1680943692.\" ],[ \"at-most\", \"1681943692.\" ]] }]}";
-        assertEquals(expectedResult, StringUtils.normalizeSpace(result));
+        String expectedResult = "{\"fold\":{\"error.message\":[[\"head\"]],\"example-attribute\":[[\"head\"]]},\"group\":[[\"_rxid\"]],\"offset\":0,\"limit\":1,\"filter\":[{\"error.type\":[[\"equal\",\"Crash\"]],\"timestamp\":[[\"at-least\",\"1680943692.\"],[\"at-most\",\"1681943692.\"]]}]}";
+        assertEquals(expectedResult, StringUtils.normalizeSpace(result.toString()));
     }
 }
