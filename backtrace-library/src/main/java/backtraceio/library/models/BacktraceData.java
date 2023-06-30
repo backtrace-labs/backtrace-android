@@ -196,7 +196,7 @@ public class BacktraceData {
 
     /**
      * Check if there is a minidump amongst the attachments
-     * @return
+     * @return if there is a minidump contained in the BacktraceData attachments
      */
     public boolean containsMinidump() {
         for(String attachment: this.getAttachments()) {
