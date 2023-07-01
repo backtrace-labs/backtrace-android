@@ -30,7 +30,6 @@ import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceExceptionHandler;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
 
         symlinkAndWriteFile();
@@ -75,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
+        BacktraceCredentials credentials = new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
+                "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
+
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
@@ -141,16 +142,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void handledException(View view) {
         try {
-            try {
-                List<String> myWarriorArmor = getWarriorArmor();
-                int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
-                // I don't need a Magic Wand, I am a warrior
-                removeEquipment(myWarriorArmor, magicWandIndex);
-                // Where was that magic wand again?
-                equipItem(myWarriorArmor, magicWandIndex);
-            } catch (IndexOutOfBoundsException e) {
-                throw new IndexOutOfBoundsException("Invalid index of selected element!");
-            }
+            List<String> myWarriorArmor = getWarriorArmor();
+            int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
+            // I don't need a Magic Wand, I am a warrior
+            removeEquipment(myWarriorArmor, magicWandIndex);
+            // Where was that magic wand again?
+            equipItem(myWarriorArmor, magicWandIndex);
         } catch (IndexOutOfBoundsException e) {
             backtraceClient.send(new BacktraceReport(e), this.listener);
         }
