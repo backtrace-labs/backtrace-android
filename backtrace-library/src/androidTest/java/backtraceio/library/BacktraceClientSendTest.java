@@ -7,8 +7,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -19,7 +20,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -318,6 +321,48 @@ public class BacktraceClientSendTest {
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS, 3);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void sendMinidumpReport() {
+        // Given
+        final Waiter waiter = new Waiter();
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+        RequestHandler rh = new TestRequestHandler() {
+            @Override
+            public BacktraceResult onNativeRequest(BacktraceNativeData data) {
+                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                        BacktraceResultStatus.Ok);
+            }
+        };
+        backtraceClient.setOnRequestHandler(rh);
+        BacktraceReport report = new BacktraceReport("");
+        List<String> attachments = new ArrayList<>();
+        attachments.add("/test/crashpad/new/myminidump.dmp");
+        attachments.add("/text/crashpad/attachments/myminidump/test.txt");
+        backtraceClient.send(report, new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                List<String> reportAttachments = backtraceResult.getBacktraceReport().attachmentPaths;
+                assertEquals(backtraceResult.getBacktraceReport().message, "");
+                for (String attachment : reportAttachments) {
+                    assertEquals(attachments.contains(attachment), true);
+                }
+                for (String attachment : attachments) {
+                    assertEquals(reportAttachments.contains(attachment), true);
+                }
+                assertEquals(backtraceResult.status, BacktraceResultStatus.Ok);
+
+                waiter.resume();
+            }
+        });
+
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
