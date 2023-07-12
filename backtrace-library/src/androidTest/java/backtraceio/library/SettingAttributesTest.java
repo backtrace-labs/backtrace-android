@@ -6,8 +6,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -136,7 +137,7 @@ public class SettingAttributesTest {
         // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceClient backtraceClient = new BacktraceClient(context, this.backtraceCredentials, (BacktraceDatabase) null, this.clientAttributes);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNotNull(data.attributes);
@@ -171,10 +172,9 @@ public class SettingAttributesTest {
         Thread customThread = new Thread(new Runnable() {
             public void run() {
                 final BacktraceClient backtraceClient = new BacktraceClient(context, backtraceCredentials);
-                backtraceClient.setOnRequestHandler(new RequestHandler() {
+                RequestHandler rh = new TestRequestHandler() {
                     @Override
                     public BacktraceResult onRequest(BacktraceData data) {
-                        // THEN
                         waiter.assertTrue(data.report.attributes.containsKey(customClientAttributeKey));
                         waiter.assertEquals(customClientAttributeValue, data.report.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.report.exception.getMessage());
@@ -182,7 +182,8 @@ public class SettingAttributesTest {
                         waiter.resume();
                         return new BacktraceResult(data.report, "", BacktraceResultStatus.Ok);
                     }
-                });
+                };
+                backtraceClient.setOnRequestHandler(rh);
                 BacktraceExceptionHandler.enable(backtraceClient);
                 BacktraceExceptionHandler.setCustomAttributes(clientAttributes);
                 throw new ArithmeticException(exceptionMessage);

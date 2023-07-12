@@ -7,8 +7,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import junit.framework.TestCase;
 
@@ -68,7 +69,7 @@ public class BacktraceClientBreadcrumbsTest {
         backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
@@ -117,7 +118,7 @@ public class BacktraceClientBreadcrumbsTest {
         backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
@@ -176,7 +177,7 @@ public class BacktraceClientBreadcrumbsTest {
         backtraceClient.database.getBreadcrumbs().setCurrentBreadcrumbId(1);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
@@ -271,7 +272,7 @@ public class BacktraceClientBreadcrumbsTest {
     public void sendBacktraceExceptionNoBreadcrumbs() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),

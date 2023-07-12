@@ -591,4 +591,8 @@ public class BacktraceBase implements Client {
     private boolean isBreadcrumbsAvailable() {
         return database != null && database.getBreadcrumbs() != null;
     }
+
+    public boolean usesCustomRequestHandler() {
+        return this.backtraceApi.usesCustomRequestHandler();
+    }
 }

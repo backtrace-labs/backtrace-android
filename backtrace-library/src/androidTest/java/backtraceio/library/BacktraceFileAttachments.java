@@ -5,9 +5,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -69,7 +70,7 @@ public class BacktraceFileAttachments {
 
         // WHEN
         final List<byte[]> fileContents = new ArrayList<>();
-        client.setOnRequestHandler(new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -84,7 +85,8 @@ public class BacktraceFileAttachments {
                 }
                 return new BacktraceResult();
             }
-        });
+        };
+        client.setOnRequestHandler(rh);
         client.send(new BacktraceReport("test", null, attachments), new
                 OnServerResponseEventListener() {
                     @Override
@@ -119,7 +121,7 @@ public class BacktraceFileAttachments {
         // WHEN
         final List<byte[]> fileContents = new ArrayList<>();
         final List<String> filteredAttachments = FileHelper.filterOutFiles(context, attachments);
-        client.setOnRequestHandler(new RequestHandler() {
+        client.setOnRequestHandler(new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 try {

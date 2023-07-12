@@ -5,8 +5,9 @@ import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -58,7 +59,7 @@ public class BacktraceErrorTypeAttributeTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),

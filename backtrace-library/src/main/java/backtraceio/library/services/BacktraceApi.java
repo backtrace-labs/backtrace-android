@@ -143,4 +143,9 @@ public class BacktraceApi implements Api {
                 this.onServerError, this.summedEventsRequestHandler);
         threadSender.sendSummedEvents(input);
     }
+
+    @Override
+    public boolean usesCustomRequestHandler() {
+        return this.requestHandler != null;
+    }
 }

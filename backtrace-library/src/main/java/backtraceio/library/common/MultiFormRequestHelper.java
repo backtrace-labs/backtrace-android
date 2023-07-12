@@ -1,6 +1,8 @@
 package backtraceio.library.common;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLConnection;
@@ -24,8 +26,12 @@ public class MultiFormRequestHelper {
      *
      * @return string with content type and information about boundary
      */
+    public static String getContentType(String boundary) {
+        return "multipart/form-data;boundary=" + boundary;
+    }
+
     public static String getContentType() {
-        return "multipart/form-data;boundary=" + MultiFormRequestHelper.BOUNDARY;
+        return getContentType(MultiFormRequestHelper.BOUNDARY);
     }
 
     /**
@@ -34,14 +40,19 @@ public class MultiFormRequestHelper {
      * @param outputStream output data stream
      * @throws IOException
      */
-    public static void addEndOfRequest(OutputStream outputStream) throws IOException {
+    public static void addEndOfRequest(OutputStream outputStream, String boundary) throws
+        IOException {
         if (outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Output stream is null");
             return;
         }
 
-        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
+        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + boundary +
                 MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.CRLF).getBytes());
+    }
+
+    public static void addEndOfRequest(OutputStream outputStream) throws IOException {
+        addEndOfRequest(outputStream, MultiFormRequestHelper.BOUNDARY);
     }
 
     /**
@@ -51,7 +62,8 @@ public class MultiFormRequestHelper {
      * @param json         JSON string with BacktraceData object
      * @throws IOException
      */
-    public static void addJson(OutputStream outputStream, String json) throws IOException {
+    public static void addJson(OutputStream outputStream, String json, String boundary) throws
+        IOException {
         if (BacktraceStringHelper.isNullOrEmpty(json)) {
             BacktraceLogger.w(LOG_TAG, "JSON is null or empty");
             return;
@@ -62,7 +74,7 @@ public class MultiFormRequestHelper {
             return;
         }
 
-        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
+        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + boundary +
                 MultiFormRequestHelper.CRLF).getBytes());
         outputStream.write((MultiFormRequestHelper.getFileInfo("upload_file")).getBytes());
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
@@ -72,22 +84,62 @@ public class MultiFormRequestHelper {
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
     }
 
+    public static void addJson(OutputStream outputStream, String json) throws IOException {
+        addJson(outputStream, json, MultiFormRequestHelper.BOUNDARY);
+    }
+
     /***
      * Write files data to outputStream
      * @param outputStream output data stream
      * @param attachments list of paths to files
      * @throws IOException
      */
-    public static void addFiles(OutputStream outputStream, List<String> attachments) throws
-            IOException {
+    public static void addFiles(OutputStream outputStream, List<String> attachments, String boundary)
+        throws IOException {
         if (attachments == null || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Attachments or output stream is null");
             return;
         }
 
         for (String fileAbsolutePath : attachments) {
-            addFile(outputStream, fileAbsolutePath);
+            addFile(outputStream, fileAbsolutePath, boundary);
         }
+    }
+
+    public static void addFiles(OutputStream outputStream, List<String> attachments) throws
+        IOException {
+        addFiles(outputStream, attachments, MultiFormRequestHelper.BOUNDARY);
+    }
+
+    /***
+     * Write mindump file in multiform data format to outputStream
+     * @param outputStream output data stream
+     * @param absolutePath path to minidump
+     * @throws IOException
+     */
+    public static void addMinidump(OutputStream outputStream, String absolutePath, String boundry)
+        throws IOException {
+        if (BacktraceStringHelper.isNullOrEmpty(absolutePath) || outputStream == null) {
+            BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
+            return;
+        }
+
+        String fileContentType = "application/octet-stream";
+
+        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + boundry +
+                MultiFormRequestHelper.CRLF).getBytes());
+        outputStream.write((MultiFormRequestHelper.getFileInfo("upload_file_minidump")
+                .getBytes()));
+        outputStream.write(("Content-Type: " + fileContentType + MultiFormRequestHelper.CRLF)
+                .getBytes());
+        outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
+        streamFile(outputStream, absolutePath);
+        outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
+    }
+
+    public static void addMinidump(OutputStream outputStream, String aboslutePath) throws
+        IOException {
+        addMinidump(outputStream, aboslutePath, MultiFormRequestHelper.BOUNDARY);
     }
 
     /***
@@ -96,8 +148,10 @@ public class MultiFormRequestHelper {
      * @param absolutePath file absolute path
      * @throws IOException
      */
-    private static void addFile(OutputStream outputStream, String absolutePath) throws IOException {
-        if (absolutePath == null || outputStream == null) {
+    private static void addFile(OutputStream outputStream, String absolutePath, String boundary)
+        throws IOException {
+
+        if (BacktraceStringHelper.isNullOrEmpty(absolutePath) || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
         }
@@ -106,7 +160,7 @@ public class MultiFormRequestHelper {
                 .getFileNameFromPath
                         (absolutePath));
 
-        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
+        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + boundary +
                 MultiFormRequestHelper.CRLF).getBytes());
         outputStream.write((MultiFormRequestHelper.getFileInfo("attachment_" + FileHelper
                 .getFileNameFromPath
@@ -120,6 +174,10 @@ public class MultiFormRequestHelper {
 
     }
 
+    private static void addFile(OutputStream outputStream, String absolutePath) throws IOException {
+        addFile(outputStream, absolutePath, MultiFormRequestHelper.BOUNDARY);
+    }
+
     /***
      * Write file content to output data stream
      * @param outputStream output data stream
@@ -128,7 +186,7 @@ public class MultiFormRequestHelper {
      */
     public static void streamFile(OutputStream outputStream, String absolutePath) throws
             IOException {
-        if (outputStream == null || absolutePath == null) {
+        if (outputStream == null || BacktraceStringHelper.isNullOrEmpty(absolutePath)) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
         }

@@ -5,8 +5,9 @@ import static org.junit.Assert.fail;
 
 import android.content.Context;
 import android.net.Uri;
-import androidx.test.platform.app.InstrumentationRegistry;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -48,7 +49,7 @@ public class BacktraceClientEventsTest {
         // GIVEN
         final Waiter waiter = new Waiter();
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(null, resultMessage, BacktraceResultStatus.Ok);
@@ -82,14 +83,13 @@ public class BacktraceClientEventsTest {
         final Waiter waiter = new Waiter();
 
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(null, data.attributes.get(attributeKey),
                         BacktraceResultStatus.Ok);
             }
         };
-
         backtraceClient.setOnRequestHandler(rh);
         backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
             @Override

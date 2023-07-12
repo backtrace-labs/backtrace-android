@@ -6,8 +6,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -57,7 +58,7 @@ public class BacktraceClientAttachmentsTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attachments);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),
@@ -100,7 +101,7 @@ public class BacktraceClientAttachmentsTest {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
 
         final Waiter waiter = new Waiter();
-        RequestHandler rh = new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 return new BacktraceResult(data.report, data.report.exception.getMessage(),

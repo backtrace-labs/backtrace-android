@@ -94,4 +94,11 @@ public interface Api {
      * @param callback The custom event to trigger on an API response for a unique events request
      */
     void setSummedEventsOnServerResponse(EventsOnServerResponseEventListener callback);
+
+    /**
+     * Check if a request handler has been set
+     *
+     * @return if a custom request handler is set
+     */
+    boolean usesCustomRequestHandler();
 }

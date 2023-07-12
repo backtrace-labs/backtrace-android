@@ -24,8 +24,10 @@ import java.util.UUID;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.TestRequestHandler;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -147,14 +149,15 @@ public class BacktraceDatabaseTest {
         BacktraceDatabaseRecord record3 = database.add(report3, null);
 
         final List<Integer> requestsCounter = new ArrayList<>();
-        backtraceClient.setOnRequestHandler(new RequestHandler() {
+        RequestHandler rh = new TestRequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 requestsCounter.add(1);
                 waiter.resume();
                 return null;
             }
-        });
+        };
+        backtraceClient.setOnRequestHandler(rh);
 
         record.close();
         record2.close();
