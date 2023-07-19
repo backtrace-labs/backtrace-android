@@ -52,13 +52,13 @@ class CoronerHttpClient implements HttpClient {
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
                 inputStream));
 
-        final StringBuilder responseSB = new StringBuilder();
+        final StringBuilder responseStringBuilder = new StringBuilder();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
-            responseSB.append(line);
+            responseStringBuilder.append(line);
         }
         bufferedReader.close();
-        return responseSB.toString();
+        return responseStringBuilder.toString();
     }
 
     private static InputStream getInputStream(final HttpURLConnection urlConnection) throws IOException {

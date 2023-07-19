@@ -31,12 +31,12 @@ public class HttpHelper {
         BufferedReader br = new BufferedReader(new InputStreamReader(
                 inputStream));
 
-        StringBuilder responseSB = new StringBuilder();
+        StringBuilder responseStringBuilder = new StringBuilder();
         String line;
         while ((line = br.readLine()) != null) {
-            responseSB.append(line);
+            responseStringBuilder.append(line);
         }
         br.close();
-        return responseSB.toString();
+        return responseStringBuilder.toString();
     }
 }
