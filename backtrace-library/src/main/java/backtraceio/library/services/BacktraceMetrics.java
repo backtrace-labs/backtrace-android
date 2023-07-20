@@ -2,7 +2,7 @@ package backtraceio.library.services;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,7 +124,7 @@ public final class BacktraceMetrics implements Metrics {
      * @param customReportAttributes Backtrace client custom report attributes (must be nonnull)
      * @param backtraceApi           Backtrace API for metrics sending
      */
-    public BacktraceMetrics(Context context, @NonNull Map<String, Object> customReportAttributes, Api backtraceApi, BacktraceCredentials credentials) {
+    public BacktraceMetrics(Context context, @NotNull Map<String, Object> customReportAttributes, Api backtraceApi, BacktraceCredentials credentials) {
         this.context = context;
         this.customReportAttributes = customReportAttributes;
         this.backtraceApi = backtraceApi;
