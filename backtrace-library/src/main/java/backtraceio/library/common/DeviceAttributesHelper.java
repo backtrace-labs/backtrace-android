@@ -5,6 +5,7 @@ import static android.content.Context.ACTIVITY_SERVICE;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -125,9 +126,12 @@ public class DeviceAttributesHelper {
         if (!PermissionHelper.isPermissionForBluetoothGranted(this.context)) {
             return BluetoothStatus.NOT_PERMITTED;
         }
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter.isEnabled()) {
-            return BluetoothStatus.ENABLED;
+        BluetoothManager mBluetoothManager = (BluetoothManager) this.context.getSystemService(Context.BLUETOOTH_SERVICE);
+        if (mBluetoothManager != null) {
+            BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
+            if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
+                return BluetoothStatus.ENABLED;
+            }
         }
         return BluetoothStatus.DISABLED;
     }
