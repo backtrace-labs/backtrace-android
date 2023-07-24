@@ -4,6 +4,10 @@
 - Added a new attribute to native reports - `breadcrumbs.lastId`
 - Fixed invalid `BacktraceCredentials` behavior when the user passed an invalid Backtrace URL
 - Capture invalid native crash reporting handler path in the initialize method 
+- Replaced androidx's ContextCompat with Context when checking for self permissions and handled permissions for versions prior to Android 6.0
+- Replaced deprecated BluetoothAdapter with BluetoothManager
+- Added missing ACCESS_WIFI_STATE and BLUETOOTH permissions to example app and Tests
+- Replaced androidx NonNull with jetbrains NotNull annotation
 
 ## Version 3.7.6
 - Maintenance: Update various components to latest versions
