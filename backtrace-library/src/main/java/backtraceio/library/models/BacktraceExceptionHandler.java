@@ -56,7 +56,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         if (throwable instanceof Exception) {
             BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
             BacktraceReport report = new BacktraceReport((Exception) throwable, BacktraceExceptionHandler.customAttributes);
-            report.attributes.put(BacktraceAttributeConsts.ErrorType, isMainThread() ? BacktraceAttributeConsts.CrashAttributeType : BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+            report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
             this.client.send(report, callback);
             BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
         }
