@@ -5,7 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class BacktraceBroadcastReceiver extends BroadcastReceiver {
     private static final transient String LOG_TAG = BacktraceBroadcastReceiver.class.getSimpleName();
     private final BacktraceBreadcrumbs backtraceBreadcrumbs;
 
-    public BacktraceBroadcastReceiver(@NonNull BacktraceBreadcrumbs backtraceBreadcrumbs) {
+    public BacktraceBroadcastReceiver(@NotNull BacktraceBreadcrumbs backtraceBreadcrumbs) {
         this.backtraceBreadcrumbs = backtraceBreadcrumbs;
     }
 

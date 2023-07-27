@@ -118,10 +118,19 @@ public class BacktraceCredentials {
         final int tokenLength = 64;
         final String tokenQueryParam = "token=";
         String submissionUrl = getSubmissionUrl().toString();
+        final int tokenEndIndex = submissionUrl.lastIndexOf("/");
         if (submissionUrl.contains("submit.backtrace.io")) {
-            return submissionUrl.substring(submissionUrl.lastIndexOf("/") - tokenLength, submissionUrl.lastIndexOf("/"));
+            if (tokenEndIndex - tokenLength < 0) {
+                return null;
+            }
+            return submissionUrl.substring(tokenEndIndex - tokenLength, tokenEndIndex);
         }
-        final int tokenQueryParamStartIndex = submissionUrl.indexOf(tokenQueryParam) + tokenQueryParam.length();
-        return submissionUrl.substring(tokenQueryParamStartIndex, tokenQueryParamStartIndex + tokenLength);
+        final int tokenQueryParamStartIndex = submissionUrl.indexOf(tokenQueryParam);
+        if (tokenQueryParamStartIndex == -1) {
+            return null;
+        }
+
+        final int tokenParamStartIndex = tokenQueryParamStartIndex + tokenQueryParam.length();
+        return submissionUrl.substring(tokenParamStartIndex, tokenParamStartIndex + tokenLength);
     }
 }
