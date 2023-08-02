@@ -7,6 +7,7 @@ import java.util.Map;
 
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.events.OnSuccessfulBreadcrumbAddEventListener;
 import backtraceio.library.models.json.BacktraceReport;
 
 public interface Breadcrumbs {
@@ -163,4 +164,28 @@ public interface Breadcrumbs {
      * @param breadcrumbId Will force set the current breadcrumb ID
      */
     void setCurrentBreadcrumbId(long breadcrumbId);
+
+    /**
+     * Get the current breadcrumb ID (exclusive). This is useful when breadcrumbs are queued and
+     * posted to an API because in the meantime before the breadcrumbs are finally posted we might
+     * get more breadcrumbs which are not relevant (because they occur after queueing up the
+     * breadcrumb sender). Therefore it is useful to mark the breadcrumb sender with the most
+     * current breadcrumb ID at the time of queuing up the request to post the breadcrumbs.
+     *
+     * @return current breadcrumb ID (exclusive)
+     */
+    long getCurrentBreadcrumbId();
+
+    /**
+     * Determinate if Breadcrumbs are enabled.
+     * @return true if breadcrumbs are enabled.
+     */
+    boolean isEnabled();
+    
+    /**
+     * Set event executed after adding a breadcrumb to the breadcrumb storage.
+     *
+     * @param eventListener object with method which will be executed.
+     */
+    void setOnSuccessfulBreadcrumbAddEventListener(OnSuccessfulBreadcrumbAddEventListener eventListener);
 }

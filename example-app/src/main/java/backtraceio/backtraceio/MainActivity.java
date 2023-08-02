@@ -99,12 +99,11 @@ public class MainActivity extends AppCompatActivity {
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
         BacktraceExceptionHandler.enable(backtraceClient);
-        // backtraceClient.send("test");
+
+        backtraceClient.metrics.enable();
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
-
-        backtraceClient.metrics.enable();
 
         // Enable ANR detection
         backtraceClient.enableAnr(anrTimeout);
