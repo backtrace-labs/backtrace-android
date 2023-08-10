@@ -54,4 +54,16 @@ public class ThreadInformation {
     ThreadInformation(Thread thread, ArrayList<BacktraceStackFrame> stack, Boolean currentThread) {
         this(thread.getName().toLowerCase(), currentThread, stack);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Boolean getFault() {
+        return fault;
+    }
+
+    public ArrayList<BacktraceStackFrame> getStack() {
+        return stack;
+    }
 }

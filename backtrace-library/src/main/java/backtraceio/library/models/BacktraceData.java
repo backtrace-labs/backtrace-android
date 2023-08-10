@@ -140,6 +140,10 @@ public class BacktraceData {
         return FileHelper.filterOutFiles(this.context, report.attachmentPaths);
     }
 
+    public Map<String, ThreadInformation> getThreadInformationMap() {
+        return threadInformationMap;
+    }
+
     /***
      * Set annotations object
      * @param complexAttributes
