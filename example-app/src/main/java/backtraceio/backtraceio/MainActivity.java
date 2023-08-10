@@ -2,11 +2,12 @@ package backtraceio.backtraceio;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,15 +28,15 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
-
     private BacktraceClient backtraceClient;
-
+    private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
 
     // Used to load the 'native-lib' library on application startup.
@@ -43,15 +44,16 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
+    public void setOnServerResponseEventListener(OnServerResponseEventListener e) {
+        this.listener = e;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Set this value in your local.properties
-        if (BuildConfig.BACKTRACE_SUBMISSION_URL != null) {
-            backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
-        }
+        
+        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
 
         symlinkAndWriteFile();
     }
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             put("custom.attribute", "My Custom Attribute");
         }};
 
-        List<String> attachments = new ArrayList<String>(){{
+        List<String> attachments = new ArrayList<String>() {{
             add(context.getFilesDir() + "/" + "myCustomFile.txt");
         }};
 
@@ -111,48 +113,51 @@ public class MainActivity extends AppCompatActivity {
     public native void cppCrash();
 
     public native boolean registerNativeBreadcrumbs(BacktraceBase backtraceBase);
+
     public native boolean addNativeBreadcrumb();
+
     public native boolean addNativeBreadcrumbUserError();
+
     public native void cleanupNativeBreadcrumbHandler();
 
     private List<String> equippedItems;
 
-    public List<String> getWarriorArmor()
-    {
+    public List<String> getWarriorArmor() {
         return new ArrayList<String>(Arrays.asList("Tough Boots", "Strong Sword", "Sturdy Shield", "Magic Wand"));
     }
 
-    int findEquipmentIndex(List<String> armor, String equipment)
-    {
+    int findEquipmentIndex(List<String> armor, String equipment) {
         return armor.indexOf(equipment);
     }
 
-    void removeEquipment(List<String> armor, int index)
-    {
+    void removeEquipment(List<String> armor, int index) {
         armor.remove(index);
     }
 
-    void equipItem(List<String> armor, int index)
-    {
+    void equipItem(List<String> armor, int index) {
         equippedItems.add(armor.get(index));
     }
 
     public void handledException(View view) {
         try {
-            List<String> myWarriorArmor = getWarriorArmor();
-            int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
-            // I don't need a Magic Wand, I am a warrior
-            removeEquipment(myWarriorArmor, magicWandIndex);
-            // Where was that magic wand again?
-            equipItem(myWarriorArmor, magicWandIndex);
-        } catch (Exception e) {
-            backtraceClient.send(new BacktraceReport(e));
+            try {
+                List<String> myWarriorArmor = getWarriorArmor();
+                int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
+                // I don't need a Magic Wand, I am a warrior
+                removeEquipment(myWarriorArmor, magicWandIndex);
+                // Where was that magic wand again?
+                equipItem(myWarriorArmor, magicWandIndex);
+            } catch (IndexOutOfBoundsException e) {
+                throw new IndexOutOfBoundsException("Invalid index of selected element!");
+            }
+        } catch (IndexOutOfBoundsException e) {
+            backtraceClient.send(new BacktraceReport(e), this.listener);
         }
     }
 
     public void getSaveData() throws IOException {
         // I know for sure this file is there (spoiler alert, it's not)
-        File mySaveData =  new File("mySave.sav");
+        File mySaveData = new File("mySave.sav");
         FileReader mySaveDataReader = new FileReader(mySaveData);
         char[] saveDataBuffer = new char[255];
         mySaveDataReader.read(saveDataBuffer);
@@ -170,14 +175,24 @@ public class MainActivity extends AppCompatActivity {
         Thread.sleep(anrTimeout + 2000);
     }
 
-    public void enableBreadcrumbs(View view) {
+    public void enableBreadcrumbs(View view) throws Exception {
+        Context appContext = view.getContext().getApplicationContext();
+        if (backtraceClient == null) {
+            throw new Exception("Backtrace client integration is not initialized");
+        }
+
+        if (appContext == null) {
+            throw new Exception("App context is null");
+        }
+
         backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
-    public void enableBreadcrumbsUserOnly(View view) {
+    public void enableBreadcrumbsUserOnly(View view) throws Exception {
         EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable = EnumSet.of(BacktraceBreadcrumbType.USER);
-        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), breadcrumbTypesToEnable);
+        Context appContext = view.getContext().getApplicationContext();
+        backtraceClient.enableBreadcrumbs(appContext, breadcrumbTypesToEnable);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
@@ -190,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");
-        backtraceClient.send(report);
+        backtraceClient.send(report, this.listener);
     }
 
     private void writeMyCustomFile(String filePath) {
@@ -200,8 +215,12 @@ public class MainActivity extends AppCompatActivity {
             outputStreamWriter.write(fileData);
             outputStreamWriter.close();
         } catch (IOException e) {
-                Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
+            Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
         }
+    }
+
+    public BacktraceClient getBacktraceClient() {
+        return backtraceClient;
     }
 
     public void exit(View view) {
