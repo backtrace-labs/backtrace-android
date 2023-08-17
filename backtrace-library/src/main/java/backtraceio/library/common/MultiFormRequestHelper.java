@@ -1,8 +1,6 @@
 package backtraceio.library.common;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLConnection;
@@ -41,7 +39,7 @@ public class MultiFormRequestHelper {
      * @throws IOException
      */
     public static void addEndOfRequest(OutputStream outputStream, String boundary) throws
-        IOException {
+            IOException {
         if (outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Output stream is null");
             return;
@@ -63,7 +61,7 @@ public class MultiFormRequestHelper {
      * @throws IOException
      */
     public static void addJson(OutputStream outputStream, String json, String boundary) throws
-        IOException {
+            IOException {
         if (BacktraceStringHelper.isNullOrEmpty(json)) {
             BacktraceLogger.w(LOG_TAG, "JSON is null or empty");
             return;
@@ -95,7 +93,7 @@ public class MultiFormRequestHelper {
      * @throws IOException
      */
     public static void addFiles(OutputStream outputStream, List<String> attachments, String boundary)
-        throws IOException {
+            throws IOException {
         if (attachments == null || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Attachments or output stream is null");
             return;
@@ -107,7 +105,7 @@ public class MultiFormRequestHelper {
     }
 
     public static void addFiles(OutputStream outputStream, List<String> attachments) throws
-        IOException {
+            IOException {
         addFiles(outputStream, attachments, MultiFormRequestHelper.BOUNDARY);
     }
 
@@ -118,7 +116,7 @@ public class MultiFormRequestHelper {
      * @throws IOException
      */
     public static void addMinidump(OutputStream outputStream, String absolutePath, String boundry)
-        throws IOException {
+            throws IOException {
         if (BacktraceStringHelper.isNullOrEmpty(absolutePath) || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
@@ -138,7 +136,7 @@ public class MultiFormRequestHelper {
     }
 
     public static void addMinidump(OutputStream outputStream, String aboslutePath) throws
-        IOException {
+            IOException {
         addMinidump(outputStream, aboslutePath, MultiFormRequestHelper.BOUNDARY);
     }
 
@@ -149,7 +147,7 @@ public class MultiFormRequestHelper {
      * @throws IOException
      */
     private static void addFile(OutputStream outputStream, String absolutePath, String boundary)
-        throws IOException {
+            throws IOException {
 
         if (BacktraceStringHelper.isNullOrEmpty(absolutePath) || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
