@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
-import backtraceio.library.common.BacktraceConstants;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
@@ -22,7 +21,7 @@ import backtraceio.library.models.json.ThreadInformation;
 /**
  * Serializable Backtrace API data object
  */
-public class BacktraceData {
+public class BacktraceData extends BacktraceBaseData {
 
     private static final transient String LOG_TAG = BacktraceData.class.getSimpleName();
     /**
@@ -30,12 +29,6 @@ public class BacktraceData {
      */
     @SerializedName("lang")
     public final String lang = "java";
-
-    /**
-     * Name of the client that is sending this error report.
-     */
-    @SerializedName("agent")
-    public final String agent = "backtrace-android";
 
     /**
      * If sending a Proguard obfuscated callstack, we need
@@ -64,18 +57,6 @@ public class BacktraceData {
     public String langVersion;
 
     /**
-     * Version of the android library
-     */
-    @SerializedName("agentVersion")
-    public String agentVersion;
-
-    /**
-     * Get built-in attributes
-     */
-    @SerializedName("attributes")
-    public Map<String, String> attributes;
-
-    /**
      * Get a main thread name
      */
     @SerializedName("mainThread")
@@ -96,10 +77,7 @@ public class BacktraceData {
     @SerializedName("sourceCode")
     public Map<String, SourceCode> sourceCode;
 
-    /**
-     * Current BacktraceReport
-     */
-    public transient BacktraceReport report;
+
 
     /**
      * Current application context
@@ -192,18 +170,5 @@ public class BacktraceData {
         this.threadInformationMap = threadData.threadInformation;
         SourceCodeData sourceCodeData = new SourceCodeData(report.diagnosticStack);
         this.sourceCode = sourceCodeData.data.isEmpty() ? null : sourceCodeData.data;
-    }
-
-    /**
-     * Check if there is a minidump amongst the attachments
-     * @return if there is a minidump contained in the BacktraceData attachments
-     */
-    public boolean containsMinidump() {
-        for(String attachment: this.getAttachments()) {
-            if (attachment.endsWith(BacktraceConstants.MinidumpExtension)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

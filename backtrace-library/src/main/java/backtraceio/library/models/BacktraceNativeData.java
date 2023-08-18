@@ -1,13 +1,14 @@
 package backtraceio.library.models;
 
 import android.content.Context;
-import android.icu.util.Output;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import backtraceio.library.common.BacktraceConstants;
 import backtraceio.library.common.BacktraceStringHelper;
@@ -16,26 +17,35 @@ import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.BacktraceReport;
 
-public final class BacktraceNativeData {
-    private String minidumpPath = "";
-    private List<String> attachments = new ArrayList<>();
-    public BacktraceReport report = null;
+public final class BacktraceNativeData extends BacktraceBaseData {
+    private final String minidumpPath;
+    private final List<String> attachments = new ArrayList<>();
+    public final BacktraceReport report;
     private final String LOG_TAG = BacktraceNativeData.class.getSimpleName();
 
     public BacktraceNativeData(BacktraceReport report) {
-        organizeAttachments(report);
-
         if (report == null) {
             BacktraceLogger.d(LOG_TAG, "Report cannot be null");
+            this.report = null;
+            this.minidumpPath = null;
             return;
         }
-        if (minidumpPath.equals("")) {
+        organizeAttachments(report);
+        this.minidumpPath = getMinidumpPath(report);
+        if (BacktraceStringHelper.isNullOrEmpty(minidumpPath)) {
             BacktraceLogger.d(LOG_TAG, "No minidump found in report attachments.");
             attachments.clear();
+            this.report = null;
             return;
         }
 
         this.report = report;
+        this.attributes = new HashMap<>();
+        this.attributes.putAll(new HashMap<String, String>() {{
+            put("agent", agent);
+            put("agentVersion", agentVersion);
+            put("lang", "minidump");
+        }});
     }
 
     /**
@@ -45,14 +55,39 @@ public final class BacktraceNativeData {
      *
      */
     private void organizeAttachments(BacktraceReport report) {
-        for (String file: report.attachmentPaths) {
-            if (file.endsWith(BacktraceConstants.MinidumpExtension)) {
-                minidumpPath = file;
-            }
-            else if (file.contains("/crashpad/")) {
-                attachments.add(file);
-            }
+        final List<String> attachments = report.attachmentPaths;
+        final List<String> nativeAttachments = filterList("/crashpad/attachments/", attachments);
+        this.attachments.addAll(nativeAttachments);
+    }
+
+    /**
+     * Parse report for minidump attachment
+     * @param report - Backtrace Report to parse
+     * @return - Absolute string path to the minidump or empty string if none found
+     */
+    private String getMinidumpPath(BacktraceReport report) {
+        final List<String> minidumps = filterList(BacktraceConstants.MinidumpExtension, report.attachmentPaths);
+        if (minidumps.size() != 1) {
+            return "";
         }
+        return minidumps.get(0);
+    }
+
+    /**
+     * Filter list removing matching items
+     * @param regexPattern - Pattern to ignore
+     * @param list - List of items to parse
+     * @return filtered List<String>
+     */
+    private List<String> filterList(String regexPattern, List<String> list) {
+        final Pattern pattern = Pattern.compile(regexPattern);
+        final List<String> result = new ArrayList<>();
+        for (String element: list) {
+            Matcher matcher = pattern.matcher(element);
+            if (matcher.find())
+                result.add(element);
+        }
+        return result;
     }
 
     /**
@@ -69,34 +104,5 @@ public final class BacktraceNativeData {
      */
     public String getMinidumpPath() {
         return minidumpPath;
-    }
-
-    /**
-     * Send the BacktraceNativeData to an OutputStream in a multipart form POST
-     * @param outputStream outputStream to push the post to
-     * @param boundary HTTP POST boundry for a multipart post
-     * @throws IOException
-     */
-    public void postOutputStream(OutputStream outputStream, String boundary) throws IOException {
-        if (outputStream == null) {
-            BacktraceLogger.w(LOG_TAG, "Output stream is null");
-            return;
-        }
-        if (BacktraceStringHelper.isNullOrEmpty(this.minidumpPath)) {
-            BacktraceLogger.w(LOG_TAG, "No minidump to upload");
-            return;
-        }
-        MultiFormRequestHelper.addMinidump(outputStream, this.minidumpPath, boundary);
-        MultiFormRequestHelper.addFiles(outputStream, this.attachments, boundary);
-        MultiFormRequestHelper.addEndOfRequest(outputStream, boundary);
-    }
-
-    /**
-     * Send the BacktraceNativeData to an OutputStream in a multipart form POST
-     * @param outputStream outputStream to push the post to
-     * @throws IOException
-     */
-    public void postOutputStream(OutputStream outputStream) throws IOException {
-        postOutputStream(outputStream, "*****");
     }
 }
