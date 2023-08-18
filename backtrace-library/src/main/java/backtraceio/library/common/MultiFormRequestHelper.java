@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.Map;
 
 import backtraceio.library.logger.BacktraceLogger;
 
@@ -193,6 +194,20 @@ public class MultiFormRequestHelper {
         int c;
         while ((c = fis.read(b)) != -1) {
             outputStream.write(b, 0, c);
+        }
+    }
+    
+    public static void addAttributes(OutputStream outputStream, Map<String, String> attributes, String boundary) throws IOException {
+        if (outputStream == null || attributes.size() == 0) {
+            BacktraceLogger.w(LOG_TAG, "No attributes passed or output stream is null");
+            return;
+        }
+        for (Map.Entry<String, String> entry: attributes.entrySet()) {
+            outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + boundary +
+                    MultiFormRequestHelper.CRLF).getBytes());
+            outputStream.write(("Content-Disposition: form-data; name=\"" + entry.getKey() + "\""
+                    + MultiFormRequestHelper.CRLF + MultiFormRequestHelper.CRLF).getBytes());
+            outputStream.write((entry.getValue() + MultiFormRequestHelper.CRLF).getBytes());
         }
     }
 
