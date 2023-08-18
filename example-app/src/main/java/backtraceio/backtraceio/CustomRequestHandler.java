@@ -71,31 +71,26 @@ public class CustomRequestHandler extends URLRequestHandler {
     }
 
     private BacktraceResult getResult(HttpURLConnection urlConnection, BacktraceBaseData data) throws IOException, HttpException {
-        BacktraceResult result;
         int statusCode = urlConnection.getResponseCode();
-        if (statusCode == HttpURLConnection.HTTP_OK) {
-            result = BacktraceSerializeHelper.backtraceResultFromJson(
-                    getResponse(urlConnection));
-            result.setBacktraceReport(data.report);
-        } else {
+        if (statusCode != HttpURLConnection.HTTP_OK) {
             String message = getResponse(urlConnection);
             message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                     urlConnection.getResponseMessage() : message;
             throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
         }
+        BacktraceResult result = BacktraceSerializeHelper.backtraceResultFromJson(getResponse(urlConnection));
+        result.setBacktraceReport(data.report);
         return result;
     }
 
     @Override
     public BacktraceResult onRequest(BacktraceData data) {
-        Log.d(LOG_TAG, "IR: Managed code request made");
         BacktraceResult result = sendData(data, jsonURL);
         return result;
     }
 
     @Override
     public BacktraceResult onNativeRequest(BacktraceNativeData data) {
-        Log.d(LOG_TAG, "IR: Native code request made");
         BacktraceResult result = sendData(data, minidumpURL);
         return result;
     }
