@@ -1,7 +1,6 @@
 package backtraceio.library.watchdog;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
