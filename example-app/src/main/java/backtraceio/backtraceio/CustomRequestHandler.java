@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -16,6 +17,8 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.common.URLRequestHandler;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceBaseData;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceNativeData;
 import backtraceio.library.models.BacktraceResult;
@@ -25,6 +28,7 @@ public class CustomRequestHandler extends URLRequestHandler {
     CustomRequestHandler(BacktraceCredentials credentials) {
         super(credentials);
     }
+
     private static final String LOG_TAG = CustomRequestHandler.class.getSimpleName();
     private static final int CHUNK_SIZE = 128 * 1024;
 
@@ -66,23 +70,7 @@ public class CustomRequestHandler extends URLRequestHandler {
         return responseSB.toString();
     }
 
-    private BacktraceResult getResult(HttpURLConnection urlConnection, BacktraceData data) throws IOException, HttpException {
-        BacktraceResult result;
-        int statusCode = urlConnection.getResponseCode();
-        if (statusCode == HttpURLConnection.HTTP_OK) {
-            result = BacktraceSerializeHelper.backtraceResultFromJson(
-                    getResponse(urlConnection));
-            result.setBacktraceReport(data.report);
-        } else {
-            String message = getResponse(urlConnection);
-            message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
-                    urlConnection.getResponseMessage() : message;
-            throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
-        }
-        return result;
-    }
-
-    private BacktraceResult getResult(HttpURLConnection urlConnection, BacktraceNativeData data) throws IOException, HttpException {
+    private BacktraceResult getResult(HttpURLConnection urlConnection, BacktraceBaseData data) throws IOException, HttpException {
         BacktraceResult result;
         int statusCode = urlConnection.getResponseCode();
         if (statusCode == HttpURLConnection.HTTP_OK) {
@@ -100,66 +88,67 @@ public class CustomRequestHandler extends URLRequestHandler {
 
     @Override
     public BacktraceResult onRequest(BacktraceData data) {
-        HttpURLConnection urlConnection = null;
-        BacktraceResult result;
-        try {
-            urlConnection = setupConnection(jsonURL);
-            DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
-            String json = BacktraceSerializeHelper.toJson(data);
-            List<String> attachments = data.getAttachments();
-            MultiFormRequestHelper.addJson(request, json);
-            MultiFormRequestHelper.addFiles(request, attachments);
-            MultiFormRequestHelper.addEndOfRequest(request);
-            request.flush();
-            request.close();
-            result = getResult(urlConnection, data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = BacktraceResult.OnError(data.report, e);
-        } finally {
-            if (urlConnection != null) {
-                try {
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    result = BacktraceResult.OnError(data.report, e);
-                }
-            }
-        }
+        Log.d(LOG_TAG, "IR: Managed code request made");
+        BacktraceResult result = sendData(data, jsonURL);
         return result;
     }
 
     @Override
     public BacktraceResult onNativeRequest(BacktraceNativeData data) {
-        Log.d(LOG_TAG,"Attachments count: " + data.getAttachments().size());
-        List<String> files = data.getAttachments();
-        for (String file: files) {
-            Log.d(LOG_TAG, "Attachment: " + file);
-        }
+        Log.d(LOG_TAG, "IR: Native code request made");
+        BacktraceResult result = sendData(data, minidumpURL);
+        return result;
+    }
+
+    public BacktraceResult sendData(BacktraceBaseData data, String URL) {
         HttpURLConnection urlConnection = null;
         BacktraceResult result;
-        Log.d(LOG_TAG, "Native request made to the custom request handler");
         try {
-            urlConnection = setupConnection(minidumpURL);
+            urlConnection = setupConnection(URL);
             DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
-            data.postOutputStream(request);
+            if (data instanceof BacktraceNativeData)
+                postNativeData((BacktraceNativeData) data, request, null);
+            else if (data instanceof BacktraceData)
+                postJsonData((BacktraceData) data, request, null);
             request.flush();
             request.close();
-
             result = getResult(urlConnection, data);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getStackTrace().toString());
             result = BacktraceResult.OnError(data.report, e);
         } finally {
             if (urlConnection != null) {
-                try {
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    result = BacktraceResult.OnError(data.report, e);
-                }
+                urlConnection.disconnect();
             }
         }
         return result;
+    }
+
+    public void postNativeData(BacktraceNativeData data, OutputStream outputStream, String boundary)
+            throws IOException {
+        if (outputStream == null) {
+            BacktraceLogger.w(LOG_TAG, "Output stream is null");
+            return;
+        }
+        if (BacktraceStringHelper.isNullOrEmpty(data.getMinidumpPath())) {
+            BacktraceLogger.w(LOG_TAG, "No minidump to upload");
+            return;
+        }
+        if (BacktraceStringHelper.isNullOrEmpty(boundary)) {
+            boundary = "*********";
+        }
+        MultiFormRequestHelper.addMinidump(outputStream, data.getMinidumpPath(), boundary);
+        MultiFormRequestHelper.addFiles(outputStream, data.getAttachments(), boundary);
+        MultiFormRequestHelper.addAttributes(outputStream, data.attributes, boundary);
+        MultiFormRequestHelper.addEndOfRequest(outputStream, boundary);
+    }
+
+    public void postJsonData(BacktraceData data, OutputStream outputStream, String boundary)
+            throws IOException {
+        String json = BacktraceSerializeHelper.toJson(data);
+        List<String> attachments = data.getAttachments();
+        MultiFormRequestHelper.addJson(outputStream, json);
+        MultiFormRequestHelper.addFiles(outputStream, attachments);
+        MultiFormRequestHelper.addEndOfRequest(outputStream);
     }
 }
