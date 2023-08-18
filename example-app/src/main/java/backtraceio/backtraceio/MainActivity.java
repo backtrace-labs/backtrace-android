@@ -27,9 +27,7 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
-import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceExceptionHandler;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -97,11 +95,13 @@ public class MainActivity extends AppCompatActivity {
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
 
-        BacktraceExceptionHandler.enable(backtraceClient);
-        // backtraceClient.send("test");
+        // Use a custom request handler instead of the one provided by the Backtrace Library
+        // Comment out if not needed
+        CustomRequestHandler handler = new CustomRequestHandler(credentials);
+        backtraceClient.setOnRequestHandler(handler);
 
-        //(RequestHandler customerHandler = new CustomRequestHandler(credentials);
-        //backtraceClient.setOnRequestHandler(customerHandler);
+        // Register the BacktraceExceptionHandler
+        BacktraceExceptionHandler.enable(backtraceClient);
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
