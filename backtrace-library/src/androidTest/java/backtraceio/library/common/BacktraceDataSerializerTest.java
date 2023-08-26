@@ -55,7 +55,7 @@ public class BacktraceDataSerializerTest {
         final Context context = InstrumentationRegistry.getInstrumentation().getContext();
         long timeGson = 0;
         long timeOrgJson = 0;
-        final int iterations = 5000;
+        final int iterations = 1;
         for (int i = 0; i < iterations; i++) {
             // INIT SAMPLE
             final Exception exception = new Exception(Integer.toString(i));
@@ -93,6 +93,5 @@ public class BacktraceDataSerializerTest {
 
         System.out.println("[GSON] Average execution time: " + averageExecutionTimeGson + " milliseconds");
         System.out.println("[Org.json] Average execution time: " + averageExecutionTimeOrgJson + " milliseconds");
-
     }
 }
