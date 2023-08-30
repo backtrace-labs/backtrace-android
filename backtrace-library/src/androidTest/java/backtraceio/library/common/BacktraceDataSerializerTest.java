@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.common.serializers.BacktraceDataSerializer;
+import backtraceio.library.common.serializers.SerializerHelper;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -48,6 +49,23 @@ public class BacktraceDataSerializerTest {
         assertEquals(jsonFromOrgJson, jsonFromGson);
     }
 
+    @Test
+    public void temp() throws JSONException {
+//        try {
+
+//        } catch (Exception e) {
+            try{
+                BacktraceReport r = null;
+                r.toString();
+            }
+            catch (Exception e) {
+                Object result2 = SerializerHelper.serialize(e);
+                System.out.println(result2);
+            }
+            Object result = SerializerHelper.serialize(new BacktraceReport("test"));
+            System.out.println(result);
+//        }
+    }
 
     @Test
     public void testGsonPerformanceSerializer() throws JSONException, IllegalAccessException { // TODO: fix name
@@ -55,7 +73,7 @@ public class BacktraceDataSerializerTest {
         final Context context = InstrumentationRegistry.getInstrumentation().getContext();
         long timeGson = 0;
         long timeOrgJson = 0;
-        final int iterations = 1;
+        final int iterations = 5000;
         for (int i = 0; i < iterations; i++) {
             // INIT SAMPLE
             final Exception exception = new Exception(Integer.toString(i));

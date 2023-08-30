@@ -1,5 +1,7 @@
 package backtraceio.library.common.serializers;
 
+import static backtraceio.library.common.serializers.BacktraceDataSerializer.executeAndGetMethods;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +17,7 @@ import java.util.Map;
 public class SerializerHelper {
     public static int MAX_SERIALIZATION_LEVEL = 5;
     private static final Map<Class<?>, Class<?>> WRAPPER_TYPE_MAP;
+
     static {
         WRAPPER_TYPE_MAP = new HashMap<>();
         WRAPPER_TYPE_MAP.put(Integer.class, int.class);
@@ -29,22 +32,33 @@ public class SerializerHelper {
     }
 
     public static boolean isPrimitiveType(Object source) {
-        return WRAPPER_TYPE_MAP.containsKey(source.getClass());
+        return WRAPPER_TYPE_MAP.containsKey(source.getClass()) || source instanceof String || source instanceof Number;
     }
 
     public static String decapitalizeString(String string) {
         return string == null || string.isEmpty() ? "" : Character.toLowerCase(string.charAt(0)) + string.substring(1);
     }
 
-    private static JSONArray serializeCollection(Collection<?> collection) throws IllegalAccessException, JSONException {
+    private static JSONArray serializeCollection(Collection<?> collection) throws JSONException {
+        return serializeCollection(collection, 0);
+    }
+
+    private static JSONArray serializeArray(Object[] array, int serializationDepth) throws JSONException {
+        JSONArray jsonArray = new JSONArray();
+        for (Object item : array) {
+            jsonArray.put(serialize(item, serializationDepth));
+        }
+        return jsonArray;
+    }
+    private static JSONArray serializeCollection(Collection<?> collection, int serializationDepth) throws JSONException {
         JSONArray jsonArray = new JSONArray();
         for (Object item : collection) {
-            jsonArray.put(serialize(item));
+            jsonArray.put(serialize(item, serializationDepth));
         }
         return jsonArray;
     }
 
-    private static List<Field> getAllFields(Class<?> klass, Object obj) throws IllegalAccessException {
+    private static JSONObject getAllFields(Class<?> klass, Object obj, int serializationDepth) {
         // TODO: improve naming
 
         List<Field> fields = new ArrayList<>();
@@ -52,33 +66,55 @@ public class SerializerHelper {
             fields.addAll(Arrays.asList(c.getDeclaredFields()));
         }
 
-        for (Field f: fields) {
+        JSONObject result = new JSONObject();
+        for (Field f : fields) {
             f.setAccessible(true);
             if (!java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
-                System.out.println(f.getName() + " " + f.get(obj));
+                try {
+                    Object value = f.get(obj);
+                    if (value == obj) {
+                        continue;
+                    }
+                    result.put(f.getName(), serialize(value, serializationDepth));
+                } catch (Exception ex) {
+
+                }
+
             }
 
         }
 
-        return fields;
+        return result;
     }
 
-    private static JSONObject serializeMap(Map<?, ?> map) throws IllegalAccessException, JSONException {
+    private static JSONObject serializeMap(Map<?, ?> map) throws JSONException {
+        return serializeMap(map, 0);
+    }
+
+    private static JSONObject serializeMap(Map<?, ?> map, int serializationDepth) throws JSONException {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             String key = String.valueOf(entry.getKey());
             Object value = entry.getValue();
-            jsonObject.put(key, serialize(value));
+            jsonObject.put(key, serialize(value, serializationDepth));
         }
         return jsonObject;
     }
 
-    public static Object serialize(Object obj, int serializationDepth) throws IllegalAccessException, JSONException {
+//    public static Object serialize(Object obj, int serializationDepth) throws IllegalAccessException, JSONException {
+//
+//    }
 
+    public static Object serialize(Object obj) throws JSONException {
+        return serialize(obj, 0);
     }
 
-    public static Object serialize(Object obj) throws IllegalAccessException, JSONException {
+    public static Object serialize(Object obj, int serializationDepth) throws JSONException {
         if (obj == null) {
+            return null;
+        }
+
+        if (serializationDepth > MAX_SERIALIZATION_LEVEL) {
             return new JSONObject();
         }
 
@@ -87,24 +123,29 @@ public class SerializerHelper {
             return obj;
         }
 
-        if (obj instanceof Collection<?>) {
-            return serializeCollection((Collection<?>) obj);
-        }
+        serializationDepth++;
 
         if (obj instanceof Map<?, ?>) {
-            return serializeMap((Map<?,?>) obj);
+            return serializeMap((Map<?, ?>) obj, serializationDepth);
         }
 
-        JSONObject jsonObject = new JSONObject();
+
+        if (obj.getClass().isArray()) {
+            return serializeArray((Object[]) obj, serializationDepth);
+        }
+
+        if (obj instanceof Collection<?>) {
+            return serializeCollection((Collection<?>) obj, serializationDepth);
+        }
+
         Class<?> clazz = obj.getClass();
-        List<Field> fields = getAllFields(clazz, obj);
-//        Map<String, Object> getters = executeAndGetMethods(obj);
-//        Map<String, Object> fields = getAllFields(obj.getClass(), obj);
-//        for (Field field : fields) {
-//            String fieldName = field.getName();
-//            Object fieldValue = field.get(obj);
-//            jsonObject.put(fieldName, fieldValue);
-//        }
+        JSONObject jsonObject = getAllFields(clazz, obj, serializationDepth);
+        Map<String, Object> getters = executeAndGetMethods(obj);
+
+        for (Map.Entry<String, Object> entry: getters.entrySet()) {
+            jsonObject.put(entry.getKey(), entry.getValue());
+            jsonObject.put(entry.getKey(), entry.getValue()); // TODO: remove
+        }
 
         return jsonObject;
     }

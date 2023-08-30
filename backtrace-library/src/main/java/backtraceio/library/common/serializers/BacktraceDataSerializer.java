@@ -13,15 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.models.BacktraceData;
@@ -123,12 +117,17 @@ public class BacktraceDataSerializer {
             String methodName = method.getName();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // TODO: check if needed
+
+                if (methodName.equals("getClass")) {
+                    continue;
+                }
+
                 if (methodName.startsWith("get") && method.getParameterCount() == 0) {
                     try {
                         Object result = method.invoke(obj);
                         String propertyName = methodName.substring(3); // Remove 'get' prefix
-                        System.out.println(propertyName + ": " + result);
-                        fields.put(decapitalizeString(propertyName), result);
+//                        System.out.println(propertyName + ": " + result);
+                        fields.put(decapitalizeString(propertyName), serialize(result));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -185,7 +184,7 @@ public class BacktraceDataSerializer {
                 json.put("attributes", serializeAttributes(data.attributes));
             }
 
-            if(data.annotations != null) {
+            if (data.annotations != null) {
                 json.put("annotations", serializeAnnotations(data.annotations));
             }
 
@@ -211,7 +210,7 @@ public class BacktraceDataSerializer {
             JSONObject threadInfoObj = new JSONObject();
             threadInfoObj.put("name", threadInfo.getName());
             threadInfoObj.put("fault", threadInfo.getFault());
-            if(threadInfo.getStack() != null) {
+            if (threadInfo.getStack() != null) {
                 JSONArray stackArray = serializeStackList(threadInfo.getStack());
                 threadInfoObj.put("stack", stackArray);
             }
