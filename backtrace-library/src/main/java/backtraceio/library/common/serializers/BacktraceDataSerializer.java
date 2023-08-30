@@ -30,10 +30,9 @@ public class BacktraceDataSerializer {
         Map<String, Object> fields = new HashMap<>();
         Method[] methods = clazz.getMethods();
 
-        for (Method method : methods) {
-            String methodName = method.getName();
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // TODO: check if needed
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // TODO: check if needed
+            for (Method method : methods) {
+                String methodName = method.getName();
 
                 if (methodName.equals("getClass")) {
                     continue;
@@ -75,7 +74,6 @@ public class BacktraceDataSerializer {
                 }
                 json.put("classifiers", classifiers);
             }
-
 
             if (data.attributes != null) {
                 json.put("attributes", serializeAttributes(data.attributes));

@@ -39,10 +39,6 @@ public class SerializerHelper {
         return string == null || string.isEmpty() ? "" : Character.toLowerCase(string.charAt(0)) + string.substring(1);
     }
 
-    private static JSONArray serializeCollection(Collection<?> collection) throws JSONException {
-        return serializeCollection(collection, 0);
-    }
-
     private static JSONArray serializeArray(Object[] array, int serializationDepth) throws JSONException {
         JSONArray jsonArray = new JSONArray();
         for (Object item : array) {
@@ -77,7 +73,7 @@ public class SerializerHelper {
                     }
                     result.put(f.getName(), serialize(value, serializationDepth));
                 } catch (Exception ex) {
-
+//                ex.printStackTrace();
                 }
 
             }
@@ -85,10 +81,6 @@ public class SerializerHelper {
         }
 
         return result;
-    }
-
-    private static JSONObject serializeMap(Map<?, ?> map) throws JSONException {
-        return serializeMap(map, 0);
     }
 
     private static JSONObject serializeMap(Map<?, ?> map, int serializationDepth) throws JSONException {
@@ -124,7 +116,6 @@ public class SerializerHelper {
         if (obj instanceof Map<?, ?>) {
             return serializeMap((Map<?, ?>) obj, serializationDepth);
         }
-
 
         if (obj.getClass().isArray()) {
             return serializeArray((Object[]) obj, serializationDepth);

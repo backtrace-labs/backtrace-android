@@ -118,6 +118,7 @@ public class BacktraceData {
      * @param report           current report
      * @param clientAttributes attributes which should be added to BacktraceData object
      */
+
     public BacktraceData(Context context, BacktraceReport report, Map<String, Object>
             clientAttributes) {
         if (report == null) {
@@ -126,8 +127,8 @@ public class BacktraceData {
         this.context = context;
         this.report = report;
 
-        setReportInformation();
-        setThreadsInformation();
+        setDefaultReportInformation();
+        setDefaultThreadsInformation();
         setAttributes(clientAttributes);
     }
 
@@ -176,24 +177,44 @@ public class BacktraceData {
     /**
      * Set report information such as report identifier (UUID), timestamp, classifier
      */
-    private void setReportInformation() {
+    private void setDefaultReportInformation() {
+        this.setReportInformation(
+                report.uuid.toString(),
+                report.timestamp,
+                report.exceptionTypeReport ? new String[]{report.classifier} : null,
+                System.getProperty("java.version"), //TODO: Fix problem with read Java version,
+                BacktraceClient.version
+                );
+    }
+
+    public void setReportInformation(String uuid, long timestamp, String [] classifiers, String langVersion, String agentVersion) {
         BacktraceLogger.d(LOG_TAG, "Setting report information");
-        uuid = report.uuid.toString();
-        timestamp = report.timestamp;
-        classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
-        langVersion = System.getProperty("java.version"); //TODO: Fix problem with read Java version
-        agentVersion = BacktraceClient.version;
+        this.uuid = uuid;
+        this.timestamp = timestamp;
+        this.classifiers = classifiers;
+        this.langVersion = langVersion;
+        this.agentVersion = agentVersion;
     }
 
     /**
      * Set information about all threads
      */
-    private void setThreadsInformation() {
+    private void setDefaultThreadsInformation() {
         BacktraceLogger.d(LOG_TAG, "Setting threads information");
+
         ThreadData threadData = new ThreadData(report.diagnosticStack);
-        this.mainThread = threadData.getMainThread();
-        this.threadInformationMap = threadData.threadInformation;
         SourceCodeData sourceCodeData = new SourceCodeData(report.diagnosticStack);
-        this.sourceCode = sourceCodeData.data.isEmpty() ? null : sourceCodeData.data;
+
+        this.setThreadsInformation(
+                threadData.getMainThread(),
+                threadData.threadInformation,
+                sourceCodeData.data.isEmpty() ? null : sourceCodeData.data
+        );
+    }
+
+    public void setThreadsInformation(String mainThreadName, Map<String, ThreadInformation> threadInformationMap, Map<String, SourceCode> sourceCodeData) {
+        this.mainThread = mainThreadName;
+        this.threadInformationMap = threadInformationMap;
+        this.sourceCode = sourceCodeData;
     }
 }
