@@ -25,89 +25,6 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDataSerializer {
 
-
-//    public static Object serialize(Object obj) throws IllegalAccessException, JSONException {
-//        if (obj == null) {
-//            return new JSONObject();
-//        }
-//
-//        // TODO: check if all of the types
-//        if (SerializerHelper.isPrimitiveType(obj)) {
-//            return obj;
-//        }
-//
-//        if (obj instanceof Collection<?>) {
-//            return serializeCollection((Collection<?>) obj);
-//        }
-//
-//        if (obj instanceof Map<?, ?>) {
-//            return serializeMap((Map<?,?>) obj);
-//        }
-//
-//        JSONObject jsonObject = new JSONObject();
-//        Class<?> clazz = obj.getClass();
-//        List<Field> fields = getAllFields(clazz, obj);
-////        Map<String, Object> getters = executeAndGetMethods(obj);
-////        Map<String, Object> fields = getAllFields(obj.getClass(), obj);
-////        for (Field field : fields) {
-////            String fieldName = field.getName();
-////            Object fieldValue = field.get(obj);
-////            jsonObject.put(fieldName, fieldValue);
-////        }
-//
-//        return jsonObject;
-//    }
-
-//    public static String decapitalizeString(String string) {
-//        return string == null || string.isEmpty() ? "" : Character.toLowerCase(string.charAt(0)) + string.substring(1);
-//    }
-
-//    private static List<Field> getAllFields(Class<?> klass, Object obj) throws IllegalAccessException {
-//        // TODO: improve naming
-//
-//        List<Field> fields = new ArrayList<Field>();
-//        for (Class<?> c = klass; c != null; c = c.getSuperclass()) {
-//            fields.addAll(Arrays.asList(c.getDeclaredFields()));
-//        }
-//
-//        for (Field f: fields) {
-//            f.setAccessible(true);
-//            if (!java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
-//                System.out.println(f.getName() + " " + f.get(obj));
-//            }
-//
-//        }
-////        return fields;
-////        Map<String, Object> fields = new HashMap<>();
-//////        List<Field> fields = new ArrayList<>();
-////        for (Class<?> k = klass; k != null; k = k.getSuperclass()) {
-////            for (Field f: k.getDeclaredFields()){
-////                try {
-////                    f.setAccessible(true);
-////                    Object val = f.get(obj);
-////                    if(val == null) {
-////                        continue;
-////                    }
-////                    fields.put(f.getName(), serialize(f.get(obj)));
-////                }
-////                catch (Exception e) {
-////                    System.out.println(e);
-////                }
-////            }
-//////            fields.addAll(Arrays.asList(k.getDeclaredFields()));
-////        }
-////
-////        for (Field f: klass.getDeclaredFields()) {
-////            try {
-////                fields.put(f.getName(), serialize(f.get(obj)));
-////            } catch (JSONException e) {
-////                throw new RuntimeException(e);
-////            }
-////        }
-//
-//        return fields;
-//    }
-
     public static Map<String, Object> executeAndGetMethods(Object obj) {
         Class<?> clazz = obj.getClass();
         Map<String, Object> fields = new HashMap<>();
@@ -126,7 +43,6 @@ public class BacktraceDataSerializer {
                     try {
                         Object result = method.invoke(obj);
                         String propertyName = methodName.substring(3); // Remove 'get' prefix
-//                        System.out.println(propertyName + ": " + result);
                         fields.put(decapitalizeString(propertyName), serialize(result));
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -136,25 +52,6 @@ public class BacktraceDataSerializer {
         }
         return fields;
     }
-
-
-//    private static JSONArray serializeCollection(Collection<?> collection) throws IllegalAccessException, JSONException {
-//        JSONArray jsonArray = new JSONArray();
-//        for (Object item : collection) {
-//            jsonArray.put(serialize(item));
-//        }
-//        return jsonArray;
-//    }
-//
-//    private static JSONObject serializeMap(Map<?, ?> map) throws IllegalAccessException, JSONException {
-//        JSONObject jsonObject = new JSONObject();
-//        for (Map.Entry<?, ?> entry : map.entrySet()) {
-//            String key = String.valueOf(entry.getKey());
-//            Object value = entry.getValue();
-//            jsonObject.put(key, serialize(value));
-//        }
-//        return jsonObject;
-//    }
 
     public static String toJson(BacktraceData data) throws JSONException, IllegalAccessException {
         {
@@ -192,7 +89,6 @@ public class BacktraceDataSerializer {
                 json.put("sourceCode", serializeSourceCode(data.sourceCode));
             }
 
-            // Serialize threadInformationMap
             if (data.getThreadInformationMap() != null) {
                 JSONObject threadInformationJson = serializeThreadInformation(data.getThreadInformationMap());
                 json.put("threads", threadInformationJson);

@@ -101,10 +101,6 @@ public class SerializerHelper {
         return jsonObject;
     }
 
-//    public static Object serialize(Object obj, int serializationDepth) throws IllegalAccessException, JSONException {
-//
-//    }
-
     public static Object serialize(Object obj) throws JSONException {
         return serialize(obj, 0);
     }
