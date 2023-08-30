@@ -140,7 +140,6 @@ public class SerializerHelper {
 
         for (Map.Entry<String, Object> entry: getters.entrySet()) {
             jsonObject.put(entry.getKey(), entry.getValue());
-            jsonObject.put(entry.getKey(), entry.getValue()); // TODO: remove
         }
 
         return jsonObject;
