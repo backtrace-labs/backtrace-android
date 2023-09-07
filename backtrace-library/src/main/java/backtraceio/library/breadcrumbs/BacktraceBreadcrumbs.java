@@ -6,8 +6,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
-import androidx.core.content.ContextCompat;
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
