@@ -1,0 +1,157 @@
+{
+  "_": {
+    "user": "test",
+    "project": "test",
+    "tx": 9444,
+    "universe": "",
+    "latency": "306 us",
+    "runtime": {
+      "filter": {
+        "time": 78,
+        "rows": 1,
+        "n_filters": 1,
+        "breakdown": [
+          71
+        ]
+      },
+      "group_by": {
+        "time": 3,
+        "groups": 1,
+        "rows": 1
+      },
+      "having": {
+        "time": 0,
+        "ungroup": 0,
+        "groups": 1,
+        "rows": 1
+      },
+      "aggregate": {
+        "pre_having": 0,
+        "pre_sort": 1,
+        "post_sort": 28,
+        "n_aggregates": 4,
+        "breakdown": [
+          12,
+          3,
+          2,
+          2
+        ]
+      },
+      "sort": {
+        "time": 1,
+        "groups": 1,
+        "rows": 1
+      },
+      "render": {
+        "time": 37
+      },
+      "set": {
+        "time": 0
+      },
+      "merge": {
+        "time": 0
+      },
+      "ungrouped": {
+        "time": 0,
+        "having": 0,
+        "subqueries": []
+      },
+      "total_time": 111,
+      "toplevel": {
+        "parse_end": 31,
+        "execute_begin": 32,
+        "execute_end": 184,
+        "print_begin": 185,
+        "print_end": 222
+      }
+    },
+    "navigation": []
+  },
+  "response": {
+    "version": "1.2.0",
+    "seq": 12,
+    "encoding": "rle",
+    "columns": [
+      [
+        "head(error.message)",
+        ""
+      ],
+      [
+        "head(callstack)",
+        "callstack"
+      ],
+      [
+        "head(guid)",
+        "uuid"
+      ],
+      [
+        "head(classifiers)",
+        "labels"
+      ]
+    ],
+    "columns_desc": [
+      {
+        "name": "error.message",
+        "format": "",
+        "type": "dictionary",
+        "op": "head"
+      },
+      {
+        "name": "callstack",
+        "format": "callstack",
+        "type": "dictionary",
+        "op": "head"
+      },
+      {
+        "name": "guid",
+        "format": "uuid",
+        "type": "uuid",
+        "op": "head"
+      },
+      {
+        "name": "classifiers",
+        "format": "labels",
+        "type": "dictionary",
+        "op": "head"
+      }
+    ],
+    "pagination": {
+      "limit": 1,
+      "offset": 0
+    },
+    "values": [
+      [
+        "*",
+        [
+          [
+            "Invalid index of selected element!"
+          ],
+          [
+            "{\"frame\":[\"backtraceio.backtraceio.MainActivity.handledException\",\"androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener.onClick\",\"android.view.View.performClick\",\"android.view.View.performClickInternal\",\"android.view.View.access$3600\",\"android.view.View$PerformClick.run\",\"androidx.test.espresso.base.Interrogator.loopAndInterrogate\",\"androidx.test.espresso.base.UiControllerImpl.loopUntil\",\"androidx.test.espresso.base.UiControllerImpl.injectMotionEvent\",\"androidx.test.espresso.action.MotionEvents.sendUp\",\"androidx.test.espresso.action.Tap.sendSingleTap\",\"androidx.test.espresso.action.Tap.-$$Nest$smsendSingleTap\",\"androidx.test.espresso.action.Tap$1.sendTap\",\"androidx.test.espresso.action.GeneralClickAction.perform\",\"androidx.test.espresso.ViewInteraction$SingleExecutionViewAction.perform\",\"androidx.test.espresso.ViewInteraction.doPerform\",\"androidx.test.espresso.ViewInteraction.-$$Nest$mdoPerform\",\"androidx.test.espresso.ViewInteraction$1.call\",\"java.util.concurrent.FutureTask.run\",\"android.os.Handler.handleCallback\",\"android.os.Handler.dispatchMessage\",\"android.os.Looper.loop\",\"android.app.ActivityThread.main\",\"java.lang.reflect.Method.invoke\",\"com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run\",\"com.android.internal.os.ZygoteInit.main\"]}"
+          ],
+          [
+            "e4c57699-0dc9-35e2-b4a0-2ffff1925ca7"
+          ],
+          [
+            "java.lang.IndexOutOfBoundsException"
+          ]
+        ],
+        1
+      ]
+    ],
+    "cardinalities": {
+      "initial": {
+        "rows": 1,
+        "groups": 1
+      },
+      "having": {
+        "rows": 1,
+        "groups": 1
+      },
+      "pagination": {
+        "rows": 1,
+        "groups": 1
+      }
+    }
+  }
+}

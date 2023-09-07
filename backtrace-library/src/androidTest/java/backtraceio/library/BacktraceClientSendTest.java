@@ -297,7 +297,6 @@ public class BacktraceClientSendTest {
         };
         backtraceClient.setOnRequestHandler(rh);
 
-
         //WHEN
         for (final String message : messages) {
             backtraceClient.send(new Exception(message), new OnServerResponseEventListener() {
