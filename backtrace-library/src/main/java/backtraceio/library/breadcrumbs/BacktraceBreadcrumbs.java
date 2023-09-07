@@ -1,7 +1,12 @@
 package backtraceio.library.breadcrumbs;
 
+import static android.content.Context.RECEIVER_EXPORTED;
+
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
+
+import androidx.core.content.ContextCompat;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -103,8 +108,14 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
 
         backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
-        context.registerReceiver(backtraceBroadcastReceiver,
-                backtraceBroadcastReceiver.getIntentFilter());
+
+        if(Build.VERSION.SDK_INT >= 33) {
+            context.registerReceiver(backtraceBroadcastReceiver,
+                    backtraceBroadcastReceiver.getIntentFilter(), RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(backtraceBroadcastReceiver,
+                    backtraceBroadcastReceiver.getIntentFilter());
+        }
 
         if (enabledBreadcrumbTypes.contains(BacktraceBreadcrumbType.SYSTEM)) {
             backtraceComponentListener = new BacktraceComponentListener(this);
