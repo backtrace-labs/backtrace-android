@@ -107,7 +107,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
         backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
 
-        if(Build.VERSION.SDK_INT >= 33) {
+        if (Build.VERSION.SDK_INT >= 33) {
             context.registerReceiver(backtraceBroadcastReceiver,
                     backtraceBroadcastReceiver.getIntentFilter(), RECEIVER_EXPORTED);
         } else {
@@ -356,6 +356,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Determinate if Breadcrumbs are enabled.
+     *
      * @return true if breadcrumbs are enabled.
      */
     public boolean isEnabled() {
