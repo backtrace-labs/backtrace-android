@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.8
+
+- Fixed missing breadcrumbs intent filter in SDK 33+.
+
 ## Version 3.7.7
 
 - Added a new attribute to native reports - `breadcrumbs.lastId`
