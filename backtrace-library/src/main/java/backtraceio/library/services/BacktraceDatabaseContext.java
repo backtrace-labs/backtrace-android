@@ -75,13 +75,13 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         this._path = path;//this.getAbsolutePath(path);
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;
-        SetupBatch();
+        setupBatch();
     }
 
     /**
      * Setup cache
      */
-    private void SetupBatch() {
+    private void setupBatch() {
         if (this._retryNumber == 0) {
             throw new IllegalArgumentException("Retry number must be greater than 0!");
         }
@@ -175,13 +175,20 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
 
         for (int key : batchRetry.keySet()) {
-            for (BacktraceDatabaseRecord databaseRecord : batchRetry.get(key)) {
+            List<BacktraceDatabaseRecord> records = batchRetry.get(key);
+
+            for (BacktraceDatabaseRecord databaseRecord : records) {
                 if (databaseRecord == null || record.id != databaseRecord.id) {
                     continue;
                 }
 
                 databaseRecord.delete();
-                batchRetry.get(key).remove(databaseRecord);
+                try {
+                    records.remove(databaseRecord);
+                }
+                catch (Exception e) {
+                    BacktraceLogger.e(LOG_TAG, "Exception on removing record from db context", e);
+                }
                 this.totalRecords--;
                 this.totalSize -= databaseRecord.getSize();
                 return true;
