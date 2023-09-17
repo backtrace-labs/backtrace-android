@@ -19,8 +19,9 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDataDeserializer {
 
-    public static BacktraceData deserialize(JSONObject obj) throws JSONException {
-        BacktraceData backtraceData = new BacktraceData(null, null, null); // todo: fix
+    public static BacktraceData deserialize(Context context, JSONObject obj) throws JSONException {
+        BacktraceReport report = BacktraceDataDeserializer.deserializeReport(context, obj.optJSONObject("report"));
+        BacktraceData backtraceData = new BacktraceData(context, report, new HashMap<>()); // todo: fix
 
         backtraceData.symbolication = obj.optString("symbolication");
         backtraceData.uuid = obj.optString("uuid");
@@ -102,52 +103,59 @@ public class BacktraceDataDeserializer {
 //            }
 //        }
 
-        // Deserialize BacktraceReport
-        JSONObject reportObj = obj.optJSONObject("report");
-        if (reportObj != null) {
-            BacktraceReport report = new BacktraceReport(""); // todo: fix
-            report.uuid = UUID.fromString(reportObj.optString("uuid"));
-            report.timestamp = reportObj.optLong("timestamp");
-            report.exceptionTypeReport = reportObj.optBoolean("exceptionTypeReport");
-            report.classifier = reportObj.optString("classifier");
-
-            JSONArray attachmentPathsArray = reportObj.optJSONArray("attachmentPaths");
-            if (attachmentPathsArray != null) {
-                report.attachmentPaths = new ArrayList<>();
-                for (int i = 0; i < attachmentPathsArray.length(); i++) {
-                    report.attachmentPaths.add(attachmentPathsArray.optString(i));
-                }
-            }
-
-            report.message = reportObj.optString("message");
-
-            // Deserialize exception field if needed
-
-            JSONArray diagnosticStackArray = reportObj.optJSONArray("diagnosticStack");
-            if (diagnosticStackArray != null) {
-                report.diagnosticStack = new ArrayList<>();
-                for (int i = 0; i < diagnosticStackArray.length(); i++) {
-                    JSONObject stackItem = diagnosticStackArray.optJSONObject(i);
-                    if (stackItem != null) {
-                        BacktraceStackFrame stackFrame = new BacktraceStackFrame();
-                        stackFrame.functionName = stackItem.optString("funcName");
-                        stackFrame.line = stackItem.optInt("line");
-                        stackFrame.sourceCode = stackItem.optString("sourceCode");
-                        report.diagnosticStack.add(stackFrame);
-                    }
-                }
-            }
-
-            // You would similarly handle other fields of BacktraceReport here
-
-            backtraceData.report = report;
-        }
-
         return backtraceData;
     }
+    public static BacktraceReport deserializeReport(Context context, JSONObject obj) throws JSONException {
+        if (obj == null ){
+            return null;
+        }
 
+        BacktraceReport report = new BacktraceReport(""); // todo: fix
+        report.uuid = UUID.fromString(obj.optString("uuid"));
+        report.timestamp = obj.optLong("timestamp");
+        report.exceptionTypeReport = obj.optBoolean("exceptionTypeReport");
+        report.classifier = obj.optString("classifier");
 
-    public static BacktraceData deserialize(Context context, JSONObject obj) throws JSONException {
+        JSONArray attachmentPathsArray = obj.optJSONArray("attachmentPaths");
+        if (attachmentPathsArray != null) {
+            report.attachmentPaths = new ArrayList<>();
+            for (int i = 0; i < attachmentPathsArray.length(); i++) {
+                report.attachmentPaths.add(attachmentPathsArray.optString(i));
+            }
+        }
+
+        report.message = obj.optString("message");
+
+        // Deserialize exception field if needed
+
+        JSONArray diagnosticStackArray = obj.optJSONArray("diagnosticStack");
+        if (diagnosticStackArray != null) {
+            report.diagnosticStack = new ArrayList<>();
+            for (int i = 0; i < diagnosticStackArray.length(); i++) {
+                JSONObject stackItem = diagnosticStackArray.optJSONObject(i);
+                if (stackItem != null) {
+                    BacktraceStackFrame stackFrame = new BacktraceStackFrame();
+                    stackFrame.functionName = stackItem.optString("funcName");
+                    stackFrame.line = stackItem.optInt("line");
+                    stackFrame.sourceCode = stackItem.optString("sourceCode");
+                    report.diagnosticStack.add(stackFrame);
+                }
+            }
+        }
+
+        JSONObject exceptionObj = obj.optJSONObject("exception");
+        if (exceptionObj != null) {
+            String exceptionClassName = exceptionObj.optString("className");
+            String exceptionMessage = exceptionObj.optString("message");
+            Exception exception = new Exception(exceptionMessage);
+            exception.setStackTrace(parseStackFrames(exceptionObj.optJSONArray("stackTrace")));
+            report.exception = exception;
+        }
+
+        return report;
+    }
+
+    public static BacktraceData deserializeReportXYZ(Context context, JSONObject obj) throws JSONException {
         BacktraceData backtraceData = new BacktraceData(context, null, null); // todo fix
 
         // ... (Deserialization logic for other fields) ...
