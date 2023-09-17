@@ -185,12 +185,13 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                 databaseRecord.delete();
                 try {
                     records.remove(databaseRecord);
+                    this.totalRecords--;
+                    this.totalSize -= databaseRecord.getSize();
                 }
                 catch (Exception e) {
                     BacktraceLogger.d(LOG_TAG, "Exception on removing record from db context: " + e.getMessage());
                 }
-                this.totalRecords--;
-                this.totalSize -= databaseRecord.getSize();
+                
                 return true;
             }
         }
