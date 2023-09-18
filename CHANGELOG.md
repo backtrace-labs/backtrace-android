@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.9
+
+- Fixed problem when thread is trying to delete already deleted record from db context
+
 ## Version 3.7.8
 
 - Fixed missing breadcrumbs intent filter in SDK 33+.
