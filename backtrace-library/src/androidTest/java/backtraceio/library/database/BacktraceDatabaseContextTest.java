@@ -200,6 +200,21 @@ public class BacktraceDatabaseContextTest {
     }
 
     @Test
+    public void deleteSameRecordFromDatabaseContext() {
+        // GIVEN
+        List<BacktraceDatabaseRecord> records = fillDatabase();
+
+        // WHEN
+        databaseContext.delete(records.get(0));
+        databaseContext.delete(records.get(0));
+
+        // THEN
+        assertEquals(2, databaseContext.count());
+        assertTrue(databaseContext.contains(records.get(1)));
+        assertTrue(databaseContext.contains(records.get(2)));
+    }
+
+    @Test
     public void tryDeleteNotExistingRecordFromDatabaseContext() {
         // GIVEN
         fillDatabase();
