@@ -1,3 +1,1016 @@
 {
-  "abc": 123
+  "agent": "backtrace-android",
+  "agentVersion": "3.7.7-8-3f67d73-org-json-serializer",
+  "annotations": {
+    "Environment Variables": {
+      "SYSTEMSERVERCLASSPATH": "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar",
+      "PATH": "/product/bin:/apex/com.android.runtime/bin:/apex/com.android.art/bin:/system_ext/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin",
+      "ANDROID_SOCKET_zygote": "17",
+      "ANDROID_I18N_ROOT": "/apex/com.android.i18n",
+      "ANDROID_DATA": "/data",
+      "ASEC_MOUNTPOINT": "/mnt/asec",
+      "ANDROID_TZDATA_ROOT": "/apex/com.android.tzdata",
+      "EXTERNAL_STORAGE": "/sdcard",
+      "ANDROID_BOOTLOGO": "1",
+      "ANDROID_ASSETS": "/system/app",
+      "ANDROID_STORAGE": "/storage",
+      "DEX2OATBOOTCLASSPATH": "/apex/com.android.art/javalib/core-oj.jar:/apex/com.android.art/javalib/core-libart.jar:/apex/com.android.art/javalib/core-icu4j.jar:/apex/com.android.art/javalib/okhttp.jar:/apex/com.android.art/javalib/bouncycastle.jar:/apex/com.android.art/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/framework-atb-backward-compatibility.jar",
+      "ANDROID_ART_ROOT": "/apex/com.android.art",
+      "ANDROID_ROOT": "/system",
+      "DOWNLOAD_CACHE": "/data/cache",
+      "BOOTCLASSPATH": "/apex/com.android.art/javalib/core-oj.jar:/apex/com.android.art/javalib/core-libart.jar:/apex/com.android.art/javalib/core-icu4j.jar:/apex/com.android.art/javalib/okhttp.jar:/apex/com.android.art/javalib/bouncycastle.jar:/apex/com.android.art/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/framework-atb-backward-compatibility.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar:/apex/com.android.mediaprovider/javalib/framework-mediaprovider.jar:/apex/com.android.os.statsd/javalib/framework-statsd.jar:/apex/com.android.permission/javalib/framework-permission.jar:/apex/com.android.sdkext/javalib/framework-sdkextensions.jar:/apex/com.android.wifi/javalib/framework-wifi.jar:/apex/com.android.tethering/javalib/framework-tethering.jar",
+      "ANDROID_SOCKET_usap_pool_primary": "21"
+    },
+    "string-key2": {
+      "detail-message": "test-error",
+      "stack-trace": [
+        {
+          "declaring-class": "backtraceio.library.common.BacktraceDataSerializerTest",
+          "file-name": "BacktraceDataSerializerTest.java",
+          "line-number": 32,
+          "method-name": "testGsonSerializer"
+        },
+        {
+          "declaring-class": "java.lang.reflect.Method",
+          "file-name": "Method.java",
+          "line-number": -2,
+          "method-name": "invoke"
+        },
+        {
+          "declaring-class": "org.junit.runners.model.FrameworkMethod$1",
+          "file-name": "FrameworkMethod.java",
+          "line-number": 59,
+          "method-name": "runReflectiveCall"
+        },
+        {
+          "declaring-class": "org.junit.internal.runners.model.ReflectiveCallable",
+          "file-name": "ReflectiveCallable.java",
+          "line-number": 12,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.model.FrameworkMethod",
+          "file-name": "FrameworkMethod.java",
+          "line-number": 56,
+          "method-name": "invokeExplosively"
+        },
+        {
+          "declaring-class": "org.junit.internal.runners.statements.InvokeMethod",
+          "file-name": "InvokeMethod.java",
+          "line-number": 17,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$3",
+          "file-name": "ParentRunner.java",
+          "line-number": 306,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner$1",
+          "file-name": "BlockJUnit4ClassRunner.java",
+          "line-number": 100,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 366,
+          "method-name": "runLeaf"
+        },
+        {
+          "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner",
+          "file-name": "BlockJUnit4ClassRunner.java",
+          "line-number": 103,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner",
+          "file-name": "BlockJUnit4ClassRunner.java",
+          "line-number": 63,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$4",
+          "file-name": "ParentRunner.java",
+          "line-number": 331,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$1",
+          "file-name": "ParentRunner.java",
+          "line-number": 79,
+          "method-name": "schedule"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 329,
+          "method-name": "runChildren"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 66,
+          "method-name": "access$100"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$2",
+          "file-name": "ParentRunner.java",
+          "line-number": 293,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$3",
+          "file-name": "ParentRunner.java",
+          "line-number": 306,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 413,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "androidx.test.ext.junit.runners.AndroidJUnit4",
+          "file-name": "AndroidJUnit4.java",
+          "line-number": 162,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.Suite",
+          "file-name": "Suite.java",
+          "line-number": 128,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.Suite",
+          "file-name": "Suite.java",
+          "line-number": 27,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$4",
+          "file-name": "ParentRunner.java",
+          "line-number": 331,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$1",
+          "file-name": "ParentRunner.java",
+          "line-number": 79,
+          "method-name": "schedule"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 329,
+          "method-name": "runChildren"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 66,
+          "method-name": "access$100"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$2",
+          "file-name": "ParentRunner.java",
+          "line-number": 293,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$3",
+          "file-name": "ParentRunner.java",
+          "line-number": 306,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 413,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runner.JUnitCore",
+          "file-name": "JUnitCore.java",
+          "line-number": 137,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runner.JUnitCore",
+          "file-name": "JUnitCore.java",
+          "line-number": 115,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "androidx.test.internal.runner.TestExecutor",
+          "file-name": "TestExecutor.java",
+          "line-number": 67,
+          "method-name": "execute"
+        },
+        {
+          "declaring-class": "androidx.test.internal.runner.TestExecutor",
+          "file-name": "TestExecutor.java",
+          "line-number": 58,
+          "method-name": "execute"
+        },
+        {
+          "declaring-class": "androidx.test.runner.AndroidJUnitRunner",
+          "file-name": "AndroidJUnitRunner.java",
+          "line-number": 446,
+          "method-name": "onStart"
+        },
+        {
+          "declaring-class": "android.app.Instrumentation$InstrumentationThread",
+          "file-name": "Instrumentation.java",
+          "line-number": 2205,
+          "method-name": "run"
+        }
+      ],
+      "suppressed-exceptions": []
+    },
+    "Exception properties": {
+      "detail-message": "test-error",
+      "stack-trace": [
+        {
+          "declaring-class": "backtraceio.library.common.BacktraceDataSerializerTest",
+          "file-name": "BacktraceDataSerializerTest.java",
+          "line-number": 32,
+          "method-name": "testGsonSerializer"
+        },
+        {
+          "declaring-class": "java.lang.reflect.Method",
+          "file-name": "Method.java",
+          "line-number": -2,
+          "method-name": "invoke"
+        },
+        {
+          "declaring-class": "org.junit.runners.model.FrameworkMethod$1",
+          "file-name": "FrameworkMethod.java",
+          "line-number": 59,
+          "method-name": "runReflectiveCall"
+        },
+        {
+          "declaring-class": "org.junit.internal.runners.model.ReflectiveCallable",
+          "file-name": "ReflectiveCallable.java",
+          "line-number": 12,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.model.FrameworkMethod",
+          "file-name": "FrameworkMethod.java",
+          "line-number": 56,
+          "method-name": "invokeExplosively"
+        },
+        {
+          "declaring-class": "org.junit.internal.runners.statements.InvokeMethod",
+          "file-name": "InvokeMethod.java",
+          "line-number": 17,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$3",
+          "file-name": "ParentRunner.java",
+          "line-number": 306,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner$1",
+          "file-name": "BlockJUnit4ClassRunner.java",
+          "line-number": 100,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 366,
+          "method-name": "runLeaf"
+        },
+        {
+          "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner",
+          "file-name": "BlockJUnit4ClassRunner.java",
+          "line-number": 103,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner",
+          "file-name": "BlockJUnit4ClassRunner.java",
+          "line-number": 63,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$4",
+          "file-name": "ParentRunner.java",
+          "line-number": 331,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$1",
+          "file-name": "ParentRunner.java",
+          "line-number": 79,
+          "method-name": "schedule"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 329,
+          "method-name": "runChildren"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 66,
+          "method-name": "access$100"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$2",
+          "file-name": "ParentRunner.java",
+          "line-number": 293,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$3",
+          "file-name": "ParentRunner.java",
+          "line-number": 306,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 413,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "androidx.test.ext.junit.runners.AndroidJUnit4",
+          "file-name": "AndroidJUnit4.java",
+          "line-number": 162,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.Suite",
+          "file-name": "Suite.java",
+          "line-number": 128,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.Suite",
+          "file-name": "Suite.java",
+          "line-number": 27,
+          "method-name": "runChild"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$4",
+          "file-name": "ParentRunner.java",
+          "line-number": 331,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$1",
+          "file-name": "ParentRunner.java",
+          "line-number": 79,
+          "method-name": "schedule"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 329,
+          "method-name": "runChildren"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 66,
+          "method-name": "access$100"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$2",
+          "file-name": "ParentRunner.java",
+          "line-number": 293,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner$3",
+          "file-name": "ParentRunner.java",
+          "line-number": 306,
+          "method-name": "evaluate"
+        },
+        {
+          "declaring-class": "org.junit.runners.ParentRunner",
+          "file-name": "ParentRunner.java",
+          "line-number": 413,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runner.JUnitCore",
+          "file-name": "JUnitCore.java",
+          "line-number": 137,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "org.junit.runner.JUnitCore",
+          "file-name": "JUnitCore.java",
+          "line-number": 115,
+          "method-name": "run"
+        },
+        {
+          "declaring-class": "androidx.test.internal.runner.TestExecutor",
+          "file-name": "TestExecutor.java",
+          "line-number": 67,
+          "method-name": "execute"
+        },
+        {
+          "declaring-class": "androidx.test.internal.runner.TestExecutor",
+          "file-name": "TestExecutor.java",
+          "line-number": 58,
+          "method-name": "execute"
+        },
+        {
+          "declaring-class": "androidx.test.runner.AndroidJUnitRunner",
+          "file-name": "AndroidJUnitRunner.java",
+          "line-number": 446,
+          "method-name": "onStart"
+        },
+        {
+          "declaring-class": "android.app.Instrumentation$InstrumentationThread",
+          "file-name": "Instrumentation.java",
+          "line-number": 2205,
+          "method-name": "run"
+        }
+      ],
+      "suppressed-exceptions": []
+    },
+    "Exception": {
+      "message": "test-error"
+    }
+  },
+  "attributes": {
+    "device.nfc.status": "NotAvailable",
+    "device.cpu.temperature": "0.0",
+    "string-key": "string-value",
+    "system.memory.active": "1051795456",
+    "device.wifi.status": "Enabled",
+    "screen.height": "1834",
+    "uname.machine": "i686",
+    "screen.dpi": "288",
+    "device.bluetooth_status": "NotPermitted",
+    "device.airplane_mode": "false",
+    "classifier": "java.lang.Exception",
+    "system.memory.total": "2077347840",
+    "device.sdk": "30",
+    "device.brand": "google",
+    "uname.sysname": "Android",
+    "cpu.boottime": "1694978533765",
+    "device.os_version": "5.4.61-android11-0-00791-gbad091cc4bf3-ab6833933",
+    "device.gps.enabled": "Enabled",
+    "application.package": "backtraceio.library.test",
+    "uname.version": "11",
+    "backtrace.version": "3.7.7-8-3f67d73-org-json-serializer",
+    "device.is_power_saving_mode": "false",
+    "screen.orientation": "Portrait",
+    "device.manufacturer": "Google",
+    "system.memory.free": "1025556480",
+    "battery.state": "Unplugged",
+    "error.type": "Exception",
+    "device.location": "Enabled",
+    "application": "backtraceio.library.test",
+    "error.message": "test-error",
+    "culture": "English",
+    "device.model": "sdk_gphone_x86",
+    "screen.width": "1080",
+    "build.type": "Debug",
+    "device.product": "sdk_gphone_x86",
+    "guid": "e4c57699-0dc9-35e2-b4a0-2ffff1925ca7",
+    "app.storage_used": "2925368",
+    "battery.level": "1.0",
+    "screen.brightness": "102"
+  },
+  "classifiers": [
+    "java.lang.Exception"
+  ],
+  "lang": "java",
+  "langVersion": "0",
+  "mainThread": "instr: androidx.test.runner.androidjunitrunner",
+  "sourceCode": {
+    "def0b244-b5c3-4c68-9e4b-b5421888eee1": {
+      "path": "ParentRunner.java",
+      "startLine": 306
+    },
+    "8d478559-5a6f-412b-b854-3000e9adc98f": {
+      "path": "Suite.java",
+      "startLine": 128
+    },
+    "448f66cf-becf-4c83-9687-37eb9369a359": {
+      "path": "BlockJUnit4ClassRunner.java",
+      "startLine": 100
+    },
+    "bd559fdd-bd6f-44b6-a9b9-a14d865961d7": {
+      "path": "ParentRunner.java",
+      "startLine": 366
+    },
+    "e0eeb7ad-1024-4789-9fbe-4becb39e8420": {
+      "path": "ParentRunner.java",
+      "startLine": 413
+    },
+    "4e282390-371b-4af4-b117-29398510be3a": {
+      "path": "FrameworkMethod.java",
+      "startLine": 59
+    },
+    "0ca32861-e9bb-4dd2-a38b-76bdb0be09e8": {
+      "path": "ParentRunner.java",
+      "startLine": 293
+    },
+    "7aaec2ac-a43e-444b-b9ae-ad41ced28f33": {
+      "path": "ParentRunner.java",
+      "startLine": 413
+    },
+    "cb3283d2-d08f-4851-96fb-ec54aac63fd2": {
+      "path": "JUnitCore.java",
+      "startLine": 115
+    },
+    "d3a587b8-9d2c-4e70-9a0a-5a8257917d2d": {
+      "path": "Method.java"
+    },
+    "4585edd4-5bf7-45e4-bb46-3f557b096852": {
+      "path": "FrameworkMethod.java",
+      "startLine": 56
+    },
+    "3e26748a-3965-4814-95a4-c474a701a15b": {
+      "path": "ParentRunner.java",
+      "startLine": 331
+    },
+    "d6321483-6dc8-4ae5-95e8-c34ca2bfb660": {
+      "path": "AndroidJUnit4.java",
+      "startLine": 162
+    },
+    "b8437309-6989-4316-ab70-925d6fbc5135": {
+      "path": "Instrumentation.java",
+      "startLine": 2205
+    },
+    "da3b40ad-d417-4f05-ae95-a7203478961d": {
+      "path": "ParentRunner.java",
+      "startLine": 329
+    },
+    "04520e56-5648-402d-99b5-434a8375e1b5": {
+      "path": "ParentRunner.java",
+      "startLine": 306
+    },
+    "dc715057-f108-4cc2-b4e8-f21aa2c4a75e": {
+      "path": "ParentRunner.java",
+      "startLine": 79
+    },
+    "ef921e3c-bbc6-4d1f-a8ac-e9dfcc2b3d90": {
+      "path": "ParentRunner.java",
+      "startLine": 79
+    },
+    "2068f2a4-9f0f-4854-bee9-cb398b7fd37f": {
+      "path": "ParentRunner.java",
+      "startLine": 331
+    },
+    "5e310bf1-ef77-449e-b523-bfb56d96cbc7": {
+      "path": "ParentRunner.java",
+      "startLine": 66
+    },
+    "3d9dcb46-6ac9-423e-8920-d0b5ec9c0f6d": {
+      "path": "BlockJUnit4ClassRunner.java",
+      "startLine": 63
+    },
+    "b47a8dd1-9c31-4793-805c-e33f9c77c818": {
+      "path": "Suite.java",
+      "startLine": 27
+    },
+    "2517e7f8-fcec-44eb-a37c-c144fd441837": {
+      "path": "AndroidJUnitRunner.java",
+      "startLine": 446
+    },
+    "2bf04cc1-bb1e-47e2-a11b-c4bdea625413": {
+      "path": "JUnitCore.java",
+      "startLine": 137
+    },
+    "295ccd27-4db2-487c-82f0-f255120cf593": {
+      "path": "ParentRunner.java",
+      "startLine": 306
+    },
+    "1ecb4287-1ad2-45a6-8450-af401cdbe17f": {
+      "path": "ReflectiveCallable.java",
+      "startLine": 12
+    },
+    "8ff34e56-9e08-4520-a87e-d7789785f013": {
+      "path": "TestExecutor.java",
+      "startLine": 67
+    },
+    "1549004b-d478-4341-87a2-4dea50ad031d": {
+      "path": "ParentRunner.java",
+      "startLine": 329
+    },
+    "5e3e29f7-7f77-4d4c-ae54-7a41caac90f4": {
+      "path": "ParentRunner.java",
+      "startLine": 293
+    },
+    "e9b5bfe9-f501-49c9-9621-02019e307488": {
+      "path": "InvokeMethod.java",
+      "startLine": 17
+    },
+    "a03637b1-a324-48e1-9b6f-06f030e2f3ba": {
+      "path": "ParentRunner.java",
+      "startLine": 66
+    },
+    "c6cf7f65-6407-4b51-91f0-76f223c36c62": {
+      "path": "BlockJUnit4ClassRunner.java",
+      "startLine": 103
+    },
+    "19b8ca48-b129-4503-99bc-da54738d3108": {
+      "path": "TestExecutor.java",
+      "startLine": 58
+    }
+  },
+  "threads": {
+    "profile saver": {
+      "fault": false,
+      "name": "profile saver",
+      "stack": []
+    },
+    "signal catcher": {
+      "fault": false,
+      "name": "signal catcher",
+      "stack": []
+    },
+    "finalizerwatchdogdaemon": {
+      "fault": false,
+      "name": "finalizerwatchdogdaemon",
+      "stack": [
+        {
+          "funcName": "java.lang.Object.wait",
+          "sourceCode": "d71a2769-7f9d-48d2-bb69-f8a99742219a"
+        },
+        {
+          "funcName": "java.lang.Object.wait",
+          "line": 442,
+          "sourceCode": "0710ca43-967f-4c85-865a-3ce24337a4d1"
+        },
+        {
+          "funcName": "java.lang.Object.wait",
+          "line": 568,
+          "sourceCode": "38e624a4-5cce-4bc5-92bb-bf684f18792b"
+        },
+        {
+          "funcName": "java.lang.Daemons$FinalizerWatchdogDaemon.sleepUntilNeeded",
+          "line": 341,
+          "sourceCode": "2b916c9d-3558-45bd-9bb0-b4436311451b"
+        },
+        {
+          "funcName": "java.lang.Daemons$FinalizerWatchdogDaemon.runInternal",
+          "line": 321,
+          "sourceCode": "c35386b7-781a-4185-8817-eef78da6c429"
+        },
+        {
+          "funcName": "java.lang.Daemons$Daemon.run",
+          "line": 139,
+          "sourceCode": "c9386136-04a8-485a-b8b9-95215d027013"
+        },
+        {
+          "funcName": "java.lang.Thread.run",
+          "line": 923,
+          "sourceCode": "caea3885-ba11-4852-ad74-8585e064bb31"
+        }
+      ]
+    },
+    "main": {
+      "fault": false,
+      "name": "main",
+      "stack": [
+        {
+          "funcName": "android.os.MessageQueue.nativePollOnce",
+          "sourceCode": "00b5be47-8513-4f2e-a5d4-c711a58ce8ab"
+        },
+        {
+          "funcName": "android.os.MessageQueue.next",
+          "line": 335,
+          "sourceCode": "caa8a790-c72a-479e-bc67-54139e01bdbe"
+        },
+        {
+          "funcName": "android.os.Looper.loop",
+          "line": 183,
+          "sourceCode": "9f06bcf3-579d-4856-90f6-530eaeb97aed"
+        },
+        {
+          "funcName": "android.app.ActivityThread.main",
+          "line": 7656,
+          "sourceCode": "6604ff49-6071-46ac-8f54-7b47f817b365"
+        },
+        {
+          "funcName": "java.lang.reflect.Method.invoke",
+          "sourceCode": "c13bba6c-f9f1-4e43-84c6-a6cd6ab76bb4"
+        },
+        {
+          "funcName": "com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run",
+          "line": 592,
+          "sourceCode": "c7255d95-3f41-422e-b491-19a60aa3f9db"
+        },
+        {
+          "funcName": "com.android.internal.os.ZygoteInit.main",
+          "line": 947,
+          "sourceCode": "20e6b724-4a53-46ba-b949-979200eb2ec9"
+        }
+      ]
+    },
+    "binder:11143_1": {
+      "fault": false,
+      "name": "binder:11143_1",
+      "stack": []
+    },
+    "binder:11143_2": {
+      "fault": false,
+      "name": "binder:11143_2",
+      "stack": []
+    },
+    "binder:11143_3": {
+      "fault": false,
+      "name": "binder:11143_3",
+      "stack": []
+    },
+    "finalizerdaemon": {
+      "fault": false,
+      "name": "finalizerdaemon",
+      "stack": [
+        {
+          "funcName": "java.lang.Object.wait",
+          "sourceCode": "9632b2af-8ce2-4c58-855b-f9b308538457"
+        },
+        {
+          "funcName": "java.lang.Object.wait",
+          "line": 442,
+          "sourceCode": "98bd4205-4ea6-4904-ac80-36c6b30ec1fe"
+        },
+        {
+          "funcName": "java.lang.ref.ReferenceQueue.remove",
+          "line": 190,
+          "sourceCode": "779a86d7-754b-45a2-b75c-8095a1a8a92a"
+        },
+        {
+          "funcName": "java.lang.ref.ReferenceQueue.remove",
+          "line": 211,
+          "sourceCode": "33d2d142-27da-4703-ae72-3064cbc5296c"
+        },
+        {
+          "funcName": "java.lang.Daemons$FinalizerDaemon.runInternal",
+          "line": 273,
+          "sourceCode": "da999508-073c-4575-8564-d5b28643a4ff"
+        },
+        {
+          "funcName": "java.lang.Daemons$Daemon.run",
+          "line": 139,
+          "sourceCode": "2c8faa9d-544a-4f03-8add-844f72ce88cc"
+        },
+        {
+          "funcName": "java.lang.Thread.run",
+          "line": 923,
+          "sourceCode": "7f1d95d6-4c9d-493d-952c-1f3214ec6f13"
+        }
+      ]
+    },
+    "referencequeuedaemon": {
+      "fault": false,
+      "name": "referencequeuedaemon",
+      "stack": [
+        {
+          "funcName": "java.lang.Object.wait",
+          "sourceCode": "26071830-c698-441a-8658-ca585739125a"
+        },
+        {
+          "funcName": "java.lang.Object.wait",
+          "line": 442,
+          "sourceCode": "be01c017-528d-4d0e-9ddb-304a6dabb97d"
+        },
+        {
+          "funcName": "java.lang.Object.wait",
+          "line": 568,
+          "sourceCode": "b8074c19-2f7e-4b14-9440-d353a52e1a33"
+        },
+        {
+          "funcName": "java.lang.Daemons$ReferenceQueueDaemon.runInternal",
+          "line": 217,
+          "sourceCode": "8038e8d8-b863-44e7-96be-86578bf7b81c"
+        },
+        {
+          "funcName": "java.lang.Daemons$Daemon.run",
+          "line": 139,
+          "sourceCode": "48686825-013f-4cb8-8fff-95040fd7b184"
+        },
+        {
+          "funcName": "java.lang.Thread.run",
+          "line": 923,
+          "sourceCode": "4c4e61d0-34c1-4011-9ddb-26fe16b66501"
+        }
+      ]
+    },
+    "instrumentationconnectionthread": {
+      "fault": false,
+      "name": "instrumentationconnectionthread",
+      "stack": [
+        {
+          "funcName": "android.os.MessageQueue.nativePollOnce",
+          "sourceCode": "1ba44e13-1bcd-4831-b880-a62f46085890"
+        },
+        {
+          "funcName": "android.os.MessageQueue.next",
+          "line": 335,
+          "sourceCode": "f0ca2009-f11a-4976-a1f2-3ceb9ef6ce95"
+        },
+        {
+          "funcName": "android.os.Looper.loop",
+          "line": 183,
+          "sourceCode": "1f3f81c7-2f6c-402b-8001-d1328c049ff4"
+        },
+        {
+          "funcName": "android.os.HandlerThread.run",
+          "line": 67,
+          "sourceCode": "d2161b2c-5baf-47ec-a9b0-2e957704aab7"
+        }
+      ]
+    },
+    "jit thread pool worker thread 0": {
+      "fault": false,
+      "name": "jit thread pool worker thread 0",
+      "stack": []
+    },
+    "instr: androidx.test.runner.androidjunitrunner": {
+      "fault": true,
+      "name": "instr: androidx.test.runner.androidjunitrunner",
+      "stack": [
+        {
+          "funcName": "java.lang.reflect.Method.invoke",
+          "sourceCode": "d3a587b8-9d2c-4e70-9a0a-5a8257917d2d"
+        },
+        {
+          "funcName": "org.junit.runners.model.FrameworkMethod$1.runReflectiveCall",
+          "line": 59,
+          "sourceCode": "4e282390-371b-4af4-b117-29398510be3a"
+        },
+        {
+          "funcName": "org.junit.internal.runners.model.ReflectiveCallable.run",
+          "line": 12,
+          "sourceCode": "1ecb4287-1ad2-45a6-8450-af401cdbe17f"
+        },
+        {
+          "funcName": "org.junit.runners.model.FrameworkMethod.invokeExplosively",
+          "line": 56,
+          "sourceCode": "4585edd4-5bf7-45e4-bb46-3f557b096852"
+        },
+        {
+          "funcName": "org.junit.internal.runners.statements.InvokeMethod.evaluate",
+          "line": 17,
+          "sourceCode": "e9b5bfe9-f501-49c9-9621-02019e307488"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$3.evaluate",
+          "line": 306,
+          "sourceCode": "def0b244-b5c3-4c68-9e4b-b5421888eee1"
+        },
+        {
+          "funcName": "org.junit.runners.BlockJUnit4ClassRunner$1.evaluate",
+          "line": 100,
+          "sourceCode": "448f66cf-becf-4c83-9687-37eb9369a359"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.runLeaf",
+          "line": 366,
+          "sourceCode": "bd559fdd-bd6f-44b6-a9b9-a14d865961d7"
+        },
+        {
+          "funcName": "org.junit.runners.BlockJUnit4ClassRunner.runChild",
+          "line": 103,
+          "sourceCode": "c6cf7f65-6407-4b51-91f0-76f223c36c62"
+        },
+        {
+          "funcName": "org.junit.runners.BlockJUnit4ClassRunner.runChild",
+          "line": 63,
+          "sourceCode": "3d9dcb46-6ac9-423e-8920-d0b5ec9c0f6d"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$4.run",
+          "line": 331,
+          "sourceCode": "3e26748a-3965-4814-95a4-c474a701a15b"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$1.schedule",
+          "line": 79,
+          "sourceCode": "dc715057-f108-4cc2-b4e8-f21aa2c4a75e"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.runChildren",
+          "line": 329,
+          "sourceCode": "da3b40ad-d417-4f05-ae95-a7203478961d"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.access$100",
+          "line": 66,
+          "sourceCode": "5e310bf1-ef77-449e-b523-bfb56d96cbc7"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$2.evaluate",
+          "line": 293,
+          "sourceCode": "0ca32861-e9bb-4dd2-a38b-76bdb0be09e8"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$3.evaluate",
+          "line": 306,
+          "sourceCode": "04520e56-5648-402d-99b5-434a8375e1b5"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.run",
+          "line": 413,
+          "sourceCode": "e0eeb7ad-1024-4789-9fbe-4becb39e8420"
+        },
+        {
+          "funcName": "androidx.test.ext.junit.runners.AndroidJUnit4.run",
+          "line": 162,
+          "sourceCode": "d6321483-6dc8-4ae5-95e8-c34ca2bfb660"
+        },
+        {
+          "funcName": "org.junit.runners.Suite.runChild",
+          "line": 128,
+          "sourceCode": "8d478559-5a6f-412b-b854-3000e9adc98f"
+        },
+        {
+          "funcName": "org.junit.runners.Suite.runChild",
+          "line": 27,
+          "sourceCode": "b47a8dd1-9c31-4793-805c-e33f9c77c818"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$4.run",
+          "line": 331,
+          "sourceCode": "2068f2a4-9f0f-4854-bee9-cb398b7fd37f"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$1.schedule",
+          "line": 79,
+          "sourceCode": "ef921e3c-bbc6-4d1f-a8ac-e9dfcc2b3d90"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.runChildren",
+          "line": 329,
+          "sourceCode": "1549004b-d478-4341-87a2-4dea50ad031d"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.access$100",
+          "line": 66,
+          "sourceCode": "a03637b1-a324-48e1-9b6f-06f030e2f3ba"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$2.evaluate",
+          "line": 293,
+          "sourceCode": "5e3e29f7-7f77-4d4c-ae54-7a41caac90f4"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner$3.evaluate",
+          "line": 306,
+          "sourceCode": "295ccd27-4db2-487c-82f0-f255120cf593"
+        },
+        {
+          "funcName": "org.junit.runners.ParentRunner.run",
+          "line": 413,
+          "sourceCode": "7aaec2ac-a43e-444b-b9ae-ad41ced28f33"
+        },
+        {
+          "funcName": "org.junit.runner.JUnitCore.run",
+          "line": 137,
+          "sourceCode": "2bf04cc1-bb1e-47e2-a11b-c4bdea625413"
+        },
+        {
+          "funcName": "org.junit.runner.JUnitCore.run",
+          "line": 115,
+          "sourceCode": "cb3283d2-d08f-4851-96fb-ec54aac63fd2"
+        },
+        {
+          "funcName": "androidx.test.internal.runner.TestExecutor.execute",
+          "line": 67,
+          "sourceCode": "8ff34e56-9e08-4520-a87e-d7789785f013"
+        },
+        {
+          "funcName": "androidx.test.internal.runner.TestExecutor.execute",
+          "line": 58,
+          "sourceCode": "19b8ca48-b129-4503-99bc-da54738d3108"
+        },
+        {
+          "funcName": "androidx.test.runner.AndroidJUnitRunner.onStart",
+          "line": 446,
+          "sourceCode": "2517e7f8-fcec-44eb-a37c-c144fd441837"
+        },
+        {
+          "funcName": "android.app.Instrumentation$InstrumentationThread.run",
+          "line": 2205,
+          "sourceCode": "b8437309-6989-4316-ab70-925d6fbc5135"
+        }
+      ]
+    },
+    "heaptaskdaemon": {
+      "fault": false,
+      "name": "heaptaskdaemon",
+      "stack": []
+    }
+  },
+  "timestamp": 1694983723,
+  "uuid": "079e41e2-bef1-4062-9e20-f2e1b3a93582"
 }

@@ -44,14 +44,17 @@ public class BacktraceDataDeserializerTest {
 
         String path = "resources/";
         String jsonPath =  path + "sample.json";
-        
+
         // WHEN
 
         String content = readFileAsString(this, fileName);
 //        File x = getFileFromPath(this, "resources/sample.json");
         JSONObject jsonObj = new JSONObject(content);
 
-        // THEN
         BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
+
+        System.out.println(backtraceData.report);
+        // THEN
+//        assertEquals(backtraceData.report.message, );
     }
 }

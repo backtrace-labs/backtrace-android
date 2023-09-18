@@ -43,6 +43,8 @@ public class BacktraceDataSerializerTest {
 
         // WHEN
         final String jsonFromGson = BacktraceSerializeHelper.toJson(data);
+
+        final BacktraceData dataGson = BacktraceSerializeHelper.fromJson(jsonFromGson, BacktraceData.class);
         final String jsonFromOrgJson = BacktraceDataSerializer.toJson(data);
 
         // THEN
