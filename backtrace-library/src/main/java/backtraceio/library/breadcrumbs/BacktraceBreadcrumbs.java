@@ -1,7 +1,10 @@
 package backtraceio.library.breadcrumbs;
 
+import static android.content.Context.RECEIVER_EXPORTED;
+
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -101,10 +104,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
             BacktraceLogger.d(LOG_TAG, "No breadcrumbs are enabled, not registering any new breadcrumb receivers");
             return;
         }
-
-        backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
-        context.registerReceiver(backtraceBroadcastReceiver,
-                backtraceBroadcastReceiver.getIntentFilter());
+        registerBroadcastReceiver();
 
         if (enabledBreadcrumbTypes.contains(BacktraceBreadcrumbType.SYSTEM)) {
             backtraceComponentListener = new BacktraceComponentListener(this);
@@ -114,6 +114,18 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
                 backtraceActivityLifecycleListener = new BacktraceActivityLifecycleListener(this);
                 ((Application) context).registerActivityLifecycleCallbacks(backtraceActivityLifecycleListener);
             }
+        }
+    }
+
+    private void registerBroadcastReceiver() {
+        backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            context.registerReceiver(backtraceBroadcastReceiver,
+                    backtraceBroadcastReceiver.getIntentFilter(), RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(backtraceBroadcastReceiver,
+                    backtraceBroadcastReceiver.getIntentFilter());
         }
     }
 
@@ -347,6 +359,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     /**
      * Determinate if Breadcrumbs are enabled.
+     *
      * @return true if breadcrumbs are enabled.
      */
     public boolean isEnabled() {

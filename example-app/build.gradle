@@ -5,7 +5,7 @@ android {
     defaultConfig {
         applicationId "backtraceio.backtraceio"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
