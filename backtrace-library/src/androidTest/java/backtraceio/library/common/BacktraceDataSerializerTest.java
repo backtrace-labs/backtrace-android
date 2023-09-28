@@ -20,7 +20,13 @@ import java.util.Map;
 import backtraceio.library.common.serializers.BacktraceDataSerializer;
 import backtraceio.library.common.serializers.SerializerHelper;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.json.SourceCode;
+import backtraceio.library.models.json.naming.LowerCaseWithDashConverter;
+import backtraceio.library.models.json.naming.NamingPolicy;
+import backtraceio.library.models.types.BacktraceResultStatus;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDataSerializerTest {
@@ -33,7 +39,9 @@ public class BacktraceDataSerializerTest {
         final Map<String, Object> attributes = new HashMap<String, Object>();
 
         attributes.put("string-key", "string-value");
-        attributes.put("string-key2", exception);
+        attributes.put("string-key-exception", exception);
+//        attributes.put("complex-obj-value", new BacktraceResult(null, "sample-msg", BacktraceResultStatus.Ok));
+        attributes.put("complex-obj-source-cd", new StackTraceElement("sample.class", "some.method", "file",123));
 
         final List<String> attachments = new ArrayList<>();
         attachments.add("test-path");
@@ -45,7 +53,8 @@ public class BacktraceDataSerializerTest {
         final String jsonFromGson = BacktraceSerializeHelper.toJson(data);
 
         final BacktraceData dataGson = BacktraceSerializeHelper.fromJson(jsonFromGson, BacktraceData.class);
-        final String jsonFromOrgJson = BacktraceDataSerializer.toJson(data);
+        BacktraceDataSerializer serializer = new BacktraceDataSerializer(new NamingPolicy());
+        final String jsonFromOrgJson = serializer.toJson(data);
 
         // THEN
         assertEquals(jsonFromOrgJson, jsonFromGson);
@@ -61,10 +70,10 @@ public class BacktraceDataSerializerTest {
                 r.toString();
             }
             catch (Exception e) {
-                Object result2 = SerializerHelper.serialize(e);
+                Object result2 = SerializerHelper.serialize(null, e);
                 System.out.println(result2);
             }
-            Object result = SerializerHelper.serialize(new BacktraceReport("test"));
+            Object result = SerializerHelper.serialize(null, new BacktraceReport("test"));
             System.out.println(result);
 //        }
     }
@@ -100,7 +109,8 @@ public class BacktraceDataSerializerTest {
 
             // ORG JSON
             long startTimeOrg = System.currentTimeMillis();
-            BacktraceDataSerializer.toJson(data);
+            BacktraceDataSerializer serializer = new BacktraceDataSerializer(new NamingPolicy());
+            serializer.toJson( data);
             long endTimeOrg = System.currentTimeMillis();
             timeOrgJson += endTimeOrg - startTimeOrg;
         }

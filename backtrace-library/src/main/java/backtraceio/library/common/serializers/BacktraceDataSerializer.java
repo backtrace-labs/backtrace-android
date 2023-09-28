@@ -22,37 +22,16 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
+import backtraceio.library.models.json.naming.NamingPolicy;
 
 public class BacktraceDataSerializer {
-
-    public static Map<String, Object> executeAndGetMethods(Object obj) {
-        Class<?> clazz = obj.getClass();
-        Map<String, Object> fields = new HashMap<>();
-        Method[] methods = clazz.getMethods();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // TODO: check if needed
-            for (Method method : methods) {
-                String methodName = method.getName();
-
-                if (methodName.equals("getClass")) {
-                    continue;
-                }
-
-                if (methodName.startsWith("get") && method.getParameterCount() == 0) {
-                    try {
-                        Object result = method.invoke(obj);
-                        String propertyName = methodName.substring(3); // Remove 'get' prefix
-                        fields.put(decapitalizeString(propertyName), serialize(result));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        return fields;
+    NamingPolicy namingPolicy;
+    public BacktraceDataSerializer(NamingPolicy policy) {
+        namingPolicy = policy;
     }
 
-    public static String toJson(BacktraceData data) throws JSONException, IllegalAccessException {
+
+    public String toJson(BacktraceData data) throws JSONException, IllegalAccessException {
         {
             JSONObject json = new JSONObject();
 
@@ -97,7 +76,7 @@ public class BacktraceDataSerializer {
     }
 
     @NonNull
-    private static JSONObject serializeThreadInformation(Map<String, ThreadInformation> threadInformationMap) throws JSONException {
+    private JSONObject serializeThreadInformation(Map<String, ThreadInformation> threadInformationMap) throws JSONException {
         JSONObject threadInformationJson = new JSONObject();
         for (Map.Entry<String, ThreadInformation> entry : threadInformationMap.entrySet()) {
             ThreadInformation threadInfo = entry.getValue();
@@ -114,7 +93,7 @@ public class BacktraceDataSerializer {
     }
 
     @NonNull
-    private static JSONArray serializeStackList(ArrayList<BacktraceStackFrame> stack) throws JSONException {
+    private JSONArray serializeStackList(ArrayList<BacktraceStackFrame> stack) throws JSONException {
         JSONArray stackArray = new JSONArray();
 
         for (BacktraceStackFrame stackFrame : stack) {
@@ -129,7 +108,7 @@ public class BacktraceDataSerializer {
     }
 
     @NonNull
-    private static JSONObject serializeSourceCode(Map<String, SourceCode> sourceCodeMap) throws JSONException {
+    private JSONObject serializeSourceCode(Map<String, SourceCode> sourceCodeMap) throws JSONException {
         JSONObject sourceCodeJson = new JSONObject();
         for (Map.Entry<String, SourceCode> entry : sourceCodeMap.entrySet()) {
             SourceCode sourceCode = entry.getValue();
@@ -141,15 +120,15 @@ public class BacktraceDataSerializer {
         return sourceCodeJson;
     }
 
-    private static JSONObject serializeAnnotations(Map<String, Object> annotations) throws JSONException, IllegalAccessException {
+    private JSONObject serializeAnnotations(Map<String, Object> annotations) throws JSONException, IllegalAccessException {
         JSONObject annotationsJson = new JSONObject();
         for (Map.Entry<String, Object> entry : annotations.entrySet()) {
-            annotationsJson.put(entry.getKey(), serialize(entry.getValue()));
+            annotationsJson.put(entry.getKey(), serialize(this.namingPolicy, entry.getValue()));
         }
         return annotationsJson;
     }
 
-    private static JSONObject serializeAttributes(Map<String, String> attributes) throws JSONException {
+    private JSONObject serializeAttributes(Map<String, String> attributes) throws JSONException {
         JSONObject attributesJson = new JSONObject();
 
         for (Map.Entry<String, String> entry : attributes.entrySet()) {

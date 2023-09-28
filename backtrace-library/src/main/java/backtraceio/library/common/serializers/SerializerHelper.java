@@ -1,18 +1,21 @@
 package backtraceio.library.common.serializers;
 
-import static backtraceio.library.common.serializers.BacktraceDataSerializer.executeAndGetMethods;
+import android.os.Build;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import backtraceio.library.models.json.naming.NamingPolicy;
 
 public class SerializerHelper {
     public static int MAX_SERIALIZATION_LEVEL = 5;
@@ -39,22 +42,29 @@ public class SerializerHelper {
         return string == null || string.isEmpty() ? "" : Character.toLowerCase(string.charAt(0)) + string.substring(1);
     }
 
-    private static JSONArray serializeArray(Object[] array, int serializationDepth) throws JSONException {
+    private static JSONArray serializeArray(NamingPolicy namingPolicy, Object[] array, int serializationDepth) throws JSONException {
         JSONArray jsonArray = new JSONArray();
         for (Object item : array) {
-            jsonArray.put(serialize(item, serializationDepth));
+            jsonArray.put(serialize(namingPolicy, item, serializationDepth));
         }
         return jsonArray;
     }
-    private static JSONArray serializeCollection(Collection<?> collection, int serializationDepth) throws JSONException {
+    private static JSONArray serializeCollection(NamingPolicy namingPolicy, Collection<?> collection, int serializationDepth) throws JSONException {
         JSONArray jsonArray = new JSONArray();
         for (Object item : collection) {
-            jsonArray.put(serialize(item, serializationDepth));
+            jsonArray.put(serialize(namingPolicy, item, serializationDepth));
         }
         return jsonArray;
     }
 
-    private static JSONObject getAllFields(Class<?> klass, Object obj, int serializationDepth) {
+    private static JSONObject serializeException(Exception exception) {
+        JSONObject obj = new JSONObject();
+
+//        obj.put();
+        return obj;
+    }
+
+    private static JSONObject getAllFields(NamingPolicy namingPolicy, Class<?> klass, Object obj, int serializationDepth) {
         // TODO: improve naming
 
         List<Field> fields = new ArrayList<>();
@@ -71,7 +81,7 @@ public class SerializerHelper {
                     if (value == obj) {
                         continue;
                     }
-                    result.put(f.getName(), serialize(value, serializationDepth));
+                    result.put(namingPolicy.convert(f.getName()), serialize(namingPolicy, value, serializationDepth));
                 } catch (Exception ex) {
 //                ex.printStackTrace();
                 }
@@ -83,21 +93,48 @@ public class SerializerHelper {
         return result;
     }
 
-    private static JSONObject serializeMap(Map<?, ?> map, int serializationDepth) throws JSONException {
+    private static JSONObject serializeMap(NamingPolicy namingPolicy, Map<?, ?> map, int serializationDepth) throws JSONException {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             String key = String.valueOf(entry.getKey());
             Object value = entry.getValue();
-            jsonObject.put(key, serialize(value, serializationDepth));
+            jsonObject.put(key, serialize(namingPolicy, value, serializationDepth));
         }
         return jsonObject;
     }
 
-    public static Object serialize(Object obj) throws JSONException {
-        return serialize(obj, 0);
+    public static Object serialize(NamingPolicy namingPolicy, Object obj) throws JSONException {
+        return serialize(namingPolicy, obj, 0);
     }
 
-    public static Object serialize(Object obj, int serializationDepth) throws JSONException {
+    public static Map<String, Object> executeAndGetMethods(NamingPolicy namingPolicy, Object obj) {
+        Class<?> clazz = obj.getClass();
+        Map<String, Object> fields = new HashMap<>();
+        Method[] methods = clazz.getMethods();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // TODO: check if needed
+            for (Method method : methods) {
+                String methodName = method.getName();
+
+                if (methodName.equals("getClass") || methodName.equals("getClassName")) {
+                    continue;
+                }
+
+                if (methodName.startsWith("get") && method.getParameterCount() == 0) {
+                    try {
+                        Object result = method.invoke(obj);
+                        String propertyName = methodName.substring(3); // Remove 'get' prefix
+                        fields.put(namingPolicy.convert(propertyName), serialize(namingPolicy, result));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return fields;
+    }
+
+    public static Object serialize(NamingPolicy namingPolicy, Object obj, int serializationDepth) throws JSONException {
         if (obj == null) {
             return null;
         }
@@ -114,23 +151,27 @@ public class SerializerHelper {
         serializationDepth++;
 
         if (obj instanceof Map<?, ?>) {
-            return serializeMap((Map<?, ?>) obj, serializationDepth);
+            return serializeMap(namingPolicy, (Map<?, ?>) obj, serializationDepth);
         }
 
         if (obj.getClass().isArray()) {
-            return serializeArray((Object[]) obj, serializationDepth);
+            return serializeArray(namingPolicy, (Object[]) obj, serializationDepth);
         }
 
         if (obj instanceof Collection<?>) {
-            return serializeCollection((Collection<?>) obj, serializationDepth);
+            return serializeCollection(namingPolicy, (Collection<?>) obj, serializationDepth);
+        }
+
+        if (obj instanceof Exception) {
+//            return serializeException((Exception) obj);
         }
 
         Class<?> clazz = obj.getClass();
-        JSONObject jsonObject = getAllFields(clazz, obj, serializationDepth);
-        Map<String, Object> getters = executeAndGetMethods(obj);
+        JSONObject jsonObject = getAllFields(namingPolicy, clazz, obj, serializationDepth);
+        Map<String, Object> getters = executeAndGetMethods(namingPolicy, obj);
 
         for (Map.Entry<String, Object> entry: getters.entrySet()) {
-            jsonObject.put(entry.getKey(), entry.getValue());
+            jsonObject.put(namingPolicy.convert(entry.getKey()), entry.getValue());
         }
 
         return jsonObject;
