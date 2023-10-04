@@ -1,6 +1,9 @@
 package backtraceio.library.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import static backtraceio.library.common.BacktraceSerializationUtils.jsonEquals;
 
 import android.content.Context;
 
@@ -42,7 +45,7 @@ public class BacktraceDataSerializerTest {
         attributes.put("string-key-exception", exception);
 //        attributes.put("complex-obj-value", new BacktraceResult(null, "sample-msg", BacktraceResultStatus.Ok));
         attributes.put("complex-obj-source-cd", new StackTraceElement("sample.class", "some.method", "file",123));
-
+//exception.getSuppressed()
         final List<String> attachments = new ArrayList<>();
         attachments.add("test-path");
         attachments.add("test-path2");
@@ -57,7 +60,8 @@ public class BacktraceDataSerializerTest {
         final String jsonFromOrgJson = serializer.toJson(data);
 
         // THEN
-        assertEquals(jsonFromOrgJson, jsonFromGson);
+        assertTrue(jsonEquals(jsonFromOrgJson, jsonFromGson));
+//        assertEquals(jsonFromOrgJson, jsonFromGson);
     }
 
     @Test
@@ -84,7 +88,7 @@ public class BacktraceDataSerializerTest {
         final Context context = InstrumentationRegistry.getInstrumentation().getContext();
         long timeGson = 0;
         long timeOrgJson = 0;
-        final int iterations = 1;
+        final int iterations = 1000;
         for (int i = 0; i < iterations; i++) {
             // INIT SAMPLE
             final Exception exception = new Exception(Integer.toString(i));

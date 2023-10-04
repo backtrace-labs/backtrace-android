@@ -7,6 +7,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+
 import com.google.gson.JsonArray;
 
 import org.json.JSONArray;
@@ -46,10 +47,9 @@ public class BacktraceDataSerializer {
             json.put("mainThread", data.mainThread);
 
             if (data.classifiers != null) {
-                final JsonArray classifiers = new JsonArray();
-
+                final JSONArray classifiers = new JSONArray();
                 for (String classifier : data.classifiers) {
-                    classifiers.add(classifier);
+                    classifiers.put(classifier);
                 }
                 json.put("classifiers", classifiers);
             }
