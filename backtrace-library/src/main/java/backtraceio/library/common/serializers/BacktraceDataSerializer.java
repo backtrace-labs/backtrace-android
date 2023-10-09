@@ -1,29 +1,22 @@
 package backtraceio.library.common.serializers;
 
-import static backtraceio.library.common.serializers.SerializerHelper.decapitalizeString;
 import static backtraceio.library.common.serializers.SerializerHelper.serialize;
-
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 
-
-import com.google.gson.JsonArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
-import backtraceio.library.models.json.naming.NamingPolicy;
+import backtraceio.library.common.serializers.naming.NamingPolicy;
 
 public class BacktraceDataSerializer {
     NamingPolicy namingPolicy;

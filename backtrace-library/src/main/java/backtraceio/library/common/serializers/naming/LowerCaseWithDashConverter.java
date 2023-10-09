@@ -1,6 +1,6 @@
-package backtraceio.library.models.json.naming;
+package backtraceio.library.common.serializers.naming;
 
-import static backtraceio.library.models.json.naming.NamingUtils.separateCamelCase;
+import static backtraceio.library.common.serializers.naming.NamingUtils.separateCamelCase;
 
 import java.util.Locale;
 

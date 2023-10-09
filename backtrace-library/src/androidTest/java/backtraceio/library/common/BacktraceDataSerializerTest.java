@@ -11,7 +11,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -23,13 +22,8 @@ import java.util.Map;
 import backtraceio.library.common.serializers.BacktraceDataSerializer;
 import backtraceio.library.common.serializers.SerializerHelper;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
-import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.models.json.SourceCode;
-import backtraceio.library.models.json.naming.LowerCaseWithDashConverter;
-import backtraceio.library.models.json.naming.NamingPolicy;
-import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.common.serializers.naming.NamingPolicy;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDataSerializerTest {
@@ -45,7 +39,7 @@ public class BacktraceDataSerializerTest {
         attributes.put("string-key-exception", exception);
 //        attributes.put("complex-obj-value", new BacktraceResult(null, "sample-msg", BacktraceResultStatus.Ok));
         attributes.put("complex-obj-source-cd", new StackTraceElement("sample.class", "some.method", "file",123));
-//exception.getSuppressed()
+
         final List<String> attachments = new ArrayList<>();
         attachments.add("test-path");
         attachments.add("test-path2");
@@ -61,7 +55,6 @@ public class BacktraceDataSerializerTest {
 
         // THEN
         assertTrue(jsonEquals(jsonFromOrgJson, jsonFromGson));
-//        assertEquals(jsonFromOrgJson, jsonFromGson);
     }
 
     @Test

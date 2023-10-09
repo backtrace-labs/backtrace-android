@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.models.json.naming.NamingPolicy;
+import backtraceio.library.common.serializers.naming.NamingPolicy;
 
 public class SerializerHelper {
     public static int MAX_SERIALIZATION_LEVEL = 5;

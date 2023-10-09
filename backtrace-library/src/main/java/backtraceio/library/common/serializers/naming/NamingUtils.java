@@ -1,4 +1,4 @@
-package backtraceio.library.models.json.naming;
+package backtraceio.library.common.serializers.naming;
 
 public class NamingUtils {
     static String separateCamelCase(String name, char separator) {
