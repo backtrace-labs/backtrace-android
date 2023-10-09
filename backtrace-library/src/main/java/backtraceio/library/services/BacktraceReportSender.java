@@ -1,10 +1,6 @@
 package backtraceio.library.services;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -14,6 +10,7 @@ import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
 import backtraceio.library.common.RequestHelper;
 import backtraceio.library.events.OnServerErrorEventListener;
+import backtraceio.library.http.HttpHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
@@ -76,12 +73,12 @@ class BacktraceReportSender {
             BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = BacktraceSerializeHelper.backtraceResultFromJson(
-                        getResponse(urlConnection)
+                result = BacktraceSerializeHelper.fromJson(
+                        HttpHelper.getResponseMessage(urlConnection), BacktraceResult.class
                 );
                 result.setBacktraceReport(report);
             } else {
-                String message = getResponse(urlConnection);
+                String message = HttpHelper.getResponseMessage(urlConnection);
                 message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                         urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
@@ -150,7 +147,7 @@ class BacktraceReportSender {
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 result = new EventsResult(payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);
             } else {
-                String message = getResponse(urlConnection);
+                String message = HttpHelper.getResponseMessage(urlConnection);
                 message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                         urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
@@ -175,34 +172,5 @@ class BacktraceReportSender {
             }
         }
         return result;
-    }
-
-    /**
-     * Read response message from HTTP response
-     *
-     * @param urlConnection current HTTP connection
-     * @return response from HTTP request
-     * @throws IOException
-     */
-    private static String getResponse(HttpURLConnection urlConnection) throws IOException {
-        BacktraceLogger.d(LOG_TAG, "Reading response from HTTP request");
-
-        InputStream inputStream;
-        if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
-            inputStream = urlConnection.getInputStream();
-        } else {
-            inputStream = urlConnection.getErrorStream();
-        }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(
-                inputStream));
-
-        StringBuilder responseSB = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            responseSB.append(line);
-        }
-        br.close();
-        return responseSB.toString();
     }
 }

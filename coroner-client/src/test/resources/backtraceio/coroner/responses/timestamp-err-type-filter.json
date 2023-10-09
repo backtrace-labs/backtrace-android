@@ -1,0 +1,159 @@
+{
+  "_": {
+    "user": "test",
+    "project": "test",
+    "tx": 9493,
+    "universe": "",
+    "latency": "226 us",
+    "runtime": {
+      "filter": {
+        "time": 44,
+        "rows": 818,
+        "n_filters": 3,
+        "breakdown": [
+          28,
+          4,
+          2
+        ]
+      },
+      "group_by": {
+        "time": 7,
+        "groups": 1,
+        "rows": 818
+      },
+      "having": {
+        "time": 0,
+        "ungroup": 0,
+        "groups": 1,
+        "rows": 818
+      },
+      "aggregate": {
+        "pre_having": 0,
+        "pre_sort": 0,
+        "post_sort": 24,
+        "n_aggregates": 4,
+        "breakdown": [
+          2,
+          3,
+          11,
+          1
+        ]
+      },
+      "sort": {
+        "time": 1,
+        "groups": 1,
+        "rows": 818
+      },
+      "render": {
+        "time": 29
+      },
+      "set": {
+        "time": 0
+      },
+      "merge": {
+        "time": 0
+      },
+      "ungrouped": {
+        "time": 0,
+        "having": 0,
+        "subqueries": []
+      },
+      "total_time": 76,
+      "toplevel": {
+        "parse_end": 29,
+        "execute_begin": 29,
+        "execute_end": 112,
+        "print_begin": 112,
+        "print_end": 142
+      }
+    },
+    "navigation": []
+  },
+  "response": {
+    "version": "1.2.0",
+    "seq": 1,
+    "encoding": "rle",
+    "columns": [
+      [
+        "head(error.message)",
+        ""
+      ],
+      [
+        "head(callstack)",
+        "callstack"
+      ],
+      [
+        "head(guid)",
+        "uuid"
+      ],
+      [
+        "head(classifiers)",
+        "labels"
+      ]
+    ],
+    "columns_desc": [
+      {
+        "name": "error.message",
+        "format": "",
+        "type": "dictionary",
+        "op": "head"
+      },
+      {
+        "name": "callstack",
+        "format": "callstack",
+        "type": "dictionary",
+        "op": "head"
+      },
+      {
+        "name": "guid",
+        "format": "uuid",
+        "type": "uuid",
+        "op": "head"
+      },
+      {
+        "name": "classifiers",
+        "format": "labels",
+        "type": "dictionary",
+        "op": "head"
+      }
+    ],
+    "pagination": {
+      "limit": 1,
+      "offset": 0
+    },
+    "values": [
+      [
+        "*",
+        [
+          [
+            "DumpWithoutCrash"
+          ],
+          [
+            "{\"frame\":[\"libbacktrace-native.so\",\"libbacktrace-native.so\",\"libart.so\",\"libc.so\",\"libbacktrace-native.so\",\"libbacktrace-native.so\",\"libart.so\",\"libbacktrace-native.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libc.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\",\"libart.so\"]}"
+          ],
+          [
+            "71baf2e3-0fe3-48fa-ba18-d2b3d98d1e75"
+          ],
+          [
+            "exception"
+          ]
+        ],
+        818
+      ]
+    ],
+    "cardinalities": {
+      "initial": {
+        "rows": 818,
+        "groups": 1
+      },
+      "having": {
+        "rows": 818,
+        "groups": 1
+      },
+      "pagination": {
+        "rows": 818,
+        "groups": 1
+      }
+    }
+  }
+}
