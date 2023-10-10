@@ -27,16 +27,6 @@ public class BacktraceApi implements Api {
     private final String reportSubmissionUrl;
 
     /**
-     * URL to unique events endpoint
-     */
-    private String uniqueEventsSubmissionUrl;
-
-    /**
-     * URL to summed events endpoint
-     */
-    private String summedEventsSubmissionUrl;
-
-    /**
      * Event triggered when server respond with error
      */
     private OnServerErrorEventListener onServerError = null;
