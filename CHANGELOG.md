@@ -1,5 +1,12 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.10
+- Add integration tests
+- Move common http response processing method to helper class
+- Remove unused code
+- Add abstraction to gson serialization
+- Improve example-app Main Activity to work in same way on different Android versions
+
 ## Version 3.7.9
 
 - Fixed problem when thread is trying to delete already deleted record from db context
