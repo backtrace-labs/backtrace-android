@@ -38,10 +38,6 @@ public class SerializerHelper {
         return WRAPPER_TYPE_MAP.containsKey(source.getClass()) || source instanceof String || source instanceof Number;
     }
 
-    public static String decapitalizeString(String string) {
-        return string == null || string.isEmpty() ? "" : Character.toLowerCase(string.charAt(0)) + string.substring(1);
-    }
-
     private static JSONArray serializeArray(NamingPolicy namingPolicy, Object[] array, int serializationDepth) throws JSONException {
         if (array == null) {
             return null;
@@ -66,17 +62,12 @@ public class SerializerHelper {
     }
 
     private static Object serializeException(NamingPolicy namingPolicy, Exception exception) {
-//        JSONObject obj = new JSONObject();
         try {
-
             return getAllFields(namingPolicy, exception.getClass(), exception, 2);
-//            return serialize(namingPolicy, exception.getCause());
         }
         catch (Exception e) {
             return null;
         }
-//        obj.put();
-//        return obj;
     }
 
     private static JSONObject getAllFields(NamingPolicy namingPolicy, Class<?> klass, Object obj, int serializationDepth) {
@@ -179,7 +170,6 @@ public class SerializerHelper {
 
         if (obj instanceof Exception) {
             return serializeException(namingPolicy, (Exception) obj);
-//            return serializeException((Exception) obj);
         }
 
         Class<?> clazz = obj.getClass();
