@@ -3,6 +3,9 @@ package backtraceio.library.common.serializers.naming;
 public class NamingUtils {
     static String separateCamelCase(String name, char separator) {
         StringBuilder translation = new StringBuilder();
+        if (name == null) {
+            return null;
+        }
         for (int i = 0, length = name.length(); i < length; i++) {
             char character = name.charAt(i);
             if (Character.isUpperCase(character) && translation.length() != 0) {

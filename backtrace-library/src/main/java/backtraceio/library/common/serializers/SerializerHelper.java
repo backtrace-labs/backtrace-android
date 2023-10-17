@@ -2,6 +2,8 @@ package backtraceio.library.common.serializers;
 
 import android.os.Build;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,11 +85,12 @@ public class SerializerHelper {
             f.setAccessible(true);
             if (!java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
                 try {
+
                     Object value = f.get(obj);
                     if (value == obj) {
                         continue;
                     }
-                    result.put(namingPolicy.convert(f.getName()), serialize(namingPolicy, value, serializationDepth));
+                    result.put(getFieldName(namingPolicy, f), serialize(namingPolicy, value, serializationDepth));
                 } catch (Exception ex) {
 //                ex.printStackTrace();
                 }
@@ -97,6 +100,15 @@ public class SerializerHelper {
         }
 
         return result;
+    }
+
+    private static String getFieldName(NamingPolicy namingPolicy, Field field) {
+        if (field.isAnnotationPresent(SerializedName.class)) {
+            // Get the SerializedName value
+            SerializedName annotation = field.getAnnotation(SerializedName.class);
+            return annotation.value();
+        }
+        return namingPolicy.convert(field.getName());
     }
 
     private static JSONObject serializeMap(NamingPolicy namingPolicy, Map<?, ?> map, int serializationDepth) throws JSONException {
