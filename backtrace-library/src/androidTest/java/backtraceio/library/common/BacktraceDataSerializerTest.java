@@ -51,7 +51,7 @@ public class BacktraceDataSerializerTest {
 
         final BacktraceData dataGson = BacktraceSerializeHelper.fromJson(jsonFromGson, BacktraceData.class);
         BacktraceDataSerializer serializer = new BacktraceDataSerializer(new NamingPolicy());
-        final String jsonFromOrgJson = serializer.toJson(data);
+        final String jsonFromOrgJson = serializer.toJson(data).toString();
 
         // THEN
         assertTrue(jsonEquals(jsonFromOrgJson, jsonFromGson));

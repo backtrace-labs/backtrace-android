@@ -1,11 +1,10 @@
 package backtraceio.library.common;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
 
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
-import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.common.serializers.BacktraceOrgJsonSerializer;
 
 /**
  * Helper class for serialize and deserialize objects
@@ -19,15 +18,11 @@ public class BacktraceSerializeHelper {
      * @return serialized object in JSON string format
      */
     public static String toJson(Object object) {
-        return BacktraceSerializeHelper.toJson(new BacktraceGsonBuilder().buildGson(), object);
+        return BacktraceOrgJsonSerializer.toJson(object);
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
         return BacktraceSerializeHelper.fromJson(new BacktraceGsonBuilder().buildGson(), json, type);
-    }
-
-    public static String toJson(Gson gson, Object object) {
-        return gson.toJson(object);
     }
 
     public static <T> T fromJson(Gson gson, String json, Class<T> type) {

@@ -25,8 +25,12 @@ public class BacktraceDataSerializer {
     }
 
 
-    public String toJson(BacktraceData data) throws JSONException, IllegalAccessException {
+    public JSONObject toJson(BacktraceData data) throws JSONException, IllegalAccessException {
         {
+            if (data == null) {
+                return null;
+            }
+
             JSONObject json = new JSONObject();
 
             // Serialize simple fields
@@ -64,7 +68,7 @@ public class BacktraceDataSerializer {
                 json.put("threads", threadInformationJson);
             }
 
-            return json.toString();
+            return json;
         }
     }
 
