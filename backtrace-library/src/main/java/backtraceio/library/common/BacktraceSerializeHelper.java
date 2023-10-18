@@ -18,6 +18,7 @@ public class BacktraceSerializeHelper {
      * @return serialized object in JSON string format
      */
     public static String toJson(Object object) {
+//        return new BacktraceGsonBuilder().buildGson().toJson(object);
         return BacktraceOrgJsonSerializer.toJson(object);
     }
 

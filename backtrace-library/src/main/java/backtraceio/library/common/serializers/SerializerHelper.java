@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import backtraceio.library.common.serializers.naming.NamingPolicy;
 
@@ -83,20 +84,21 @@ public class SerializerHelper {
         JSONObject result = new JSONObject();
         for (Field f : fields) {
             f.setAccessible(true);
-            if (!java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
-                try {
 
-                    Object value = f.get(obj);
-                    if (value == obj) {
-                        continue;
-                    }
-                    result.put(getFieldName(namingPolicy, f), serialize(namingPolicy, value, serializationDepth));
-                } catch (Exception ex) {
-//                ex.printStackTrace();
-                }
-
+            if (java.lang.reflect.Modifier.isTransient(f.getModifiers()) ||
+                    java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
+                continue;
             }
 
+            try {
+                Object value = f.get(obj);
+                if (value == obj) {
+                    continue;
+                }
+                result.put(getFieldName(namingPolicy, f), serialize(namingPolicy, value, serializationDepth));
+            } catch (Exception ex) {
+//                ex.printStackTrace();
+            }
         }
 
         return result;
@@ -167,6 +169,10 @@ public class SerializerHelper {
         }
 
         serializationDepth++;
+
+        if (obj instanceof UUID) {
+            return obj.toString();
+        }
 
         if (obj instanceof Map<?, ?>) {
             return serializeMap(namingPolicy, (Map<?, ?>) obj, serializationDepth);
