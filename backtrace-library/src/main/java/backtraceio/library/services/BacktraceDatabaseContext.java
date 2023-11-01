@@ -348,11 +348,17 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private BacktraceDatabaseRecord getRecordFromCache(boolean reverse) {
         for (int i = _retryNumber - 1; i >= 0; i--) {
             List<BacktraceDatabaseRecord> reverseRecords = batchRetry.get(i);
+
+            if (reverseRecords == null) {
+                continue;
+            }
+
             if (reverse) {
                 Collections.reverse(reverseRecords);
             }
+
             for (BacktraceDatabaseRecord record : reverseRecords) {
-                if (!record.locked) {
+                if (record != null && !record.locked) {
                     record.locked = true;
                     return record;
                 }
