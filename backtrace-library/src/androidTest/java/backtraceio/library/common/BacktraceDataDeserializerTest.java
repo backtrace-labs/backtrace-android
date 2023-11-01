@@ -28,12 +28,38 @@ import java.util.Map;
 import backtraceio.library.R;
 import backtraceio.library.common.serializers.BacktraceDataDeserializer;
 import backtraceio.library.common.serializers.BacktraceDataSerializer;
+import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
 import backtraceio.library.common.serializers.SerializerHelper;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDataDeserializerTest {
+
+    @Test
+    public void fromJson2() throws JSONException, IllegalAccessException {
+        // GIVEN
+        final Context context = InstrumentationRegistry.getInstrumentation().getContext();
+
+        String fileName = "sample.json";
+
+        String path = "resources/";
+        String jsonPath =  path + "sample.json";
+
+        // WHEN
+
+        String content = readFileAsString(this, fileName);
+//        File x = getFileFromPath(this, "resources/sample.json");
+        JSONObject jsonObj = new JSONObject(content);
+
+        BacktraceData dataJson = BacktraceOrgJsonDeserializer.deserialize(content, BacktraceData.class);
+
+        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
+
+        System.out.println(backtraceData.report);
+        // THEN
+//        assertEquals(backtraceData.report.message, );
+    }
 
     @Test
     public void fromJson() throws JSONException, IllegalAccessException {

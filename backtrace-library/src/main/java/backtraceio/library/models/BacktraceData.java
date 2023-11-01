@@ -111,6 +111,10 @@ public class BacktraceData {
     @SerializedName("threads")
     Map<String, ThreadInformation> threadInformationMap;
 
+
+    public BacktraceData() {
+
+    }
     /**
      * Create instance of report data
      *
