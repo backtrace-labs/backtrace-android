@@ -72,7 +72,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private BacktraceDatabaseContext(Context context, String path, int retryNumber, RetryOrder retryOrder) {
         this._applicationContext = context;
-        this._path = path;//this.getAbsolutePath(path);
+        this._path = path;
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;
         setupBatch();
@@ -297,9 +297,9 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private void incrementBatches() {
         for (int i = this._retryNumber - 2; i >= 0; i--) {
-            List<BacktraceDatabaseRecord> temp = this.batchRetry.get(i);
+            List<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
             batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
-            batchRetry.put(i + 1, temp);
+            batchRetry.put(i + 1, currentBatch);
         }
     }
 
