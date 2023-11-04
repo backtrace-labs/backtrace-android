@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.11
+- Fix NPE in DatabaseContext
+- Add session attribute and backtrace reporter name to every error report
+
 ## Version 3.7.10
 - Add integration tests
 - Move common http response processing method to helper class
