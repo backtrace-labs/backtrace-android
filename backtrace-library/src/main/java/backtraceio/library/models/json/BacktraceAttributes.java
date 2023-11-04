@@ -50,7 +50,7 @@ public class BacktraceAttributes {
     /**
      * Metrics session ID
      */
-    private static String sessionId;
+    private static String sessionId = UUID.randomUUID().toString();
 
     /**
      * Create instance of Backtrace Attribute
@@ -84,12 +84,6 @@ public class BacktraceAttributes {
         setAppInformation();
         setDeviceInformation(includeDynamicAttributes);
         setScreenInformation(includeDynamicAttributes);
-
-        // For tracking crash-free sessions we need to add
-        // application.session and application.version to Backtrace attributes
-        if (isMetricsEnabled) {
-            this.attributes.put("application.session", sessionId);
-        }
     }
 
     public Map<String, Object> getComplexAttributes() {
@@ -126,6 +120,8 @@ public class BacktraceAttributes {
             // But we keep version attribute name as to not break any customer workflows
             this.attributes.put("version", version);
         }
+        this.attributes.put("application.session", sessionId);
+        this.attributes.put("backtrace.agent", "backtrace-android");
         this.attributes.put("backtrace.version", BacktraceClient.version);
     }
 
@@ -256,13 +252,5 @@ public class BacktraceAttributes {
         attributes.putAll(this.attributes);
         attributes.putAll(this.complexAttributes);
         return attributes;
-    }
-
-    public static void enableMetrics() {
-        BacktraceAttributes.isMetricsEnabled = true;
-
-        // Create a session ID for metrics session tracking
-        String sessionId = UUID.randomUUID().toString();
-        BacktraceAttributes.sessionId = sessionId;
     }
 }
