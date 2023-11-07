@@ -37,7 +37,7 @@ public class BacktraceDatabaseContextTest {
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
-        this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);
+        this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
     }
 
     @After
@@ -78,7 +78,7 @@ public class BacktraceDatabaseContextTest {
     public void firstFromDatabaseContextStack() {
         // GIVEN
         BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Stack);
-        this.databaseContext = new BacktraceDatabaseContext(this.context, settings);
+        this.databaseContext = new BacktraceDatabaseContext(settings);
         List<BacktraceDatabaseRecord> records = fillDatabase();
 
         // WHEN
@@ -93,7 +93,7 @@ public class BacktraceDatabaseContextTest {
     public void lastFromDatabaseContextStack() {
         // GIVEN
         BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Stack);
-        this.databaseContext = new BacktraceDatabaseContext(this.context, settings);
+        this.databaseContext = new BacktraceDatabaseContext(settings);
         List<BacktraceDatabaseRecord> records = fillDatabase();
 
         // WHEN

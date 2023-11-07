@@ -123,8 +123,7 @@ public class BacktraceDatabase implements Database {
 
         this._applicationContext = context;
         this.databaseSettings = databaseSettings;
-        this.backtraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext,
-                databaseSettings);
+        this.backtraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
