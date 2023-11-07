@@ -122,7 +122,7 @@ public class BacktraceDatabaseRecord {
     /**
      * Get valid BacktraceData from current record
      *
-     * @param context
+     * @param context application context
      * @return valid BacktraceData object
      */
     public BacktraceData getBacktraceData(Context context) {
