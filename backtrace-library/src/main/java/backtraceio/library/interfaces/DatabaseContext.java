@@ -38,7 +38,7 @@ public interface DatabaseContext {
     /**
      * Get all records stored in Database
      *
-     * @return
+     * @return all existing database records
      */
     Iterable<BacktraceDatabaseRecord> get();
 
@@ -54,14 +54,14 @@ public interface DatabaseContext {
      * Check if any similar record exists
      *
      * @param n Compared record
-     * @return
+     * @return is record passed as argument is in the database
      */
     boolean contains(BacktraceDatabaseRecord n);
 
     /**
      * Check if any similar record exists
      *
-     * @return
+     * @return is database empty
      */
     boolean isEmpty();
 
