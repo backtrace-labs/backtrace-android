@@ -78,11 +78,6 @@ public interface DatabaseContext {
     void clear();
 
     /**
-     * Increment record time for all records
-     */
-    void incrementBatchRetry();
-
-    /**
      * Get database size
      *
      * @return Database size
