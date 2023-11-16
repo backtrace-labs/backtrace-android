@@ -53,23 +53,18 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     public void uncaughtException(final Thread thread, final Throwable throwable) {
         OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
 
-        if (throwable instanceof Exception) {
-            BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-            BacktraceReport report = new BacktraceReport((Exception) throwable, BacktraceExceptionHandler.customAttributes);
-            report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
-            this.client.send(report, callback);
-            BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
-        }
-        BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
+        BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
+        BacktraceReport report = new BacktraceReport((Exception) throwable, BacktraceExceptionHandler.customAttributes);
+        report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+        this.client.send(report, callback);
+        BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
+
         try {
             signal.await();
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
-    }
-
-    private boolean isMainThread() {
-        return Looper.myLooper() == Looper.getMainLooper();
+        BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
     }
 
     private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
