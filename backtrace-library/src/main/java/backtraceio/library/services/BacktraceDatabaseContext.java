@@ -316,7 +316,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         for (int i = _retryNumber - 1; i >= 0; i--) {
             List<BacktraceDatabaseRecord> reverseRecords = batchRetry.get(i);
 
-            if (reverseRecords == null) {
+            if (reverseRecords == null || reverseRecords.size() == 0) {
                 continue;
             }
 
@@ -325,6 +325,10 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             }
 
             for (BacktraceDatabaseRecord record : reverseRecords) {
+                if(record == null) {
+                    System.out.println("NULLL!!!!");
+                    throw new RuntimeException("NULL");
+                }
                 if (record != null && !record.locked) {
                     record.locked = true;
                     return record;

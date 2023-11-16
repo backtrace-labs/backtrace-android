@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceData;
@@ -87,6 +88,99 @@ public class BacktraceDatabaseContextTest {
         // THEN
         assertEquals(3, databaseContext.count());
         assertEquals(records.get(2), firstOnStack);
+    }
+
+    @Test
+    public void multithreadedTest() throws InterruptedException {
+        BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Stack);
+        this.databaseContext = new BacktraceDatabaseContext(settings);
+
+        CountDownLatch latch1 = new CountDownLatch(1);
+        CountDownLatch latch2 = new CountDownLatch(1);
+        CountDownLatch latch3 = new CountDownLatch(1);
+
+        Thread t1 = new Thread(() -> {
+            try {
+                for (int i = 0; i < 100; i++) {
+                    BacktraceData data = new BacktraceData(context, new BacktraceReport(Integer.toString(i)), null);
+                    databaseContext.add(data);
+                    Thread.sleep(1);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                latch1.countDown();
+            }
+        });
+
+        Thread t2 = new Thread(() -> {
+            try {
+                for (int i = 0; i < 10; i++) {
+                    BacktraceDatabaseRecord record = databaseContext.last();
+                    if (record != null) {
+                        databaseContext.add(record);
+                    }
+                    BacktraceDatabaseRecord record3 = databaseContext.first();
+                    BacktraceDatabaseRecord record2 = databaseContext.last();
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                latch2.countDown();
+            }
+        });
+
+
+        Thread t3 = new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+                databaseContext.get().forEach(x-> {
+                    x.locked = false;
+
+                });
+
+                for (int i = 0; i < 100; i++) {
+                    BacktraceDatabaseRecord record = databaseContext.first();
+                    if(record == null) {
+                        continue;
+                    }
+                    record.locked = false;
+                    databaseContext.delete(record);
+                    databaseContext.delete(record);
+                    databaseContext.delete(record);
+                    BacktraceData data = new BacktraceData(context, new BacktraceReport(Integer.toString(i)), null);
+//                    databaseContext.add(data);
+//                    Thread.sleep(200);
+
+                    BacktraceDatabaseRecord record2 = databaseContext.last();
+                    BacktraceDatabaseRecord record3 = databaseContext.first();
+                    if(record2 == null) {
+                        continue;
+                    }
+
+                    if(record3 == null) {
+                        continue;
+                    }
+                    databaseContext.delete(record2);
+                    Thread.sleep(50);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                latch3.countDown();
+            }
+        });
+
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        latch1.await();
+        latch2.await();
+        latch3.await();
+        System.out.println("END");
     }
 
     @Test
@@ -229,6 +323,35 @@ public class BacktraceDatabaseContextTest {
         assertEquals(3, databaseContext.count());
     }
 
+    @Test
+    public void xyz() throws Exception{ // todo: fix name
+        fillDatabase();
+
+//        final List<BacktraceDatabaseRecord> records = (List) databaseContext.get();
+//        BacktraceDatabaseRecord x = databaseContext.first();
+        databaseContext.clear();
+//        x = null;
+//        System.gc();
+//        ((List)databaseContext.get()).set(0, null);
+//        databaseContext.removeOldestRecord();
+
+//
+//        databaseContext.removeOldestRecord();
+
+//
+//        databaseContext.removeOldestRecord();
+////        databaseContext.
+
+//        final List<BacktraceDatabaseRecord> records2 = (List) databaseContext.get();
+
+        for (BacktraceDatabaseRecord rec : databaseContext.get()) {
+            if (rec == null) {
+                throw new Exception("NULL");
+            }
+        }
+
+    }
+
     @Test(expected = NullPointerException.class)
     public void tryAddNullBacktraceData() {
         databaseContext.add((BacktraceData) null);
@@ -250,6 +373,8 @@ public class BacktraceDatabaseContextTest {
         result.add(databaseContext.add(data));
         result.add(databaseContext.add(data2));
         result.add(databaseContext.add(data3));
+
+
 
         // Dispose all records
         for (BacktraceDatabaseRecord record : result) {
