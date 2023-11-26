@@ -24,20 +24,20 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 abstract class CustomExceptionBase extends Exception {
     @SerializedName("message")
-    public String Message;
+    public String message;
     public CustomExceptionBase(String message) {
         super(message);
-        this.Message = message;
+        this.message = message;
     }
 }
 class SerializationTestException extends CustomExceptionBase {
     @SerializedName("message")
-    public String Message;
+    public String message;
 
     public SerializationTestException(String message) {
         super(message);
         // modify the exception in the source class
-        this.Message = message + message;
+        this.message = message + message;
     }
 }
 
