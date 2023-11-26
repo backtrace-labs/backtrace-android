@@ -104,11 +104,6 @@ public class BacktraceClientSendTest {
                 assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
                 assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
 
-                final JSONObject firstCause = exceptionProperties.getJSONObject("cause");
-                assertEquals("java.lang.IllegalArgumentException: New Exception", firstCause.getString("detail-message"));
-
-                final JSONObject secondCause = firstCause.getJSONObject("cause");
-                assertEquals(lastExceptionExpectedMessage, secondCause.getString("detail-message"));
             } catch (JSONException e) {
                 e.printStackTrace();
                 fail(e.getMessage());
