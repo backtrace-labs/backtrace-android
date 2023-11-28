@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.12
+- Fixed bug when exception contains base class with same field
+
 ## Version 3.7.11
 - Fix NPE in DatabaseContext
 - Add session attribute and backtrace reporter name to every error report
