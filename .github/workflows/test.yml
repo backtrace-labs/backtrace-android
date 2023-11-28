@@ -100,7 +100,7 @@ jobs:
 
       - name: Run Saucectl
         run: |
-          saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
+          saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }} --region eu-central-1
           # recent real device
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
           # newest Android version
