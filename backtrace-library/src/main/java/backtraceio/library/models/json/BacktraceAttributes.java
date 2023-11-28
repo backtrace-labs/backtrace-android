@@ -157,7 +157,7 @@ public class BacktraceAttributes {
             this.attributes.put("error.message", report.message);
             return;
         }
-        this.attributes.put("classifier", report.exception.getClass().getName());
+        this.attributes.put("classifier", report.classifier);
         this.attributes.put("error.message", report.exception.getMessage());
     }
 
