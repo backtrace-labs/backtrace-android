@@ -160,8 +160,6 @@ public final class BacktraceMetrics implements Metrics {
         }
         setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
-        BacktraceAttributes.enableMetrics();
-
         try {
             startMetricsEventHandlers(backtraceApi);
             sendStartupEvent();

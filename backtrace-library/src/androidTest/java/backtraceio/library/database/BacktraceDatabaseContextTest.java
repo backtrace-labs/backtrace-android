@@ -229,6 +229,16 @@ public class BacktraceDatabaseContextTest {
         assertEquals(3, databaseContext.count());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void tryAddNullBacktraceData() {
+        databaseContext.add((BacktraceData) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void tryAddNullBacktraceDbRecord() {
+        databaseContext.add((BacktraceDatabaseRecord) null);
+    }
+
     private List<BacktraceDatabaseRecord> fillDatabase() {
         List<BacktraceDatabaseRecord> result = new ArrayList<>();
         BacktraceReport report = new BacktraceReport(this.testMessage);
