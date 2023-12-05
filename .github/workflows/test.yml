@@ -94,7 +94,7 @@ jobs:
         run: curl -L https://saucelabs.github.io/saucectl/install | bash
 
       - name: Install saucectl
-        uses: saucelabs/saucectl-run-action@v3
+        uses: saucelabs/saucectl-run-action@v4
         with:
           skip-run: true
 
