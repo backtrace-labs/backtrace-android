@@ -177,7 +177,7 @@ public class BacktraceReport {
         this.attributes = attributes == null ? new HashMap<String, Object>() {
         } : attributes;
         this.attachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
-        this.exception = exception;
+        this.exception = this.prepareException(exception);
         this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
 
@@ -185,6 +185,22 @@ public class BacktraceReport {
             this.classifier = exception.getClass().getCanonicalName();
         }
         this.setDefaultErrorTypeAttribute();
+    }
+
+    /**
+     * To avoid serialization issues with custom exceptions, our goal is to always
+     * prepare exception in a way potential serialization won't break it
+     *
+     * @param exception captured client-side exception
+     */
+    private Exception prepareException(Exception exception) {
+        if (exception == null) {
+            return null;
+        }
+        Exception reportException = new Exception(exception.getMessage());
+        reportException.setStackTrace(exception.getStackTrace());
+
+        return reportException;
     }
 
     /**
