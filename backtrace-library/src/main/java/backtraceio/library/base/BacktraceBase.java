@@ -570,7 +570,8 @@ public class BacktraceBase implements Client {
                 if (record != null) {
                     record.close();
                 }
-                if (backtraceResult != null && backtraceResult.status == BacktraceResultStatus.Ok) {
+
+                if (backtraceResult != null && record != null && backtraceResult.status == BacktraceResultStatus.Ok) {
                     database.delete(record);
                 }
 
