@@ -70,7 +70,7 @@ public class BacktraceDatabaseRecord {
      */
     private transient BacktraceData record;
 
-    BacktraceDatabaseRecord() {
+    public BacktraceDatabaseRecord() {
         this._path = "";
         this.recordPath = String.format("%s-record.json", this.id);
         this.diagnosticDataPath = String.format("%s-attachment", this.id);

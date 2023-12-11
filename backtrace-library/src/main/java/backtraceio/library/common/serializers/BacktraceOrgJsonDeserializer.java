@@ -27,6 +27,18 @@ public class BacktraceOrgJsonDeserializer {
                     if (jsonObject.has(fieldName)) {
                         // Set the field value using reflection
                         field.set(instance, jsonObject.get(fieldName));
+                        continue;
+                    }
+
+
+                    if (field.isAnnotationPresent(SerializedName.class)) {
+                        SerializedName annotation = field.getAnnotation(SerializedName.class);
+                        if (annotation != null) {
+                            String customName = annotation.value();
+                            field.set(instance, jsonObject.get(customName));
+                            continue;
+                        }
+
                     }
                 }
 
