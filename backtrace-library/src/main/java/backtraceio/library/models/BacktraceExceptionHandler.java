@@ -70,9 +70,8 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
             return (Exception) throwable;
         }
 
-        Exception exception = new Exception(throwable);
+        Exception exception = new Exception(throwable.toString(), throwable);
         exception.setStackTrace(throwable.getStackTrace());
-
         return exception;
     }
 
