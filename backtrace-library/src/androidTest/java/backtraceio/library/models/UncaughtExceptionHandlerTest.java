@@ -125,10 +125,9 @@ public class UncaughtExceptionHandlerTest {
         // THEN
         assertNotNull(testedAtomicReportData);
         final BacktraceData testedReportData = testedAtomicReportData.get();
-        assertEquals("java.lang.OutOfMemoryError", testedReportData.report.exception.getMessage());
         assertNull(testedReportData.report.message);
         assertTrue(testedReportData.report.diagnosticStack.size() > 0);
-        assertEquals("java.lang.Exception", testedReportData.report.classifier);
+        assertEquals("java.lang.OutOfMemoryError", testedReportData.report.classifier);
         assertEquals("Unhandled Exception", testedReportData.report.attributes.get("error.type"));
         assertTrue(testedReportData.report.exceptionTypeReport);
     }

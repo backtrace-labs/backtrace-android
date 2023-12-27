@@ -58,11 +58,11 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
 
         try {
+            BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
             signal.await();
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
-        BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
     }
 
     private Exception getCausedException(Throwable throwable) {
@@ -70,9 +70,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
             return (Exception) throwable;
         }
 
-        Exception exception = new Exception(throwable.toString(), throwable);
-        exception.setStackTrace(throwable.getStackTrace());
-        return exception;
+        return new UnhandledThrowableWrapper(throwable);
     }
 
     private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
