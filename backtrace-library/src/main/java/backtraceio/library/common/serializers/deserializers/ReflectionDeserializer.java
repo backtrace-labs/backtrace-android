@@ -1,0 +1,54 @@
+package backtraceio.library.common.serializers.deserializers;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.models.BacktraceResult;
+
+public class ReflectionDeserializer implements Deserializable<Object> {
+
+
+    @Override
+    public <T1> T1 deserialize(JSONObject jsonObj, Class<T> clazz) throws JSONException {
+        try {
+            T instance = clazz.newInstance();
+            // Assuming that the class has a default (no-argument) constructor
+
+            // Iterate through the fields of the class
+            for (java.lang.reflect.Field field : clazz.getDeclaredFields()) {
+                // Make the field accessible (public, private, etc.)
+                field.setAccessible(true);
+
+                // Get the field name
+                String fieldName = field.getName();
+
+                // Check if the JSON object has a key with the field name
+                if (jsonObject.has(fieldName)) {
+                    // Set the field value using reflection
+                    field.set(instance, jsonObject.get(fieldName));
+                    continue;
+                }
+
+
+                if (field.isAnnotationPresent(SerializedName.class)) {
+                    SerializedName annotation = field.getAnnotation(SerializedName.class);
+                    if (annotation != null) {
+                        String customName = annotation.value();
+                        field.set(instance, jsonObject.get(customName));
+                        continue;
+                    }
+
+                }
+            }
+
+            return instance;
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace(); // Handle the exception appropriately
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+}

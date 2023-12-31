@@ -74,6 +74,17 @@ public class BacktraceDataDeserializerTest {
         assertEquals("/data/user/0/backtraceio.backtraceio/files/8fbde28b-aa64-4e2f-83d8-493a98446fc8-record.json", result.getRecordPath());
         assertEquals("/data/user/0/backtraceio.backtraceio/files/8fbde28b-aa64-4e2f-83d8-493a98446fc8-report.json", result.getReportPath());
     }
+
+    @Test
+    public void deserializeBacktraceApiResult() throws JSONException {
+        // GIVEN
+
+        // WHEN
+
+        // THEN
+
+    }
+
     @Test
     public void fromJson2() throws JSONException, IllegalAccessException {
         // GIVEN

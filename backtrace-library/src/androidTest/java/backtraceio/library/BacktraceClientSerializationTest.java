@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-import com.google.gson.annotations.SerializedName;
+import backtraceio.library.common.serializers.SerializedName;
 import net.jodah.concurrentunit.Waiter;
 import org.junit.Before;
 import org.junit.Test;

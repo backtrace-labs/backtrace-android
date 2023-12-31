@@ -2,7 +2,6 @@ package backtraceio.library.common.serializers;
 
 import android.os.Build;
 
-import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
 import org.json.JSONException;

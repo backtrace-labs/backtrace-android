@@ -1,7 +1,5 @@
 package backtraceio.coroner.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import com.google.gson.JsonElement;

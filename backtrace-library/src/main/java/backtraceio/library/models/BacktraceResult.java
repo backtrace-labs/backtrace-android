@@ -38,6 +38,11 @@ public class BacktraceResult {
 
     }
 
+    public BacktraceResult(String rxId, String status) {
+        this.rxId = rxId;
+        this.status = BacktraceResultStatus.valueOf(status);
+    }
+
     /**
      * Create new instance of BacktraceResult
      *

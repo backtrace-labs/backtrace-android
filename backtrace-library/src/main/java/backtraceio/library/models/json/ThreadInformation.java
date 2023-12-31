@@ -1,6 +1,6 @@
 package backtraceio.library.models.json;
 
-import com.google.gson.annotations.SerializedName;
+import backtraceio.library.common.serializers.SerializedName;
 
 import java.util.ArrayList;
 
