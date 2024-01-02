@@ -39,7 +39,6 @@ public class BacktraceDatabase implements Database {
 
     private final String _crashpadHandlerName = "/libcrashpad_handler.so";
     private final String _crashpadDatabasePathPrefix = "/crashpad";
-
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
@@ -410,6 +409,10 @@ public class BacktraceDatabase implements Database {
 
     public void delete(BacktraceDatabaseRecord record) {
         if (this.backtraceDatabaseContext == null) {
+            return;
+        }
+
+        if (record == null){
             return;
         }
         this.backtraceDatabaseContext.delete(record);
