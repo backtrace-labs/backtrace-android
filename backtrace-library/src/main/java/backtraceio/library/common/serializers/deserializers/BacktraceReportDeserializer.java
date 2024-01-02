@@ -8,8 +8,10 @@ import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceReportDeserializer implements Deserializable<BacktraceReport>{
 
+
+    @Override
     public BacktraceReport deserialize(JSONObject obj) throws JSONException {
-//        return new BacktraceReport(); // TODO
-        return null; // TODO:
+        return this.deserialize(obj);
+//        return null; // TODO:
     }
 }

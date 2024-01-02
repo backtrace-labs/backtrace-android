@@ -3,16 +3,27 @@ package backtraceio.library.common.serializers.deserializers;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
+
 import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.models.BacktraceResult;
 
-public class ReflectionDeserializer implements Deserializable<Object> {
 
+public final class ReflectionDeserializer implements Deserializable<Object> {
 
     @Override
-    public <T1> T1 deserialize(JSONObject jsonObj, Class<T> clazz) throws JSONException {
+    public Object deserialize(JSONObject obj) throws JSONException {
         try {
-            T instance = clazz.newInstance();
+            Class<?> clazz = Object.class;
+
+            // Get the class type from the JSON object if available
+            if (obj.has("classType")) {
+                String className = obj.getString("classType");
+                clazz = Class.forName(className);
+            }
+
+            // Create an instance of the class using reflection
+            Object instance = clazz.getDeclaredConstructor().newInstance();
             // Assuming that the class has a default (no-argument) constructor
 
             // Iterate through the fields of the class
@@ -24,9 +35,9 @@ public class ReflectionDeserializer implements Deserializable<Object> {
                 String fieldName = field.getName();
 
                 // Check if the JSON object has a key with the field name
-                if (jsonObject.has(fieldName)) {
+                if (obj.has(fieldName)) {
                     // Set the field value using reflection
-                    field.set(instance, jsonObject.get(fieldName));
+                    field.set(instance, obj.get(fieldName));
                     continue;
                 }
 
@@ -35,7 +46,7 @@ public class ReflectionDeserializer implements Deserializable<Object> {
                     SerializedName annotation = field.getAnnotation(SerializedName.class);
                     if (annotation != null) {
                         String customName = annotation.value();
-                        field.set(instance, jsonObject.get(customName));
+                        field.set(instance, obj.get(customName));
                         continue;
                     }
 
@@ -46,6 +57,12 @@ public class ReflectionDeserializer implements Deserializable<Object> {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace(); // Handle the exception appropriately
         } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 

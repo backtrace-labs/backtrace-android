@@ -24,18 +24,21 @@ public class BacktraceDeserializer {
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
         put(Exception.class, new ExceptionDeserializer());
-        put(BacktraceDatabaseRecordDeserializer.class, new BacktraceDatabaseRecordDeserializer())
+        put(BacktraceDatabaseRecordDeserializer.class, new BacktraceDatabaseRecordDeserializer());
     }};
+
 
     public static void registerDeserializer(Class clazz, Deserializable obj) {
         deserializers.put(clazz, obj);
     }
 
+
+    @SuppressWarnings("unchecked")
     public static <T> T deserialize(JSONObject obj, Class<T> clazz) throws JSONException {
         if (deserializers.containsKey(clazz)) {
-            return deserializers.get(clazz).deserialize(obj);
+            return (T) deserializers.get(clazz).deserialize(obj);
         }
 
-        return DEFAULT_DESERIALIZER.deserialize(obj);
+        return (T) DEFAULT_DESERIALIZER.deserialize(obj);
     }
 }

@@ -4,5 +4,5 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public interface Deserializable<T> {
-    public <T> T deserialize(JSONObject jsonObj) throws JSONException;
+    T deserialize(JSONObject obj) throws JSONException;
 }
