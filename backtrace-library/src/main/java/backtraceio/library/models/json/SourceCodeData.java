@@ -2,6 +2,7 @@ package backtraceio.library.models.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.logger.BacktraceLogger;
@@ -18,7 +19,7 @@ public class SourceCodeData {
      */
     public Map<String, SourceCode> data = new HashMap<>();
 
-    public SourceCodeData(ArrayList<BacktraceStackFrame> exceptionStack) {
+    public SourceCodeData(List<BacktraceStackFrame> exceptionStack) {
         BacktraceLogger.d(LOG_TAG, "Initialization source code data");
         if (exceptionStack == null || exceptionStack.size() == 0) {
             BacktraceLogger.w(LOG_TAG, "Exception stack is null or empty");

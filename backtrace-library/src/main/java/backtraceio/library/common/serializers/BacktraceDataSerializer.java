@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.models.BacktraceData;
@@ -90,7 +91,7 @@ public class BacktraceDataSerializer {
     }
 
     @NonNull
-    private JSONArray serializeStackList(ArrayList<BacktraceStackFrame> stack) throws JSONException {
+    private JSONArray serializeStackList(List<BacktraceStackFrame> stack) throws JSONException {
         JSONArray stackArray = new JSONArray();
 
         for (BacktraceStackFrame stackFrame : stack) {

@@ -63,7 +63,7 @@ public class BacktraceReport {
     /**
      * Current report exception stack
      */
-    public ArrayList<BacktraceStackFrame> diagnosticStack;
+    public List<BacktraceStackFrame> diagnosticStack;
 
     /**
      * Create new instance of Backtrace report to send a report with custom client message
@@ -185,6 +185,23 @@ public class BacktraceReport {
             this.classifier = exception.getClass().getCanonicalName();
         }
         this.setDefaultErrorTypeAttribute();
+    }
+
+    public BacktraceReport(UUID uuid, long timestamp,
+                           boolean exceptionTypeReport, String classifier,
+                           Map<String, Object> attributes,
+                           String message, Exception exception,
+                           List<String> attachmentPaths,
+                           List<BacktraceStackFrame> diagnosticStack) {
+        this.uuid = uuid;
+        this.timestamp = timestamp;
+        this.exceptionTypeReport = exceptionTypeReport;
+        this.classifier = classifier;
+        this.attributes = attributes;
+        this.message = message;
+        this.exception = exception;
+        this.attachmentPaths = attachmentPaths;
+        this.diagnosticStack = diagnosticStack;
     }
 
     /**
