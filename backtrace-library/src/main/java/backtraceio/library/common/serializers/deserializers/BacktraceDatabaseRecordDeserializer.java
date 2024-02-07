@@ -9,6 +9,13 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 public class BacktraceDatabaseRecordDeserializer implements Deserializable<BacktraceDatabaseRecord>{
 
     public BacktraceDatabaseRecord deserialize(JSONObject obj) throws JSONException {
-        return new BacktraceDatabaseRecord(); // TODO
+        return new BacktraceDatabaseRecord(
+                obj.optString("Id"),
+                obj.optString("path"),
+                obj.optString("RecordName"),
+                obj.optString("DataPath"),
+                obj.optString("ReportPath"),
+                obj.optLong("size")// TODO: use all from fields or annotation
+        );
     }
 }

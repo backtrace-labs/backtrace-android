@@ -30,7 +30,7 @@ public class BacktraceDataTest {
         BacktraceReport report = new BacktraceReport(new IllegalAccessException("test-message"));
 
         // WHEN
-        BacktraceData backtraceData = new BacktraceData(context, report, new HashMap<>());
+        BacktraceData backtraceData = new BacktraceData.Builder(context, report, new HashMap<>()).build();
 
         // THEN
         assertEquals(backtraceData.classifiers, new String[]{"java.lang.IllegalAccessException"});

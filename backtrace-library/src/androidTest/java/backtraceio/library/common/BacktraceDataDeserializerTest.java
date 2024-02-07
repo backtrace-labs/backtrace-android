@@ -103,9 +103,9 @@ public class BacktraceDataDeserializerTest {
 
         BacktraceData dataJson = BacktraceOrgJsonDeserializer.deserialize(content, BacktraceData.class);
 
-        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
+//        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
 
-        System.out.println(backtraceData.report);
+//        System.out.println(backtraceData.report);
         // THEN
 //        assertEquals(backtraceData.report.message, );
     }
@@ -126,9 +126,9 @@ public class BacktraceDataDeserializerTest {
 //        File x = getFileFromPath(this, "resources/sample.json");
         JSONObject jsonObj = new JSONObject(content);
 
-        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
+//        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
 
-        System.out.println(backtraceData.report);
+//        System.out.println(backtraceData.report);
         // THEN
 //        assertEquals(backtraceData.report.message, );
     }

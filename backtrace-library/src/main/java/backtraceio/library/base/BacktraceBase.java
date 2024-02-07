@@ -236,7 +236,7 @@ public class BacktraceBase implements Client {
         this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
         this.attachments = attachments != null ? attachments : new ArrayList<String>();
         this.database = database != null ? database : new BacktraceDatabase();
-        this.setBacktraceApi(new BacktraceApi(credentials));
+        this.setBacktraceApi(new BacktraceApi(this.context, credentials));
         this.database.start();
         this.metrics = new BacktraceMetrics(context, attributes, backtraceApi, credentials);
     }
@@ -551,8 +551,8 @@ public class BacktraceBase implements Client {
         }
         addReportAttachments(report);
 
-        BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
-        backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
+        String symbolication = this.isProguardEnabled ? "proguard" : null;
+        BacktraceData backtraceData = new BacktraceData.Builder(context, report, symbolication, this.attributes).build();
 
         final BacktraceDatabaseRecord record = this.database.add(report, this.attributes, this.isProguardEnabled);
 

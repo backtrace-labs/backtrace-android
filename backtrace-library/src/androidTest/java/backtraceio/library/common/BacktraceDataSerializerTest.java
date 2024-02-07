@@ -44,7 +44,7 @@ public class BacktraceDataSerializerTest {
         attachments.add("test-path");
         attachments.add("test-path2");
         final BacktraceReport report = new BacktraceReport(exception, attributes, attachments);
-        final BacktraceData  data = new BacktraceData(context, report, null);
+        final BacktraceData  data = new BacktraceData.Builder(context, report, null).build();
 
         // WHEN
         final String jsonFromGson = BacktraceSerializeHelper.toJson(data);
@@ -95,7 +95,7 @@ public class BacktraceDataSerializerTest {
             attachments.add(Integer.toString(i));
             attachments.add(Integer.toString(i * 10));
             final BacktraceReport report = new BacktraceReport(exception, attributes, attachments);
-            final BacktraceData  data = new BacktraceData(context, report, null);
+            final BacktraceData  data = new BacktraceData.Builder(context, report, null).build();
 
             // GSON
             long startTime = System.currentTimeMillis();
@@ -107,7 +107,7 @@ public class BacktraceDataSerializerTest {
             // ORG JSON
             long startTimeOrg = System.currentTimeMillis();
             BacktraceDataSerializer serializer = new BacktraceDataSerializer(new NamingPolicy());
-            serializer.toJson( data);
+            serializer.toJson(data);
             long endTimeOrg = System.currentTimeMillis();
             timeOrgJson += endTimeOrg - startTimeOrg;
         }
