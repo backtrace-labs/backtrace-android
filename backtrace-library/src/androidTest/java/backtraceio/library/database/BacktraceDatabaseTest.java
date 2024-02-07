@@ -52,6 +52,10 @@ public class BacktraceDatabaseTest {
         this.database.clear();
     }
 
+    @Test
+    public void shouldNotCrashWhenNativeIntegrationIsNotEnabled() {
+        assertEquals(false, this.database.addNativeAttribute("key", "value"));
+    }
 
     @Test
     public void isDatabaseEmpty() {

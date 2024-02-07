@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
+import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -51,6 +52,7 @@ public class BacktraceDatabase implements Database {
     private boolean _enable = false;
     private Breadcrumbs breadcrumbs;
 
+    private boolean _enabledNativeIntegration = false;
     /**
      * Add attributes to native reports
      *
@@ -168,7 +170,7 @@ public class BacktraceDatabase implements Database {
     public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
                                           boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
         // avoid initialization when database doesn't exist
-        if (getSettings() == null) {
+        if (_enable == false || getSettings() == null) {
             return false;
         }
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
@@ -203,7 +205,7 @@ public class BacktraceDatabase implements Database {
         File crashHandlerDir = new File(databasePath);
         crashHandlerDir.mkdir();
 
-        Boolean initialized = initialize(
+        _enabledNativeIntegration = initialize(
                 minidumpSubmissionUrl,
                 databasePath,
                 handlerPath,
@@ -214,12 +216,12 @@ public class BacktraceDatabase implements Database {
                 unwindingMode
         );
 
-        if (initialized && this.breadcrumbs.isEnabled()) {
+        if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
             this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
                 this.addAttribute("breadcrumbs.lastId", Long.toString((breadcrumbId)));
             });
         }
-        return initialized;
+        return _enabledNativeIntegration;
     }
 
     /**
@@ -233,6 +235,22 @@ public class BacktraceDatabase implements Database {
     @Override
     public Breadcrumbs getBreadcrumbs() {
         return this.breadcrumbs;
+    }
+
+    public Boolean addNativeAttribute(String key, Object value) {
+        if (!_enabledNativeIntegration) {
+            return false;
+        }
+
+        if(value == null) {
+            return false;
+        }
+        Class type = value.getClass();
+        if (!TypeHelper.isPrimitiveOrPrimitiveWrapperOrString(type)) {
+            return false;
+        }
+        addAttribute(key, value.toString());
+        return true;
     }
 
     public void start() {
