@@ -120,4 +120,13 @@ public interface Database {
      * @return the breadcrumbs implementation for this Database, if any
      */
     Breadcrumbs getBreadcrumbs();
+
+    /**
+     * If the native integration is enabled and a value is a primitive type,
+     * adds a new attribute to the native integration.
+     * @param key attribute key
+     * @param value attribute value
+     * @return true, if attribute was added to the native report. Otherwise false.
+     */
+    Boolean addNativeAttribute(String key, Object value);
 }
