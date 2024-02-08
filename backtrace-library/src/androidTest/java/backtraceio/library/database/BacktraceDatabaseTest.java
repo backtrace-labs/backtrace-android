@@ -3,6 +3,8 @@ package backtraceio.library.database;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
+import android.os.FileUtils;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -14,7 +16,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +40,8 @@ public class BacktraceDatabaseTest {
     private Context context;
     private String dbPath;
     private BacktraceDatabase database;
+    private BacktraceClient client;
+    private BacktraceCredentials credentials;
     private final String testMessage = "Example test string";
 
     @Before
@@ -43,6 +49,8 @@ public class BacktraceDatabaseTest {
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.database = new BacktraceDatabase(this.context, dbPath);
+        this.credentials = new BacktraceCredentials("https://test.sp.backtrace.io", "1231231231231");
+        this.client = new BacktraceClient(this.context, this.credentials);
         this.database.start();
         this.database.clear();
     }
@@ -50,8 +58,37 @@ public class BacktraceDatabaseTest {
     @After
     public void after() {
         this.database.clear();
+        this.database.disableNativeIntegration();
     }
 
+    @Test
+    public void shouldNotCrashWhenNativeIntegrationIsNotEnabled() {
+        assertEquals(false, this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void shouldAddAnAttributeToNativeIntegration() {
+        this.database.setupNativeIntegration(this.client, this.credentials);
+        assertEquals(true, this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void shouldNotAddAnAttributeToNativeIntegrationWithComplexAttributeValue() {
+        this.database.setupNativeIntegration(this.client, this.credentials);
+        assertEquals(false, this.database.addNativeAttribute("key", new HashMap<>()));
+    }
+
+    @Test
+    public void shouldPreventAddingAnAttributeWithNullableKey() {
+        this.database.setupNativeIntegration(this.client, this.credentials);
+        assertEquals(false, this.database.addNativeAttribute(null, "value"));
+    }
+
+    @Test
+    public void shouldPreventAddingAnAttributeWithNullableValue() {
+        this.database.setupNativeIntegration(this.client, this.credentials);
+        assertEquals(false, this.database.addNativeAttribute("key", null));
+    }
 
     @Test
     public void isDatabaseEmpty() {
@@ -124,8 +161,13 @@ public class BacktraceDatabaseTest {
         assertEquals(2, database.count());
 
         database.clear();
-        int filesNumber = new File(this.dbPath).listFiles().length;
-        assertEquals(0, filesNumber);
+        File[] files = new File(this.dbPath).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile();
+            }
+        });
+        assertEquals(0, files.length);
         assertEquals(0, database.getDatabaseSize());
         assertEquals(0, database.count());
     }
