@@ -299,9 +299,10 @@ public class BacktraceBase implements Client {
     /**
      * Adds a new attribute to Backtrace Client. If the native integration is enabled, adds the attribute
      * to the native report attributes if:
-     *  - the value exists (is not a null)
-     *  - is not an object (the attribute value is primitive type like String, or Int)
-     * @param key attribute name
+     * - the value exists (is not a null)
+     * - is not an object (the attribute value is primitive type like String, or Int)
+     *
+     * @param key   attribute name
      * @param value attribute value.
      */
     public void addAttribute(String key, Object value) {
@@ -312,14 +313,19 @@ public class BacktraceBase implements Client {
 
         database.addNativeAttribute(key, value);
     }
+
     /**
      * Adds new attributes to Backtrace Client. If the native integration is enabled, adds attributes
      * to the native report attributes if:
-     *  - the value exists (is not a null)
-     *  - is not an object (the attribute value is primitive type like String, or Int)
+     * - the value exists (is not a null)
+     * - is not an object (the attribute value is primitive type like String, or Int)
+     *
      * @param attributes Map of attributes
      */
     public void addAttribute(Map<String, Object> attributes) {
+        if (attributes == null) {
+            return;
+        }
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             addAttribute(entry.getKey(), entry.getValue());
         }

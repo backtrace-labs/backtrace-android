@@ -229,6 +229,7 @@ public class BacktraceDatabase implements Database {
     @Override
     public void disableNativeIntegration() {
         disable();
+        this._enabledNativeIntegration = false;
     }
 
     @Override
@@ -241,7 +242,7 @@ public class BacktraceDatabase implements Database {
             return false;
         }
 
-        if(value == null) {
+        if (key == null || value == null) {
             return false;
         }
         Class type = value.getClass();
