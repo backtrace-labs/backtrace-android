@@ -20,6 +20,7 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData>{
                 // TODO: fix all below
                 null,
                 obj.optString("main-thread"),
+                // TODO: deserialize all of below
                 null,
                 null,
                 null,

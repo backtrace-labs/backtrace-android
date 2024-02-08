@@ -24,6 +24,7 @@ public class BacktraceResult {
     /**
      * Result status eg. server error, ok
      */
+    @SerializedName("response") // TODO: check if status or response
     public BacktraceResultStatus status = BacktraceResultStatus.Ok;
 
     /**

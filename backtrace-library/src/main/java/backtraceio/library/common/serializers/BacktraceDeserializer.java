@@ -14,6 +14,7 @@ import backtraceio.library.common.serializers.deserializers.ExceptionDeserialize
 import backtraceio.library.common.serializers.deserializers.ReflectionDeserializer;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceDeserializer {
@@ -24,7 +25,7 @@ public class BacktraceDeserializer {
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
         put(Exception.class, new ExceptionDeserializer());
-        put(BacktraceDatabaseRecordDeserializer.class, new BacktraceDatabaseRecordDeserializer());
+        put(BacktraceDatabaseRecord.class, new BacktraceDatabaseRecordDeserializer());
     }};
 
 
@@ -38,7 +39,7 @@ public class BacktraceDeserializer {
         if (deserializers.containsKey(clazz)) {
             return (T) deserializers.get(clazz).deserialize(obj);
         }
-
+        // todo: maybe return unsupported
         return (T) DEFAULT_DESERIALIZER.deserialize(obj);
     }
 }

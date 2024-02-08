@@ -35,10 +35,10 @@ public class ExceptionDeserializer implements Deserializable<Exception> {
         for(int idx = 0; idx < array.length(); idx++) {
             JSONObject obj = (JSONObject) array.get(idx);
             result[idx] = new StackTraceElement(
-                obj.optString("declaring-class"), // make something to not hardcode in this way
-                    obj.getString("method-name"), // make something to not hardcode in this way
-                    obj.optString("file-name"), // make something to not hardcode in this way
-                    obj.getInt("line-number") // make something to not hardcode in this way
+                obj.optString("declaring-class"), // TODO: make something to not hardcode in this way
+                    obj.getString("method-name"), // TODO: make something to not hardcode in this way
+                    obj.optString("file-name"), // TODO: make something to not hardcode in this way
+                    obj.getInt("line-number") // TODO: make something to not hardcode in this way
             );
         }
 

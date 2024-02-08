@@ -29,7 +29,7 @@ public class BacktraceDatabaseRecord {
      * Id
      */
     @SerializedName("Id")
-    public UUID id;// = UUID.randomUUID();
+    public UUID id;
 
     /**
      * Check if current record is in use

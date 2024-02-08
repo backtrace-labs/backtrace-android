@@ -21,6 +21,7 @@ import backtraceio.library.models.json.ThreadInformation;
  */
 public class BacktraceData {
 
+
     private static final transient String LOG_TAG = BacktraceData.class.getSimpleName();
     /**
      * Name of programming language/environment this error comes from.
