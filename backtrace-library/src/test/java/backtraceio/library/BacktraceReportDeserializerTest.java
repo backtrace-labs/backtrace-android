@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -16,10 +14,7 @@ import java.util.HashMap;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
 import backtraceio.library.common.serializers.deserializers.BacktraceReportDeserializer;
-import backtraceio.library.common.serializers.deserializers.BacktraceResultDeserializer;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.models.types.BacktraceResultStatus;
 
 // TODO: move to standard unit tests not instrumented
 public class BacktraceReportDeserializerTest {

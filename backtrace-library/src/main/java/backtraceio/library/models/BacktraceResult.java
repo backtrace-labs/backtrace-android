@@ -12,8 +12,6 @@ public class BacktraceResult {
     /**
      * Object identifier
      */
-    @SerializedName("_rxid")
-    @SuppressWarnings({"UnusedDeclaration"})
     public String rxId;
 
     /**
@@ -24,7 +22,6 @@ public class BacktraceResult {
     /**
      * Result status eg. server error, ok
      */
-    @SerializedName("response") // TODO: check if status or response
     public BacktraceResultStatus status = BacktraceResultStatus.Ok;
 
     /**
@@ -36,12 +33,14 @@ public class BacktraceResult {
      * Create new instance of BacktraceResult
      */
     public BacktraceResult() {
+    }
 
+    public BacktraceResult(BacktraceApiResult apiResult) {
+        this(apiResult.rxId, apiResult.response);
     }
 
     public BacktraceResult(String rxId, String status) {
-        this.rxId = rxId;
-        this.status = BacktraceResultStatus.valueOf(status);
+        this(null, rxId, BacktraceResultStatus.valueOf(status));
     }
 
     /**

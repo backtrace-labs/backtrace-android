@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import backtraceio.library.common.serializers.deserializers.BacktraceResultDeserializer;
+import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -21,7 +21,7 @@ public class BacktraceResultDeserializerTest {
         String json = "{\"response\":\"Ok\",\"_rxid\":\"01000000-5360-240b-0000-000000000000\"}";
 
         // WHEN
-        BacktraceResultDeserializer deserializer = new BacktraceResultDeserializer();
+        BacktraceApiResultDeserializer deserializer = new BacktraceApiResultDeserializer();
         BacktraceResult result = deserializer.deserialize(new JSONObject(json));
 
         // THEN
