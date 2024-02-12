@@ -2,7 +2,7 @@
 
 ## Version 3.7.14
 
-- Added a new Attribute API to the BacktraceClient. 
+- Added a new attribute API to the BacktraceClient.
 
 ## Version 3.7.13
 
