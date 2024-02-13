@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.7.14
+
+- Added a new attribute API to the BacktraceClient.
+
 ## Version 3.7.13
 
 - BacktraceExceptionHandler will catch Errors (not only Exception) when unhandled Throwable will happen
