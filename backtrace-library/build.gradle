@@ -24,8 +24,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags ""
-                arguments "-DCMAKE_BUILD_TYPE=Release -DCRASHPAD_HTTPS_TRANSPORT=OPENSSL"
+                cppFlags "-DCRASHPAD_HTTPS_TRANSPORT=NONE"
+                arguments "-DCMAKE_BUILD_TYPE=Release -DCRASHPAD_HTTPS_TRANSPORT=NONE"
             }
         }
         ndk {
