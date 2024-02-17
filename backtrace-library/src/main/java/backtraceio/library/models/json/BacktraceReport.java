@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
+import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
@@ -33,6 +34,7 @@ public class BacktraceReport {
     /**
      * Get information about report type. If value is true the BacktraceReport has an error
      */
+    @SerializedName("exception-type-report")
     public Boolean exceptionTypeReport = false;
 
     /**
@@ -63,6 +65,7 @@ public class BacktraceReport {
     /**
      * Current report exception stack
      */
+    @SerializedName("diagnostic-stack")
     public List<BacktraceStackFrame> diagnosticStack;
 
     /**

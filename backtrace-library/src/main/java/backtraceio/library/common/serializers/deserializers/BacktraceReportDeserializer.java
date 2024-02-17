@@ -13,28 +13,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceReportDeserializer implements Deserializable<BacktraceReport> {
 
-    ExceptionDeserializer exceptionDeserializer;
+    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceReport.class); // TODO: maybe we can reuse it
+    final ExceptionDeserializer exceptionDeserializer;
+
+    static class Fields {
+        final static String uuid = "rxId";
+        final static String timestamp = "timestamp";
+        final static String exceptionTypeReport = "exceptionTypeReport";
+        final static String attributes = "attributes";
+        final static String classifier = "classifier";
+        final static String message = "message";
+        final static String exception = "exception";
+        final static String attachmentPaths = "attachmentPaths";
+        final static String diagnosticStack = "diagnosticStack";
+    }
+
     public BacktraceReportDeserializer() {
         this.exceptionDeserializer = new ExceptionDeserializer();
     }
     @Override
     // TODO: fix all null warnings
     public BacktraceReport deserialize(JSONObject obj) throws JSONException {
-        final String uuid = obj.optString("uuid", null);
-        final long timestamp = obj.optLong("timestamp", 0);
-        final String message = obj.optString("message", null);
-        final String classifier = obj.optString("classifier", "");
-        final boolean exceptionTypeReport = obj.optBoolean("exception-type-report");
-        final Exception exception = getException(obj.optJSONObject("exception"));
-        final Map<String, Object> attributes = this.getAttributes(obj.optJSONObject("attributes")); // TODO: fix
+        final String uuid = obj.optString(fieldNameLoader.get(Fields.uuid), null);
+        final long timestamp = obj.optLong(fieldNameLoader.get(Fields.timestamp), 0);
+        final String message = obj.optString(fieldNameLoader.get(Fields.message), null);
+        final String classifier = obj.optString(fieldNameLoader.get(Fields.classifier), "");
+        final boolean exceptionTypeReport = obj.optBoolean(fieldNameLoader.get(Fields.exceptionTypeReport));
+        final Exception exception = getException(obj.optJSONObject(fieldNameLoader.get(Fields.exception)));
+        final Map<String, Object> attributes = this.getAttributes(obj.optJSONObject(fieldNameLoader.get(Fields.attributes)));
 
-        final List<String> attachmentPaths = this.getAttachmentList(obj.optJSONArray("attachmentPaths"));
-        final List<BacktraceStackFrame> diagnosticStack = this.getDiagnosticStack(obj.optJSONArray("diagnostic-stack")); // todo fix diagnostic-stack name
+        final List<String> attachmentPaths = this.getAttachmentList(obj.optJSONArray(fieldNameLoader.get(Fields.attachmentPaths)));
+        final List<BacktraceStackFrame> diagnosticStack = this.getDiagnosticStack(obj.optJSONArray(fieldNameLoader.get(Fields.diagnosticStack)));
 
         return new BacktraceReport(
                 !isNullOrEmpty(uuid)? UUID.fromString(uuid) : null,

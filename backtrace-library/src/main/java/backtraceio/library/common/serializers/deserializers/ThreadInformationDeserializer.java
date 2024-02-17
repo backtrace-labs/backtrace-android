@@ -22,9 +22,9 @@ public class ThreadInformationDeserializer implements Deserializable<ThreadInfor
 
     public ThreadInformation deserialize(JSONObject obj) throws JSONException {
         return new ThreadInformation(
-                obj.optString(Fields.name, null), // TODO: fallback warning
-                obj.optBoolean(Fields.fault, false),
-                getBacktraceStackFrameList(obj.optJSONArray(Fields.stack))
+                obj.optString(fieldNameLoader.get(Fields.name), null), // TODO: fallback warning
+                obj.optBoolean(fieldNameLoader.get(Fields.fault), false),
+                getBacktraceStackFrameList(obj.optJSONArray(fieldNameLoader.get(Fields.stack)))
                 );
     }
 

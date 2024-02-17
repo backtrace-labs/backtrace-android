@@ -21,6 +21,12 @@ import backtraceio.library.models.json.ThreadInformation;
  */
 public class BacktraceData {
 
+    /**
+     * 16 bytes of randomness in human readable UUID format
+     * server will reject request if uuid is already found
+     */
+    @SerializedName("uuid")
+    public String uuid;
 
     private static final transient String LOG_TAG = BacktraceData.class.getSimpleName();
     /**
@@ -41,13 +47,6 @@ public class BacktraceData {
      */
     @SerializedName("symbolication")
     public String symbolication;
-
-    /**
-     * 16 bytes of randomness in human readable UUID format
-     * server will reject request if uuid is already found
-     */
-    @SerializedName("uuid")
-    public String uuid;
 
     /**
      * UTC timestamp in seconds
@@ -115,8 +114,8 @@ public class BacktraceData {
                          String[] classifiers, BacktraceReport report, Map<String, Object> annotations,
                          Map<String, SourceCode> sourceCode,
                          Map<String, ThreadInformation> threadInformationMap) {
-        this.symbolication = symbolication;
         this.uuid = uuid;
+        this.symbolication = symbolication;
         this.timestamp = timestamp;
         this.langVersion = langVersion;
         this.agentVersion = agentVersion;

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
@@ -17,21 +18,37 @@ import backtraceio.library.models.json.ThreadInformation;
 // TODO: check if methods should be private
 public class BacktraceDataDeserializer implements Deserializable<BacktraceData>{
 
+    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceData.class); // TODO: maybe we can reuse it
+    static class Fields {
+        final static String uuid = "uuid";
+        final static String symbolication = "symbolication";
+        final static String timestamp = "timestamp";
+        final static String langVersion = "langVersion";
+        final static String agentVersion = "agentVersion";
+        final static String attributes = "attributes";
+        final static String mainThread = "mainThread";
+        final static String classifiers = "classifiers";
+        final static String annotations = "annotations";
+        final static String sourceCode = "sourceCode";
+        final static String report = "report";
+        final static String threadInformationMap = "threadInformationMap";
+
+    }
     public BacktraceData deserialize(JSONObject obj) throws JSONException {
         return new BacktraceData(
-              obj.optString("uuid"),
-                obj.optString("symbolication"),
-                obj.optLong("timestamp"),
-                obj.optString("lang-version"), // TODO: fix or improve casing should get from annotation
-                obj.optString("agent-version"), // TODO: fix or improve casing should get from annotation
+              obj.optString(fieldNameLoader.get(Fields.uuid)),
+                obj.optString(fieldNameLoader.get(Fields.symbolication)),
+                obj.optLong(fieldNameLoader.get(Fields.timestamp)),
+                obj.optString(fieldNameLoader.get(Fields.langVersion)), // TODO: fix or improve casing should get from annotation
+                obj.optString(fieldNameLoader.get(Fields.agentVersion)), // TODO: fix or improve casing should get from annotation
                 // TODO: fix all below and maybe add fallback
-                getAttributes(obj.optJSONObject("attributes")),
-                obj.optString("main-thread"),
-                getClassifiers(obj.optJSONArray("classifiers")),
-                getBacktraceReport(obj.optJSONObject("report")),
-                getAnnotations(obj.optJSONObject("annotations")),
-                getSourceCode(obj.optJSONObject("sourceCode")),
-                getThreadInformation(obj.optJSONObject("threads"))
+                getAttributes(obj.optJSONObject(fieldNameLoader.get(Fields.attributes))),
+                obj.optString(fieldNameLoader.get(Fields.mainThread)),
+                getClassifiers(obj.optJSONArray(fieldNameLoader.get(Fields.classifiers))),
+                getBacktraceReport(obj.optJSONObject(fieldNameLoader.get(Fields.report))),
+                getAnnotations(obj.optJSONObject(fieldNameLoader.get(Fields.annotations))),
+                getSourceCode(obj.optJSONObject(fieldNameLoader.get(Fields.sourceCode))),
+                getThreadInformation(obj.optJSONObject(fieldNameLoader.get(Fields.threadInformationMap)))
         ); // TODO
     }
 

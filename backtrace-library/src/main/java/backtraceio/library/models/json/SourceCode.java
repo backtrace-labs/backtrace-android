@@ -27,6 +27,6 @@ public class SourceCode {
 
     public SourceCode(Integer line, String sourceCodeFileName) {
         this.startLine = line;
-        this.sourceCodeFileName = sourceCodeFileName
+        this.sourceCodeFileName = sourceCodeFileName;
     }
 }
