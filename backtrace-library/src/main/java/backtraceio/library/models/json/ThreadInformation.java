@@ -38,7 +38,7 @@ public class ThreadInformation {
      * @param fault      denotes whether a thread is a faulting thread - in most cases main thread
      * @param stack      exception stack information
      */
-    private ThreadInformation(String threadName, Boolean fault, List<BacktraceStackFrame>
+    public ThreadInformation(String threadName, Boolean fault, List<BacktraceStackFrame>
             stack) {
         this.stack = stack == null ? new ArrayList<>() : stack;
         this.name = threadName;

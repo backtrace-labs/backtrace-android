@@ -44,7 +44,7 @@ public class SerializerHelperTest {
     @Test
     public void serializeObject() throws JSONException {
         // GIVEN
-        final SourceCode sourceCode = new SourceCode(new BacktraceStackFrame(new StackTraceElement("sample-class", "sample-method", "sample-file", 123)));
+        final SourceCode sourceCode = new SourceCode(BacktraceStackFrame.fromStackTraceElement(new StackTraceElement("sample-class", "sample-method", "sample-file", 123)));
 
         // WHEN
         JSONObject jsonObject = (JSONObject) SerializerHelper.serialize(namingPolicy, sourceCode);

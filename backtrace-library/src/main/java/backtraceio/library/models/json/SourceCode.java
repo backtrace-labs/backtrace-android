@@ -22,7 +22,11 @@ public class SourceCode {
 
 
     public SourceCode(BacktraceStackFrame stackFrame) {
-        this.sourceCodeFileName = stackFrame.sourceCodeFileName;
-        this.startLine = stackFrame.line;
+        this(stackFrame.line, stackFrame.sourceCodeFileName);
+    }
+
+    public SourceCode(Integer line, String sourceCodeFileName) {
+        this.startLine = line;
+        this.sourceCodeFileName = sourceCodeFileName
     }
 }

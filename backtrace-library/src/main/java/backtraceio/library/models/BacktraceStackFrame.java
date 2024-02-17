@@ -48,14 +48,21 @@ public class BacktraceStackFrame {
      *
      * @param frame single stacktrace element
      */
-    public BacktraceStackFrame(StackTraceElement frame) {
+    public static BacktraceStackFrame fromStackTraceElement(StackTraceElement frame) {
         if (frame == null || frame.getMethodName() == null) {
             BacktraceLogger.w(LOG_TAG, "Frame or method name is null");
-            return;
+            return null;
         }
-        this.functionName = frame.getClassName() + "." + frame.getMethodName();
-        this.sourceCodeFileName = frame.getFileName();
+        final String functionName = frame.getClassName() + "." + frame.getMethodName();
+        final String fileName = frame.getFileName();
+        final Integer line = frame.getLineNumber() > 0 ? frame.getLineNumber() : null;
+        return new BacktraceStackFrame(functionName, fileName, line);
+    }
+
+    public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line) {
+        this.functionName = functionName;
+        this.sourceCodeFileName = sourceCodeFileName;
         this.sourceCode = UUID.randomUUID().toString();
-        this.line = frame.getLineNumber() > 0 ? frame.getLineNumber() : null;
+        this.line = line;
     }
 }

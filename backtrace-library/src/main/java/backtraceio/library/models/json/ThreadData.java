@@ -74,7 +74,7 @@ public class ThreadData {
             }
             if (stack != null && stack.length != 0) {
                 for (StackTraceElement stackTraceElement : stack) {
-                    stackFrame.add(new BacktraceStackFrame(stackTraceElement));
+                    stackFrame.add(BacktraceStackFrame.fromStackTraceElement(stackTraceElement));
                 }
             }
             this.threadInformation.put(threadName, new ThreadInformation(thread, stackFrame,
