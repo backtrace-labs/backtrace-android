@@ -35,7 +35,13 @@ public class BacktraceDeserializer {
 
     @SuppressWarnings("unchecked")
     public static <T> T deserialize(JSONObject obj, Class<T> clazz) throws JSONException {
+        if (obj == null) {
+//            LOGG
+            // TODO: Add logging
+            return null;
+        }
         if (deserializers.containsKey(clazz)) {
+            // TODO: check if deserializers.get(clazz) is not null
             return (T) deserializers.get(clazz).deserialize(obj);
         }
         // todo: maybe return unsupported

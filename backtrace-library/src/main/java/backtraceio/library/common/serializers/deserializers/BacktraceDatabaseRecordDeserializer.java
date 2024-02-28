@@ -3,9 +3,7 @@ package backtraceio.library.common.serializers.deserializers;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.UUID;
-
-import backtraceio.library.models.BacktraceData;
+import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
 public class BacktraceDatabaseRecordDeserializer implements Deserializable<BacktraceDatabaseRecord> {

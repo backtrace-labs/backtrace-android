@@ -1,4 +1,4 @@
-package backtraceio.library.common.serializers.deserializers;
+package backtraceio.library.common.serializers.deserializers.cache;
 
 public class FieldNameLoader {
     private final Class clazz;

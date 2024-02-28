@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import backtraceio.library.models.BacktraceApiResult;
+import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -22,8 +22,10 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
     private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceReport.class); // TODO: maybe we can reuse it
     final ExceptionDeserializer exceptionDeserializer;
 
+    final BacktraceStackFrameDeserializer stackFrameDeserializer;
+
     static class Fields {
-        final static String uuid = "rxId";
+        final static String uuid = "uuid";
         final static String timestamp = "timestamp";
         final static String exceptionTypeReport = "exceptionTypeReport";
         final static String attributes = "attributes";
@@ -36,10 +38,14 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
 
     public BacktraceReportDeserializer() {
         this.exceptionDeserializer = new ExceptionDeserializer();
+        this.stackFrameDeserializer = new BacktraceStackFrameDeserializer();
     }
     @Override
     // TODO: fix all null warnings
     public BacktraceReport deserialize(JSONObject obj) throws JSONException {
+        if (obj == null) {
+            return null;
+        }
         final String uuid = obj.optString(fieldNameLoader.get(Fields.uuid), null);
         final long timestamp = obj.optLong(fieldNameLoader.get(Fields.timestamp), 0);
         final String message = obj.optString(fieldNameLoader.get(Fields.message), null);
@@ -107,9 +113,14 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         for (int i = 0; i < obj.length(); i++) {
             JSONObject stackItem = obj.optJSONObject(i);
             if (stackItem != null) {
+                try {
+                    result.add(this.stackFrameDeserializer.deserialize(stackItem));
+                } catch (Exception e) {
+                    // TODO: handle
+                }
                 BacktraceStackFrame stackFrame = new BacktraceStackFrame();
                 stackFrame.functionName = stackItem.optString("function-name");
-                stackFrame.line = stackItem.optInt("line"); // todo: should be null in case of empty
+                stackFrame.line = stackItem.optInt("line");
                 stackFrame.sourceCode = stackItem.optString("source-code");
                 result.add(stackFrame);
             }

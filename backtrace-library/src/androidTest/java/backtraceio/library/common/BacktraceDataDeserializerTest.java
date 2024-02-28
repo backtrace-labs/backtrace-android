@@ -12,6 +12,10 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -90,47 +94,32 @@ public class BacktraceDataDeserializerTest {
     @Test
     public void fromJson2() throws JSONException, IllegalAccessException {
         // GIVEN
-        final Context context = InstrumentationRegistry.getInstrumentation().getContext();
-
         String fileName = "sample.json";
-
-        String path = "resources/";
-        String jsonPath =  path + "sample.json";
+        String content = readFileAsString(this, fileName);
 
         // WHEN
-
-        String content = readFileAsString(this, fileName);
-//        File x = getFileFromPath(this, "resources/sample.json");
-        JSONObject jsonObj = new JSONObject(content);
-
         BacktraceData dataJson = BacktraceOrgJsonDeserializer.deserialize(content, BacktraceData.class);
 
-//        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
+        BacktraceData gsonDataJson = (new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)).create().fromJson(content, BacktraceData.class); // GSON backup
 
-//        System.out.println(backtraceData.report);
-        // THEN
-//        assertEquals(backtraceData.report.message, );
-    }
+        assertEquals(dataJson.uuid, "079e41e2-bef1-4062-9e20-f2e1b3a93582");
+        assertEquals(dataJson.report, null);
+        assertEquals(dataJson.lang, "java");
+        assertEquals(dataJson.agent, "backtrace-android");
+        assertEquals(dataJson.langVersion, "0");
+        assertEquals(dataJson.agentVersion, "3.7.7-8-3f67d73-org-json-serializer");
+        assertEquals(dataJson.mainThread, "instr: androidx.test.runner.androidjunitrunner");
+        assertEquals(dataJson.timestamp, 1694983723);
+//        assertEquals(dataJson.);
 
-    @Test
-    public void fromJson() throws JSONException, IllegalAccessException {
-        // GIVEN
-        final Context context = InstrumentationRegistry.getInstrumentation().getContext();
-
-        String fileName = "sample.json";
-
-        String path = "resources/";
-        String jsonPath =  path + "sample.json";
-
-        // WHEN
-
-        String content = readFileAsString(this, fileName);
-//        File x = getFileFromPath(this, "resources/sample.json");
-        JSONObject jsonObj = new JSONObject(content);
+//        assertEquals(dataJson.symbolication, "");
+//        assertEquals(dataJson.classifiers, "");
+//        assertEquals(dataJson.sourceCode, "");
+//        assertEquals(dataJson.annotations, "");
 
 //        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
 
-//        System.out.println(backtraceData.report);
+        System.out.println(dataJson.report);
         // THEN
 //        assertEquals(backtraceData.report.message, );
     }

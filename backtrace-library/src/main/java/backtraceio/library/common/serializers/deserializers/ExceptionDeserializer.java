@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExceptionDeserializer implements Deserializable<Exception> {
+    static class Fields {
+        final static String startLine = "startLine";
+        final static String sourceCodeFileName = "sourceCodeFileName";
+    }
     @Override
     public Exception deserialize(JSONObject obj) {
         final String message = obj.optString("detail-message", "");
@@ -31,7 +35,6 @@ public class ExceptionDeserializer implements Deserializable<Exception> {
         }
 
         StackTraceElement[] result = new StackTraceElement[array.length()];
-
         for(int idx = 0; idx < array.length(); idx++) {
             JSONObject obj = (JSONObject) array.get(idx);
             result[idx] = new StackTraceElement(

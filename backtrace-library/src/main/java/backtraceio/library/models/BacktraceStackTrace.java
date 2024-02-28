@@ -61,7 +61,7 @@ public class BacktraceStackTrace {
                 BacktraceLogger.d(LOG_TAG, "Skipping frame because it comes from inside the Backtrace library");
                 continue;
             }
-            BacktraceStackFrame backtraceStackFrame = new BacktraceStackFrame(frame);
+            BacktraceStackFrame backtraceStackFrame = BacktraceStackFrame.fromStackTraceElement(frame);
             this.stackFrames.add(backtraceStackFrame);
         }
     }

@@ -3,8 +3,8 @@ package backtraceio.library.common.serializers.deserializers;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.models.BacktraceApiResult;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 public class BacktraceApiResultDeserializer implements Deserializable<BacktraceApiResult> {
@@ -18,8 +18,7 @@ public class BacktraceApiResultDeserializer implements Deserializable<BacktraceA
     public BacktraceApiResult deserialize(JSONObject obj) throws JSONException {
         return new BacktraceApiResult(
                 obj.optString(fieldNameLoader.get(Fields.rxId), null), // TODO: check fallback warning
-                obj.optString(fieldNameLoader.get(Fields.response), BacktraceResultStatus.Ok.toString()
-                )
+                obj.optString(fieldNameLoader.get(Fields.response), BacktraceResultStatus.Ok.toString())
         );
     }
 }

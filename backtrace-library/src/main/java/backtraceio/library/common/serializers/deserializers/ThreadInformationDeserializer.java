@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.ThreadInformation;
 
@@ -24,21 +25,21 @@ public class ThreadInformationDeserializer implements Deserializable<ThreadInfor
         return new ThreadInformation(
                 obj.optString(fieldNameLoader.get(Fields.name), null), // TODO: fallback warning
                 obj.optBoolean(fieldNameLoader.get(Fields.fault), false),
-                getBacktraceStackFrameList(obj.optJSONArray(fieldNameLoader.get(Fields.stack)))
-                );
+                getBacktraceStackFrameList(obj.optJSONArray(fieldNameLoader.get(Fields.stack))));
     }
 
     public List<BacktraceStackFrame> getBacktraceStackFrameList(JSONArray jsonArray) {
+        if (jsonArray == null) {
+            return null; // todo: Check if we should return empty or null
+        }
         final List<BacktraceStackFrame> result = new ArrayList<>();
 
-//        StackTraceElement[] result = new StackTraceElement[array.length()];
         final BacktraceStackFrameDeserializer deserializer = new BacktraceStackFrameDeserializer(); // TODO: check how to resolve it
-        for(int idx = 0; idx < jsonArray.length(); idx++) {
+        for (int idx = 0; idx < jsonArray.length(); idx++) {
             try {
                 JSONObject obj = (JSONObject) jsonArray.get(idx);
                 result.add(deserializer.deserialize(obj));
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 // TODO: handle
             }
         }

@@ -3,7 +3,7 @@ package backtraceio.library.common.serializers.deserializers;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import backtraceio.library.models.BacktraceStackFrame;
+import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.models.json.SourceCode;
 
 public class SourceCodeDeserializer  implements Deserializable<SourceCode> {

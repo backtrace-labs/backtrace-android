@@ -1,4 +1,4 @@
-package backtraceio.library.common.serializers.deserializers;
+package backtraceio.library.common.serializers.deserializers.cache;
 
 import androidx.annotation.NonNull;
 
@@ -10,7 +10,7 @@ import backtraceio.library.common.serializers.SerializedName;
 
 public class FieldNameCache {
         // Map to store annotation information
-        private static Map<String, String> fieldNameMap = new HashMap<>();
+        private final static Map<String, String> fieldNameMap = new HashMap<>();
 
         // Method to get annotation for a given class and field
         public static String getAnnotation(Class<?> clazz, @NonNull String fieldName) {
@@ -26,6 +26,8 @@ public class FieldNameCache {
                     if (field.isAnnotationPresent(SerializedName.class)) {
                         cachedFieldName = field.getAnnotation(SerializedName.class).value();
                         fieldNameMap.put(key, cachedFieldName);
+                    } else {
+                        cachedFieldName = field.getName();
                     }
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
