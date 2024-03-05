@@ -78,7 +78,7 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
             String key = keys.next();
             try {
                 if (obj.get(key) instanceof JSONObject) {
-                    result.put(key, deserializer.deserialize(obj));
+                    result.put(key, deserializer.deserialize((JSONObject) obj.get(key)));
                 }
             } catch (JSONException e) {
                 // TODO:
@@ -100,7 +100,7 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
             String key = keys.next();
             try {
                 if (obj.get(key) instanceof JSONObject) {
-                    result.put(key, deserializer.deserialize(obj));
+                    result.put(key, deserializer.deserialize((JSONObject) obj.get(key)));
                 }
             } catch (JSONException e) {
                 // TODO:

@@ -18,8 +18,8 @@ public class BacktraceStackFrameDeserializer implements Deserializable<Backtrace
     public BacktraceStackFrame deserialize(JSONObject obj) throws JSONException {
         return new BacktraceStackFrame(
                 obj.optString(fieldNameLoader.get(Fields.functionName), null), // TODO: check fallback warning
-                obj.optString(fieldNameLoader.get(Fields.line), null), // TODO: check fallback warning  // todo: should be null in case of empty
-                obj.optInt(fieldNameLoader.get(Fields.sourceCode))); // TODO: check fallback warning
+                obj.optString(fieldNameLoader.get(Fields.sourceCode), null), // TODO: check fallback warning  // todo: should be null in case of empty
+                obj.optInt(fieldNameLoader.get(Fields.line))); // TODO: check fallback warning
     }
 }
 

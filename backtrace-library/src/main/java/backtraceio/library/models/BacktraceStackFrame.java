@@ -34,7 +34,7 @@ public class BacktraceStackFrame {
     /**
      * Source code file name where exception occurs
      */
-    public transient String sourceCodeFileName;
+    public transient String sourceCodeFileName; // why transient
 
     /**
      * Create new instance of BacktraceStackFrame
@@ -61,7 +61,7 @@ public class BacktraceStackFrame {
 
     public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line) {
         this.functionName = functionName;
-        this.sourceCodeFileName = sourceCodeFileName;
+        this.sourceCodeFileName = sourceCodeFileName; // why
         this.sourceCode = UUID.randomUUID().toString();
         this.line = line;
     }
