@@ -36,5 +36,6 @@ public class BacktraceDataTest {
         assertEquals(backtraceData.classifiers, new String[]{"java.lang.IllegalAccessException"});
         assertEquals(backtraceData.report, report);
         assertEquals(backtraceData.attributes.get("classifier"), "java.lang.IllegalAccessException");
+        // TODO: add next checks
     }
 }

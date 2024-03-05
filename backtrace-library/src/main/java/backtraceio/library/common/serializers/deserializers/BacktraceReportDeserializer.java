@@ -74,20 +74,12 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         return this.exceptionDeserializer.deserialize(obj); // TODO: fix usage
     }
 
-    public Map<String, Object> getAttributes(JSONObject obj) {
+    public Map<String, Object> getAttributes(JSONObject obj) throws JSONException {
         if (obj == null) {
             return null;
         }
 
-        Map<String, Object> result = new HashMap<>();
-
-        Iterator<String> attributesKeys = obj.keys();
-        while (attributesKeys.hasNext()) {
-            String key = attributesKeys.next();
-            result.put(key, obj.optString(key));
-        }
-
-        return result;
+        return MapDeserializer.toMap(obj); // TODO: check exception
     }
 
     public List<String> getAttachmentList(JSONArray array) {
@@ -104,28 +96,12 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         return result;
     }
 
-    public List<BacktraceStackFrame> getDiagnosticStack(JSONArray obj) {
-        if (obj == null) {
+    public List<BacktraceStackFrame> getDiagnosticStack(JSONArray array) {
+        if (array == null) {
             return null;
         }
 
-        List<BacktraceStackFrame> result = new ArrayList<>();
-        for (int i = 0; i < obj.length(); i++) {
-            JSONObject stackItem = obj.optJSONObject(i);
-            if (stackItem != null) {
-                try {
-                    result.add(this.stackFrameDeserializer.deserialize(stackItem));
-                } catch (Exception e) {
-                    // TODO: handle
-                }
-                BacktraceStackFrame stackFrame = new BacktraceStackFrame();
-                stackFrame.functionName = stackItem.optString("function-name");
-                stackFrame.line = stackItem.optInt("line");
-                stackFrame.sourceCode = stackItem.optString("source-code");
-                result.add(stackFrame);
-            }
-        }
-
-        return result;
+        GenericListDeserializer<BacktraceStackFrame> deserializer = new GenericListDeserializer<>();
+        return deserializer.deserialize(array, this.stackFrameDeserializer);
     }
 }
