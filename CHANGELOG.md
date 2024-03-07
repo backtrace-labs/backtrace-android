@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.8.0
+
+- Update crashpad to latest version 
+
 ## Version 3.7.14
 
 - Added a new attribute API to the BacktraceClient.
