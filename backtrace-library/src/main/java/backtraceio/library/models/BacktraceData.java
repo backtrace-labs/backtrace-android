@@ -16,6 +16,9 @@ import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
 
+
+// TODO: replace direct access with getters
+
 /**
  * Serializable Backtrace API data object
  */
@@ -141,74 +144,6 @@ public class BacktraceData {
         return threadInformationMap;
     }
 
-//    /***
-//     * Set annotations object
-//     * @param complexAttributes
-//     */
-//    private void setAnnotations(Map<String, Object> complexAttributes) {
-//        BacktraceLogger.d(LOG_TAG, "Setting annotations");
-//        Object exceptionMessage = null;
-//
-//        if (this.attributes != null &&
-//                this.attributes.containsKey("error.message")) {
-//            exceptionMessage = this.attributes.get("error.message");
-//        }
-//        this.annotations = Annotations.getAnnotations(exceptionMessage, complexAttributes);
-//    }
-
-//    /**
-//     * Set attributes and add complex attributes to annotations
-//     *
-//     * @param context          // TODO:
-//     * @param clientAttributes
-//     */
-
-
-//    /**
-//     * Set report information such as report identifier (UUID), timestamp, classifier
-//     */
-//    private void setDefaultReportInformation() {
-//        this.setReportInformation(
-//                report.uuid.toString(),
-//                report.timestamp,
-//                report.exceptionTypeReport ? new String[]{report.classifier} : null,
-//                System.getProperty("java.version"), //TODO: Fix problem with read Java version,
-//                BacktraceClient.version
-//                );
-//    }
-
-//    public void setReportInformation(String uuid, long timestamp, String [] classifiers, String langVersion, String agentVersion) {
-//        BacktraceLogger.d(LOG_TAG, "Setting report information");
-//        this.uuid = uuid;
-//        this.timestamp = timestamp;
-//        this.classifiers = classifiers;
-//        this.langVersion = langVersion;
-//        this.agentVersion = agentVersion;
-//    }
-
-//    /**
-//     * Set information about all threads
-//     */
-//    private void setDefaultThreadsInformation() {
-//        BacktraceLogger.d(LOG_TAG, "Setting threads information");
-//
-//        ThreadData threadData = new ThreadData(report.diagnosticStack);
-//        SourceCodeData sourceCodeData = new SourceCodeData(report.diagnosticStack);
-//
-//        this.setThreadsInformation(
-//                threadData.getMainThread(),
-//                threadData.threadInformation,
-//                sourceCodeData.data.isEmpty() ? null : sourceCodeData.data
-//        );
-//    }
-//
-//    public void setThreadsInformation(String mainThreadName, Map<String, ThreadInformation> threadInformationMap, Map<String, SourceCode> sourceCodeData) {
-//        this.mainThread = mainThreadName;
-//        this.threadInformationMap = threadInformationMap;
-//        this.sourceCode = sourceCodeData;
-//    }
-
-    //Builder Class
     public static class Builder {
         final BacktraceReport report;
 
@@ -263,6 +198,9 @@ public class BacktraceData {
             return backtraceData;
         }
 
+        /**
+         * Set report information such as report identifier (UUID), timestamp, classifier
+         */
         private void setDefaultReportInformation(BacktraceReport report) {
             this.uuid = report.uuid.toString();
             this.timestamp = report.timestamp;
@@ -271,6 +209,9 @@ public class BacktraceData {
             this.agentVersion = BacktraceClient.version;
         }
 
+        /**
+        * Set information about all threads
+        */
         private void setDefaultThreadsInformation() {
             BacktraceLogger.d(LOG_TAG, "Setting threads information");
 
