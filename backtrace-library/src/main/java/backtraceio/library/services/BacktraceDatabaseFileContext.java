@@ -52,12 +52,7 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
     public Iterable<File> getRecords() {
         BacktraceLogger.d(LOG_TAG, "Getting files from file context");
         final Pattern p = Pattern.compile(this.recordFilterRegex);
-        File[] pagesTemplates = this._databaseDirectory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return p.matcher(f.getName()).matches();
-            }
-        });
+        File[] pagesTemplates = this._databaseDirectory.listFiles(f -> p.matcher(f.getName()).matches());
         if (pagesTemplates == null) {
             return Collections.emptyList();
         }

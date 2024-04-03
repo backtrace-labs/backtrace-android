@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("native-lib");
+//        System.loadLibrary("native-lib");
     }
 
     public void setOnServerResponseEventListener(OnServerResponseEventListener e) {
@@ -75,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
-
+//        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
+BacktraceCredentials credentials = new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
+        "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 

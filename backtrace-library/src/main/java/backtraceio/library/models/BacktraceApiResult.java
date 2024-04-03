@@ -23,4 +23,12 @@ public class BacktraceApiResult {
         this.rxId = rxId;
         this.response = response;
     }
+
+    public String getRxId() {
+        return rxId;
+    }
+
+    public String getResponse() {
+        return response;
+    }
 }

@@ -1,6 +1,9 @@
 package backtraceio.library.models;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 
@@ -33,9 +36,20 @@ public class BacktraceDataTest {
         BacktraceData backtraceData = new BacktraceData.Builder(context, report, new HashMap<>()).build();
 
         // THEN
-        assertEquals(backtraceData.classifiers, new String[]{"java.lang.IllegalAccessException"});
+        assertArrayEquals(backtraceData.classifiers, new String[]{"java.lang.IllegalAccessException"});
         assertEquals(backtraceData.report, report);
         assertEquals(backtraceData.attributes.get("classifier"), "java.lang.IllegalAccessException");
-        // TODO: add next checks
+        assertEquals(backtraceData.agent, "backtrace-android");
+        assertEquals(backtraceData.agentVersion, "3.8.0-6-6b6db45-backtrace-data-refactor");
+        assertEquals(backtraceData.lang, "java");
+        assertEquals(backtraceData.langVersion, "0");
+        assertEquals(backtraceData.symbolication, "");
+        assertEquals(backtraceData.timestamp, report.timestamp);
+        assertEquals(backtraceData.uuid, report.uuid.toString());
+        assertEquals(backtraceData.attributes.size(), 40);
+        assertEquals(backtraceData.annotations.size(), 3);
+        assertEquals(backtraceData.mainThread, "instr: androidx.test.runner.androidjunitrunner");
+        assertEquals(backtraceData.sourceCode.size(), 34);
+        assertEquals(backtraceData.getThreadInformationMap().size(), 13);
     }
 }

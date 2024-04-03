@@ -40,7 +40,7 @@ public class BacktraceDatabaseFileContextTest {
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
-        this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);
+        this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
         this.databaseContext.clear();
         this.databaseFileContext.clear();
@@ -143,7 +143,7 @@ public class BacktraceDatabaseFileContextTest {
         // GIVEN
         this.databaseSettings.setMaxRecordCount(1);
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
-        this.databaseContext = new BacktraceDatabaseContext(this.context, this.databaseSettings);
+        this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
 
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);

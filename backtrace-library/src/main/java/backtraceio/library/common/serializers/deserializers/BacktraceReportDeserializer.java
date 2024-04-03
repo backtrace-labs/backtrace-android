@@ -69,6 +69,9 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
     }
 
     public Exception getException(JSONObject obj) {
+        if (obj == null) {
+            return null;
+        }
         return this.exceptionDeserializer.deserialize(obj); // TODO: fix usage
     }
 

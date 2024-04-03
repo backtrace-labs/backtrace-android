@@ -18,7 +18,7 @@ public class BacktraceApiResultDeserializer implements Deserializable<BacktraceA
     public BacktraceApiResult deserialize(JSONObject obj) throws JSONException {
         return new BacktraceApiResult(
                 obj.optString(fieldNameLoader.get(Fields.rxId), null), // TODO: check fallback warning
-                obj.optString(fieldNameLoader.get(Fields.response), BacktraceResultStatus.Ok.toString())
+                obj.optString(fieldNameLoader.get(Fields.response), BacktraceResultStatus.ServerError.toString())
         );
     }
 }
