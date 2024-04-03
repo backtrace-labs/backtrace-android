@@ -14,6 +14,7 @@ import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
+import backtraceio.library.models.UnhandledThrowableWrapper;
 
 /**
  * Captured application error
@@ -185,7 +186,7 @@ public class BacktraceReport {
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
 
         if (this.exceptionTypeReport && exception != null) {
-            this.classifier = exception.getClass().getCanonicalName();
+            this.classifier = getExceptionClassifier(exception);
         }
         this.setDefaultErrorTypeAttribute();
     }
@@ -221,6 +222,13 @@ public class BacktraceReport {
         reportException.setStackTrace(exception.getStackTrace());
 
         return reportException;
+    }
+
+    public String getExceptionClassifier(Exception exception) {
+        if (exception instanceof UnhandledThrowableWrapper) {
+            return ((UnhandledThrowableWrapper) exception).getClassifier();
+        }
+        return exception.getClass().getCanonicalName();
     }
 
     /**

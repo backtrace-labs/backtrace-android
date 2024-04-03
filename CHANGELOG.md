@@ -1,13 +1,28 @@
 # Backtrace Android Release Notes
 
+## Version 3.8.0
+
+- Update crashpad to latest version 
+
+## Version 3.7.14
+
+- Added a new attribute API to the BacktraceClient.
+
+## Version 3.7.13
+
+- BacktraceExceptionHandler will catch Errors (not only Exception) when unhandled Throwable will happen
+
 ## Version 3.7.12
+
 - Fixed bug when exception contains base class with same field
 
 ## Version 3.7.11
+
 - Fix NPE in DatabaseContext
 - Add session attribute and backtrace reporter name to every error report
 
 ## Version 3.7.10
+
 - Add integration tests
 - Move common http response processing method to helper class
 - Remove unused code

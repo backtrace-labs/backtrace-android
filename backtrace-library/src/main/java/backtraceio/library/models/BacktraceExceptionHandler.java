@@ -1,7 +1,5 @@
 package backtraceio.library.models;
 
-import android.os.Looper;
-
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -53,23 +51,26 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     public void uncaughtException(final Thread thread, final Throwable throwable) {
         OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
 
-        if (throwable instanceof Exception) {
-            BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-            BacktraceReport report = new BacktraceReport((Exception) throwable, BacktraceExceptionHandler.customAttributes);
-            report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
-            this.client.send(report, callback);
-            BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
-        }
-        BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
+        BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
+        BacktraceReport report = new BacktraceReport(this.getCausedException(throwable), BacktraceExceptionHandler.customAttributes);
+        report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+        this.client.send(report, callback);
+        BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
+
         try {
+            BacktraceLogger.d(LOG_TAG, "Default uncaught exception handler");
             signal.await();
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
     }
 
-    private boolean isMainThread() {
-        return Looper.myLooper() == Looper.getMainLooper();
+    private Exception getCausedException(Throwable throwable) {
+        if (throwable instanceof Exception) {
+            return (Exception) throwable;
+        }
+
+        return new UnhandledThrowableWrapper(throwable);
     }
 
     private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {

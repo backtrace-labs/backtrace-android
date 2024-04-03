@@ -26,6 +26,7 @@ android {
             cmake {
                 cppFlags ""
                 arguments "-DCMAKE_BUILD_TYPE=Release"
+                arguments "-DCRASHPAD_HTTPS_TRANSPORT=OPENSSL"
             }
         }
         ndk {

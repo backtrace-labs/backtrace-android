@@ -297,6 +297,41 @@ public class BacktraceBase implements Client {
     }
 
     /**
+     * Adds a new attribute to Backtrace Client. If the native integration is enabled, adds the attribute
+     * to the native report attributes if:
+     * - the value exists (is not a null)
+     * - is not an object (the attribute value is primitive type like String, or Int)
+     *
+     * @param key   attribute name
+     * @param value attribute value.
+     */
+    public void addAttribute(String key, Object value) {
+        attributes.put(key, value);
+        if (database == null) {
+            return;
+        }
+
+        database.addNativeAttribute(key, value);
+    }
+
+    /**
+     * Adds new attributes to Backtrace Client. If the native integration is enabled, adds attributes
+     * to the native report attributes if:
+     * - the value exists (is not a null)
+     * - is not an object (the attribute value is primitive type like String, or Int)
+     *
+     * @param attributes Map of attributes
+     */
+    public void addAttribute(Map<String, Object> attributes) {
+        if (attributes == null) {
+            return;
+        }
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            addAttribute(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
      * Set event executed before sending data to Backtrace API
      *
      * @param eventListener object with method which will be executed
@@ -570,7 +605,8 @@ public class BacktraceBase implements Client {
                 if (record != null) {
                     record.close();
                 }
-                if (backtraceResult != null && backtraceResult.status == BacktraceResultStatus.Ok) {
+
+                if (backtraceResult != null && record != null && backtraceResult.status == BacktraceResultStatus.Ok) {
                     database.delete(record);
                 }
 
