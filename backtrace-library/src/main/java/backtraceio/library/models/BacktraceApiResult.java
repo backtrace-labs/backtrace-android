@@ -5,7 +5,7 @@ import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 /**
- * Send method result
+ * Coroner API response
  */
 public class BacktraceApiResult {
 
