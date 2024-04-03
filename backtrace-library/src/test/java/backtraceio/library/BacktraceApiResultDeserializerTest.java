@@ -2,8 +2,6 @@ package backtraceio.library;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;

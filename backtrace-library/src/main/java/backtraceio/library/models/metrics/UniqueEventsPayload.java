@@ -1,8 +1,8 @@
 package backtraceio.library.models.metrics;
 
-import backtraceio.library.common.serializers.SerializedName;
-
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+import backtraceio.library.common.serializers.SerializedName;
 
 public final class UniqueEventsPayload extends EventsPayload<UniqueEvent> {
     @SerializedName("unique_events")

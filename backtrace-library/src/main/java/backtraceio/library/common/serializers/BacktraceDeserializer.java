@@ -5,16 +5,15 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceDataDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceDatabaseRecordDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceReportDeserializer;
-import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
 import backtraceio.library.common.serializers.deserializers.Deserializable;
 import backtraceio.library.common.serializers.deserializers.ExceptionDeserializer;
 import backtraceio.library.common.serializers.deserializers.ReflectionDeserializer;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.json.BacktraceReport;
 

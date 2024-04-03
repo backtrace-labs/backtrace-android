@@ -4,9 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ExceptionDeserializer implements Deserializable<Exception> {
     static class Fields {
         final static String startLine = "startLine";

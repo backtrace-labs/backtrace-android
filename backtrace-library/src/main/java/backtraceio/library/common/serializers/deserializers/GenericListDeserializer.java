@@ -6,8 +6,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import backtraceio.library.models.BacktraceStackFrame;
-
 public class GenericListDeserializer<T> {
     List<T> deserialize(JSONArray array, Deserializable<T> deserializer) {
         List<T> result = new ArrayList<T>();

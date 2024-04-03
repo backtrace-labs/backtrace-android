@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationTargetException;
 
 import backtraceio.library.common.serializers.SerializedName;
-import backtraceio.library.models.BacktraceResult;
 
 
 public final class ReflectionDeserializer implements Deserializable<Object> {

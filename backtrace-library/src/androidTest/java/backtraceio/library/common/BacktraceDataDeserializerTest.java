@@ -7,41 +7,21 @@ import static org.junit.Assert.assertNull;
 
 import static backtraceio.library.TestUtils.readFileAsString;
 
-import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import backtraceio.library.R;
-import backtraceio.library.common.serializers.BacktraceDataDeserializer;
-import backtraceio.library.common.serializers.BacktraceDataSerializer;
 import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
-import backtraceio.library.common.serializers.SerializerHelper;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
-import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 @RunWith(AndroidJUnit4.class)

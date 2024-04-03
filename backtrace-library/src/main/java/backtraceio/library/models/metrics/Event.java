@@ -1,11 +1,10 @@
 package backtraceio.library.models.metrics;
 
-import backtraceio.library.common.serializers.SerializedName;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.common.BacktraceStringHelper;
+import backtraceio.library.common.serializers.SerializedName;
 
 public abstract class Event {
 

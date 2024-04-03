@@ -1,9 +1,5 @@
 package backtraceio.library.common.serializers;
 
-import org.json.JSONException;
-
-import backtraceio.library.common.serializers.BacktraceDataSerializer;
-import backtraceio.library.common.serializers.SerializerHelper;
 import backtraceio.library.common.serializers.naming.NamingPolicy;
 import backtraceio.library.models.BacktraceData;
 

@@ -1,13 +1,13 @@
 package backtraceio.library;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.models.json.BacktraceReport;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class ConcatAttributesUnitTest {

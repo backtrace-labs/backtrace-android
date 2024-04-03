@@ -4,20 +4,18 @@ import static backtraceio.library.common.serializers.SerializerHelper.serialize;
 
 import androidx.annotation.NonNull;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.common.serializers.naming.NamingPolicy;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
-import backtraceio.library.common.serializers.naming.NamingPolicy;
 
 public class BacktraceDataSerializer {
     NamingPolicy namingPolicy;
