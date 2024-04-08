@@ -22,7 +22,9 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.Metrics;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -66,7 +68,7 @@ public class BacktraceBase implements Client {
     /**
      * Backtrace metrics instance
      */
-    public Metrics metrics = null;
+    private Metrics metrics = null;
 
     /**
      * Application context
@@ -233,12 +235,15 @@ public class BacktraceBase implements Client {
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes, List<String> attachments) {
         this.context = context;
         this.credentials = credentials;
-        this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
-        this.attachments = attachments != null ? attachments : new ArrayList<String>();
+        this.attributes = attributes != null ? attributes : new HashMap<>();
+        this.attachments = attachments != null ? attachments : new ArrayList<>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
-        this.metrics = new BacktraceMetrics(context, attributes, backtraceApi, credentials);
+
+        if (this.areMetricsAvailable()) {
+            this.metrics = new BacktraceMetrics(context, attributes, backtraceApi, credentials);
+        }
     }
 
     public native void crash();
@@ -248,6 +253,10 @@ public class BacktraceBase implements Client {
         if (this.database != null) {
             this.database.setApi(this.backtraceApi);
         }
+    }
+
+    private boolean areMetricsAvailable() {
+        return credentials.isBacktraceServerUrl();
     }
 
     /**
@@ -312,6 +321,53 @@ public class BacktraceBase implements Client {
         }
 
         database.addNativeAttribute(key, value);
+    }
+    /*
+    TODO:
+    */
+    public boolean enableMetrics() {
+        if (this.metrics != null) {
+            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
+            this.metrics.enable();
+        }
+        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        return false;
+    }
+
+    /*
+   TODO:
+    */
+    public boolean enableMetrics(String defaultUniqueEventName) {
+        if (this.metrics != null) {
+            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
+            this.metrics.enable(defaultUniqueEventName);
+        }
+        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        return false;
+    }
+
+    /*
+   TODO:
+    */
+    public boolean enableMetrics(BacktraceMetricsSettings settings) {
+        if (this.metrics != null) {
+            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
+            this.metrics.enable(settings);
+        }
+        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        return false;
+    }
+
+    /*
+    TODO:
+     */
+    public boolean enableMetrics(BacktraceMetricsSettings settings, String defaultEventUniqueName) {
+        if (this.metrics != null) {
+            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
+            this.metrics.enable(settings,defaultEventUniqueName);
+        }
+        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        return false;
     }
 
     /**

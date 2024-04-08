@@ -2,10 +2,15 @@ package backtraceio.library;
 
 import android.net.Uri;
 
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.services.BacktraceMetrics;
+
 /**
  * Backtrace credentials information
  */
 public class BacktraceCredentials {
+    private static final String LOG_TAG = BacktraceCredentials.class.getSimpleName();
+
     /**
      * Data format
      */
@@ -91,18 +96,24 @@ public class BacktraceCredentials {
             int universeIndexStart = backtraceSubmitUrl.length();
             int universeIndexEnd = submissionUrl.indexOf('/', universeIndexStart);
             if (universeIndexEnd == -1) {
-                throw new IllegalArgumentException("Invalid Backtrace URL");
+                BacktraceLogger.w(LOG_TAG, "Backtrace domain not found in " + submissionUrl + ", universe not available");
+                return null;
             }
             return submissionUrl.substring(universeIndexStart, universeIndexEnd);
         } else {
             final String backtraceDomain = "backtrace.io";
             if (submissionUrl.indexOf(backtraceDomain) == -1) {
-                throw new IllegalArgumentException("Invalid Backtrace URL");
+                BacktraceLogger.w(LOG_TAG, "Backtrace domain not found in " + submissionUrl + ", universe not available");
+                return null;
             }
 
             Uri uri = Uri.parse(submissionUrl);
             return uri.getHost().substring(0, uri.getHost().indexOf("."));
         }
+    }
+
+    public boolean isBacktraceServerUrl() {
+        return this.getUniverseName() != null;
     }
 
     /**

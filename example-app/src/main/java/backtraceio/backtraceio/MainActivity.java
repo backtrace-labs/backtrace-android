@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         BacktraceExceptionHandler.enable(backtraceClient);
 
-        backtraceClient.metrics.enable();
+        backtraceClient.enableMetrics();
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
