@@ -322,51 +322,57 @@ public class BacktraceBase implements Client {
 
         database.addNativeAttribute(key, value);
     }
-    /*
-    TODO:
-    */
+    /**
+     * Enables gathering metrics
+     */
     public boolean enableMetrics() {
         if (this.metrics != null) {
             BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
             this.metrics.enable();
         }
-        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        BacktraceLogger.w(LOG_TAG, "Metrics not available");
         return false;
     }
 
-    /*
-   TODO:
-    */
+    /**
+     * Enables gathering metrics
+     * @param defaultUniqueEventName custom session user identifier
+     */
     public boolean enableMetrics(String defaultUniqueEventName) {
         if (this.metrics != null) {
             BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
             this.metrics.enable(defaultUniqueEventName);
         }
-        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        BacktraceLogger.w(LOG_TAG, "Metrics not available");
         return false;
     }
 
-    /*
-   TODO:
-    */
+    /**
+     * Enables gathering metrics
+     *
+     * @param settings for Backtrace metrics
+     */
     public boolean enableMetrics(BacktraceMetricsSettings settings) {
         if (this.metrics != null) {
             BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
             this.metrics.enable(settings);
         }
-        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        BacktraceLogger.w(LOG_TAG, "Metrics not available");
         return false;
     }
 
-    /*
-    TODO:
+    /**
+     * Enables gathering metrics
+     *
+     * @param settings for Backtrace metrics
+     * @param defaultUniqueEventName custom session user identifier
      */
-    public boolean enableMetrics(BacktraceMetricsSettings settings, String defaultEventUniqueName) {
+    public boolean enableMetrics(BacktraceMetricsSettings settings, String defaultUniqueEventName) {
         if (this.metrics != null) {
             BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
-            this.metrics.enable(settings,defaultEventUniqueName);
+            this.metrics.enable(settings, defaultUniqueEventName);
         }
-        BacktraceLogger.d(LOG_TAG, "Metrics not available");
+        BacktraceLogger.w(LOG_TAG, "Metrics not available");
         return false;
     }
 
