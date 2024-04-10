@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.UnsupportedMetricsServer;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.logger.BacktraceLogger;
@@ -79,14 +80,14 @@ public class BacktraceClientSummedEventTest {
     }
 
     @Test
-    public void uploadSummedEventsManual() {
+    public void uploadSummedEventsManual() throws UnsupportedMetricsServer {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setSummedEventsRequestHandler(mockRequestHandler);
+        backtraceClient.getMetrics().setSummedEventsRequestHandler(mockRequestHandler);
 
-        backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
@@ -97,8 +98,8 @@ public class BacktraceClientSummedEventTest {
             }
         });
 
-        backtraceClient.metrics.addSummedEvent(summedEventName);
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().addSummedEvent(summedEventName);
+        backtraceClient.getMetrics().send();
 
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -108,17 +109,17 @@ public class BacktraceClientSummedEventTest {
 
         assertFalse(mockRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(1, mockRequestHandler.numAttempts);
-        assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
+        assertEquals(0, backtraceClient.getMetrics().getSummedEvents().size());
     }
 
     @Test
-    public void doNotUploadWhenNoEventsAvailable() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void doNotUploadWhenNoEventsAvailable() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setSummedEventsRequestHandler(mockRequestHandler);
+        backtraceClient.getMetrics().setSummedEventsRequestHandler(mockRequestHandler);
 
-        backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 fail("Should not upload event");
@@ -126,21 +127,21 @@ public class BacktraceClientSummedEventTest {
         });
 
         // When no events in queue request handler should not be called
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
         assertEquals(0, mockRequestHandler.numAttempts);
     }
 
     @Test
-    public void try3TimesOn503AndDropSummedEventsIfMaxNumEventsReached() {
+    public void try3TimesOn503AndDropSummedEventsIfMaxNumEventsReached() throws UnsupportedMetricsServer {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 1;
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
         mockSummedRequestHandler.statusCode = 503;
-        backtraceClient.metrics.setSummedEventsRequestHandler(mockSummedRequestHandler);
+        backtraceClient.getMetrics().setSummedEventsRequestHandler(mockSummedRequestHandler);
 
-        backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
@@ -151,12 +152,12 @@ public class BacktraceClientSummedEventTest {
             }
         });
 
-        backtraceClient.metrics.addSummedEvent(summedEventName);
-        backtraceClient.metrics.addSummedEvent(summedEventName);
+        backtraceClient.getMetrics().addSummedEvent(summedEventName);
+        backtraceClient.getMetrics().addSummedEvent(summedEventName);
 
-        assertEquals(2, backtraceClient.metrics.getSummedEvents().size());
-        backtraceClient.metrics.setMaximumNumberOfEvents(1);
-        backtraceClient.metrics.send();
+        assertEquals(2, backtraceClient.getMetrics().getSummedEvents().size());
+        backtraceClient.getMetrics().setMaximumNumberOfEvents(1);
+        backtraceClient.getMetrics().send();
 
         try {
             waiter.await(5, TimeUnit.SECONDS, 3);
@@ -167,48 +168,48 @@ public class BacktraceClientSummedEventTest {
         assertEquals(3, mockSummedRequestHandler.numAttempts);
         assertFalse(mockSummedRequestHandler.lastEventPayloadJson.isEmpty());
         // We should drop summed event since we failed to send and maximum number of events is too small
-        assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
+        assertEquals(0, backtraceClient.getMetrics().getSummedEvents().size());
     }
 
     @Test
-    public void addAndStoreSummedEvent() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void addAndStoreSummedEvent() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertTrue(backtraceClient.metrics.addSummedEvent(summedEventName));
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
+        assertTrue(backtraceClient.getMetrics().addSummedEvent(summedEventName));
+        assertEquals(1, backtraceClient.getMetrics().getSummedEvents().size());
 
-        assertEquals(summedEventName, backtraceClient.metrics.getSummedEvents().getFirst().getName());
-        assertNotEquals(0, backtraceClient.metrics.getSummedEvents().getFirst().getTimestamp());
+        assertEquals(summedEventName, backtraceClient.getMetrics().getSummedEvents().getFirst().getName());
+        assertNotEquals(0, backtraceClient.getMetrics().getSummedEvents().getFirst().getTimestamp());
     }
 
     @Test
-    public void addSummedEventWithAttributes() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void addSummedEventWithAttributes() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
             put("foo", "bar");
         }};
-        assertTrue(backtraceClient.metrics.addSummedEvent(summedEventName, myCustomAttributes));
-        assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
+        assertTrue(backtraceClient.getMetrics().addSummedEvent(summedEventName, myCustomAttributes));
+        assertEquals(1, backtraceClient.getMetrics().getSummedEvents().size());
 
-        assertEquals(summedEventName, backtraceClient.metrics.getSummedEvents().getFirst().getName());
-        assertNotEquals(0, backtraceClient.metrics.getSummedEvents().getFirst().getTimestamp());
-        assertEquals("bar", backtraceClient.metrics.getSummedEvents().getFirst().getAttributes().get("foo"));
+        assertEquals(summedEventName, backtraceClient.getMetrics().getSummedEvents().getFirst().getName());
+        assertNotEquals(0, backtraceClient.getMetrics().getSummedEvents().getFirst().getTimestamp());
+        assertEquals("bar", backtraceClient.getMetrics().getSummedEvents().getFirst().getAttributes().get("foo"));
     }
 
     @Test
-    public void shouldNotAddNullSummedEvent() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void shouldNotAddNullSummedEvent() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertFalse(backtraceClient.metrics.addSummedEvent(null));
-        assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
+        assertFalse(backtraceClient.getMetrics().addSummedEvent(null));
+        assertEquals(0, backtraceClient.getMetrics().getSummedEvents().size());
     }
 
     @Test
-    public void shouldNotAddEmptySummedEvent() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void shouldNotAddEmptySummedEvent() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertFalse(backtraceClient.metrics.addSummedEvent(""));
-        assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
+        assertFalse(backtraceClient.getMetrics().addSummedEvent(""));
+        assertEquals(0, backtraceClient.getMetrics().getSummedEvents().size());
     }
 }

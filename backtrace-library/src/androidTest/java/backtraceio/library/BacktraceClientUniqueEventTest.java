@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.UnsupportedMetricsServer;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.logger.BacktraceLogger;
@@ -34,6 +35,7 @@ import backtraceio.library.models.metrics.Event;
 import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.metrics.UniqueEvent;
+import backtraceio.library.models.metrics.Event;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceMetrics;
 
@@ -86,14 +88,14 @@ public class BacktraceClientUniqueEventTest {
     }
 
     @Test
-    public void uploadDefaultUniqueEventManual() {
+    public void uploadDefaultUniqueEventManual() throws UnsupportedMetricsServer {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
+        backtraceClient.getMetrics().setUniqueEventsRequestHandler(mockRequestHandler);
 
-        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
@@ -104,9 +106,9 @@ public class BacktraceClientUniqueEventTest {
             }
         });
 
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
 
-        assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(1, backtraceClient.getMetrics().getUniqueEvents().size());
 
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -116,18 +118,18 @@ public class BacktraceClientUniqueEventTest {
 
         assertFalse(mockRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(1, mockRequestHandler.numAttempts);
-        assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(1, backtraceClient.getMetrics().getUniqueEvents().size());
     }
 
     @Test
-    public void uploadUniqueEventsManual() {
+    public void uploadUniqueEventsManual() throws UnsupportedMetricsServer {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
+        backtraceClient.getMetrics().setUniqueEventsRequestHandler(mockRequestHandler);
 
-        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
@@ -138,11 +140,11 @@ public class BacktraceClientUniqueEventTest {
             }
         });
 
-        backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]);
+        backtraceClient.getMetrics().send();
 
         // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(2, backtraceClient.getMetrics().getUniqueEvents().size());
 
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -153,21 +155,21 @@ public class BacktraceClientUniqueEventTest {
         assertFalse(mockRequestHandler.lastEventPayloadJson.isEmpty());
         assertEquals(1, mockRequestHandler.numAttempts);
         // We will always have startup unique event GUID
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(2, backtraceClient.getMetrics().getUniqueEvents().size());
     }
 
     @Test
-    public void doNotUploadWhenNoEventsAvailable() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void doNotUploadWhenNoEventsAvailable() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         // Clear startup event
-        ConcurrentLinkedDeque<UniqueEvent> uniqueEvents = backtraceClient.metrics.getUniqueEvents();
+        ConcurrentLinkedDeque<UniqueEvent> uniqueEvents = backtraceClient.getMetrics().getUniqueEvents();
         uniqueEvents.clear();
 
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
+        backtraceClient.getMetrics().setUniqueEventsRequestHandler(mockUniqueRequestHandler);
 
-        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 fail("Should not upload event");
@@ -175,21 +177,21 @@ public class BacktraceClientUniqueEventTest {
         });
 
         // When no events in queue request handler should not be called
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
         assertEquals(0, mockUniqueRequestHandler.numAttempts);
     }
 
     @Test
-    public void doNotAddMoreUniqueEventsWhenMaxNumEventsReached() {
+    public void doNotAddMoreUniqueEventsWhenMaxNumEventsReached() throws UnsupportedMetricsServer {
         final int maximumNumberOfEvents = 3;
         final int numberOfTestEventsToAdd = 10;
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
-        backtraceClient.metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+        backtraceClient.getMetrics().setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
-        backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
+        backtraceClient.getMetrics().setUniqueEventsRequestHandler(mockRequestHandler);
 
-        backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
+        backtraceClient.getMetrics().setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
                 assertEquals(0, result.getEventsPayload().getDroppedEvents());
@@ -201,22 +203,22 @@ public class BacktraceClientUniqueEventTest {
 
         // All unique attributes must have different unique attribute names
         for (int i = 0; i < numberOfTestEventsToAdd; i++) {
-            backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[i]);
+            backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[i]);
         }
 
-        assertEquals(maximumNumberOfEvents, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(maximumNumberOfEvents, backtraceClient.getMetrics().getUniqueEvents().size());
     }
 
     @Test
-    public void addAndStoreUniqueEvent() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void addAndStoreUniqueEvent() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]));
         // Account for the startup unique event
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(2, backtraceClient.getMetrics().getUniqueEvents().size());
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertNotEquals(0, backtraceClient.getMetrics().getUniqueEvents().getLast().getTimestamp());
 
         // See how we get all different kinds of attributes in backtraceio.library.models.BacktraceData.setAttributes
         Map<String, Object> expectedAttributes = new HashMap<String, Object>();
@@ -224,19 +226,19 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        assertEquals(expectedAttributes.size(), backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
+        assertEquals(expectedAttributes.size(), backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().size());
     }
 
     @Test
-    public void addAndStoreUniqueEventNullAttributes() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void addAndStoreUniqueEventNullAttributes() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0], null));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0], null));
         // Account for the startup unique event
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(2, backtraceClient.getMetrics().getUniqueEvents().size());
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertNotEquals(0, backtraceClient.getMetrics().getUniqueEvents().getLast().getTimestamp());
 
         // See how we get all different kinds of attributes in backtraceio.library.models.BacktraceData.setAttributes
         Map<String, Object> expectedAttributes = new HashMap<String, Object>();
@@ -244,23 +246,23 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        assertEquals(expectedAttributes.size(), backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
+        assertEquals(expectedAttributes.size(), backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().size());
     }
 
     @Test
-    public void addAndStoreUniqueEventWithAttributes() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void addAndStoreUniqueEventWithAttributes() throws UnsupportedMetricsServer{
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
             put("foo", "bar");
         }};
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0], myCustomAttributes));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0], myCustomAttributes));
         // Account for the startup unique event
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(2, backtraceClient.getMetrics().getUniqueEvents().size());
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
-        assertEquals("bar", backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get("foo"));
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertNotEquals(0, backtraceClient.getMetrics().getUniqueEvents().getLast().getTimestamp());
+        assertEquals("bar", backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get("foo"));
 
         // See how we get all different kinds of attributes in backtraceio.library.models.BacktraceData.setAttributes
         Map<String, Object> expectedAttributes = new HashMap<String, Object>();
@@ -268,99 +270,99 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        assertEquals(expectedAttributes.size() + 1, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
+        assertEquals(expectedAttributes.size() + 1, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().size());
     }
 
     @Test
-    public void doNotAddUniqueEventIfUniqueAttributeNotDefined() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void doNotAddUniqueEventIfUniqueAttributeNotDefined() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertFalse(backtraceClient.metrics.addUniqueEvent("undefined-attribute"));
+        assertFalse(backtraceClient.getMetrics().addUniqueEvent("undefined-attribute"));
         // Account for the startup unique event
-        assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(1, backtraceClient.getMetrics().getUniqueEvents().size());
     }
 
     @Test
-    public void doAddUniqueEventIfUniqueAttributeDefinedInCustomAttributes() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void doAddUniqueEventIfUniqueAttributeDefinedInCustomAttributes() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         final String expectedKey = "foo";
         final String expectedValue = "bar";
         Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
             put(expectedKey, expectedValue);
         }};
-        assertTrue(backtraceClient.metrics.addUniqueEvent(expectedKey, myCustomAttributes));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(expectedKey, myCustomAttributes));
 
         // Account for the startup unique event
-        assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
-        assertEquals(expectedKey, backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(2, backtraceClient.getMetrics().getUniqueEvents().size());
+        assertEquals(expectedKey, backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertNotEquals(0, backtraceClient.getMetrics().getUniqueEvents().getLast().getTimestamp());
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
     }
 
     @Test
-    public void doNotAddNullUniqueEvent() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void doNotAddNullUniqueEvent() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertFalse(backtraceClient.metrics.addUniqueEvent(null));
+        assertFalse(backtraceClient.getMetrics().addUniqueEvent(null));
         // Account for the startup unique event
-        assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(1, backtraceClient.getMetrics().getUniqueEvents().size());
     }
 
     @Test
-    public void doNotAddUniqueEventEmptyString() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void doNotAddUniqueEventEmptyString() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertFalse(backtraceClient.metrics.addUniqueEvent(""));
+        assertFalse(backtraceClient.getMetrics().addUniqueEvent(""));
         // Account for the startup unique event
-        assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(1, backtraceClient.getMetrics().getUniqueEvents().size());
     }
 
     @Test
-    public void uniqueAttributesPerEventDoNotMutate() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void uniqueAttributesPerEventDoNotMutate() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue1 = "bar";
         String expectedValue2 = "baz";
         backtraceClient.attributes.put(expectedKey, expectedValue1);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]));
 
         backtraceClient.attributes.put(expectedKey, expectedValue2);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[1]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[1]));
 
-        assertEquals(3, backtraceClient.metrics.getUniqueEvents().size());
-        Event event2 = backtraceClient.metrics.getUniqueEvents().getLast();
-        backtraceClient.metrics.getUniqueEvents().removeLast();
-        Event event1 = backtraceClient.metrics.getUniqueEvents().getLast();
+        assertEquals(3, backtraceClient.getMetrics().getUniqueEvents().size());
+        Event event2 = backtraceClient.getMetrics().getUniqueEvents().getLast();
+        backtraceClient.getMetrics().getUniqueEvents().removeLast();
+        Event event1 = backtraceClient.getMetrics().getUniqueEvents().getLast();
 
         assertEquals(expectedValue1, event1.getAttributes().get(expectedKey));
         assertEquals(expectedValue2, event2.getAttributes().get(expectedKey));
     }
 
     @Test
-    public void uniqueEventWithCustomAttributeExistsEvenIfCustomAttributeDeletedLater() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void uniqueEventWithCustomAttributeExistsEvenIfCustomAttributeDeletedLater() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
         backtraceClient.attributes.put(expectedKey, expectedValue);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(expectedKey));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(expectedKey));
 
         backtraceClient.attributes.remove(expectedKey);
 
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-        assertEquals(expectedKey, backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(expectedKey, backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
     }
 
     @Test
-    public void uniqueEventUpdateTimestamp() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void uniqueEventUpdateTimestamp() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]));
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        long previousTimestamp = backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        long previousTimestamp = backtraceClient.getMetrics().getUniqueEvents().getLast().getTimestamp();
 
         // Wait 1 second so that the timestamp will update on the next send.
         // Timestamp granularity is 1 second
@@ -371,76 +373,76 @@ public class BacktraceClientUniqueEventTest {
         }
 
         // Force update
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
 
-        long updatedTimestamp = backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
+        long updatedTimestamp = backtraceClient.getMetrics().getUniqueEvents().getLast().getTimestamp();
 
         assertTrue(updatedTimestamp > previousTimestamp);
     }
 
     @Test
-    public void uniqueEventUpdateAttributes() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void uniqueEventUpdateAttributes() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
 
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]));
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertNull(backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertNull(backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
 
         backtraceClient.attributes.put(expectedKey, expectedValue);
         // It should not be added to the unique event yet
-        assertNull(backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertNull(backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
 
         // Force update
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
 
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
     }
 
     @Test
-    public void uniqueEventEmptyAttributeValueShouldNotOverridePreviousValueOnUpdate() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void uniqueEventEmptyAttributeValueShouldNotOverridePreviousValueOnUpdate() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
 
         backtraceClient.attributes.put(expectedKey, expectedValue);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]));
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
 
         backtraceClient.attributes.put(expectedKey, "");
         assertEquals("", backtraceClient.attributes.get(expectedKey));
 
         // Force update
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
 
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
     }
 
     @Test
-    public void uniqueEventNullAttributeValueShouldNotOverridePreviousValueOnUpdate() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+    public void uniqueEventNullAttributeValueShouldNotOverridePreviousValueOnUpdate() throws UnsupportedMetricsServer {
+        backtraceClient.getMetrics().enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         String expectedKey = "foo";
         String expectedValue = "bar";
 
         backtraceClient.attributes.put(expectedKey, expectedValue);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
+        assertTrue(backtraceClient.getMetrics().addUniqueEvent(uniqueAttributeName[0]));
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(uniqueAttributeName[0], backtraceClient.getMetrics().getUniqueEvents().getLast().getName());
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
 
         backtraceClient.attributes.put(expectedKey, null);
         assertNull(backtraceClient.attributes.get(expectedKey));
 
         // Force update
-        backtraceClient.metrics.send();
+        backtraceClient.getMetrics().send();
 
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(expectedValue, backtraceClient.getMetrics().getUniqueEvents().getLast().getAttributes().get(expectedKey));
     }
 }

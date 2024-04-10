@@ -10,6 +10,7 @@ import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.common.UnsupportedMetricsServer;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.UnwindingMode;
@@ -608,6 +609,10 @@ public class BacktraceBase implements Client {
         }
 
         this.backtraceApi.send(backtraceData, this.getDatabaseCallback(record, callback));
+    }
+
+    public BacktraceMetrics getMetrics() throws UnsupportedMetricsServer { //TODO: fix Exception type
+        return this.metricsController.getMetrics();
     }
 
     private OnServerResponseEventListener getDatabaseCallback(final BacktraceDatabaseRecord record, final OnServerResponseEventListener customCallback) {
