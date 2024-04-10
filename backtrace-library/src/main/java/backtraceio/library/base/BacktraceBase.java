@@ -68,7 +68,7 @@ public class BacktraceBase implements Client {
     /**
      * Backtrace metrics instance
      */
-    private Metrics metrics = null;
+    private final Metrics metrics;
 
     /**
      * Application context
@@ -240,10 +240,7 @@ public class BacktraceBase implements Client {
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
-
-        if (this.areMetricsAvailable()) {
-            this.metrics = new BacktraceMetrics(context, attributes, backtraceApi, credentials);
-        }
+        this.metrics = this.areMetricsAvailable() ? new BacktraceMetrics(context, attributes, backtraceApi, credentials) : null;
     }
 
     public native void crash();
