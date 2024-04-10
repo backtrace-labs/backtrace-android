@@ -32,6 +32,7 @@ import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 import backtraceio.library.services.BacktraceMetrics;
+import backtraceio.library.services.BacktraceMetricsController;
 
 /**
  * Base Backtrace Android client
@@ -68,7 +69,7 @@ public class BacktraceBase implements Client {
     /**
      * Backtrace metrics instance
      */
-    private final Metrics metrics;
+    private final BacktraceMetricsController metricsController;
 
     /**
      * Application context
@@ -222,6 +223,13 @@ public class BacktraceBase implements Client {
         this(context, credentials, database, attributes, null);
     }
 
+    /*
+    TODO: add doc
+     */
+    public BacktraceMetricsController getMetricsController() {
+        return metricsController;
+    }
+
     /**
      * Initialize new client instance with BacktraceCredentials
      *
@@ -240,7 +248,7 @@ public class BacktraceBase implements Client {
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
-        this.metrics = this.areMetricsAvailable() ? new BacktraceMetrics(context, attributes, backtraceApi, credentials) : null;
+        this.metricsController = new BacktraceMetricsController(context, attributes, backtraceApi, credentials);
     }
 
     public native void crash();
@@ -252,9 +260,6 @@ public class BacktraceBase implements Client {
         }
     }
 
-    private boolean areMetricsAvailable() {
-        return credentials.isBacktraceServerUrl();
-    }
 
     /**
      * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
@@ -319,59 +324,7 @@ public class BacktraceBase implements Client {
 
         database.addNativeAttribute(key, value);
     }
-    /**
-     * Enables gathering metrics
-     */
-    public boolean enableMetrics() {
-        if (this.metrics != null) {
-            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
-            this.metrics.enable();
-        }
-        BacktraceLogger.w(LOG_TAG, "Metrics not available");
-        return false;
-    }
 
-    /**
-     * Enables gathering metrics
-     * @param defaultUniqueEventName custom session user identifier
-     */
-    public boolean enableMetrics(String defaultUniqueEventName) {
-        if (this.metrics != null) {
-            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
-            this.metrics.enable(defaultUniqueEventName);
-        }
-        BacktraceLogger.w(LOG_TAG, "Metrics not available");
-        return false;
-    }
-
-    /**
-     * Enables gathering metrics
-     *
-     * @param settings for Backtrace metrics
-     */
-    public boolean enableMetrics(BacktraceMetricsSettings settings) {
-        if (this.metrics != null) {
-            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
-            this.metrics.enable(settings);
-        }
-        BacktraceLogger.w(LOG_TAG, "Metrics not available");
-        return false;
-    }
-
-    /**
-     * Enables gathering metrics
-     *
-     * @param settings for Backtrace metrics
-     * @param defaultUniqueEventName custom session user identifier
-     */
-    public boolean enableMetrics(BacktraceMetricsSettings settings, String defaultUniqueEventName) {
-        if (this.metrics != null) {
-            BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
-            this.metrics.enable(settings, defaultUniqueEventName);
-        }
-        BacktraceLogger.w(LOG_TAG, "Metrics not available");
-        return false;
-    }
 
     /**
      * Adds new attributes to Backtrace Client. If the native integration is enabled, adds attributes

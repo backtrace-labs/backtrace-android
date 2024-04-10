@@ -155,6 +155,7 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
+        BacktraceLogger.d(LOG_TAG, "Enabling metrics..");
         if (uniqueEventName == null || uniqueEventName.length() == 0) {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
@@ -268,6 +269,22 @@ public final class BacktraceMetrics implements Metrics {
         summedEventsHandler.setMaximumNumberOfEvents(maximumNumberOfEvents);
     }
 
+
+    /*
+    TODO:
+     */
+    public void setUniqueEventsHandler(UniqueEventsHandler uniqueEventsHandler) {
+        this.uniqueEventsHandler = uniqueEventsHandler;
+    }
+
+    /*
+    TODO:
+     */
+    public void setSummedEventsHandler(SummedEventsHandler summedEventsHandler) {
+        this.summedEventsHandler = summedEventsHandler;
+    }
+
+
     /**
      * Get number of stored events
      *
@@ -360,7 +377,7 @@ public final class BacktraceMetrics implements Metrics {
         return true;
     }
 
-    protected Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
+    Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
         Map<String, Object> localAttributes = new HashMap<String, Object>();
 
         if (attributes != null) {

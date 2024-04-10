@@ -78,7 +78,7 @@ public class BacktraceMetricsTest {
     public void testDefaultUrl() {
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null, credentials);
         metrics.enable(new BacktraceMetricsSettings(credentials));
-        TestCase.assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
+        TestCase.assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl()); // TODO: remove
     }
 
     @Test
@@ -86,6 +86,6 @@ public class BacktraceMetricsTest {
         String customUrl = "https://my.custom.url";
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null, credentials);
         metrics.enable(new BacktraceMetricsSettings(credentials, customUrl));
-        TestCase.assertEquals(customUrl, metrics.getBaseUrl());
+        TestCase.assertEquals(customUrl, metrics.getBaseUrl()); // TODO: remove
     }
 }
