@@ -90,7 +90,7 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
         long timeIntervalMillis = backtraceMetrics.settings.getTimeIntervalMillis();
 
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(backtraceMetrics.context, null, null);
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(backtraceMetrics.getContext(), null, null);
         this.application = backtraceAttributes.getApplicationName();
         this.appVersion = backtraceAttributes.getApplicationVersionOrEmpty();
 

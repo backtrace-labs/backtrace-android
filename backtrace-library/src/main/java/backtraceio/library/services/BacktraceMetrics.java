@@ -13,7 +13,6 @@ import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
-import backtraceio.library.events.RequestHandler;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
@@ -67,6 +66,11 @@ public final class BacktraceMetrics implements Metrics {
     private final String startupSummedEventName = "Application Launches";
 
     /**
+     * Is gathering and sending metrics enabled, supported only on Backtrace servers
+     */
+    public boolean enabled;
+
+    /**
      * Unique Events handler
      */
     public UniqueEventsHandler uniqueEventsHandler;
@@ -79,17 +83,17 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Custom attributes provided by the user to BacktraceBase
      */
-    protected Map<String, Object> customReportAttributes;
+    Map<String, Object> customReportAttributes;
 
     /**
      * The application context
      */
-    protected Context context;
+    private final Context context;
 
     /**
      * Backtrace metrics settings
      */
-    protected BacktraceMetricsSettings settings = null;
+    BacktraceMetricsSettings settings = null;
 
     /**
      * Name of the unique event that will be generated on app startup
@@ -101,11 +105,6 @@ public final class BacktraceMetrics implements Metrics {
      * BacktraceMetrics instance will send data to Backtrace.
      */
     private int maximumNumberOfEvents = 350;
-
-    /**
-     * User custom request method
-     */
-    private final RequestHandler requestHandler = null;
 
     /**
      * Backtrace API class for metrics sending
@@ -129,6 +128,10 @@ public final class BacktraceMetrics implements Metrics {
         this.customReportAttributes = customReportAttributes;
         this.backtraceApi = backtraceApi;
         this.credentials = credentials;
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     /**
@@ -155,11 +158,17 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
+        if (settings.isBacktraceServer()) {
+            throw new IllegalArgumentException("Unsupported metrics server " + settings.getBaseUrl());
+        }
+
         if (uniqueEventName == null || uniqueEventName.length() == 0) {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
+
         setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
+        this.enabled = true;
         try {
             startMetricsEventHandlers(backtraceApi);
             sendStartupEvent();
@@ -169,13 +178,16 @@ public final class BacktraceMetrics implements Metrics {
         }
     }
 
-    private void startMetricsEventHandlers(Api backtraceApi) {
-        uniqueEventsHandler = backtraceApi.enableUniqueEvents(this);
-        summedEventsHandler = backtraceApi.enableSummedEvents(this);
+    private void verifyIfMetricsAvailable() {
+        if (!enabled) {
+            throw new IllegalArgumentException("Unique event name must be defined!");
+        }
     }
 
-    protected String getStartupUniqueEventName() {
-        return this.startupUniqueEventName;
+    private void startMetricsEventHandlers(Api backtraceApi) {
+        verifyIfMetricsAvailable();
+        uniqueEventsHandler = backtraceApi.enableUniqueEvents(this);
+        summedEventsHandler = backtraceApi.enableSummedEvents(this);
     }
 
     public void setStartupUniqueEventName(String startupUniqueEventName) {
@@ -190,6 +202,7 @@ public final class BacktraceMetrics implements Metrics {
      * Send startup event to Backtrace
      */
     public void sendStartupEvent() {
+        verifyIfMetricsAvailable();
         addUniqueEvent(startupUniqueEventName);
         addSummedEvent(startupSummedEventName);
         uniqueEventsHandler.send();
@@ -200,6 +213,7 @@ public final class BacktraceMetrics implements Metrics {
      * Send all outgoing messages (unique and summed) currently queued
      */
     public void send() {
+        verifyIfMetricsAvailable();
         uniqueEventsHandler.send();
         summedEventsHandler.send();
     }
@@ -222,6 +236,8 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if success
      */
     public boolean addUniqueEvent(String attributeName, Map<String, Object> attributes) {
+        verifyIfMetricsAvailable();
+
         if (!shouldProcessEvent(attributeName)) {
             BacktraceLogger.w(LOG_TAG, "Skipping report");
             return false;
@@ -284,6 +300,8 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName) {
+        verifyIfMetricsAvailable();
+
         return addSummedEvent(metricGroupName, null);
     }
 
@@ -295,12 +313,14 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
+        verifyIfMetricsAvailable();
+
         if (!shouldProcessEvent(metricGroupName)) {
             BacktraceLogger.w(LOG_TAG, "Skipping report");
             return false;
         }
 
-        Map<String, Object> localAttributes = new HashMap<String, Object>();
+        Map<String, Object> localAttributes = new HashMap<>();
         if (attributes != null) {
             localAttributes.putAll(attributes);
         }
@@ -360,8 +380,8 @@ public final class BacktraceMetrics implements Metrics {
         return true;
     }
 
-    protected Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
-        Map<String, Object> localAttributes = new HashMap<String, Object>();
+    Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
+        Map<String, Object> localAttributes = new HashMap<>();
 
         if (attributes != null) {
             localAttributes.putAll(attributes);
