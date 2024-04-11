@@ -158,7 +158,7 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
-        if (settings.isBacktraceServer()) {
+        if (!settings.isBacktraceServer()) {
             throw new IllegalArgumentException("Unsupported metrics server " + settings.getBaseUrl());
         }
 
