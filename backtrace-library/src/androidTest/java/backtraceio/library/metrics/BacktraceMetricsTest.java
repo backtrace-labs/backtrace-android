@@ -36,7 +36,6 @@ public class BacktraceMetricsTest {
     private final String[] uniqueAttributeName = {"uname.version", "cpu.boottime", "screen.orientation", "battery.state", "device.airplane_mode", "device.sdk", "device.brand", "system.memory.total", "uname.sysname", "application.package"};
 
     private final String token = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
-    private final String universeName = "testing-universe-name";
 
     /**
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
@@ -76,16 +75,38 @@ public class BacktraceMetricsTest {
 
     @Test
     public void testDefaultUrl() {
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null, credentials);
-        metrics.enable(new BacktraceMetricsSettings(credentials));
+        // GIVEN
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, credentials);
+        BacktraceMetricsSettings settings = new BacktraceMetricsSettings(credentials);
+        // WHEN
+        metrics.enable(settings);
+
+        // THEN
         TestCase.assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
+        TestCase.assertTrue(settings.isBacktraceServer());
     }
 
     @Test
-    public void testCustomUrl() {
+    public void testCustomServerUrl() {
+        // GIVEN
         String customUrl = "https://my.custom.url";
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null, credentials);
-        metrics.enable(new BacktraceMetricsSettings(credentials, customUrl));
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, credentials);
+        BacktraceMetricsSettings settings = new BacktraceMetricsSettings(credentials, customUrl);
+        // WHEN
+        metrics.enable(settings);
+        // WHEN
         TestCase.assertEquals(customUrl, metrics.getBaseUrl());
+        TestCase.assertFalse(settings.isBacktraceServer());
     }
+
+    @Test
+    public void tryToEnableMetricsOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.enable();
+    }
+
 }
