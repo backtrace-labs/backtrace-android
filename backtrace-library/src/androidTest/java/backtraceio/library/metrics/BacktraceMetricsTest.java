@@ -86,20 +86,7 @@ public class BacktraceMetricsTest {
         TestCase.assertTrue(settings.isBacktraceServer());
     }
 
-    @Test
-    public void testCustomServerUrl() {
-        // GIVEN
-        String customUrl = "https://my.custom.url";
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, credentials);
-        BacktraceMetricsSettings settings = new BacktraceMetricsSettings(credentials, customUrl);
-        // WHEN
-        metrics.enable(settings);
-        // WHEN
-        TestCase.assertEquals(customUrl, metrics.getBaseUrl());
-        TestCase.assertFalse(settings.isBacktraceServer());
-    }
-
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void tryToEnableMetricsOnCustomServer() {
         // GIVEN
         BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
@@ -107,6 +94,46 @@ public class BacktraceMetricsTest {
 
         // WHEN
         metrics.enable();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToAddSummedEventOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.addSummedEvent("demo", new HashMap<String, Object>() {});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToAddUniqueEventOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.addUniqueEvent("demo", new HashMap<String, Object>() {});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToSendOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.send();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToSendStartupEventOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.sendStartupEvent();
     }
 
 }

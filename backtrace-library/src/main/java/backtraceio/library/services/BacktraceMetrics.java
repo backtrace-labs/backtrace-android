@@ -68,7 +68,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Is gathering and sending metrics enabled, supported only on Backtrace servers
      */
-    public boolean enabled;
+    private boolean enabled;
 
     /**
      * Unique Events handler
@@ -300,8 +300,6 @@ public final class BacktraceMetrics implements Metrics {
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName) {
-        verifyIfMetricsAvailable();
-
         return addSummedEvent(metricGroupName, null);
     }
 
