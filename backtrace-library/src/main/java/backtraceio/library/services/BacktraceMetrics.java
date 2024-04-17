@@ -159,7 +159,7 @@ public final class BacktraceMetrics implements Metrics {
 
     public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
         if (!settings.isBacktraceServer()) {
-            throw new IllegalArgumentException("Unsupported metrics server " + settings.getBaseUrl());
+            throw new IllegalArgumentException("Unsupported metrics server");
         }
 
         if (uniqueEventName == null || uniqueEventName.length() == 0) {
@@ -180,7 +180,7 @@ public final class BacktraceMetrics implements Metrics {
 
     private void verifyIfMetricsAvailable() {
         if (!enabled) {
-            throw new IllegalArgumentException("Unique event name must be defined!");
+            throw new IllegalArgumentException("Metrics are not available!");
         }
     }
 
