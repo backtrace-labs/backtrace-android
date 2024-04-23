@@ -158,6 +158,10 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     public void enable(BacktraceMetricsSettings settings, String uniqueEventName) {
+        if (this.enabled) {
+            throw new IllegalStateException("Metrics already enabled");
+        }
+
         if (!settings.isBacktraceServer()) {
             throw new IllegalArgumentException("Unsupported metrics server");
         }
@@ -378,7 +382,7 @@ public final class BacktraceMetrics implements Metrics {
         return true;
     }
 
-    Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
+    protected Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
         Map<String, Object> localAttributes = new HashMap<>();
 
         if (attributes != null) {

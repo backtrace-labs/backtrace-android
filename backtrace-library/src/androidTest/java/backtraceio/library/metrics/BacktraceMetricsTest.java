@@ -86,6 +86,16 @@ public class BacktraceMetricsTest {
         TestCase.assertTrue(settings.isBacktraceServer());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void tryToEnableMetricsTwoTimes() {
+        // GIVEN
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, credentials);
+        BacktraceMetricsSettings settings = new BacktraceMetricsSettings(credentials);
+        // WHEN
+        metrics.enable(settings);
+        metrics.enable(settings);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void tryToEnableMetricsOnCustomServer() {
         // GIVEN
