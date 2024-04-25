@@ -93,11 +93,23 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
         return true;
     }
 
+
+    public void deleteFile(File file) {
+        boolean result = file.delete();
+
+        if (result) {
+            BacktraceLogger.d(LOG_TAG, "Delete file completed with success: " + file.getName());
+        } else {
+            BacktraceLogger.w(LOG_TAG, "Delete file completed with error: " + file.getName());
+        }
+    }
+
     /**
      * Remove orphaned files existing in database directory
      *
      * @param existingRecords existing entries in BacktraceDatabaseContext
      */
+
     public void removeOrphaned(Iterable<BacktraceDatabaseRecord> existingRecords) {
         BacktraceLogger.d(LOG_TAG, "Removing orphaned files from file context");
         List<String> recordStringIds = new ArrayList<>();
@@ -111,26 +123,27 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
             if (file.isDirectory() && file.getName().endsWith(this._crashpadDatabasePathPrefix)) {
                 continue;
             }
+            String fileName = file.getName();
             String extension = FileHelper.getFileExtension(file);
             if (!extension.equals("json")) {
-                BacktraceLogger.d(LOG_TAG, "Deleting file - it is not a JSON file");
-                file.delete();
+                BacktraceLogger.d(LOG_TAG, "Deleting file because it's not a JSON file: " + fileName);
+                deleteFile(file);
                 continue;
             }
 
             int fileNameIndex = file.getName().lastIndexOf('-');
 
             if (fileNameIndex == -1) {
-                BacktraceLogger.d(LOG_TAG, "Deleting file - name is incorrect");
-                file.delete();
+                BacktraceLogger.d(LOG_TAG, "Deleting file with incorrect name: " + fileName);
+                deleteFile(file);
                 continue;
             }
 
-            String fileUuid = file.getName().substring(0, fileNameIndex);
+            String fileUuid = fileName.substring(0, fileNameIndex);
 
             if (!recordStringIds.contains(fileUuid)) {
-                BacktraceLogger.d(LOG_TAG, "Deleting file - file id is not in existing collection");
-                file.delete();
+                BacktraceLogger.d(LOG_TAG, "Deleting file because file id is not in existing collection: " + fileName);
+                deleteFile(file);
             }
         }
     }

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +30,16 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.services.BacktraceMetrics;
 
 public class MainActivity extends AppCompatActivity {
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
     private BacktraceClient backtraceClient;
     private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
@@ -74,40 +79,59 @@ public class MainActivity extends AppCompatActivity {
         writeMyCustomFile(fileNameDateString);
     }
 
+    private long getCurrentTimeMiliseconds() {
+        Date date = new Date();
+
+        long timeMilli = date.getTime();
+        System.out.println("Time in milliseconds using Date class: " + timeMilli);
+        return timeMilli;
+    }
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
+        long start = getCurrentTimeMiliseconds();
+        BacktraceLogger.setLevel(LogLevel.DEBUG);
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        List<String> attachments = new ArrayList<>();
 
+        // attachments.add() TODO: add attachment
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        BacktraceCredentials credentials =  new BacktraceCredentials("https://yol2o.sp.backtrace.io:6098/",
+                "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
         Context context = getApplicationContext();
-        String dbPath = context.getFilesDir().getAbsolutePath();
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        BacktraceDatabaseSettings backtraceDatabaseSettings = new BacktraceDatabaseSettings(context.getFilesDir().getAbsolutePath());
+        backtraceDatabaseSettings.setAutoSendMode(true);
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
 
-        BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings(dbPath);
-        settings.setMaxRecordCount(100);
-        settings.setMaxDatabaseSize(1000);
-        settings.setRetryBehavior(RetryBehavior.ByInterval);
-        settings.setAutoSendMode(true);
-        settings.setRetryOrder(RetryOrder.Queue);
 
-        Map<String, Object> attributes = new HashMap<String, Object>() {{
-            put("custom.attribute", "My Custom Attribute");
-        }};
 
-        List<String> attachments = new ArrayList<String>() {{
-            add(context.getFilesDir() + "/" + "myCustomFile.txt");
-        }};
+        BacktraceDatabase db = new BacktraceDatabase(context, backtraceDatabaseSettings);
 
-        BacktraceDatabase database = new BacktraceDatabase(context, settings);
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
+        Map<String, Object> attributes= new HashMap<>();
+        // attributes.put(SYMB) // TODO: add symbolication
 
-        BacktraceExceptionHandler.enable(backtraceClient);
-
-        backtraceClient.metrics.enable();
-
-        // Enable handling of native crashes
-        database.setupNativeIntegration(backtraceClient, credentials, true);
-
-        // Enable ANR detection
-        backtraceClient.enableAnr(anrTimeout);
-        return backtraceClient;
+        BacktraceClient client = new BacktraceClient(context, credentials, db, attributes, attachments);
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        client.enableProguard();
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        BacktraceExceptionHandler.enable(client);
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        client.metrics.enable(new BacktraceMetricsSettings(credentials));
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        client.enableBreadcrumbs(context, EnumSet.of(
+                BacktraceBreadcrumbType.SYSTEM,
+                BacktraceBreadcrumbType.LOG,
+                BacktraceBreadcrumbType.NAVIGATION,
+                BacktraceBreadcrumbType.HTTP,
+                BacktraceBreadcrumbType.USER,
+                BacktraceBreadcrumbType.CONFIGURATION
+        ));
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        client.enableNativeIntegration(true);
+        BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
+        long end = getCurrentTimeMiliseconds();
+        BacktraceLogger.d(LOG_TAG, "Diff: " + Long.toString(end - start));
+        return client;
     }
 
     public native void cppCrash();

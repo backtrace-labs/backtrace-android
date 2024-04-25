@@ -442,22 +442,32 @@ public class BacktraceDatabase implements Database {
     }
 
     private void loadReports() {
+        BacktraceLogger.d(LOG_TAG, "Load reports");
         Iterable<File> files = backtraceDatabaseFileContext.getRecords();
 
+        int validRecords = 0;
+        int nullRecords = 0;
+        int invalidRecords = 0;
         for (File file : files) {
             BacktraceDatabaseRecord record = BacktraceDatabaseRecord.readFromFile(file);
             if (record == null) {
+                nullRecords++;
                 continue;
             }
 
             if (!record.valid()) {
                 record.delete();
+                invalidRecords++;
                 continue;
             }
             backtraceDatabaseContext.add(record);
+            validRecords++;
             validateDatabaseSize();
             record.close();
         }
+        BacktraceLogger.d(LOG_TAG, "Valid records: " + validRecords);
+        BacktraceLogger.d(LOG_TAG, "Null records: " + nullRecords);
+        BacktraceLogger.d(LOG_TAG, "Invalid records: " + invalidRecords);
     }
 
     /**
