@@ -2,10 +2,15 @@ package backtraceio.library;
 
 import android.net.Uri;
 
+import backtraceio.library.logger.BacktraceLogger;
+
 /**
  * Backtrace credentials information
  */
 public class BacktraceCredentials {
+
+    private final static transient String LOG_TAG = BacktraceCredentials.class.getSimpleName();
+
     /**
      * Data format
      */
@@ -91,13 +96,15 @@ public class BacktraceCredentials {
             int universeIndexStart = backtraceSubmitUrl.length();
             int universeIndexEnd = submissionUrl.indexOf('/', universeIndexStart);
             if (universeIndexEnd == -1) {
-                throw new IllegalArgumentException("Invalid Backtrace URL");
+                BacktraceLogger.w(LOG_TAG, "Missed universe in server URL: " + submissionUrl);
+                return null;
             }
             return submissionUrl.substring(universeIndexStart, universeIndexEnd);
         } else {
             final String backtraceDomain = "backtrace.io";
             if (submissionUrl.indexOf(backtraceDomain) == -1) {
-                throw new IllegalArgumentException("Invalid Backtrace URL");
+                BacktraceLogger.w(LOG_TAG, "Missed universe in server URL: " + submissionUrl);
+                return null;
             }
 
             Uri uri = Uri.parse(submissionUrl);
@@ -108,8 +115,8 @@ public class BacktraceCredentials {
     /**
      * Get an access token to Backtrace server API
      *
-     * @return: access token
-     * @note: Using algorithm from backtrace-unity https://github.com/backtrace-labs/backtrace-unity/blob/553aab2b39c318ff96ebed4bc739bf2c87304649/Runtime/Model/BacktraceConfiguration.cs#L320
+     * Note: Using algorithm from backtrace-unity https://github.com/backtrace-labs/backtrace-unity/blob/553aab2b39c318ff96ebed4bc739bf2c87304649/Runtime/Model/BacktraceConfiguration.cs#L320
+     * @return access token
      */
     public String getSubmissionToken() {
         if (submissionToken != null)
