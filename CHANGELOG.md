@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.8.1
+
+- Bugfix for initialization BacktraceMetrics with custom server
+
 ## Version 3.8.0
 
 - Update crashpad to latest version 
