@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -286,6 +287,9 @@ public class BacktraceDatabase implements Database {
 
     private void setupTimer() {
         _timer = new Timer();
+        if (true) {
+            return;
+        }
         _timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -443,11 +447,13 @@ public class BacktraceDatabase implements Database {
 
     private void loadReports() {
         BacktraceLogger.d(LOG_TAG, "Load reports");
-        Iterable<File> files = backtraceDatabaseFileContext.getRecords();
-
         int validRecords = 0;
         int nullRecords = 0;
         int invalidRecords = 0;
+
+        long start = getCurrentTimeMiliseconds();
+        Iterable<File> files = backtraceDatabaseFileContext.getRecords();
+
         for (File file : files) {
             BacktraceDatabaseRecord record = BacktraceDatabaseRecord.readFromFile(file);
             if (record == null) {
@@ -465,9 +471,19 @@ public class BacktraceDatabase implements Database {
             validateDatabaseSize();
             record.close();
         }
+        long end = getCurrentTimeMiliseconds();
+        BacktraceLogger.d(LOG_TAG, "Diff on load: " + Long.toString(end - start));
         BacktraceLogger.d(LOG_TAG, "Valid records: " + validRecords);
         BacktraceLogger.d(LOG_TAG, "Null records: " + nullRecords);
         BacktraceLogger.d(LOG_TAG, "Invalid records: " + invalidRecords);
+    }
+
+    private long getCurrentTimeMiliseconds() {
+        Date date = new Date();
+
+        long timeMilli = date.getTime();
+        System.out.println("Time in milliseconds using Date class: " + timeMilli);
+        return timeMilli;
     }
 
     /**

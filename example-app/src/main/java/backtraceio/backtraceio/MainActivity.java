@@ -87,7 +87,20 @@ public class MainActivity extends AppCompatActivity {
         return timeMilli;
     }
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
+        Context context = getApplicationContext();
+        BacktraceDatabaseSettings backtraceDatabaseSettings = new BacktraceDatabaseSettings(context.getFilesDir().getAbsolutePath());
+        backtraceDatabaseSettings.setAutoSendMode(true);
+
+        BacktraceDatabase db2  = new BacktraceDatabase(context, backtraceDatabaseSettings);
+        db2.start();
+//        db2.flush();
+
+        for (int i = 0; i < 200; i ++) {
+            db2.add(new BacktraceReport(Integer.toString(i)), null);
+        }
+
         long start = getCurrentTimeMiliseconds();
+
         BacktraceLogger.setLevel(LogLevel.DEBUG);
         BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
         List<String> attachments = new ArrayList<>();
@@ -97,16 +110,16 @@ public class MainActivity extends AppCompatActivity {
         BacktraceCredentials credentials =  new BacktraceCredentials("https://yol2o.sp.backtrace.io:6098/",
                 "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
         BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
-        Context context = getApplicationContext();
+
         BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
-        BacktraceDatabaseSettings backtraceDatabaseSettings = new BacktraceDatabaseSettings(context.getFilesDir().getAbsolutePath());
-        backtraceDatabaseSettings.setAutoSendMode(true);
+
+
         BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
 
 
 
         BacktraceDatabase db = new BacktraceDatabase(context, backtraceDatabaseSettings);
-
+        int size = db.count();
         Map<String, Object> attributes= new HashMap<>();
         // attributes.put(SYMB) // TODO: add symbolication
 
@@ -130,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         client.enableNativeIntegration(true);
         BacktraceLogger.d(LOG_TAG, Long.toString(getCurrentTimeMiliseconds()));
         long end = getCurrentTimeMiliseconds();
-        BacktraceLogger.d(LOG_TAG, "Diff: " + Long.toString(end - start));
+        BacktraceLogger.d(LOG_TAG, "Db size: " + Long.toString(db.count()));
+        BacktraceLogger.d(LOG_TAG, "Diff: " + Long.toString((end - start)/1000) + " seconds");
         return client;
     }
 
