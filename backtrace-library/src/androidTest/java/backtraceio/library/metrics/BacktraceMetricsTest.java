@@ -36,7 +36,6 @@ public class BacktraceMetricsTest {
     private final String[] uniqueAttributeName = {"uname.version", "cpu.boottime", "screen.orientation", "battery.state", "device.airplane_mode", "device.sdk", "device.brand", "system.memory.total", "uname.sysname", "application.package"};
 
     private final String token = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
-    private final String universeName = "testing-universe-name";
 
     /**
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
@@ -76,16 +75,75 @@ public class BacktraceMetricsTest {
 
     @Test
     public void testDefaultUrl() {
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null, credentials);
-        metrics.enable(new BacktraceMetricsSettings(credentials));
+        // GIVEN
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, credentials);
+        BacktraceMetricsSettings settings = new BacktraceMetricsSettings(credentials);
+        // WHEN
+        metrics.enable(settings);
+
+        // THEN
         TestCase.assertEquals(BacktraceMetrics.defaultBaseUrl, metrics.getBaseUrl());
+        TestCase.assertTrue(settings.isBacktraceServer());
     }
 
-    @Test
-    public void testCustomUrl() {
-        String customUrl = "https://my.custom.url";
-        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<String, Object>(), null, credentials);
-        metrics.enable(new BacktraceMetricsSettings(credentials, customUrl));
-        TestCase.assertEquals(customUrl, metrics.getBaseUrl());
+    @Test(expected = IllegalStateException.class)
+    public void tryToEnableMetricsTwoTimes() {
+        // GIVEN
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, credentials);
+        BacktraceMetricsSettings settings = new BacktraceMetricsSettings(credentials);
+        // WHEN
+        metrics.enable(settings);
+        metrics.enable(settings);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToEnableMetricsOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.enable();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToAddSummedEventOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.addSummedEvent("demo", new HashMap<String, Object>() {});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToAddUniqueEventOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.addUniqueEvent("demo", new HashMap<String, Object>() {});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToSendOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.send();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tryToSendStartupEventOnCustomServer() {
+        // GIVEN
+        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
+
+        // WHEN
+        metrics.sendStartupEvent();
+    }
+
 }
