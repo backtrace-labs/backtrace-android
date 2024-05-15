@@ -233,12 +233,12 @@ public class BacktraceBase implements Client {
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes, List<String> attachments) {
         this.context = context;
         this.credentials = credentials;
-        this.attributes = attributes != null ? attributes : new HashMap<String, Object>();
-        this.attachments = attachments != null ? attachments : new ArrayList<String>();
+        this.attributes = createAttributes(attributes);
+        this.attachments = attachments != null ? attachments : new ArrayList<>();
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
-        this.metrics = new BacktraceMetrics(context, attributes, backtraceApi, credentials);
+        this.metrics = new BacktraceMetrics(context, this.attributes, backtraceApi, credentials);
     }
 
     public native void crash();
@@ -619,13 +619,21 @@ public class BacktraceBase implements Client {
 
     private void addReportAttachments(BacktraceReport report) {
         if (this.attachments != null) {
-            for (String path : this.attachments) {
-                report.attachmentPaths.add(path);
-            }
+            report.attachmentPaths.addAll(this.attachments);
         }
     }
 
     private boolean isBreadcrumbsAvailable() {
         return database != null && database.getBreadcrumbs() != null;
     }
+
+    private HashMap<String, Object> createAttributes(Map<String, Object> userAttributes) {
+        HashMap<String, Object> attributes = new HashMap<>();
+
+        if (userAttributes != null) {
+            attributes.putAll(userAttributes);
+        }
+        return attributes;
+    }
+
 }
