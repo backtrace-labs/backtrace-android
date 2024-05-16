@@ -175,9 +175,8 @@ public class BacktraceReport {
             Map<String, Object> attributes,
             List<String> attachmentPaths) {
 
-        this.attributes = attributes == null ? new HashMap<String, Object>() {
-        } : attributes;
-        this.attachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
+        this.attributes = this.createAttributes(attributes);
+        this.attachmentPaths = this.createAttachments(attachmentPaths);
         this.exception = this.prepareException(exception);
         this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
@@ -242,6 +241,25 @@ public class BacktraceReport {
         }
         reportAttributes.putAll(attributes);
         return reportAttributes;
+    }
+
+    private HashMap<String, Object> createAttributes(Map<String, Object> userAttributes) {
+        HashMap<String, Object> attributes = new HashMap<>();
+
+        if (userAttributes != null) {
+            attributes.putAll(userAttributes);
+        }
+        return attributes;
+    }
+
+    private List<String> createAttachments(List<String> userAttachments) {
+        List<String> attachments = new ArrayList<>();
+
+        if (userAttachments != null) {
+            attachments.addAll(userAttachments);
+        }
+
+        return attachments;
     }
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {

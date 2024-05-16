@@ -233,8 +233,8 @@ public class BacktraceBase implements Client {
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes, List<String> attachments) {
         this.context = context;
         this.credentials = credentials;
-        this.attributes = createAttributes(attributes);
-        this.attachments = attachments != null ? attachments : new ArrayList<>();
+        this.attributes = this.createAttributes(attributes);
+        this.attachments = this.createAttachments(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
@@ -369,7 +369,6 @@ public class BacktraceBase implements Client {
             return false;
         }
         return database.getBreadcrumbs().enableBreadcrumbs(context);
-
     }
 
     /**
@@ -387,7 +386,6 @@ public class BacktraceBase implements Client {
             return false;
         }
         return database.getBreadcrumbs().enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
-
     }
 
     /**
@@ -634,6 +632,16 @@ public class BacktraceBase implements Client {
             attributes.putAll(userAttributes);
         }
         return attributes;
+    }
+
+    private List<String> createAttachments(List<String> userAttachments) {
+        List<String> attachments = new ArrayList<>();
+
+        if (userAttachments != null) {
+            attachments.addAll(userAttachments);
+        }
+
+        return attachments;
     }
 
 }
