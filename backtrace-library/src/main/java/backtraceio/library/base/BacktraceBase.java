@@ -10,6 +10,7 @@ import java.util.Map;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.common.CollectionUtils;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.UnwindingMode;
@@ -233,8 +234,8 @@ public class BacktraceBase implements Client {
     public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes, List<String> attachments) {
         this.context = context;
         this.credentials = credentials;
-        this.attributes = this.createAttributes(attributes);
-        this.attachments = this.createAttachments(attachments);
+        this.attributes = CollectionUtils.copyMap(attributes);
+        this.attachments = CollectionUtils.copyList(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(credentials));
         this.database.start();
@@ -623,25 +624,6 @@ public class BacktraceBase implements Client {
 
     private boolean isBreadcrumbsAvailable() {
         return database != null && database.getBreadcrumbs() != null;
-    }
-
-    private HashMap<String, Object> createAttributes(Map<String, Object> userAttributes) {
-        HashMap<String, Object> attributes = new HashMap<>();
-
-        if (userAttributes != null) {
-            attributes.putAll(userAttributes);
-        }
-        return attributes;
-    }
-
-    private List<String> createAttachments(List<String> userAttachments) {
-        List<String> attachments = new ArrayList<>();
-
-        if (userAttachments != null) {
-            attachments.addAll(userAttachments);
-        }
-
-        return attachments;
     }
 
 }

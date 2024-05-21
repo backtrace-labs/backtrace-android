@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
+import backtraceio.library.common.CollectionUtils;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
@@ -175,8 +176,8 @@ public class BacktraceReport {
             Map<String, Object> attributes,
             List<String> attachmentPaths) {
 
-        this.attributes = this.createAttributes(attributes);
-        this.attachmentPaths = this.createAttachments(attachmentPaths);
+        this.attributes = CollectionUtils.copyMap(attributes);
+        this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
         this.exception = this.prepareException(exception);
         this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
@@ -241,25 +242,6 @@ public class BacktraceReport {
         }
         reportAttributes.putAll(attributes);
         return reportAttributes;
-    }
-
-    private HashMap<String, Object> createAttributes(Map<String, Object> userAttributes) {
-        HashMap<String, Object> attributes = new HashMap<>();
-
-        if (userAttributes != null) {
-            attributes.putAll(userAttributes);
-        }
-        return attributes;
-    }
-
-    private List<String> createAttachments(List<String> userAttachments) {
-        List<String> attachments = new ArrayList<>();
-
-        if (userAttachments != null) {
-            attachments.addAll(userAttachments);
-        }
-
-        return attachments;
     }
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
