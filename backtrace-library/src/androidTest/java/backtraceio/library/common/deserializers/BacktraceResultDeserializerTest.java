@@ -7,11 +7,13 @@ import static org.junit.Assert.assertNull;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
+import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -43,14 +45,12 @@ public class BacktraceResultDeserializerTest {
         String json = JSON_1;
 
         // WHEN
-        BacktraceResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceResult.class);
+        BacktraceApiResult result = deserializer.deserialize(new JSONObject(json));
 
         // THEN
         assertNotNull(result);
-        assertNull(result.getBacktraceReport());
-        assertNull(result.message);
-        assertEquals(BacktraceResultStatus.Ok, result.status);
-        assertEquals("01000000-5360-240b-0000-000000000000", result.rxId);
+        assertEquals("ok", result.getResponse());
+        assertEquals("01000000-5360-240b-0000-000000000000", result.getRxId());
     }
 
 }
