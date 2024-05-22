@@ -71,30 +71,31 @@ public class SerializerHelper {
         }
     }
 
-    private static JSONObject getAllFields(NamingPolicy namingPolicy, Class<?> klass, Object obj, int serializationDepth) {
+    private static JSONObject getAllFields(NamingPolicy namingPolicy, Class<?> serializedClass, Object obj, int serializationDepth) {
         // TODO: improve naming
 
         List<Field> fields = new ArrayList<>();
-        for (Class<?> c = klass; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+        for (Class<?> clazz = serializedClass; clazz != null; clazz = clazz.getSuperclass()) {
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
         }
 
         JSONObject result = new JSONObject();
-        for (Field f : fields) {
-            f.setAccessible(true);
+        for (Field field : fields) {
+            field.setAccessible(true);
 
-            if (java.lang.reflect.Modifier.isTransient(f.getModifiers()) ||
-                    java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
+            if (java.lang.reflect.Modifier.isTransient(field.getModifiers()) ||
+                    java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
 
             try {
-                Object value = f.get(obj);
+                Object value = field.get(obj);
                 if (value == obj) {
                     continue;
                 }
-                result.put(getFieldName(namingPolicy, f), serialize(namingPolicy, value, serializationDepth));
+                result.put(getFieldName(namingPolicy, field), serialize(namingPolicy, value, serializationDepth));
             } catch (Exception ex) {
+                // TODO: error handling
 //                ex.printStackTrace();
             }
         }
@@ -144,6 +145,7 @@ public class SerializerHelper {
                         String propertyName = methodName.substring(3); // Remove 'get' prefix
                         fields.put(namingPolicy.convert(propertyName), serialize(namingPolicy, result));
                     } catch (Exception e) {
+                        // TODO: error handling
                         e.printStackTrace();
                     }
                 }
