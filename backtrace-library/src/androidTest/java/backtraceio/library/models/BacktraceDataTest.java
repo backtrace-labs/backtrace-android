@@ -2,8 +2,6 @@ package backtraceio.library.models;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 
@@ -14,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -30,7 +30,8 @@ public class BacktraceDataTest {
     @Test
     public void createBacktraceDataTest() {
         // GIVEN
-        BacktraceReport report = new BacktraceReport(new IllegalAccessException("test-message"));
+        List<String> attachmentsPath = Arrays.asList("one", "two", "three");
+        BacktraceReport report = new BacktraceReport(new IllegalAccessException("test-message"), attachmentsPath);
 
         // WHEN
         BacktraceData backtraceData = new BacktraceData.Builder(context, report, new HashMap<>()).build();
@@ -51,5 +52,6 @@ public class BacktraceDataTest {
         assertEquals(backtraceData.mainThread, "instr: androidx.test.runner.androidjunitrunner");
         assertEquals(backtraceData.sourceCode.size(), 34);
         assertEquals(backtraceData.getThreadInformationMap().size(), 13);
+        assertEquals(backtraceData.getAttachmentPaths().size(), 2);
     }
 }
