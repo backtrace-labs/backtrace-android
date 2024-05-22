@@ -1,4 +1,5 @@
 #include "crashpad-backend.h"
+#include "handler/handler_main.h"
 #include "backtrace-native.h"
 #include <jni.h>
 #include <libgen.h>
@@ -18,7 +19,8 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attributeValues,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
-                        jint unwindingMode) {
+                        jint unwindingMode,
+                        jobjectArray environmentVariables) {
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
@@ -66,7 +68,7 @@ bool InitializeCrashpad(jstring url,
             if (!convertedKey || !convertedValue)
                 continue;
 
-            attributes[convertedKey] = convertedValue;
+            // attributes[convertedKey] = convertedValue;
 
             env->ReleaseStringUTFChars(jstringKey, convertedKey);
             env->ReleaseStringUTFChars(stringValue, convertedValue);
@@ -102,9 +104,9 @@ bool InitializeCrashpad(jstring url,
 
             std::string attachmentBaseName = basename(convertedAttachmentPath);
 
-            std::string attachmentArgumentString("--attachment=");
-            attachmentArgumentString += convertedAttachmentPath;
-            arguments.push_back(attachmentArgumentString);
+//            std::string attachmentArgumentString("--attachment=");
+//            attachmentArgumentString += convertedAttachmentPath;
+//            arguments.push_back(attachmentArgumentString);
 
             env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
         }
@@ -127,8 +129,22 @@ bool InitializeCrashpad(jstring url,
         client->OverrideGuid(guidIterator->second);
     }
 
-    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
-                                              arguments);
+    base::FilePath metrics_directory;
+
+    std::vector<std::string> *handlerEnvVariables = nullptr;
+    if(environmentVariables != nullptr) {
+        handlerEnvVariables = new std::vector<std::string>;
+        for (int envVariableIndex = 0; envVariableIndex < env->GetArrayLength(environmentVariables); ++envVariableIndex) {
+            jstring envVariable = (jstring) env->GetObjectArrayElement(environmentVariables,
+                                                                      envVariableIndex);
+            jboolean isCopy;
+            handlerEnvVariables->push_back((env)->GetStringUTFChars(envVariable, &isCopy));
+        }
+        arguments.push_back(handlerEnvVariables->back());
+    }
+
+    initialized = client->StartJavaHandlerAtCrash(handlerPath, handlerEnvVariables, db, metrics_directory, backtraceUrl, attributes,
+                                                  arguments);
 
     env->ReleaseStringUTFChars(url, backtraceUrl);
     env->ReleaseStringUTFChars(handler_path, handlerPath);
@@ -139,6 +155,19 @@ bool InitializeCrashpad(jstring url,
     }
 
     return initialized;
+}
+
+void CaptureCrashpadCrash(jstring library_path, jobjectArray args) {
+    JNIEnv *env = GetJniEnv();
+
+    int argSize = env->GetArrayLength(args);
+    char** argv = new char*[argSize + 1];
+    for (int i = 0; i < argSize; ++i) {
+        jstring currentArg = (jstring) env->GetObjectArrayElement(args,i);
+        argv[i] =  const_cast<char *>(env->GetStringUTFChars(currentArg, 0));
+    }
+
+    int status = crashpad::HandlerMain(argSize, argv, nullptr);
 }
 
 void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_faulting_thread) {

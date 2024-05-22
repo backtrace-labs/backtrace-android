@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 34
+    namespace "backtraceio.backtraceio"
     defaultConfig {
         applicationId "backtraceio.backtraceio"
         minSdkVersion 21
@@ -37,6 +38,14 @@ android {
             buildConfigField ("String", "BACKTRACE_CORONER_URL", getProperty("BACKTRACE_CORONER_URL", "null"))
             buildConfigField ("String", "BACKTRACE_CORONER_TOKEN", getProperty("BACKTRACE_CORONER_TOKEN", "null"))
         }
+        buildFeatures {
+            buildConfig = true
+        }
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+       }
     }
 }
 

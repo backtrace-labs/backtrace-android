@@ -102,11 +102,12 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                                                       jobjectArray attributeValues,
                                                       jobjectArray attachmentPaths = nullptr,
                                                       jboolean enableClientSideUnwinding = false,
-                                                      jobject unwindingMode = nullptr) {
+                                                      jobject unwindingMode = nullptr,
+                                                      jobjectArray environmentVariables = nullptr) {
     jint unwindingModeInt = ExtractClientSideUnwindingMode(env, unwindingMode);
     return Initialize(url, database_path, handler_path, attributeKeys,
                       attributeValues, attachmentPaths, enableClientSideUnwinding,
-                      unwindingModeInt);
+                      unwindingModeInt, environmentVariables);
 }
 
 JNIEXPORT void JNICALL
@@ -135,4 +136,10 @@ Java_backtraceio_library_BacktraceDatabase_disable(JNIEnv *env, jobject thiz) {
     Disable();
 }
 
+JNIEXPORT void JNICALL
+Java_backtraceio_library_services_BacktraceCrashHandler_handleCrash(JNIEnv *env, jclass clazz,
+                                                                    jstring library_path,
+                                                                    jobjectArray args) {
+    CaptureCrash(library_path, args);
+}
 }

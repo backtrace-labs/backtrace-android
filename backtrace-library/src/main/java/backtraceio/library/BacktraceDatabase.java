@@ -1,6 +1,8 @@
 package backtraceio.library;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.util.Calendar;
@@ -30,6 +32,7 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.services.BacktraceCrashHandler;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -76,7 +79,7 @@ public class BacktraceDatabase implements Database {
     private native boolean initialize(String url, String databasePath, String handlerPath,
                                       String[] attributeKeys, String[] attributeValues,
                                       String[] attachmentPaths, boolean enableClientSideUnwinding,
-                                      UnwindingMode unwindingMode);
+                                      UnwindingMode unwindingMode, String[] environmentVariables);
 
     /**
      * Disable Backtrace-native integration
@@ -176,11 +179,14 @@ public class BacktraceDatabase implements Database {
         if (minidumpSubmissionUrl == null) {
             return false;
         }
-        // Path to Crashpad native handler
-        String handlerPath = _applicationContext.getApplicationInfo().nativeLibraryDir + _crashpadHandlerName;
-        if (!FileHelper.isFileExists(handlerPath)) {
-            return false;
-        }
+
+        String classPath = "backtraceio/library/services/BacktraceCrashHandler"; //BacktraceCrashHandler.class.getCanonicalName();
+        String[] environmentVariables = new String[]{
+                "CLASSPATH=" + _applicationContext.getApplicationInfo().sourceDir,
+                "LD_LIBRARY_PATH=" +  TextUtils.join(File.pathSeparator, new String[] {
+                        _applicationContext.getApplicationInfo().nativeLibraryDir,
+                        new File(_applicationContext.getApplicationInfo().nativeLibraryDir).getParentFile().getPath(),
+                        System.getProperty("java.library.path")})};
 
         // setup default native attributes
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
@@ -204,16 +210,30 @@ public class BacktraceDatabase implements Database {
         File crashHandlerDir = new File(databasePath);
         crashHandlerDir.mkdir();
 
+        File[] crashFiles = crashHandlerDir.listFiles();
+        File newCrashpadHandlerDir = new File(databasePath + "/new");
+
+        if(FileHelper.isFileExists(databasePath + "/new")) {
+            File[] newCrashFiles = newCrashpadHandlerDir.listFiles();
+
+            BacktraceLogger.d(LOG_TAG, "Number of files: " + newCrashFiles.length);
+        }
+
         _enabledNativeIntegration = initialize(
                 minidumpSubmissionUrl,
                 databasePath,
-                handlerPath,
+                classPath,
                 keys,
                 values,
                 attachmentPaths,
                 enableClientSideUnwinding,
-                unwindingMode
+                unwindingMode,
+                environmentVariables
         );
+
+        if(!_enabledNativeIntegration) {
+            throw new RuntimeException("expect the crash handler to start");
+        }
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
             this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {

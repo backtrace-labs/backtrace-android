@@ -107,10 +107,12 @@ list(APPEND LIBS backtrace-native)
 list(APPEND LIBS ${log-lib})
 
 if(BACKEND STREQUAL "CRASHPAD_BACKEND")
-    set(CUSTOM_CRASHPAD_HANDLER_DESTINATION
-            ${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libcrashpad_handler.so)
+#    set(CUSTOM_CRASHPAD_HANDLER_DESTINATION
+#            ${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libcrashpad_handler.so)
     add_subdirectory(crashpad)
     target_link_libraries(backtrace-native client)
+    target_link_libraries(backtrace-native handler)
+
 elseif(BACKEND STREQUAL "BREAKPAD_BACKEND")
     list(APPEND LIBS breakpad_client)
     list(APPEND LIBS curl)

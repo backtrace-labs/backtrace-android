@@ -20,7 +20,8 @@ bool Initialize(jstring url,
                 jobjectArray attributeValues,
                 jobjectArray attachmentPaths,
                 jboolean enableClientSideUnwinding,
-                jint unwindingMode) {
+                jint unwindingMode,
+                jobjectArray environmentVariables) {
     static std::once_flag initialize_flag;
 
     std::call_once(initialize_flag, [&] {
@@ -29,7 +30,7 @@ bool Initialize(jstring url,
                                          database_path, handler_path,
                                          attributeKeys, attributeValues,
                                          attachmentPaths, enableClientSideUnwinding,
-                                         unwindingMode);
+                                         unwindingMode, environmentVariables);
 #elif BREAKPAD_BACKEND
         initialized = InitializeBreakpad(url,
                                          database_path, handler_path,
@@ -50,6 +51,17 @@ bool Initialize(jstring url,
 #endif
 
     return initialized;
+}
+
+void CaptureCrash(jstring handler_path, jobjectArray args) {
+
+#ifdef CRASHPAD_BACKEND
+    CaptureCrashpadCrash(handler_path, args);
+#else
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "No native crash reporting backend defined");
+#endif
+
 }
 
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread) {

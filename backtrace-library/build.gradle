@@ -12,12 +12,10 @@ androidGitVersion {
 android {
 
     compileSdkVersion 33
-
+    namespace "backtraceio.library"
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionName androidGitVersion.name()
-        versionCode androidGitVersion.code()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -31,6 +29,9 @@ android {
         }
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+        buildFeatures {
+            buildConfig = true
         }
     }
 

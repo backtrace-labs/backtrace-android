@@ -18,7 +18,10 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attributeValues,
                         jobjectArray attachmentPaths = nullptr,
                         jboolean enableClientSideUnwinding = false,
-                        jint unwindingMode = UNWINDING_MODE_DEFAULT);
+                        jint unwindingMode = UNWINDING_MODE_DEFAULT,
+                        jobjectArray environmentVariables = nullptr);
+
+void CaptureCrashpadCrash(jstring library_path, jobjectArray args);
 
 void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_faulting_thread);
 
