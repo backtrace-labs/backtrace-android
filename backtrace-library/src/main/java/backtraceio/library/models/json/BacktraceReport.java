@@ -2,6 +2,8 @@ package backtraceio.library.models.json;
 
 import android.content.Context;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
-import com.google.gson.annotations.SerializedName;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;

@@ -1,5 +1,7 @@
 package backtraceio.library.models.database;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -7,7 +9,6 @@ import java.util.UUID;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.FileHelper;
-import com.google.gson.annotations.SerializedName;
 import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;

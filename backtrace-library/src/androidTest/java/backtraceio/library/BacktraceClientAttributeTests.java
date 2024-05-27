@@ -20,9 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
-import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 

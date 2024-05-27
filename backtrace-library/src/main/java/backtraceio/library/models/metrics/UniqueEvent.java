@@ -1,5 +1,7 @@
 package backtraceio.library.models.metrics;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +9,6 @@ import java.util.Map;
 
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
-import com.google.gson.annotations.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class UniqueEvent extends Event {

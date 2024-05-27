@@ -2,11 +2,12 @@ package backtraceio.library.models;
 
 import android.content.Context;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
-import com.google.gson.annotations.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
