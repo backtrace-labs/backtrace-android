@@ -2,7 +2,6 @@ package backtraceio.library.models.json;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.CollectionUtils;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
@@ -178,9 +178,8 @@ public class BacktraceReport {
             Map<String, Object> attributes,
             List<String> attachmentPaths) {
 
-        this.attributes = attributes == null ? new HashMap<String, Object>() {
-        } : attributes;
-        this.attachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
+        this.attributes = CollectionUtils.copyMap(attributes);
+        this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
         this.exception = this.prepareException(exception);
         this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
@@ -257,7 +256,7 @@ public class BacktraceReport {
     public static Map<String, Object> concatAttributes(
             BacktraceReport report, Map<String, Object> attributes) {
         Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
-                new HashMap<String, Object>();
+                new HashMap<>();
         if (attributes == null) {
             return reportAttributes;
         }
