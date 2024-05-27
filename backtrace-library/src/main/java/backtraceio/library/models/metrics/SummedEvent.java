@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 
 public final class SummedEvent extends Event {
 

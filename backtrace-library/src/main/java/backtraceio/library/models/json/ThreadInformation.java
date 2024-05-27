@@ -3,7 +3,7 @@ package backtraceio.library.models.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 import backtraceio.library.models.BacktraceStackFrame;
 
 /**

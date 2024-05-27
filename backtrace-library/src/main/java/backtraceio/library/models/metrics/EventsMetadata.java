@@ -1,6 +1,6 @@
 package backtraceio.library.models.metrics;
 
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 
 public class EventsMetadata {
 

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class UniqueEvent extends Event {

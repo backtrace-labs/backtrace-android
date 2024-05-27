@@ -3,7 +3,7 @@ package backtraceio.library.models;
 
 import java.util.UUID;
 
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 
 /**

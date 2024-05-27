@@ -1,6 +1,6 @@
 package backtraceio.library.models.json;
 
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 import backtraceio.library.models.BacktraceStackFrame;
 
 /**

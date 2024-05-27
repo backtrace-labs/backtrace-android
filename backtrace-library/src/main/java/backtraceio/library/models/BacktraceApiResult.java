@@ -1,6 +1,6 @@
 package backtraceio.library.models;
 
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Coroner API response

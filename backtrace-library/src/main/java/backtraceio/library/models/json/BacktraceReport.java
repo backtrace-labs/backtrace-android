@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.serializers.SerializedName;
+import com.google.gson.annotations.SerializedName;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
