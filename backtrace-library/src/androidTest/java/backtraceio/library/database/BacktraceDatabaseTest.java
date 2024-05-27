@@ -3,10 +3,9 @@ package backtraceio.library.database;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-import android.os.FileUtils;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
