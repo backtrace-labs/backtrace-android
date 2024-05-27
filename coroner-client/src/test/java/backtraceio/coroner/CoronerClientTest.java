@@ -1,5 +1,17 @@
 package backtraceio.coroner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123;
+import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123_ATTR_ERR_MSG;
+import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_TIMESTAMP_ERR_TYPE;
+import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_OPERATION_ERROR_JSON;
+import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
+import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_TIMESTAMP_ERR_TYPE_CORONER_JSON;
+import static backtraceio.coroner.utils.ResourceUtils.readResourceFile;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -15,17 +27,6 @@ import backtraceio.coroner.response.CoronerResponseException;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
 import backtraceio.coroner.serialization.GsonWrapper;
 import backtraceio.coroner.utils.MockHttpClient;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
-import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123;
-import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123_ATTR_ERR_MSG;
-import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_TIMESTAMP_ERR_TYPE;
-import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_OPERATION_ERROR_JSON;
-import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
-import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_TIMESTAMP_ERR_TYPE_CORONER_JSON;
-import static backtraceio.coroner.utils.ResourceUtils.readResourceFile;
 
 public class CoronerClientTest {
     private final static String rxId = "12345";
