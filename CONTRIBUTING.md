@@ -1,5 +1,5 @@
 # Contributing
-Thank you for considering contributing to our project! Here are some guidelines to help you get started:
+Thank you for considering contributing to Backtrace Android SDK library. Here are some guidelines to help you get started:
 
 ### Getting Started
 
