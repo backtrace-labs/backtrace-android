@@ -7,7 +7,6 @@ import com.google.gson.JsonParser;
 
 import org.junit.Test;
 
-
 import backtraceio.coroner.response.CoronerResponseGroup;
 
 public class CoronerResponseGroupDeserializerTest {

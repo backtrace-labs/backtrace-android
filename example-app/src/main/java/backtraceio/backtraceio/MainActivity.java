@@ -30,7 +30,6 @@ import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceExceptionHandler;
-import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 

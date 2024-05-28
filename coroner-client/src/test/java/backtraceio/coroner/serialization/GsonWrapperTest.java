@@ -3,7 +3,6 @@ package backtraceio.coroner.serialization;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import static backtraceio.coroner.utils.ResourceUtils.EXPECTED_FRAMES;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.readResourceFile;
