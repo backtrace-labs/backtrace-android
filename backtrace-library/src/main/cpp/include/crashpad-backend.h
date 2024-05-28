@@ -21,7 +21,7 @@ bool InitializeCrashpad(jstring url,
                         jint unwindingMode = UNWINDING_MODE_DEFAULT,
                         jobjectArray environmentVariables = nullptr);
 
-void CaptureCrashpadCrash(jstring library_path, jobjectArray args);
+bool CaptureCrashCrashpad(jobjectArray args);
 
 void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_faulting_thread);
 

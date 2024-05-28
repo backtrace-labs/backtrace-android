@@ -53,13 +53,14 @@ bool Initialize(jstring url,
     return initialized;
 }
 
-void CaptureCrash(jstring handler_path, jobjectArray args) {
+bool CaptureCrash(jobjectArray args) {
 
 #ifdef CRASHPAD_BACKEND
-    CaptureCrashpadCrash(handler_path, args);
+    return CaptureCrashCrashpad(args);
 #else
     __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
                         "No native crash reporting backend defined");
+    return false;
 #endif
 
 }

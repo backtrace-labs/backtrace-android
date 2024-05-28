@@ -136,10 +136,9 @@ Java_backtraceio_library_BacktraceDatabase_disable(JNIEnv *env, jobject thiz) {
     Disable();
 }
 
-JNIEXPORT void JNICALL
+JNIEXPORT bool JNICALL
 Java_backtraceio_library_services_BacktraceCrashHandler_handleCrash(JNIEnv *env, jclass clazz,
-                                                                    jstring library_path,
                                                                     jobjectArray args) {
-    CaptureCrash(library_path, args);
+    return CaptureCrash(args);
 }
 }
