@@ -4,13 +4,10 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.BacktraceResult;
-import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 public class BacktraceSerializeHelperTest {

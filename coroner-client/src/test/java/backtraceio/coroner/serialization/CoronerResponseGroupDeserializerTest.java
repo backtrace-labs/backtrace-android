@@ -1,14 +1,11 @@
 package backtraceio.coroner.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import org.junit.Test;
-
 
 import backtraceio.coroner.response.CoronerResponseGroup;
 
