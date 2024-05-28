@@ -14,6 +14,7 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
       ```bash
       git checkout -b jira-ticket/your-feature-name
       ```
+      
 3. **Update submodules**
 ```bash
 git submodule update --recursive --remote
