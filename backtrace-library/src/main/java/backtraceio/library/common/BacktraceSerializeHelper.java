@@ -1,11 +1,8 @@
 package backtraceio.library.common;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
-import backtraceio.library.models.BacktraceResult;
 
 /**
  * Helper class for serialize and deserialize objects
