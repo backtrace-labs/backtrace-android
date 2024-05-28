@@ -209,16 +209,6 @@ public class BacktraceDatabase implements Database {
         }
         attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
 
-
-//        File[] crashFiles = crashHandlerDir.listFiles();
-//        File newCrashpadHandlerDir = new File(databasePath + "/new");
-//
-//        if(FileHelper.isFileExists(databasePath + "/new")) {
-//            File[] newCrashFiles = newCrashpadHandlerDir.listFiles();
-//
-//            BacktraceLogger.d(LOG_TAG, "Number of files: " + newCrashFiles.length);
-//        }
-
         _enabledNativeIntegration = initialize(
                 minidumpSubmissionUrl,
                 databasePath,
@@ -230,10 +220,6 @@ public class BacktraceDatabase implements Database {
                 unwindingMode,
                 environmentVariables
         );
-
-        if(!_enabledNativeIntegration) {
-            throw new RuntimeException("expect the crash handler to start");
-        }
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
             this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
