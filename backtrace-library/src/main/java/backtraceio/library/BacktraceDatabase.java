@@ -1,10 +1,10 @@
 package backtraceio.library;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,8 +30,8 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import backtraceio.library.models.types.BacktraceResultStatus;
-import backtraceio.library.services.BacktraceCrashHandler;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -40,8 +40,6 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  */
 public class BacktraceDatabase implements Database {
 
-    private final String _crashpadHandlerName = "/libcrashpad_handler.so";
-    private final String _crashpadDatabasePathPrefix = "/crashpad";
     private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
@@ -53,7 +51,7 @@ public class BacktraceDatabase implements Database {
     private boolean _enable = false;
     private Breadcrumbs breadcrumbs;
 
-    private BacktraceCrashHandler crashHandler;
+    private CrashHandlerConfiguration crashHandlerConfiguration;
 
     private boolean _enabledNativeIntegration = false;
 
@@ -135,7 +133,7 @@ public class BacktraceDatabase implements Database {
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
         this.breadcrumbs = new BacktraceBreadcrumbs(getDatabasePath());
-        this.crashHandler = new BacktraceCrashHandler();
+        this.crashHandlerConfiguration = new CrashHandlerConfiguration();
     }
 
     private String getDatabasePath() {
@@ -178,19 +176,19 @@ public class BacktraceDatabase implements Database {
         if (_enable == false || getSettings() == null) {
             return false;
         }
+
+        if (!this.crashHandlerConfiguration.isSupportedAbi()) {
+            return false;
+        }
+
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
         if (minidumpSubmissionUrl == null) {
             return false;
         }
 
         // Create the crashpad directory if it doesn't exist
-        String databasePath = getSettings().getDatabasePath() + _crashpadDatabasePathPrefix;
-        File crashHandlerDir = new File(databasePath);
-        crashHandlerDir.mkdir();
-
-        String classPath = this.crashHandler.getClassPath();
-        ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
-        String[] environmentVariables = this.crashHandler.setCrashHandlerEnvironmentVariables(applicationInfo);
+        String crashpadDatabaseDirectory = this.crashHandlerConfiguration.useCrashpadDirectory(getSettings().getDatabasePath());
+        List<String> environmentVariables = this.crashHandlerConfiguration.getCrashHandlerEnvironmentVariables(_applicationContext.getApplicationInfo());
 
         // setup default native attributes
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
@@ -211,14 +209,14 @@ public class BacktraceDatabase implements Database {
 
         _enabledNativeIntegration = initialize(
                 minidumpSubmissionUrl,
-                databasePath,
-                classPath,
+                crashpadDatabaseDirectory,
+                this.crashHandlerConfiguration.getClassPath(),
                 keys,
                 values,
                 attachmentPaths,
                 enableClientSideUnwinding,
                 unwindingMode,
-                environmentVariables
+                environmentVariables.toArray(new String[0])
         );
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
