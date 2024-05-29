@@ -35,7 +35,7 @@ public class BacktraceStackFrame {
     /**
      * Source code file name where exception occurs
      */
-    public transient String sourceCodeFileName; // why transient
+    public transient String sourceCodeFileName;
 
     /**
      * Create new instance of BacktraceStackFrame
