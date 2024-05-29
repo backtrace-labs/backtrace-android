@@ -16,6 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
+        versionName androidGitVersion.name()
+        versionCode androidGitVersion.code()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -58,7 +60,7 @@ android {
         }
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
-    
+
     // Needed until we migrate to AndroidX
     android {
         lintOptions {
