@@ -2,13 +2,14 @@ package backtraceio.library.models.json;
 
 import android.content.Context;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.common.CollectionUtils;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
@@ -35,7 +36,6 @@ public class BacktraceReport {
     /**
      * Get information about report type. If value is true the BacktraceReport has an error
      */
-    @SerializedName("exception-type-report")
     public Boolean exceptionTypeReport = false;
 
     /**
