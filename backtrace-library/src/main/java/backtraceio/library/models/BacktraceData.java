@@ -97,6 +97,55 @@ public class BacktraceData {
     @SerializedName("sourceCode")
     public Map<String, SourceCode> sourceCode;
 
+    /**
+     * Current BacktraceReport
+     */
+    public transient BacktraceReport report; // Think if we need it
+
+    /**
+     * Application thread details
+     */
+    @SerializedName("threads")
+    Map<String, ThreadInformation> threadInformationMap;
+
+
+    public BacktraceData() {
+
+    }
+
+    public BacktraceData(String uuid, String symbolication, long timestamp, String langVersion,
+                         String agentVersion, Map<String, String> attributes, String mainThread,
+                         String[] classifiers, BacktraceReport report, Map<String, Object> annotations,
+                         Map<String, SourceCode> sourceCode,
+                         Map<String, ThreadInformation> threadInformationMap) {
+        this.uuid = uuid;
+        this.symbolication = symbolication;
+        this.timestamp = timestamp;
+        this.langVersion = langVersion;
+        this.agentVersion = agentVersion;
+        this.attributes = attributes;
+        this.mainThread = mainThread;
+        this.report = report;
+        this.classifiers = classifiers;
+        this.annotations = annotations;
+        this.sourceCode = sourceCode;
+        this.threadInformationMap = threadInformationMap;
+    }
+
+    /**
+     * Get absolute paths to report attachments
+     *
+     * @return paths to attachments
+     */
+    public List<String> getAttachmentPaths() {
+        return report.attachmentPaths;
+    }
+
+    public Map<String, ThreadInformation> getThreadInformationMap() {
+        return threadInformationMap;
+    }
+
+
     public String getUuid() {
         return uuid;
     }
@@ -149,53 +198,6 @@ public class BacktraceData {
         return report;
     }
 
-    /**
-     * Current BacktraceReport
-     */
-    public transient BacktraceReport report; // Think if we need it
-
-    /**
-     * Application thread details
-     */
-    @SerializedName("threads")
-    Map<String, ThreadInformation> threadInformationMap;
-
-
-    public BacktraceData() {
-
-    }
-
-    public BacktraceData(String uuid, String symbolication, long timestamp, String langVersion,
-                         String agentVersion, Map<String, String> attributes, String mainThread,
-                         String[] classifiers, BacktraceReport report, Map<String, Object> annotations,
-                         Map<String, SourceCode> sourceCode,
-                         Map<String, ThreadInformation> threadInformationMap) {
-        this.uuid = uuid;
-        this.symbolication = symbolication;
-        this.timestamp = timestamp;
-        this.langVersion = langVersion;
-        this.agentVersion = agentVersion;
-        this.attributes = attributes;
-        this.mainThread = mainThread;
-        this.report = report;
-        this.classifiers = classifiers;
-        this.annotations = annotations;
-        this.sourceCode = sourceCode;
-        this.threadInformationMap = threadInformationMap;
-    }
-
-    /**
-     * Get absolute paths to report attachments
-     *
-     * @return paths to attachments
-     */
-    public List<String> getAttachmentPaths() {
-        return report.attachmentPaths;
-    }
-
-    public Map<String, ThreadInformation> getThreadInformationMap() {
-        return threadInformationMap;
-    }
 
     public static class Builder {
         private final BacktraceReport report;
