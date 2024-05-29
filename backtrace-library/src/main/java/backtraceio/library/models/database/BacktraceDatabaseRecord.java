@@ -37,7 +37,7 @@ public class BacktraceDatabaseRecord {
     /**
      * record writer
      */
-    private transient DatabaseRecordWriter recordWriter;
+    private final transient DatabaseRecordWriter recordWriter;
 
 
     /**
@@ -68,13 +68,6 @@ public class BacktraceDatabaseRecord {
      * Stored record
      */
     private transient BacktraceData record;
-
-//    public BacktraceDatabaseRecord() {
-//        this.path = "";
-//        this.recordPath = String.format("%s-record.json", this.id);
-//        this.diagnosticDataPath = String.format("%s-attachment", this.id);
-//    }
-
     public BacktraceDatabaseRecord(BacktraceData data, String path) {
         this.id = UUID.fromString(data.uuid);
         this.record = data;
@@ -133,8 +126,6 @@ public class BacktraceDatabaseRecord {
 
     /**
      * Get valid BacktraceData from current record
-     *
-     * @param context
      * @return valid BacktraceData object
      */
     public BacktraceData getBacktraceData() { // TODO: check if we still need it
