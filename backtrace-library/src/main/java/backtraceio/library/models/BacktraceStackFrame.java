@@ -62,7 +62,7 @@ public class BacktraceStackFrame {
 
     public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line) {
         this.functionName = functionName;
-        this.sourceCodeFileName = sourceCodeFileName; // why
+        this.sourceCodeFileName = sourceCodeFileName;
         this.sourceCode = UUID.randomUUID().toString();
         this.line = line;
     }
