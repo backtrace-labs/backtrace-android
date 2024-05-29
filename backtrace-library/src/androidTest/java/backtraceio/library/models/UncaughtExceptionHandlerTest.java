@@ -87,12 +87,12 @@ public class UncaughtExceptionHandlerTest {
         // THEN
         assertNotNull(testedAtomicReportData);
         final BacktraceData testedReportData = testedAtomicReportData.get();
-        assertEquals("Test message", testedReportdata.getReport().exception.getMessage());
-        assertNull(testedReportdata.getReport().message);
-        assertTrue(testedReportdata.getReport().diagnosticStack.size() > 0);
-        assertEquals("java.lang.IllegalArgumentException", testedReportdata.getReport().classifier);
-        assertEquals("Unhandled Exception", testedReportdata.getReport().attributes.get("error.type"));
-        assertTrue(testedReportdata.getReport().exceptionTypeReport);
+        assertEquals("Test message", testedReportData.getReport().exception.getMessage());
+        assertNull(testedReportData.getReport().message);
+        assertTrue(testedReportData.getReport().diagnosticStack.size() > 0);
+        assertEquals("java.lang.IllegalArgumentException", testedReportData.getReport().classifier);
+        assertEquals("Unhandled Exception", testedReportData.getReport().attributes.get("error.type"));
+        assertTrue(testedReportData.getReport().exceptionTypeReport);
     }
 
     @Test
@@ -125,10 +125,10 @@ public class UncaughtExceptionHandlerTest {
         // THEN
         assertNotNull(testedAtomicReportData);
         final BacktraceData testedReportData = testedAtomicReportData.get();
-        assertNull(testedReportdata.getReport().message);
-        assertTrue(testedReportdata.getReport().diagnosticStack.size() > 0);
-        assertEquals("java.lang.OutOfMemoryError", testedReportdata.getReport().classifier);
-        assertEquals("Unhandled Exception", testedReportdata.getReport().attributes.get("error.type"));
-        assertTrue(testedReportdata.getReport().exceptionTypeReport);
+        assertNull(testedReportData.getReport().message);
+        assertTrue(testedReportData.getReport().diagnosticStack.size() > 0);
+        assertEquals("java.lang.OutOfMemoryError", testedReportData.getReport().classifier);
+        assertEquals("Unhandled Exception", testedReportData.getReport().attributes.get("error.type"));
+        assertTrue(testedReportData.getReport().exceptionTypeReport);
     }
 }

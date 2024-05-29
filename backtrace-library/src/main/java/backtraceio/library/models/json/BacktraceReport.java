@@ -2,8 +2,6 @@ package backtraceio.library.models.json;
 
 import android.content.Context;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +64,6 @@ public class BacktraceReport {
     /**
      * Current report exception stack
      */
-    @SerializedName("diagnostic-stack")
     public List<BacktraceStackFrame> diagnosticStack;
 
     /**
