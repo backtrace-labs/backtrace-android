@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.BacktraceTimeHelper;
+import backtraceio.library.common.CollectionUtils;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
@@ -175,9 +176,8 @@ public class BacktraceReport {
             Map<String, Object> attributes,
             List<String> attachmentPaths) {
 
-        this.attributes = attributes == null ? new HashMap<String, Object>() {
-        } : attributes;
-        this.attachmentPaths = attachmentPaths == null ? new ArrayList<String>() : attachmentPaths;
+        this.attributes = CollectionUtils.copyMap(attributes);
+        this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
         this.exception = this.prepareException(exception);
         this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();

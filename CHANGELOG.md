@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.8.2
+
+- Improve handling of immutable collections (attributes and attachments) in BacktraceBase and BacktraceReport
+
 ## Version 3.8.1
 
 - Bugfix for initialization BacktraceMetrics with custom server
