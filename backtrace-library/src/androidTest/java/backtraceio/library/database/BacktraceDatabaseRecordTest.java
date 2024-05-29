@@ -96,7 +96,7 @@ public class BacktraceDatabaseRecordTest {
         record.close();
 
         final BacktraceData loadedData = record.getBacktraceData();
-        final List<String> existingFiles = BacktraceDataAttachmentsFileHelper.getExistingFiles(context, loadedData);
+        final List<String> existingFiles = BacktraceDataAttachmentsFileHelper.getValidAttachments(context, loadedData);
         // THEN
         assertTrue(saveResult);
         assertTrue(validResult);

@@ -8,7 +8,7 @@ import backtraceio.library.common.FileHelper;
 
 public class BacktraceDataAttachmentsFileHelper {
 
-    public static List<String> getExistingFiles (Context context, BacktraceData backtraceData) { // TODO: fix name
+    public static List<String> getValidAttachments(Context context, BacktraceData backtraceData) { // TODO: fix name
         return FileHelper.filterOutFiles(context, backtraceData.getAttachmentPaths());
     }
 }
