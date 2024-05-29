@@ -17,9 +17,6 @@ import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
 
-
-// TODO: replace direct access with getters
-
 /**
  * Serializable Backtrace API data object
  */
