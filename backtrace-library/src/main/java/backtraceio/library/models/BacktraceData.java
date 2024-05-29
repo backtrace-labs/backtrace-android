@@ -97,6 +97,58 @@ public class BacktraceData {
     @SerializedName("sourceCode")
     public Map<String, SourceCode> sourceCode;
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public String getAgent() {
+        return agent;
+    }
+
+    public String getSymbolication() {
+        return symbolication;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getLangVersion() {
+        return langVersion;
+    }
+
+    public String getAgentVersion() {
+        return agentVersion;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public String getMainThread() {
+        return mainThread;
+    }
+
+    public String[] getClassifiers() {
+        return classifiers;
+    }
+
+    public Map<String, Object> getAnnotations() {
+        return annotations;
+    }
+
+    public Map<String, SourceCode> getSourceCode() {
+        return sourceCode;
+    }
+
+    public BacktraceReport getReport() {
+        return report;
+    }
+
     /**
      * Current BacktraceReport
      */
@@ -146,25 +198,25 @@ public class BacktraceData {
     }
 
     public static class Builder {
-        final BacktraceReport report;
+        private final BacktraceReport report;
 
-        final String symbolication;
+        private final String symbolication;
 
-        String uuid;
+        private String uuid;
 
-        long timestamp;
+        private long timestamp;
 
-        String[] classifiers;
+        private String[] classifiers;
 
-        String langVersion;
+        private String langVersion;
 
-        String agentVersion;
+        private String agentVersion;
 
-        Map<String, Object> annotations;
-        Map<String, SourceCode> sourceCode;
-        Map<String, ThreadInformation> threadInformationMap;
-        Map<String, String> attributes;
-        String mainThread;
+        private Map<String, Object> annotations;
+        private Map<String, SourceCode> sourceCode;
+        private Map<String, ThreadInformation> threadInformationMap;
+        private Map<String, String> attributes;
+        private String mainThread;
 
         public Builder(Context context, BacktraceReport report, Map<String, Object>
                 clientAttributes) {
@@ -181,7 +233,7 @@ public class BacktraceData {
         }
 
         public BacktraceData build() {
-            BacktraceData backtraceData = new BacktraceData(
+            return new BacktraceData(
                     this.uuid,
                     this.symbolication,
                     this.timestamp,
@@ -195,8 +247,6 @@ public class BacktraceData {
                     this.sourceCode,
                     this.threadInformationMap
             );
-
-            return backtraceData;
         }
 
         /**
@@ -224,7 +274,7 @@ public class BacktraceData {
             this.sourceCode = sourceCodeData.data.isEmpty() ? null : sourceCodeData.data;
         }
 
-        public void setAttributes(Context context, Map<String, Object> clientAttributes) {
+        private void setAttributes(Context context, Map<String, Object> clientAttributes) {
             BacktraceLogger.d(LOG_TAG, "Setting attributes");
             BacktraceAttributes backtraceAttributes = new BacktraceAttributes(
                     context,

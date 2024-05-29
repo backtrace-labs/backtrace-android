@@ -75,11 +75,11 @@ public class BacktraceClientSerializationTest {
             public BacktraceResult onRequest(BacktraceData data) {
                 String dataJson = BacktraceSerializeHelper.toJson(data);
                 assertNotNull(dataJson);
-                String reportJson = BacktraceSerializeHelper.toJson(data.report);
+                String reportJson = BacktraceSerializeHelper.toJson(data.getReport());
                 assertNotNull(reportJson);
 
 
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };

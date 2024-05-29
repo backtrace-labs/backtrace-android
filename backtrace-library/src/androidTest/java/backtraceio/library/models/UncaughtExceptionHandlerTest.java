@@ -68,7 +68,7 @@ public class UncaughtExceptionHandlerTest {
         client.setOnRequestHandler(data -> {
             testedAtomicReportData.set(data);
             waiter.resume();
-            return new BacktraceResult(data.report, data.report.message,
+            return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         });
 
@@ -87,12 +87,12 @@ public class UncaughtExceptionHandlerTest {
         // THEN
         assertNotNull(testedAtomicReportData);
         final BacktraceData testedReportData = testedAtomicReportData.get();
-        assertEquals("Test message", testedReportData.report.exception.getMessage());
-        assertNull(testedReportData.report.message);
-        assertTrue(testedReportData.report.diagnosticStack.size() > 0);
-        assertEquals("java.lang.IllegalArgumentException", testedReportData.report.classifier);
-        assertEquals("Unhandled Exception", testedReportData.report.attributes.get("error.type"));
-        assertTrue(testedReportData.report.exceptionTypeReport);
+        assertEquals("Test message", testedReportdata.getReport().exception.getMessage());
+        assertNull(testedReportdata.getReport().message);
+        assertTrue(testedReportdata.getReport().diagnosticStack.size() > 0);
+        assertEquals("java.lang.IllegalArgumentException", testedReportdata.getReport().classifier);
+        assertEquals("Unhandled Exception", testedReportdata.getReport().attributes.get("error.type"));
+        assertTrue(testedReportdata.getReport().exceptionTypeReport);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class UncaughtExceptionHandlerTest {
         client.setOnRequestHandler(data -> {
             testedAtomicReportData.set(data);
             waiter.resume();
-            return new BacktraceResult(data.report, data.report.message,
+            return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         });
 
@@ -125,10 +125,10 @@ public class UncaughtExceptionHandlerTest {
         // THEN
         assertNotNull(testedAtomicReportData);
         final BacktraceData testedReportData = testedAtomicReportData.get();
-        assertNull(testedReportData.report.message);
-        assertTrue(testedReportData.report.diagnosticStack.size() > 0);
-        assertEquals("java.lang.OutOfMemoryError", testedReportData.report.classifier);
-        assertEquals("Unhandled Exception", testedReportData.report.attributes.get("error.type"));
-        assertTrue(testedReportData.report.exceptionTypeReport);
+        assertNull(testedReportdata.getReport().message);
+        assertTrue(testedReportdata.getReport().diagnosticStack.size() > 0);
+        assertEquals("java.lang.OutOfMemoryError", testedReportdata.getReport().classifier);
+        assertEquals("Unhandled Exception", testedReportdata.getReport().attributes.get("error.type"));
+        assertTrue(testedReportdata.getReport().exceptionTypeReport);
     }
 }

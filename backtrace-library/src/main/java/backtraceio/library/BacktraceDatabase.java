@@ -317,7 +317,7 @@ public class BacktraceDatabase implements Database {
                 while (record != null) {
                     final CountDownLatch threadWaiter = new CountDownLatch(1);
                     BacktraceData backtraceData = record.getBacktraceData();
-                    if (backtraceData == null || backtraceData.report == null) {
+                    if (backtraceData == null || backtracedata.getReport() == null) {
                         BacktraceLogger.d(LOG_TAG, "Timer - backtrace data or report is null - " +
                                 "deleting record");
                         delete(record);

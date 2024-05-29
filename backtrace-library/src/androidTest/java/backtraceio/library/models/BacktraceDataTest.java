@@ -38,7 +38,7 @@ public class BacktraceDataTest {
 
         // THEN
         assertArrayEquals(backtraceData.classifiers, new String[]{"java.lang.IllegalAccessException"});
-        assertEquals(backtraceData.report, report);
+        assertEquals(backtracedata.getReport(), report);
         assertEquals(backtraceData.attributes.get("classifier"), "java.lang.IllegalAccessException");
         assertEquals(backtraceData.agent, "backtrace-android");
         assertEquals(backtraceData.agentVersion, "3.8.0-6-6b6db45-backtrace-data-refactor");

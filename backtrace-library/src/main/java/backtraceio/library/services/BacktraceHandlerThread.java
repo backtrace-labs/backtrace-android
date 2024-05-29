@@ -95,7 +95,7 @@ public class BacktraceHandlerThread extends HandlerThread {
                 BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
                 String json = BacktraceSerializeHelper.toJson(mInput.data);
                 List<String> attachments = BacktraceDataAttachmentsFileHelper.getExistingFiles(this.context, mInput.data);
-                result = BacktraceReportSender.sendReport(url, json, attachments, mInput.data.report,
+                result = BacktraceReportSender.sendReport(url, json, attachments, mInput.data.getReport(),
                         mInput.serverErrorEventListener);
             }
 

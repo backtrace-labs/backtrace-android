@@ -55,7 +55,7 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(null, data.report.exception.getMessage(),
+                return new BacktraceResult(null, data.getReport().exception.getMessage(),
                         BacktraceResultStatus.ServerError);
             }
         };
@@ -110,7 +110,7 @@ public class BacktraceClientSendTest {
                 fail(e.getMessage());
             }
 
-            return new BacktraceResult(data.report, data.report.message,
+            return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -136,7 +136,7 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.message,
+                return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
         };
@@ -171,7 +171,7 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.message,
+                return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
         };
@@ -209,7 +209,7 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -244,7 +244,7 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -287,7 +287,7 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };

@@ -66,7 +66,7 @@ public class BacktraceDatabaseRecordTest {
         // THEN
         assertTrue(saveResult);
         assertTrue(validResult);
-        assertEquals(data.report.message, loadedData.report.message);
+        assertEquals(data.getReport().message, loadeddata.getReport().message);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class BacktraceDatabaseRecordTest {
         // THEN
         assertTrue(saveResult);
         assertTrue(validResult);
-        assertEquals(data.report.message, loadedData.report.message);
+        assertEquals(data.getReport().message, loadeddata.getReport().message);
         assertTrue(existingFiles.contains(attachment0));
         assertTrue(existingFiles.contains(attachment1));
     }
@@ -174,6 +174,6 @@ public class BacktraceDatabaseRecordTest {
         final BacktraceData dataFromFile = recordFromFile.getBacktraceData();
 
         // THEN
-        assertEquals(data.report.message, dataFromFile.report.message);
+        assertEquals(data.getReport().message, dataFromFile.report.message);
     }
 }

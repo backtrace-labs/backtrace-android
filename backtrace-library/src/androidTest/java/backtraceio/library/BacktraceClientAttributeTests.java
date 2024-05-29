@@ -136,7 +136,7 @@ public class BacktraceClientAttributeTests {
             Object value = data.attributes.get(attributeKey);
             assertNotNull(value);
             assertEquals(value, attributeValue);
-            return new BacktraceResult(data.report, data.report.exception.getMessage(),
+            return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                     BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);
