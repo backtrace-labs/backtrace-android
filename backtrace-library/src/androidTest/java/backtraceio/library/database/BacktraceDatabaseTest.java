@@ -125,7 +125,7 @@ public class BacktraceDatabaseTest {
         final BacktraceData dataFromDatabase = record.getBacktraceData();
 
         // THEN
-        assertEquals(value, dataFromDatabase.attributes.get(key));
+        assertEquals(value, dataFromDatabase.getAttributes().get(key));
     }
 
     @Test

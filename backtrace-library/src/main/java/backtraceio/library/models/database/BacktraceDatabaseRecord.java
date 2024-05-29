@@ -69,7 +69,7 @@ public class BacktraceDatabaseRecord {
      */
     private transient BacktraceData record;
     public BacktraceDatabaseRecord(BacktraceData data, String path) {
-        this.id = UUID.fromString(data.uuid);
+        this.id = UUID.fromString(data.getUuid());
         this.record = data;
         this.path = path;
         this.recordWriter = new BacktraceDatabaseRecordWriter(path);

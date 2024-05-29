@@ -37,20 +37,20 @@ public class BacktraceDataTest {
         BacktraceData backtraceData = new BacktraceData.Builder(context, report, new HashMap<>()).build();
 
         // THEN
-        assertArrayEquals(backtraceData.classifiers, new String[]{"java.lang.IllegalAccessException"});
-        assertEquals(backtracedata.getReport(), report);
-        assertEquals(backtraceData.attributes.get("classifier"), "java.lang.IllegalAccessException");
-        assertEquals(backtraceData.agent, "backtrace-android");
-        assertEquals(backtraceData.agentVersion, "3.8.0-6-6b6db45-backtrace-data-refactor");
-        assertEquals(backtraceData.lang, "java");
-        assertEquals(backtraceData.langVersion, "0");
-        assertEquals(backtraceData.symbolication, "");
-        assertEquals(backtraceData.timestamp, report.timestamp);
-        assertEquals(backtraceData.uuid, report.uuid.toString());
-        assertEquals(backtraceData.attributes.size(), 40);
-        assertEquals(backtraceData.annotations.size(), 3);
-        assertEquals(backtraceData.mainThread, "instr: androidx.test.runner.androidjunitrunner");
-        assertEquals(backtraceData.sourceCode.size(), 34);
+        assertArrayEquals(backtraceData.getClassifiers(), new String[]{"java.lang.IllegalAccessException"});
+        assertEquals(backtraceData.getReport(), report);
+        assertEquals(backtraceData.getAttributes().get("classifier"), "java.lang.IllegalAccessException");
+        assertEquals(backtraceData.getAgent(), "backtrace-android");
+        assertEquals(backtraceData.getAgentVersion(), "3.8.0-6-6b6db45-backtrace-data-refactor");
+        assertEquals(backtraceData.getLang(), "java");
+        assertEquals(backtraceData.getLangVersion(), "0");
+        assertEquals(backtraceData.getSymbolication(), "");
+        assertEquals(backtraceData.getTimestamp(), report.timestamp);
+        assertEquals(backtraceData.getUuid(), report.uuid.toString());
+        assertEquals(backtraceData.getAttributes().size(), 40);
+        assertEquals(backtraceData.getAnnotations().size(), 3);
+        assertEquals(backtraceData.getMainThread(), "instr: androidx.test.runner.androidjunitrunner");
+        assertEquals(backtraceData.getSourceCode().size(), 34);
         assertEquals(backtraceData.getThreadInformationMap().size(), 13);
         assertEquals(backtraceData.getAttachmentPaths().size(), 2);
     }

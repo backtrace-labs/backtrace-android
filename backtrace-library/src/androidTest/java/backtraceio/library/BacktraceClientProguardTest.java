@@ -58,7 +58,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertEquals("proguard", data.symbolication);
+                assertEquals("proguard", data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
@@ -97,7 +97,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertNull(data.symbolication);
+                assertNull(data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
@@ -138,7 +138,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertEquals("proguard", data.symbolication);
+                assertEquals("proguard", data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -180,7 +180,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertNull(data.symbolication);
+                assertNull(data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -224,7 +224,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertEquals("proguard", data.symbolication);
+                assertEquals("proguard", data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -266,7 +266,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertNull(data.symbolication);
+                assertNull(data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
@@ -309,7 +309,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertEquals("proguard", data.symbolication);
+                assertEquals("proguard", data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
@@ -351,7 +351,7 @@ public class BacktraceClientProguardTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                assertNull(data.symbolication);
+                assertNull(data.getSymbolication());
                 return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }

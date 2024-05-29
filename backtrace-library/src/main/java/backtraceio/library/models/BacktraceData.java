@@ -107,11 +107,8 @@ public class BacktraceData {
      */
     @SerializedName("threads")
     Map<String, ThreadInformation> threadInformationMap;
-
-
-    public BacktraceData() {
-
-    }
+    
+    public BacktraceData() { }
 
     public BacktraceData(String uuid, String symbolication, long timestamp, String langVersion,
                          String agentVersion, Map<String, String> attributes, String mainThread,
