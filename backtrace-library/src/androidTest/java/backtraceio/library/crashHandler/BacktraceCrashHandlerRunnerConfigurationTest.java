@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 
@@ -31,7 +30,7 @@ public class BacktraceCrashHandlerRunnerConfigurationTest {
     public void supportedAbiVersion() {
         CrashHandlerConfiguration crashHandlerConfiguration = new CrashHandlerConfiguration();
         for (String unsupportedAbi :
-                new String[]{"armeabi", "arm64", "arm64-v8"}) {
+                new String[]{"armeabi", "arm64", "arm64-v8", "x86-64"}) {
             assertTrue(crashHandlerConfiguration.isSupportedAbi(unsupportedAbi));
         }
     }
@@ -43,15 +42,13 @@ public class BacktraceCrashHandlerRunnerConfigurationTest {
         String fakePathToLib = "fake/path/to/lib/arm64";
         String fakeAbi = "fake-abi";
         List<String> environmentVariables = crashHandlerConfiguration.getCrashHandlerEnvironmentVariables(fakePathToApk, fakePathToLib, fakeAbi);
-
-        Optional<String> crashHandlerEnv = environmentVariables.stream()
-                .filter(n -> n.startsWith(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER))
-                .findFirst();
-
-        if (!crashHandlerEnv.isPresent()) {
-            fail("Backtrace crash handler env variable is not present");
+        for (String envVariable : environmentVariables) {
+            if (envVariable.startsWith(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER)) {
+                assertEquals(envVariable, String.format("%s=%s!/lib/%s/libbacktrace-native.so", CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, fakePathToApk, fakeAbi));
+                return;
+            }
         }
-        assertEquals(crashHandlerEnv.get(), String.format("%s=%s!/lib/%s/libbacktrace-native.so", CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, fakePathToApk, fakeAbi));
+        fail("Cannot find Backtrace Crash Handler environment variable");
     }
 
     @Test

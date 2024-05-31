@@ -17,7 +17,7 @@ import backtraceio.library.services.BacktraceCrashHandlerRunner;
 public class CrashHandlerConfiguration {
 
     public static final String BACKTRACE_CRASH_HANDLER = "BACKTRACE_CRASH_HANDLER";
-    public static final Set<String> UNSUPPORTED_ABIS = new HashSet<String>(Arrays.asList(new String[]{"x86", "x86_64"}));
+    public static final Set<String> UNSUPPORTED_ABIS = new HashSet<String>(Arrays.asList(new String[]{"x86"}));
     private static final String CRASHPAD_DIRECTORY_PATH = "/crashpad";
 
 
