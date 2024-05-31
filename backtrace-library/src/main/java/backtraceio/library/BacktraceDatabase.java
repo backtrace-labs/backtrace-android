@@ -177,9 +177,9 @@ public class BacktraceDatabase implements Database {
             return false;
         }
 
-        if (!this.crashHandlerConfiguration.isSupportedAbi()) {
-            return false;
-        }
+//        if (!this.crashHandlerConfiguration.isSupportedAbi()) {
+//            return false;
+//        }
 
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
         if (minidumpSubmissionUrl == null) {
@@ -435,7 +435,7 @@ public class BacktraceDatabase implements Database {
             return;
         }
 
-        if (record == null){
+        if (record == null) {
             return;
         }
         this.backtraceDatabaseContext.delete(record);
