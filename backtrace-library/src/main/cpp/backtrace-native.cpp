@@ -72,7 +72,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     javaVm = jvm;
 
     char thread_id_cstr[25];
-    sprintf(thread_id_cstr, "%jd", (intmax_t) gettid());
+    sprintf(thread_id_cstr, "%jd", (intmax_t)gettid());
     thread_id = std::string(thread_id_cstr);
     return JNI_VERSION_1_4;
 }
