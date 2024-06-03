@@ -126,12 +126,6 @@ bool InitializeCrashpad(jstring url,
         }
     }
 
-    std::map<std::string, std::string> attributes = generateInitializationAttributes(env,
-                                                                                     attributeKeys,
-                                                                                     attributeValues);
-
-    std::vector<std::string> arguments = generateInitializationArguments(env, attachmentPaths);
-
     // Backtrace url
     const char *backtraceUrl = env->GetStringUTFChars(url, 0);
 
@@ -149,6 +143,12 @@ bool InitializeCrashpad(jstring url,
 
     // Start crash handler
     client = new crashpad::CrashpadClient();
+
+    std::map<std::string, std::string> attributes = generateInitializationAttributes(env,
+                                                                                     attributeKeys,
+                                                                                     attributeValues);
+
+    std::vector<std::string> arguments = generateInitializationArguments(env, attachmentPaths);
 
     std::map<std::string, std::string>::iterator guidIterator = attributes.find("guid");
     if (guidIterator != attributes.end()) {
