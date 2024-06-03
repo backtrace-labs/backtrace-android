@@ -12,6 +12,86 @@ extern std::atomic_bool disabled;
 static crashpad::CrashpadClient *client;
 static std::unique_ptr<crashpad::CrashReportDatabase> database;
 
+std::vector<std::string>
+generateInitializationArguments(JNIEnv *env, jobjectArray attachmentPaths) {
+    std::vector<std::string> arguments;
+    arguments.push_back("--no-rate-limit");
+
+    // paths to file attachments
+    if (attachmentPaths == nullptr) {
+        return arguments;
+    }
+    jint attachmentsLength = env->GetArrayLength(attachmentPaths);
+    for (int attachmentIndex = 0; attachmentIndex < attachmentsLength; ++attachmentIndex) {
+        jstring jstringAttachmentPath = (jstring) env->GetObjectArrayElement(
+                attachmentPaths,
+                attachmentIndex);
+        jboolean isCopy;
+        const char *convertedAttachmentPath = (env)->GetStringUTFChars(
+                jstringAttachmentPath, &isCopy);
+
+        if (!convertedAttachmentPath)
+            continue;
+
+        std::string attachmentBaseName = basename(convertedAttachmentPath);
+
+        std::string attachmentArgumentString("--attachment=");
+        attachmentArgumentString += convertedAttachmentPath;
+        arguments.push_back(attachmentArgumentString);
+
+        env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
+        env->DeleteLocalRef(jstringAttachmentPath);
+    }
+
+
+    return arguments;
+
+}
+
+std::map<std::string, std::string> generateInitializationAttributes(JNIEnv *env,
+                                                                    jobjectArray attributeKeys,
+                                                                    jobjectArray attributeValues) {
+    std::map<std::string, std::string> attributes;
+    attributes["format"] = "minidump";
+    if (!thread_id.empty()) {
+        attributes["thread.main"] = thread_id;
+    }
+
+    // Get lengths of the Java arrays
+    jint keyLength = env->GetArrayLength(attributeKeys);
+    jint valueLength = env->GetArrayLength(attributeValues);
+    // Ensure the key and value arrays have the same length
+    if (keyLength != valueLength) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Attribute array length doesn't match. Attributes won't be available in the Crashpad integration");
+        return attributes;
+    }
+
+
+    for (int attributeIndex = 0; attributeIndex < keyLength; ++attributeIndex) {
+        jstring jstringKey = (jstring) env->GetObjectArrayElement(attributeKeys,
+                                                                  attributeIndex);
+        jboolean isCopy;
+        const char *convertedKey = (env)->GetStringUTFChars(jstringKey, &isCopy);
+
+        jstring stringValue = (jstring) env->GetObjectArrayElement(attributeValues,
+                                                                   attributeIndex);
+        const char *convertedValue = (env)->GetStringUTFChars(stringValue, &isCopy);
+
+        if (convertedKey && convertedValue) {
+            attributes[convertedKey] = convertedValue;
+
+            env->ReleaseStringUTFChars(jstringKey, convertedKey);
+            env->ReleaseStringUTFChars(stringValue, convertedValue);
+        }
+
+        env->DeleteLocalRef(jstringKey);
+        env->DeleteLocalRef(stringValue);
+    }
+
+    return attributes;
+}
+
 bool InitializeCrashpad(jstring url,
                         jstring database_path,
                         jstring handler_path,
@@ -19,11 +99,11 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attributeValues,
                         jobjectArray attachmentPaths,
                         jboolean enableClientSideUnwinding,
-                        jint unwindingMode,
-                        jobjectArray environmentVariables) {
+                        jint unwindingMode) {
     // avoid multi initialization
     if (initialized) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad is already initialized");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Crashpad is already initialized");
         return true;
     }
 
@@ -41,45 +121,16 @@ bool InitializeCrashpad(jstring url,
     if (enableClientSideUnwinding) {
         bool success = EnableClientSideUnwinding(env, filePath, unwindingMode);
         if (!success) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot enable client side unwinding");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Cannot enable client side unwinding");
         }
     }
 
-    std::map<std::string, std::string> attributes;
-    attributes["format"] = "minidump";
-    // save native main thread id
-    if(!thread_id.empty()) {
-        attributes["thread.main"] = thread_id;
-    }
+    std::map<std::string, std::string> attributes = generateInitializationAttributes(env,
+                                                                                     attributeKeys,
+                                                                                     attributeValues);
 
-    jint keyLength = env->GetArrayLength(attributeKeys);
-    jint valueLength = env->GetArrayLength(attributeValues);
-    if (keyLength == valueLength) {
-        for (int attributeIndex = 0; attributeIndex < keyLength; ++attributeIndex) {
-            jstring jstringKey = (jstring) env->GetObjectArrayElement(attributeKeys,
-                                                                      attributeIndex);
-            jboolean isCopy;
-            const char *convertedKey = (env)->GetStringUTFChars(jstringKey, &isCopy);
-
-            jstring stringValue = (jstring) env->GetObjectArrayElement(attributeValues,
-                                                                       attributeIndex);
-            const char *convertedValue = (env)->GetStringUTFChars(stringValue, &isCopy);
-
-            if (!convertedKey || !convertedValue)
-                continue;
-
-            attributes[convertedKey] = convertedValue;
-
-            env->ReleaseStringUTFChars(jstringKey, convertedKey);
-            env->ReleaseStringUTFChars(stringValue, convertedValue);
-        }
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                            "Attribute array length doesn't match. Attributes won't be available in the Crashpad integration");
-    }
-
-    std::vector<std::string> arguments;
-    arguments.push_back("--no-rate-limit");
+    std::vector<std::string> arguments = generateInitializationArguments(env, attachmentPaths);
 
     // Backtrace url
     const char *backtraceUrl = env->GetStringUTFChars(url, 0);
@@ -87,30 +138,6 @@ bool InitializeCrashpad(jstring url,
     // path to crash handler executable
     const char *handlerPath = env->GetStringUTFChars(handler_path, 0);
     base::FilePath handler(handlerPath);
-
-    // paths to file attachments
-    if (attachmentPaths != nullptr) {
-        jint attachmentsLength = env->GetArrayLength(attachmentPaths);
-        for (int attachmentIndex = 0; attachmentIndex < attachmentsLength; ++attachmentIndex) {
-            jstring jstringAttachmentPath = (jstring) env->GetObjectArrayElement(
-                    attachmentPaths,
-                    attachmentIndex);
-            jboolean isCopy;
-            const char *convertedAttachmentPath = (env)->GetStringUTFChars(
-                    jstringAttachmentPath, &isCopy);
-
-            if (!convertedAttachmentPath)
-                continue;
-
-            std::string attachmentBaseName = basename(convertedAttachmentPath);
-
-            std::string attachmentArgumentString("--attachment=");
-            attachmentArgumentString += convertedAttachmentPath;
-            arguments.push_back(attachmentArgumentString);
-
-            env->ReleaseStringUTFChars(jstringAttachmentPath, convertedAttachmentPath);
-        }
-    }
 
     database = crashpad::CrashReportDatabase::Initialize(db);
     if (database == nullptr || database->GetSettings() == NULL) {
@@ -124,11 +151,83 @@ bool InitializeCrashpad(jstring url,
     client = new crashpad::CrashpadClient();
 
     std::map<std::string, std::string>::iterator guidIterator = attributes.find("guid");
-    if(guidIterator != attributes.end()) {
+    if (guidIterator != attributes.end()) {
+        client->OverrideGuid(guidIterator->second);
+    }
+
+    initialized = client->StartHandlerAtCrash(handler, db, db, backtraceUrl, attributes,
+                                              arguments);
+
+    env->ReleaseStringUTFChars(url, backtraceUrl);
+    env->ReleaseStringUTFChars(handler_path, handlerPath);
+    env->ReleaseStringUTFChars(database_path, filePath);
+
+    if (enableClientSideUnwinding) {
+        SetCrashpadHandlerForClientSideUnwinding();
+    }
+
+    return initialized;
+}
+
+
+bool InitializeCrashpadJavaCrashHandler(jstring url,
+                                        jstring database_path,
+                                        jstring class_path,
+                                        jobjectArray attributeKeys,
+                                        jobjectArray attributeValues,
+                                        jobjectArray attachmentPaths,
+                                        jobjectArray environmentVariables) {
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "InitializeCrashpadJavaCrashHandler");
+    // avoid multi initialization
+    if (initialized) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Crashpad is already initialized");
+        return true;
+    }
+
+    JNIEnv *env = GetJniEnv();
+    if (env == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
+        return false;
+    }
+
+
+    // path to crashpad database
+    const char *filePath = env->GetStringUTFChars(database_path, 0);
+
+    // Backtrace url
+    const char *backtraceUrl = env->GetStringUTFChars(url, 0);
+
+    // path to crash handler executable
+    const char *classPath = env->GetStringUTFChars(class_path, 0);
+    base::FilePath db(filePath);
+
+    database = crashpad::CrashReportDatabase::Initialize(db);
+    if (database == nullptr || database->GetSettings() == NULL) {
+        return false;
+    }
+
+    // Enable automated uploads.
+    database->GetSettings()->SetUploadsEnabled(true);
+
+    // Start crash handler
+    client = new crashpad::CrashpadClient();
+
+    std::map<std::string, std::string> attributes = generateInitializationAttributes(env,
+                                                                                     attributeKeys,
+                                                                                     attributeValues);
+
+    std::vector<std::string> arguments = generateInitializationArguments(env, attachmentPaths);
+
+
+    std::map<std::string, std::string>::iterator guidIterator = attributes.find("guid");
+    if (guidIterator != attributes.end()) {
         client->OverrideGuid(guidIterator->second);
     }
 
     base::FilePath metrics_directory;
+
 
     std::vector<std::string> *handlerEnvVariables = nullptr;
     if (environmentVariables != nullptr) {
@@ -143,20 +242,17 @@ bool InitializeCrashpad(jstring url,
     }
 
 
-    initialized = client->StartJavaHandlerAtCrash(handlerPath, handlerEnvVariables, db,
+    initialized = client->StartJavaHandlerAtCrash(classPath, handlerEnvVariables, db,
                                                   metrics_directory, backtraceUrl, attributes,
                                                   arguments);
 
     env->ReleaseStringUTFChars(url, backtraceUrl);
-    env->ReleaseStringUTFChars(handler_path, handlerPath);
+    env->ReleaseStringUTFChars(class_path, classPath);
     env->ReleaseStringUTFChars(database_path, filePath);
-
-//    if (enableClientSideUnwinding) {
-//        SetCrashpadHandlerForClientSideUnwinding();
-//    }
 
     return initialized;
 }
+
 
 bool CaptureCrashCrashpad(jobjectArray args) {
     JNIEnv *env = GetJniEnv();
@@ -244,7 +340,8 @@ void AddAttributeCrashpad(jstring key, jstring value) {
 
 void DisableCrashpad() {
     if (database == nullptr) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Crashpad database is null, this should not happen");
         return;
     }
     // Disable automated uploads.
@@ -256,7 +353,8 @@ void ReEnableCrashpad() {
     // Re-enable uploads if disabled
     if (disabled) {
         if (database == nullptr) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Crashpad database is null, this should not happen");
             return;
         }
         database->GetSettings()->SetUploadsEnabled(true);

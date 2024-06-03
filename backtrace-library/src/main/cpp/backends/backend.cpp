@@ -11,7 +11,7 @@
 #endif
 
 extern std::atomic_bool initialized;
-
+static std::once_flag initialize_flag;
 extern "C" {
 bool Initialize(jstring url,
                 jstring database_path,
@@ -20,9 +20,8 @@ bool Initialize(jstring url,
                 jobjectArray attributeValues,
                 jobjectArray attachmentPaths,
                 jboolean enableClientSideUnwinding,
-                jint unwindingMode,
-                jobjectArray environmentVariables) {
-    static std::once_flag initialize_flag;
+                jint unwindingMode) {
+
 
     std::call_once(initialize_flag, [&] {
 #ifdef CRASHPAD_BACKEND
@@ -30,7 +29,7 @@ bool Initialize(jstring url,
                                          database_path, handler_path,
                                          attributeKeys, attributeValues,
                                          attachmentPaths, enableClientSideUnwinding,
-                                         unwindingMode, environmentVariables);
+                                         unwindingMode);
 #elif BREAKPAD_BACKEND
         initialized = InitializeBreakpad(url,
                                          database_path, handler_path,
@@ -50,6 +49,28 @@ bool Initialize(jstring url,
     }
 #endif
 
+    return initialized;
+}
+
+bool InitializeJavaCrashHandler(jstring url,
+                                jstring database_path,
+                                jstring class_path,
+                                jobjectArray attributeKeys,
+                                jobjectArray attributeValues,
+                                jobjectArray attachmentPaths,
+                                jobjectArray environmentVariables) {
+    std::call_once(initialize_flag, [&] {
+#ifdef CRASHPAD_BACKEND
+        initialized = InitializeCrashpadJavaCrashHandler(url,
+                                             database_path, class_path,
+                                             attributeKeys, attributeValues,
+                                             attachmentPaths, environmentVariables);
+#else
+        initialized = false;
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "No support for Java Crash handler");
+#endif
+    });
     return initialized;
 }
 

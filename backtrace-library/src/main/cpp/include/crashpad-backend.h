@@ -18,8 +18,15 @@ bool InitializeCrashpad(jstring url,
                         jobjectArray attributeValues,
                         jobjectArray attachmentPaths = nullptr,
                         jboolean enableClientSideUnwinding = false,
-                        jint unwindingMode = UNWINDING_MODE_DEFAULT,
-                        jobjectArray environmentVariables = nullptr);
+                        jint unwindingMode = UNWINDING_MODE_DEFAULT);
+
+bool InitializeCrashpadJavaCrashHandler(jstring url,
+                                        jstring database_path,
+                                        jstring class_path,
+                                        jobjectArray attributeKeys,
+                                        jobjectArray attributeValues,
+                                        jobjectArray attachmentPaths = nullptr,
+                                        jobjectArray environmentVariables = nullptr);
 
 bool CaptureCrashCrashpad(jobjectArray args);
 

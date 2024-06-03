@@ -1,10 +1,10 @@
 package backtraceio.library;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,6 +22,7 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.DatabaseContext;
 import backtraceio.library.interfaces.DatabaseFileContext;
+import backtraceio.library.interfaces.NativeCommunication;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
@@ -32,6 +33,7 @@ import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.nativeCalls.BacktraceCrashHandlerWrapper;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
 
@@ -54,6 +56,7 @@ public class BacktraceDatabase implements Database {
     private CrashHandlerConfiguration crashHandlerConfiguration;
 
     private boolean _enabledNativeIntegration = false;
+    private NativeCommunication nativeCommunication = new BacktraceCrashHandlerWrapper();
 
     /**
      * Add attributes to native reports
@@ -62,24 +65,6 @@ public class BacktraceDatabase implements Database {
      * @param value attribute value
      */
     public native void addAttribute(String name, String value);
-
-    /**
-     * Initialize Backtrace-native integration
-     *
-     * @param url                       url to Backtrace
-     * @param databasePath              path to Backtrace-native database
-     * @param handlerPath               path to error handler
-     * @param attributeKeys             array of attribute keys
-     * @param attributeValues           array of attribute values
-     * @param attachmentPaths           array of paths to file attachments
-     * @param enableClientSideUnwinding enable client side unwinding
-     * @param unwindingMode             unwinding mode for client side unwinding to use
-     * @return true - if backtrace-native was able to initialize correctly, otherwise false.
-     */
-    private native boolean initialize(String url, String databasePath, String handlerPath,
-                                      String[] attributeKeys, String[] attributeValues,
-                                      String[] attachmentPaths, boolean enableClientSideUnwinding,
-                                      UnwindingMode unwindingMode, String[] environmentVariables);
 
     /**
      * Disable Backtrace-native integration
@@ -163,6 +148,13 @@ public class BacktraceDatabase implements Database {
     }
 
     /**
+     * Overrides default native communication bridge
+     */
+    public void useNativeCommunication(NativeCommunication nativeCommunication) {
+        this.nativeCommunication = nativeCommunication;
+    }
+
+    /**
      * Setup native crash handler
      *
      * @param client                    Backtrace client
@@ -188,7 +180,6 @@ public class BacktraceDatabase implements Database {
 
         // Create the crashpad directory if it doesn't exist
         String crashpadDatabaseDirectory = this.crashHandlerConfiguration.useCrashpadDirectory(getSettings().getDatabasePath());
-        List<String> environmentVariables = this.crashHandlerConfiguration.getCrashHandlerEnvironmentVariables(_applicationContext.getApplicationInfo());
 
         // setup default native attributes
         BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
@@ -207,17 +198,17 @@ public class BacktraceDatabase implements Database {
         }
         attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
 
-        _enabledNativeIntegration = initialize(
-                minidumpSubmissionUrl,
-                crashpadDatabaseDirectory,
-                this.crashHandlerConfiguration.getClassPath(),
-                keys,
-                values,
-                attachmentPaths,
-                enableClientSideUnwinding,
-                unwindingMode,
-                environmentVariables.toArray(new String[0])
-        );
+        ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
+
+        _enabledNativeIntegration =
+                nativeCommunication.initializeJavaCrashHandler(minidumpSubmissionUrl,
+                        crashpadDatabaseDirectory,
+                        this.crashHandlerConfiguration.getClassPath(),
+                        keys,
+                        values,
+                        attachmentPaths,
+                        this.crashHandlerConfiguration.getCrashHandlerEnvironmentVariables(applicationInfo).toArray(new String[0])
+                );
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
             this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
