@@ -12,8 +12,15 @@ bool Initialize(jstring url,
                 jobjectArray attributeValues,
                 jobjectArray attachmentPaths = nullptr,
                 jboolean enableClientSideUnwinding = false,
-                jint unwindingMode = UNWINDING_MODE_DEFAULT,
-                jobjectArray environmentVariables = nullptr);
+                jint unwindingMode = UNWINDING_MODE_DEFAULT);
+
+bool InitializeJavaCrashHandler(jstring url,
+                                jstring database_path,
+                                jstring class_path,
+                                jobjectArray attributeKeys,
+                                jobjectArray attributeValues,
+                                jobjectArray attachmentPaths = nullptr,
+                                jobjectArray environmentVariables = nullptr);
 
 bool CaptureCrash(jobjectArray args);
 
