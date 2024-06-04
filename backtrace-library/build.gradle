@@ -12,7 +12,7 @@ androidGitVersion {
 android {
 
     compileSdkVersion 33
-
+    namespace "backtraceio.library"
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
@@ -31,6 +31,9 @@ android {
         }
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+        buildFeatures {
+            buildConfig = true
         }
     }
 
@@ -57,7 +60,7 @@ android {
         }
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
-    
+
     // Needed until we migrate to AndroidX
     android {
         lintOptions {
@@ -77,6 +80,8 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'org.mockito:mockito-core:2.28.2'
+    androidTestImplementation "org.mockito:mockito-android:2.28.2"
 }
 
 apply from: 'publish.gradle'

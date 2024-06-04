@@ -109,6 +109,52 @@ Java_backtraceio_library_BacktraceDatabase_initialize(JNIEnv *env,
                       unwindingModeInt);
 }
 
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_nativeCalls_BacktraceCrashHandler_initializeCrashHandler(JNIEnv *env,
+                                                                                  jobject thiz,
+                                                                                  jstring url,
+                                                                                  jstring database_path,
+                                                                                  jstring handler_path,
+                                                                                  jobjectArray attribute_keys,
+                                                                                  jobjectArray attribute_values,
+                                                                                  jobjectArray attachment_paths,
+                                                                                  jboolean enable_client_side_unwinding,
+                                                                                  jobject unwinding_mode) {
+    return Java_backtraceio_library_BacktraceDatabase_initialize(env, thiz, url, database_path,
+                                                                 handler_path, attribute_keys,
+                                                                 attribute_values, attachment_paths,
+                                                                 enable_client_side_unwinding,
+                                                                 unwinding_mode);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_nativeCalls_BacktraceCrashHandler_initializeJavaCrashHandler(JNIEnv *env,
+                                                                                      jobject thiz,
+                                                                                      jstring url,
+                                                                                      jstring database_path,
+                                                                                      jstring class_path,
+                                                                                      jobjectArray attributeKeys,
+                                                                                      jobjectArray attributeValues,
+                                                                                      jobjectArray attachmentPaths = nullptr,
+                                                                                      jobjectArray environmentVariables = nullptr) {
+    return InitializeJavaCrashHandler(url, database_path, class_path, attributeKeys,
+                                      attributeValues, attachmentPaths, environmentVariables);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_BacktraceDatabase_initializeJavaCrashHandler(JNIEnv *env,
+                                                                      jobject thiz,
+                                                                      jstring url,
+                                                                      jstring database_path,
+                                                                      jstring class_path,
+                                                                      jobjectArray attributeKeys,
+                                                                      jobjectArray attributeValues,
+                                                                      jobjectArray attachmentPaths = nullptr,
+                                                                      jobjectArray environmentVariables = nullptr) {
+    return InitializeJavaCrashHandler(url, database_path, class_path, attributeKeys,
+                                      attributeValues, attachmentPaths, environmentVariables);
+}
+
 JNIEXPORT void JNICALL
 Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thiz,
                                                         jstring name, jstring value) {
@@ -135,4 +181,9 @@ Java_backtraceio_library_BacktraceDatabase_disable(JNIEnv *env, jobject thiz) {
     Disable();
 }
 
+JNIEXPORT jboolean JNICALL
+Java_backtraceio_library_nativeCalls_BacktraceCrashHandler_handleCrash(JNIEnv *env, jclass clazz,
+                                                                       jobjectArray args) {
+    return CaptureCrash(args);
+}
 }
