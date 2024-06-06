@@ -1,5 +1,12 @@
 # Backtrace Android Release Notes
 
+## Version 3.8.3
+- Updates native crash repeating to a new strategy. Starting now, we don't require to extract native executables.
+- Added a new native crash handler that allows to generate a crash dump by using Java class name
+- Update Gradle to 8.3.0
+- Update GSON to 2.10.1 in coroner-client
+- Optimize imports
+
 ## Version 3.8.2
 
 - Improve handling of immutable collections (attributes and attachments) in BacktraceBase and BacktraceReport
