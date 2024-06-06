@@ -11,7 +11,7 @@
 #endif
 
 extern std::atomic_bool initialized;
-
+static std::once_flag initialize_flag;
 extern "C" {
 bool Initialize(jstring url,
                 jstring database_path,
@@ -21,7 +21,7 @@ bool Initialize(jstring url,
                 jobjectArray attachmentPaths,
                 jboolean enableClientSideUnwinding,
                 jint unwindingMode) {
-    static std::once_flag initialize_flag;
+
 
     std::call_once(initialize_flag, [&] {
 #ifdef CRASHPAD_BACKEND
@@ -50,6 +50,40 @@ bool Initialize(jstring url,
 #endif
 
     return initialized;
+}
+
+bool InitializeJavaCrashHandler(jstring url,
+                                jstring database_path,
+                                jstring class_path,
+                                jobjectArray attributeKeys,
+                                jobjectArray attributeValues,
+                                jobjectArray attachmentPaths,
+                                jobjectArray environmentVariables) {
+    std::call_once(initialize_flag, [&] {
+#ifdef CRASHPAD_BACKEND
+        initialized = InitializeCrashpadJavaCrashHandler(url,
+                                             database_path, class_path,
+                                             attributeKeys, attributeValues,
+                                             attachmentPaths, environmentVariables);
+#else
+        initialized = false;
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "No support for Java Crash handler");
+#endif
+    });
+    return initialized;
+}
+
+bool CaptureCrash(jobjectArray args) {
+
+#ifdef CRASHPAD_BACKEND
+    return CaptureCrashCrashpad(args);
+#else
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "No native crash reporting backend defined");
+    return false;
+#endif
+
 }
 
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread) {

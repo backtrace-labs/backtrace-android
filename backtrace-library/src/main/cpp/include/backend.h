@@ -14,6 +14,16 @@ bool Initialize(jstring url,
                 jboolean enableClientSideUnwinding = false,
                 jint unwindingMode = UNWINDING_MODE_DEFAULT);
 
+bool InitializeJavaCrashHandler(jstring url,
+                                jstring database_path,
+                                jstring class_path,
+                                jobjectArray attributeKeys,
+                                jobjectArray attributeValues,
+                                jobjectArray attachmentPaths = nullptr,
+                                jobjectArray environmentVariables = nullptr);
+
+bool CaptureCrash(jobjectArray args);
+
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread);
 
 void AddAttribute(jstring key, jstring value);
