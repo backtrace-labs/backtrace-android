@@ -80,10 +80,10 @@ afterEvaluate { project ->
     publishing {
         publications {
             release(MavenPublication) {
+                from components.findByName('release')
                 groupId GROUP
                 artifactId POM_ARTIFACT_ID
                 version version
-                from components.release
             }
         }
 
