@@ -177,8 +177,7 @@ bool InitializeCrashpadJavaCrashHandler(jstring url,
                                         jobjectArray attributeValues,
                                         jobjectArray attachmentPaths,
                                         jobjectArray environmentVariables) {
-    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
-                        "InitializeCrashpadJavaCrashHandler");
+
     // avoid multi initialization
     if (initialized) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
@@ -340,7 +339,8 @@ void AddAttributeCrashpad(jstring key, jstring value) {
 
 void DisableCrashpad() {
     if (database == nullptr) {
-        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Crashpad database is null, this should not happen");
         return;
     }
     // Disable automated uploads.
@@ -352,7 +352,8 @@ void ReEnableCrashpad() {
     // Re-enable uploads if disabled
     if (disabled) {
         if (database == nullptr) {
-            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Crashpad database is null, this should not happen");
+            __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                                "Crashpad database is null, this should not happen");
             return;
         }
         database->GetSettings()->SetUploadsEnabled(true);
