@@ -170,7 +170,7 @@ public class BacktraceDatabase implements Database {
         }
 
         if (!this.crashHandlerConfiguration.isSupportedAbi()) {
-            throw new RuntimeException("Unsupported ABI");
+            return false;
         }
 
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
