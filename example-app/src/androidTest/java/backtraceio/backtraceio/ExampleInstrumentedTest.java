@@ -33,7 +33,8 @@ import backtraceio.coroner.response.CoronerResponseProcessingException;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest extends InstrumentedTest {
-    private final int THREAD_SLEEP_TIME_MS = 2000;
+    private final int THREAD_SLEEP_TIME_MS = 20000;
+    private final int AWAIT_TIME_SEC = 10;
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityRule =
@@ -64,7 +65,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
         // WHEN
         onView(withId(R.id.handledException)).perform(click()); // UI action
-        waiter.await(5, TimeUnit.SECONDS, 1);
+        waiter.await(AWAIT_TIME_SEC, TimeUnit.SECONDS, 1);
         Thread.sleep(THREAD_SLEEP_TIME_MS);
 
         // THEN
@@ -94,7 +95,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
         // WHEN
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
-        Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
+        Thread.sleep(THREAD_SLEEP_TIME_MS);
 
         // THEN
         try {
