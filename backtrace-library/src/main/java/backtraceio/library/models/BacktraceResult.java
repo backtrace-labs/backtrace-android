@@ -1,5 +1,7 @@
 package backtraceio.library.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -11,6 +13,7 @@ public class BacktraceResult {
     /**
      * Object identifier
      */
+    @SerializedName("_rxid")
     public String rxId;
 
     /**
@@ -35,11 +38,11 @@ public class BacktraceResult {
     }
 
     public BacktraceResult(BacktraceApiResult apiResult) {
-        this(apiResult.rxId, apiResult.response);
+        this(apiResult.rxId, apiResult.getResponse());
     }
 
     public BacktraceResult(String rxId, String status) {
-        this(null, rxId, BacktraceResultStatus.valueOf(status));
+        this(null, rxId, null, BacktraceResultStatus.valueOf(status));
     }
 
     /**
@@ -50,9 +53,34 @@ public class BacktraceResult {
      * @param status  result status eg. ok, server error
      */
     public BacktraceResult(BacktraceReport report, String message, BacktraceResultStatus status) {
-        setBacktraceReport(report);
+        this(report, null, message, status);
+    }
+
+    /**
+     * Create new instance of BacktraceResult
+     *
+     * @param report  executed report
+     * @param message message
+     * @param status  result status eg. ok, server error
+     */
+    public BacktraceResult(BacktraceReport report, String rxId, String message, BacktraceResultStatus status) {
+        this.rxId = rxId;
         this.message = message;
         this.status = status;
+
+        setBacktraceReport(report);
+    }
+
+    public String getRxId() {
+        return rxId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public BacktraceResultStatus getStatus() {
+        return status;
     }
 
     /**
