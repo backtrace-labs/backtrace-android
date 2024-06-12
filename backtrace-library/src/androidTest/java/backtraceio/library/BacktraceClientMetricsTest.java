@@ -101,7 +101,7 @@ public class BacktraceClientMetricsTest {
     public void try3TimesOn503() {
         final Waiter waiter = new Waiter();
 
-        final int timeBetweenRetriesMillis = 1;
+        final int timeBetweenRetriesMillis = 1000;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
@@ -182,7 +182,7 @@ public class BacktraceClientMetricsTest {
         });
 
         // Enabling metrics will automatically send startup events
-        final int timeBetweenRetriesMillis = 1;
+        final int timeBetweenRetriesMillis = 1000;
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
         try {
@@ -273,7 +273,7 @@ public class BacktraceClientMetricsTest {
     public void uploadEventsAutomatic() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1000));
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
