@@ -20,6 +20,8 @@ public class CrashHandlerConfiguration {
     public static final Set<String> UNSUPPORTED_ABIS = new HashSet<String>(Arrays.asList(new String[]{"x86"}));
     private static final String CRASHPAD_DIRECTORY_PATH = "/crashpad";
 
+    private static final String BACKTRACE_NATIVE_LIBRARY_NAME = "libbacktrace-native.so";
+
 
     public Boolean isSupportedAbi() {
         return isSupportedAbi(AbiHelper.getCurrentAbi());
@@ -48,6 +50,7 @@ public class CrashHandlerConfiguration {
         // extend system-specific environment variables, with variables needed to properly run app_process via crashpad
         File nativeLibraryDirectory = new File(nativeLibraryDirPath);
 
+        String backtraceNativeLibraryPath = getBacktraceNativeLibraryPath(nativeLibraryDirPath, apkPath, arch);
         File allNativeLibrariesDirectory = nativeLibraryDirectory.getParentFile();
         String allPossibleLibrarySearchPaths = TextUtils.join(File.pathSeparator, new String[]{
                 nativeLibraryDirPath,
@@ -56,7 +59,7 @@ public class CrashHandlerConfiguration {
                 "/data/local"});
 
         environmentVariables.add(String.format("CLASSPATH=%s", apkPath));
-        environmentVariables.add(String.format("%s=%s!/lib/%s/libbacktrace-native.so", BACKTRACE_CRASH_HANDLER, apkPath, arch));
+        environmentVariables.add(String.format("%s=%s", BACKTRACE_CRASH_HANDLER, backtraceNativeLibraryPath));
         environmentVariables.add(String.format("LD_LIBRARY_PATH=%s", allPossibleLibrarySearchPaths));
         environmentVariables.add("ANDROID_DATA=/data");
 
@@ -71,5 +74,16 @@ public class CrashHandlerConfiguration {
             crashHandlerDir.mkdir();
         }
         return databasePath;
+    }
+
+    private String getBacktraceNativeLibraryPath(String nativeLibraryDirPath, String apkPath, String arch) {
+        String backtraceNativeLibraryPath = String.format("%s/%s", nativeLibraryDirPath, BACKTRACE_NATIVE_LIBRARY_NAME);
+        File backtraceNativeLibrary = new File(backtraceNativeLibraryPath);
+
+        // If ndk libraries are already extracted, we shouldn't use libraries from the apk.
+        // Otherwise. We need to find a path in the apk to use compressed libraries from there.
+        return backtraceNativeLibrary.exists()
+                ? backtraceNativeLibraryPath
+                : String.format("%s!/lib/%s/%s", apkPath, arch, BACKTRACE_NATIVE_LIBRARY_NAME);
     }
 }
