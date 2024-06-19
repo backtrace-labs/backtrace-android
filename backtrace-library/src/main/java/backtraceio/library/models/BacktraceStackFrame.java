@@ -61,9 +61,13 @@ public class BacktraceStackFrame {
     }
 
     public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line) {
+        this(functionName, sourceCodeFileName, line, UUID.randomUUID().toString());
+    }
+
+    public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line, String sourceCodeUuid) {
         this.functionName = functionName;
         this.sourceCodeFileName = sourceCodeFileName;
-        this.sourceCode = UUID.randomUUID().toString();
+        this.sourceCode = sourceCodeUuid;
         this.line = line;
     }
 }
