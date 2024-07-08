@@ -31,17 +31,15 @@ import backtraceio.library.models.json.BacktraceReport;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseRecordTest {
     private Context context;
-    private String dbPath;
-    private BacktraceDatabaseSettings databaseSettings;
     private BacktraceDatabase database;
     private final String testMessage = "Example test string";
 
     @Before
     public void setUp() {
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
-        this.dbPath = this.context.getFilesDir().getAbsolutePath();
-        this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
-        this.database = new BacktraceDatabase(this.context, dbPath);
+        String dbPath = this.context.getFilesDir().getAbsolutePath();
+        BacktraceDatabaseSettings databaseSettings = new BacktraceDatabaseSettings(dbPath, RetryOrder.Queue);
+        this.database = new BacktraceDatabase(this.context, databaseSettings);
     }
 
     @After
@@ -54,7 +52,7 @@ public class BacktraceDatabaseRecordTest {
         // GIVEN
         final BacktraceReport report = new BacktraceReport(testMessage);
         final BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         final boolean saveResult = record.save();
@@ -88,7 +86,7 @@ public class BacktraceDatabaseRecordTest {
 
         final BacktraceReport report = new BacktraceReport(testMessage, attachments);
         final BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         final boolean saveResult = record.save();
@@ -110,7 +108,7 @@ public class BacktraceDatabaseRecordTest {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         boolean saveResult = record.save();
@@ -128,7 +126,7 @@ public class BacktraceDatabaseRecordTest {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         boolean saveResult = record.save();
@@ -146,14 +144,14 @@ public class BacktraceDatabaseRecordTest {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         boolean saveResult = record.save();
-        int numberOfFilesAfterSave = new File(this.dbPath).listFiles().length;
+        int numberOfFilesAfterSave = new File(this.database.getSettings().getDatabasePath()).listFiles().length;
 
         record.delete();
-        int numberOfFilesAfterDelete = new File(this.dbPath).listFiles().length;
+        int numberOfFilesAfterDelete = new File(this.database.getSettings().getDatabasePath()).listFiles().length;
 
         // THEN
         assertTrue(saveResult);
@@ -166,7 +164,7 @@ public class BacktraceDatabaseRecordTest {
         // GIVEN
         final BacktraceReport report = new BacktraceReport(testMessage);
         final BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
+        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
         record.save();
 
         // WHEN
@@ -175,5 +173,20 @@ public class BacktraceDatabaseRecordTest {
 
         // THEN
         assertEquals(data.getReport().message, dataFromFile.report.message);
+    }
+
+    @Test
+    public void serialize() {
+
+    }
+
+    @Test
+    public void deserialize() {
+
+    }
+
+    @Test
+    public void serializeAndDeserialize() {
+
     }
 }
