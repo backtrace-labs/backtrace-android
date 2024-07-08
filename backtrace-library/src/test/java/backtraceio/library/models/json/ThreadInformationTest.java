@@ -33,7 +33,7 @@ public class ThreadInformationTest {
                 .replace(" ", "")
                 .replace("\t", "");
 
-        assertEquals(expectedJson,json);
+        assertEquals(expectedJson, json);
     }
 
     @Test

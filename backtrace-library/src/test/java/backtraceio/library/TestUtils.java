@@ -26,4 +26,10 @@ public class TestUtils {
         }
         return null;
     }
+
+    public static String unifyJsonString(String json) {
+        return json.replace("\n", "")
+                .replace(" ", "")
+                .replace("\t", "");
+    }
 }
