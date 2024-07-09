@@ -28,10 +28,9 @@ public class ThreadInformationTest {
         String json = BacktraceSerializeHelper.toJson(obj);
 
         // THEN
-        String expectedJson = TestUtils.readFileAsString(this, "threadInformation.json")
-                .replace("\n", "")
-                .replace(" ", "")
-                .replace("\t", "");
+        String expectedJson = TestUtils.unifyJsonString(
+                TestUtils.readFileAsString(this, "threadInformation.json")
+        );
 
         assertEquals(expectedJson, json);
     }

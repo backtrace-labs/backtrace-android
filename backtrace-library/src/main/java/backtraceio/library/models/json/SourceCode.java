@@ -29,4 +29,12 @@ public class SourceCode {
         this.startLine = line;
         this.sourceCodeFileName = sourceCodeFileName;
     }
+
+    public Integer getStartLine() {
+        return startLine;
+    }
+
+    public String getSourceCodeFileName() {
+        return sourceCodeFileName;
+    }
 }

@@ -16,7 +16,7 @@ public class SourceCodeData {
     /**
      * Source code information about current executed program
      */
-    public Map<String, SourceCode> data = new HashMap<>();
+    public final Map<String, SourceCode> data = new HashMap<>();
 
     public SourceCodeData(List<BacktraceStackFrame> exceptionStack) {
         BacktraceLogger.d(LOG_TAG, "Initialization source code data");
