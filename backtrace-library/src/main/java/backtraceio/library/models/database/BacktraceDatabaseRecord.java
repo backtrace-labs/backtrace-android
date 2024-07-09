@@ -21,7 +21,7 @@ public class BacktraceDatabaseRecord {
     /**
      * Path to database directory
      */
-    private final String path;
+    private final transient String path;
 
     /**
      * Id

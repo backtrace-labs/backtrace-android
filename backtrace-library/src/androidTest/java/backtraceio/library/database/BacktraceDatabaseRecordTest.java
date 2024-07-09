@@ -174,19 +174,4 @@ public class BacktraceDatabaseRecordTest {
         // THEN
         assertEquals(data.getReport().message, dataFromFile.report.message);
     }
-
-    @Test
-    public void serialize() {
-
-    }
-
-    @Test
-    public void deserialize() {
-
-    }
-
-    @Test
-    public void serializeAndDeserialize() {
-
-    }
 }
