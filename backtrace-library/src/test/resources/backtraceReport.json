@@ -23,7 +23,8 @@
         "declaring-class": "backtraceio.library.SettingAttributesTest",
         "file-name": "SettingAttributesTest.java",
         "line-number": 75,
-        "method-name": "tmpGsonTest"
+        "method-name": "tmpGsonTest",
+        "format": 0
       }
     ],
     "suppressed-exceptions": []
