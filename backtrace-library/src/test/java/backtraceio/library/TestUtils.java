@@ -1,5 +1,8 @@
 package backtraceio.library;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,5 +34,13 @@ public class TestUtils {
         return json.replace("\n", "")
                 .replace(" ", "")
                 .replace("\t", "");
+    }
+
+    public static boolean compareJson(String json1, String json2) {
+        JsonParser parser = new JsonParser();
+        JsonElement o1 = parser.parse(json1);
+        JsonElement o2 = parser.parse(json2);
+//        System.out.println(o1.equals(o2));
+        return o1.equals(o2);
     }
 }
