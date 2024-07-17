@@ -109,8 +109,41 @@ public class BacktraceDataJsonTest {
         assertEquals("backtrace-android", obj.getAgent());
         assertEquals("instr: androidx.test.runner.androidjunitrunner", obj.getMainThread());
         assertNull(obj.classifiers);
-//        assertNull(obj.ge);
-        // TODO: more
+        assertEquals(2, obj.getAnnotations().size());
+        assertEquals("/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar", ((Map<String, Object>)obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
+        assertEquals("Example test string", ((Map<String, Object>)obj.getAnnotations().get("Exception")).get("message"));
+        assertEquals(1, obj.getAttributes().size());
+        assertEquals("4b965773-539e-4dd3-be1b-f8ab017c2c9f", obj.getAttributes().get("application.session"));
+        assertNull(obj.getReport());
+
+        // THEN source-code
+        assertEquals(2, obj.getSourceCode().size());
+        assertNull(obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
+        assertEquals("VMStack.java", obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
+        assertEquals(new Integer(17), obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
+        assertEquals("InvokeMethod.java", obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
+        assertEquals(2, obj.getThreadInformationMap().size());
+
+        // THEN 'profile saver' thread
+        ThreadInformation resultProfileSaverThread = obj.getThreadInformationMap().get("profile saver");
+        assertEquals(false, resultProfileSaverThread.getFault());
+        assertEquals("profile saver", resultProfileSaverThread.getName());
+        assertEquals(0, resultProfileSaverThread.getStack().size());
+
+        // THEN 'main' thread
+        ThreadInformation resultMainThread = obj.getThreadInformationMap().get("main");
+        assertEquals(false,resultMainThread.getFault());
+        assertEquals("main", resultMainThread.getName());
+        assertEquals(2, resultMainThread.getStack().size());
+        assertEquals(null, resultMainThread.getStack().get(0).sourceCodeFileName);
+        assertEquals(null, resultMainThread.getStack().get(0).line);
+        assertEquals("b1a3d84a-fcf3-4d10-90d5-994f1e397607", resultMainThread.getStack().get(0).sourceCode);
+        assertEquals("android.os.MessageQueue.nativePollOnce", resultMainThread.getStack().get(0).functionName);
+
+        assertEquals(null, resultMainThread.getStack().get(1).sourceCodeFileName);
+        assertEquals(new Integer(335), resultMainThread.getStack().get(1).line);
+        assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
+        assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
 
 
@@ -134,7 +167,40 @@ public class BacktraceDataJsonTest {
         assertEquals("backtrace-android", obj.getAgent());
         assertEquals("instr: androidx.test.runner.androidjunitrunner", obj.getMainThread());
         assertNull(obj.classifiers);
-//        assertNull(obj.ge);
-        // TODO: more
+        assertEquals(2, obj.getAnnotations().size());
+        assertEquals("/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar", ((Map<String, Object>)obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
+        assertEquals("Example test string", ((Map<String, Object>)obj.getAnnotations().get("Exception")).get("message"));
+        assertEquals(1, obj.getAttributes().size());
+        assertEquals("4b965773-539e-4dd3-be1b-f8ab017c2c9f", obj.getAttributes().get("application.session"));
+        assertNull(obj.getReport());
+
+        // THEN source-code
+        assertEquals(2, obj.getSourceCode().size());
+        assertNull(obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
+        assertEquals("VMStack.java", obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
+        assertEquals(new Integer(17), obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
+        assertEquals("InvokeMethod.java", obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
+        assertEquals(2, obj.getThreadInformationMap().size());
+
+        // THEN 'profile saver' thread
+        ThreadInformation resultProfileSaverThread = obj.getThreadInformationMap().get("profile saver");
+        assertEquals(false, resultProfileSaverThread.getFault());
+        assertEquals("profile saver", resultProfileSaverThread.getName());
+        assertEquals(0, resultProfileSaverThread.getStack().size());
+
+        // THEN 'main' thread
+        ThreadInformation resultMainThread = obj.getThreadInformationMap().get("main");
+        assertEquals(false,resultMainThread.getFault());
+        assertEquals("main", resultMainThread.getName());
+        assertEquals(2, resultMainThread.getStack().size());
+        assertEquals(null, resultMainThread.getStack().get(0).sourceCodeFileName);
+        assertEquals(null, resultMainThread.getStack().get(0).line);
+        assertEquals("b1a3d84a-fcf3-4d10-90d5-994f1e397607", resultMainThread.getStack().get(0).sourceCode);
+        assertEquals("android.os.MessageQueue.nativePollOnce", resultMainThread.getStack().get(0).functionName);
+
+        assertEquals(null, resultMainThread.getStack().get(1).sourceCodeFileName);
+        assertEquals(new Integer(335), resultMainThread.getStack().get(1).line);
+        assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
+        assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
 }
