@@ -59,7 +59,7 @@ public class BacktraceWatchdogSharedTest {
         backtraceClient.clearBreadcrumbs();
 
         backtraceClient.setOnRequestHandler(data -> {
-            String breadcrumbPath = data.report.attachmentPaths.get(0);
+            String breadcrumbPath = data.getReport().attachmentPaths.get(0);
 
             assertTrue(breadcrumbPath.contains("bt-breadcrumbs"));
             assertEquals(data.attributes.get("error.type"), AnrAttributeType);

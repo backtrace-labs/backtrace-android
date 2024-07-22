@@ -140,6 +140,11 @@ public class BacktraceData {
         return FileHelper.filterOutFiles(this.context, report.attachmentPaths);
     }
 
+
+    public BacktraceReport getReport() {
+        return report;
+    }
+
     /***
      * Set annotations object
      * @param complexAttributes

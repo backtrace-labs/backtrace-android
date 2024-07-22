@@ -59,7 +59,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
-                return new BacktraceResult(data.report, data.report.message,
+                return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
         };
@@ -98,7 +98,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
-                return new BacktraceResult(data.report, data.report.message,
+                return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
         };
@@ -139,7 +139,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -181,7 +181,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -225,7 +225,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -267,7 +267,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -310,7 +310,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.symbolication);
-                return new BacktraceResult(data.report, data.report.message,
+                return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
         };
@@ -352,7 +352,7 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.symbolication);
-                return new BacktraceResult(data.report, data.report.message,
+                return new BacktraceResult(data.getReport(), data.getReport().message,
                         BacktraceResultStatus.Ok);
             }
         };
