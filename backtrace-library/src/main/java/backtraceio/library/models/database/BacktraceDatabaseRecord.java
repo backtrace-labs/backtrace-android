@@ -169,7 +169,7 @@ public class BacktraceDatabaseRecord {
         try {
             BacktraceLogger.d(LOG_TAG, "Trying saving data to internal app storage");
             this.diagnosticDataPath = save(record, String.format("%s-attachment", id));
-            this.reportPath = save(record.report, String.format("%s-report", id));
+            this.reportPath = save(record.getReport(), String.format("%s-report", id));
 
             this.recordPath = new File(this.path,
                     String.format("%s-record.json", this.id)).getAbsolutePath();

@@ -139,7 +139,6 @@ public class BacktraceData {
         return threadInformationMap;
     }
 
-
     public String getUuid() {
         return uuid;
     }

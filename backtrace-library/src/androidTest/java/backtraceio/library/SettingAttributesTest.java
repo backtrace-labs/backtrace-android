@@ -177,11 +177,13 @@ public class SettingAttributesTest {
                     @Override
                     public BacktraceResult onRequest(BacktraceData data) {
                         // THEN
+
                         final BacktraceReport dataReport = data.getReport();
                         waiter.assertTrue(dataReport.attributes.containsKey(customClientAttributeKey));
                         waiter.assertEquals(customClientAttributeValue, dataReport.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.getReport().exception.getMessage());
                         waiter.assertEquals(dataReport.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+
                         waiter.resume();
                         return new BacktraceResult(data.getReport(), "", BacktraceResultStatus.Ok);
                     }
