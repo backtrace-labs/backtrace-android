@@ -62,7 +62,7 @@ public class BacktraceErrorTypeAttributeTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.report, data.report.exception.getMessage(),
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                         BacktraceResultStatus.Ok);
             }
         };
