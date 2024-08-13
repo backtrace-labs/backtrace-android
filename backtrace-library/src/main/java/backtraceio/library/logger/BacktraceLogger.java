@@ -1,25 +1,14 @@
 package backtraceio.library.logger;
 
-import android.util.Log;
-
 /**
- * Backtrace Logger class for logging messages from inside library
+ * TODO: improve Backtrace Logger class for logging messages from inside library
  */
 public class BacktraceLogger {
 
-    private static final String BASE_TAG = "BacktraceLogger: ";
-    /**
-     * Level from which all information is logged
-     */
-    private static LogLevel logLevel = LogLevel.OFF;
+    private static Logger logger = new BacktraceLogLogger();
 
-    /**
-     * set logging level from which all messages should be logged to the console
-     *
-     * @param level login level
-     */
-    public static void setLevel(LogLevel level) {
-        BacktraceLogger.logLevel = level;
+    public static void setLogger(Logger logger) {
+        BacktraceLogger.logger = logger;
     }
 
     /**
@@ -28,10 +17,7 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int d(String tag, String message) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.DEBUG.ordinal()) {
-            return Log.d(getTag(tag), message);
-        }
-        return 0;
+        return logger.d(tag, message);
     }
 
     /**
@@ -42,10 +28,7 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int w(String tag, String message) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.WARN.ordinal()) {
-            return Log.w(getTag(tag), message);
-        }
-        return 0;
+        return logger.w(tag, message);
     }
 
     /**
@@ -56,10 +39,7 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int e(String tag, String message) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.ERROR.ordinal()) {
-            return Log.e(getTag(tag), message);
-        }
-        return 0;
+        return logger.e(tag, message);
     }
 
     /**
@@ -71,13 +51,6 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int e(String tag, String message, Throwable tr) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.ERROR.ordinal()) {
-            return Log.e(getTag(tag), message, tr);
-        }
-        return 0;
-    }
-
-    private static String getTag(String tag) {
-        return BacktraceLogger.BASE_TAG + tag;
+        return logger.e(tag, message, tr);
     }
 }
