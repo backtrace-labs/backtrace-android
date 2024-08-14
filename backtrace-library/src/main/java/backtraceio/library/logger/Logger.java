@@ -1,7 +1,7 @@
 package backtraceio.library.logger;
 
 /**
- * Interface for logging messages in the Backtrace library.
+ * Interface for Backtrace Android library used for logging internal library messages.
  * <p>
  * Defines methods for logging at various levels, such as debug, warning, and error.
  * Implementing classes will provide the actual logging functionality, ensuring consistent
