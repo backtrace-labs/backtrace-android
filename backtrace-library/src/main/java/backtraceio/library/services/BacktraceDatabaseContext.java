@@ -3,6 +3,7 @@ package backtraceio.library.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -170,22 +171,27 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         for (int key : batchRetry.keySet()) {
             List<BacktraceDatabaseRecord> records = batchRetry.get(key);
 
-            for (BacktraceDatabaseRecord databaseRecord : records) {
-                if (databaseRecord == null || record.id != databaseRecord.id) {
+            if (records == null) {
+                continue;
+            }
+
+            Iterator<BacktraceDatabaseRecord> iterator = records.iterator();
+            while (iterator.hasNext()) {
+                BacktraceDatabaseRecord databaseRecord = iterator.next();
+                if (databaseRecord == null || !record.id.equals(databaseRecord.id)) {
                     continue;
                 }
 
                 databaseRecord.delete();
                 try {
-                    records.remove(databaseRecord);
+                    iterator.remove();
                     this.totalRecords--;
                     this.totalSize -= databaseRecord.getSize();
+                    return true;
+                } catch (Exception e) {
+                    BacktraceLogger.d(LOG_TAG, "Exception on removing record "
+                            + databaseRecord.id.toString() + "from db context: " + e.getMessage());
                 }
-                catch (Exception e) {
-                    BacktraceLogger.d(LOG_TAG, "Exception on removing record from db context: " + e.getMessage());
-                }
-                
-                return true;
             }
         }
         return false;
