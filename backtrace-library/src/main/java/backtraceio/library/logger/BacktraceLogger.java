@@ -1,7 +1,18 @@
 package backtraceio.library.logger;
 
 /**
- * TODO: improve Backtrace Logger class for logging messages from inside library
+ * A global logging utility for the Backtrace library.
+ * <p>
+ * {@code BacktraceLogger} acts as a wrapper around a {@link Logger} implementation,
+ * providing a centralized logging mechanism throughout the library. By default, it uses
+ * the {@link BacktraceLogLogger}, which relies on {@code android.util.Log} for logging.
+ * However, the logger can be replaced with a custom implementation by using the
+ * {@link #setLogger(Logger)} method.
+ * </p>
+ * <p>
+ * This allows for flexibility in logging strategies, enabling developers to integrate
+ * their preferred logging framework or customize log handling as needed.
+ * </p>
  */
 public class BacktraceLogger {
 

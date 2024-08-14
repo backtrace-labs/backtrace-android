@@ -3,7 +3,12 @@ package backtraceio.library.logger;
 import android.util.Log;
 
 /**
- * TODO: improve Backtrace Logger implementation class for logging messages from inside library
+ * Backtrace Logger implementation class for logging messages within the Backtrace library.
+ * <p>
+ * This class leverages the {@link android.util.Log} package to output log messages.
+ * It provides a standardized way to log information, warnings, errors, and debug messages
+ * from within the library, making it easier to track and diagnose issues.
+ * </p>
  */
 public class BacktraceLogLogger implements Logger {
 
@@ -12,7 +17,6 @@ public class BacktraceLogLogger implements Logger {
      * Level from which all information is logged
      */
     private LogLevel logLevel;
-
 
     public BacktraceLogLogger() {
         this(LogLevel.OFF);
