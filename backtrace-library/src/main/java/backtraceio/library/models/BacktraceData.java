@@ -97,15 +97,14 @@ public class BacktraceData {
     /**
      * Current BacktraceReport
      */
-    public transient BacktraceReport report; // Think if we need it
+    public transient BacktraceReport report; // TODO: verify if we need it
 
     /**
      * Application thread details
      */
     @SerializedName("threads")
     Map<String, ThreadInformation> threadInformationMap;
-    
-    public BacktraceData() { }
+
 
     public BacktraceData(String uuid, String symbolication, long timestamp, String langVersion,
                          String agentVersion, Map<String, String> attributes, String mainThread,
