@@ -1,128 +1,141 @@
 package backtraceio.library.logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 import android.util.Log;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class BacktraceLogLoggerTest {
+    private final int LOG_ENABLED = 12345;
+    private final int LOG_DISABLED = 0;
+
+    private final String TEST_TAG = "TEST-TAG";
+    private final String TEST_MSG = "TEST-MSG";
+
+    public class LogMockAnswer implements Answer<Integer> {
+        @Override
+        public Integer answer(InvocationOnMock invocation) { return LOG_ENABLED; }
+    }
 
     @Mock
-    private Log mockLog;
-
+    private static MockedStatic<Log> mockLog;
     private BacktraceLogLogger logger;
+
+    @BeforeClass
+    public static void init() {
+        mockLog = mockStatic(Log.class);
+    }
+
+    @AfterClass
+    public static void close() {
+        mockLog.close();
+    }
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        // We need to mock the Log class's static methods
-        mockStatic(Log.class);
+        logger = new BacktraceLogLogger();
+        mockLogMethods();
+    }
+
+    private void mockLogMethods() {
+        try {
+            mockLog.when(() -> Log.d(Mockito.any(), Mockito.any())).thenAnswer(
+                    new LogMockAnswer()
+            );
+            mockLog.when(() -> Log.w(Mockito.any(), Mockito.anyString())).thenAnswer(
+                    new LogMockAnswer()
+            );
+            mockLog.when(() -> Log.e(Mockito.any(), Mockito.any())).thenAnswer(
+                    new LogMockAnswer()
+            );
+            mockLog.when(() -> Log.e(Mockito.any(), Mockito.any(), Mockito.any())).thenAnswer(
+                    new LogMockAnswer()
+            );
+        }
+        catch (Exception e) {
+            Assert.fail(e.toString());
+        }
     }
 
     @Test
     public void testDebugLog() {
-        try (MockedStatic<BacktraceLogLogger> dummyStatic = Mockito.mockStatic(BacktraceLogLogger.class)) {
-            dummyStatic.when(BacktraceLogLogger::d)
-                    .thenReturn(1);
-            // when
-            System.out.println(SomePublicClass.myPublicStaticFunc());
-            //then
-            dummyStatic.verify(
-                    SomePublicClass::myPublicStaticFunc, times(1));
-        }
+        // GIVEN
+        logger.setLevel(LogLevel.DEBUG);
 
-        logger = new BacktraceLogLogger(LogLevel.DEBUG);
-        String tag = "TestTag";
-        String message = "Debug message";
+        // WHEN
+        final int debugResult = logger.d(TEST_TAG, TEST_MSG);
+        final int warnResult = logger.w(TEST_TAG, TEST_MSG);
+        final int errorResult = logger.e(TEST_TAG, TEST_MSG);
+        final int errorResult2 = logger.e(TEST_TAG, TEST_MSG, new Exception());
 
-        when(Log.d(anyString(), anyString())).thenReturn(10);
-
-        int result = logger.d(tag, message);
-
-        // Verify that Log.d was called
-        verifyStatic(Log.class);
-        Log.d(eq("BacktraceLogger: " + tag), eq(message));
-
-        assertEquals(10, result);
+        // THEN
+        Assert.assertEquals(LOG_ENABLED, debugResult);
+        Assert.assertEquals(LOG_ENABLED, warnResult);
+        Assert.assertEquals(LOG_ENABLED, errorResult);
+        Assert.assertEquals(LOG_ENABLED, errorResult2);
     }
 
     @Test
-    public void testWarningLog() {
-        logger = new BacktraceLogLogger(LogLevel.WARN);
-        String tag = "TestTag";
-        String message = "Warning message";
+    public void testWarnLog() {
+        // GIVEN
+        logger.setLevel(LogLevel.WARN);
 
-        when(Log.w(anyString(), anyString())).thenReturn(10);
+        // WHEN
+        final int debugResult = logger.d(TEST_TAG, TEST_MSG);
+        final int warnResult = logger.w(TEST_TAG, TEST_MSG);
+        final int errorResult = logger.e(TEST_TAG, TEST_MSG);
+        final int errorResult2 = logger.e(TEST_TAG, TEST_MSG, new Exception());
 
-        int result = logger.w(tag, message);
-
-        // Verify that Log.w was called
-        verifyStatic(Log.class);
-        Log.w(eq("BacktraceLogger: " + tag), eq(message));
-
-        assertEquals(10, result);
+        // THEN
+        Assert.assertEquals(LOG_DISABLED, debugResult);
+        Assert.assertEquals(LOG_ENABLED, warnResult);
+        Assert.assertEquals(LOG_ENABLED, errorResult);
+        Assert.assertEquals(LOG_ENABLED, errorResult2);
     }
 
     @Test
     public void testErrorLog() {
-        logger = new BacktraceLogLogger(LogLevel.ERROR);
-        String tag = "TestTag";
-        String message = "Error message";
+        // GIVEN
+        logger.setLevel(LogLevel.ERROR);
 
-        when(Log.e(anyString(), anyString())).thenReturn(10);
+        // WHEN
+        final int debugResult = logger.d(TEST_TAG, TEST_MSG);
+        final int warnResult = logger.w(TEST_TAG, TEST_MSG);
+        final int errorResult = logger.e(TEST_TAG, TEST_MSG);
+        final int errorResult2 = logger.e(TEST_TAG, TEST_MSG, new Exception());
 
-        int result = logger.e(tag, message);
-
-        // Verify that Log.e was called
-        verifyStatic(Log.class);
-        Log.e(eq("BacktraceLogger: " + tag), eq(message));
-
-        assertEquals(10, result);
+        // THEN
+        Assert.assertEquals(LOG_DISABLED, debugResult);
+        Assert.assertEquals(LOG_DISABLED, warnResult);
+        Assert.assertEquals(LOG_ENABLED, errorResult);
+        Assert.assertEquals(LOG_ENABLED, errorResult2);
     }
 
     @Test
-    public void testErrorLogWithThrowable() {
-        logger = new BacktraceLogLogger(LogLevel.ERROR);
-        String tag = "TestTag";
-        String message = "Error message";
-        Throwable tr = new Throwable("Test Exception");
+    public void testLogOff() {
+        // GIVEN
+        logger.setLevel(LogLevel.OFF);
 
-        when(Log.e(anyString(), anyString(), any(Throwable.class))).thenReturn(10);
+        // WHEN
+        final int debugResult = logger.d(TEST_TAG, TEST_MSG);
+        final int warnResult = logger.w(TEST_TAG, TEST_MSG);
+        final int errorResult = logger.e(TEST_TAG, TEST_MSG);
+        final int errorResult2 = logger.e(TEST_TAG, TEST_MSG, new Exception());
 
-        int result = logger.e(tag, message, tr);
-
-        // Verify that Log.e was called with throwable
-        verifyStatic(Log.class);
-        Log.e(eq("BacktraceLogger: " + tag), eq(message), eq(tr));
-
-        assertEquals(10, result);
-    }
-
-    @Test
-    public void testLogLevelFiltering() {
-        logger = new BacktraceLogLogger(LogLevel.WARN);
-        String tag = "TestTag";
-        String message = "Debug message";
-
-        int result = logger.d(tag, message);
-
-        // Verify that Log.d was not called due to log level filtering
-        verifyStatic(Log.class, never());
-        Log.d(anyString(), anyString());
-
-        assertEquals(0, result);
+        // THEN
+        Assert.assertEquals(LOG_DISABLED, debugResult);
+        Assert.assertEquals(LOG_DISABLED, warnResult);
+        Assert.assertEquals(LOG_DISABLED, errorResult);
+        Assert.assertEquals(LOG_DISABLED, errorResult2);
     }
 }
