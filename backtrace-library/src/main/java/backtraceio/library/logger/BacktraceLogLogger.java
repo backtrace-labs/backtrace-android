@@ -2,6 +2,8 @@ package backtraceio.library.logger;
 
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Backtrace Logger implementation class for logging messages within the Backtrace library.
  * <p>
@@ -22,7 +24,7 @@ public class BacktraceLogLogger implements Logger {
         this(LogLevel.OFF);
     }
 
-    public BacktraceLogLogger(LogLevel logLevel) {
+    public BacktraceLogLogger(@NotNull LogLevel logLevel) {
         this.logLevel = logLevel.ordinal();
     }
 
@@ -31,7 +33,7 @@ public class BacktraceLogLogger implements Logger {
      *
      * @param level login level
      */
-    public void setLevel(LogLevel level) {
+    public void setLevel(@NotNull LogLevel level) {
         this.logLevel = level.ordinal();
     }
 

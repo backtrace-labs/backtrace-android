@@ -1,5 +1,7 @@
 package backtraceio.library.logger;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A global logging utility for the Backtrace library.
  * <p>
@@ -22,7 +24,7 @@ public class BacktraceLogger {
         return logger;
     }
 
-    public static void setLogger(Logger logger) {
+    public static void setLogger(@NotNull Logger logger) {
         BacktraceLogger.logger = logger;
     }
 
@@ -79,7 +81,7 @@ public class BacktraceLogger {
      *
      */
     @Deprecated
-    public static void setLevel(LogLevel level) {
+    public static void setLevel(@NotNull LogLevel level) {
         logger.setLevel(level);
     }
 }
