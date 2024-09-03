@@ -28,4 +28,9 @@ public class BacktraceLoggerTest {
         Assert.assertEquals(BacktraceMockLogger.MOCK_VALUE, errorResult);
         Assert.assertEquals(BacktraceMockLogger.MOCK_VALUE, errorResult2);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullCustomLogger() {
+        BacktraceLogger.setLogger(null);
+    }
 }
