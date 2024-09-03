@@ -16,14 +16,14 @@ public class BacktraceLogLogger implements Logger {
     /**
      * Level from which all information is logged
      */
-    private LogLevel logLevel;
+    private int logLevel;
 
     public BacktraceLogLogger() {
         this(LogLevel.OFF);
     }
 
     public BacktraceLogLogger(LogLevel logLevel) {
-        this.logLevel = logLevel;
+        this.logLevel = logLevel.ordinal();
     }
     /**
      * set logging level from which all messages should be logged to the console
@@ -31,7 +31,7 @@ public class BacktraceLogLogger implements Logger {
      * @param level login level
      */
     public void setLevel(LogLevel level) {
-        this.logLevel = level;
+        this.logLevel = level.ordinal();
     }
 
     /**
@@ -40,7 +40,7 @@ public class BacktraceLogLogger implements Logger {
      * @return the number of bytes written
      */
     public int d(String tag, String message) {
-        if (this.logLevel.ordinal() <= LogLevel.DEBUG.ordinal()) {
+        if (this.logLevel <= LogLevel.DEBUG.ordinal()) {
             return Log.d(this.getTag(tag), message);
         }
         return 0;
@@ -54,7 +54,7 @@ public class BacktraceLogLogger implements Logger {
      * @return the number of bytes written
      */
     public int w(String tag, String message) {
-        if (this.logLevel.ordinal() <= LogLevel.WARN.ordinal()) {
+        if (this.logLevel <= LogLevel.WARN.ordinal()) {
             return Log.w(this.getTag(tag), message);
         }
         return 0;
@@ -68,7 +68,7 @@ public class BacktraceLogLogger implements Logger {
      * @return the number of bytes written
      */
     public int e(String tag, String message) {
-        if (this.logLevel.ordinal() <= LogLevel.ERROR.ordinal()) {
+        if (this.logLevel <= LogLevel.ERROR.ordinal()) {
             return Log.e(this.getTag(tag), message);
         }
         return 0;
@@ -83,7 +83,7 @@ public class BacktraceLogLogger implements Logger {
      * @return the number of bytes written
      */
     public int e(String tag, String message, Throwable tr) {
-        if (this.logLevel.ordinal() <= LogLevel.ERROR.ordinal()) {
+        if (this.logLevel <= LogLevel.ERROR.ordinal()) {
             return Log.e(this.getTag(tag), message, tr);
         }
         return 0;
