@@ -25,6 +25,7 @@ public class BacktraceLogLogger implements Logger {
     public BacktraceLogLogger(LogLevel logLevel) {
         this.logLevel = logLevel.ordinal();
     }
+
     /**
      * set logging level from which all messages should be logged to the console
      *

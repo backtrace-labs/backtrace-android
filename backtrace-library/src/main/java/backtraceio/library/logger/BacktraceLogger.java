@@ -18,6 +18,10 @@ public class BacktraceLogger {
 
     private static Logger logger = new BacktraceLogLogger();
 
+    public static Logger getLogger() {
+        return logger;
+    }
+
     public static void setLogger(Logger logger) {
         BacktraceLogger.logger = logger;
     }
@@ -63,5 +67,19 @@ public class BacktraceLogger {
      */
     public static int e(String tag, String message, Throwable tr) {
         return logger.e(tag, message, tr);
+    }
+
+    /**
+     * Set logging level from which all messages should be logged to the console
+     * @param level login level (debug, warn, error, off)
+     *
+     * @deprecated setting the logging level should be done directly in the passed custom logger
+     * implementation so as not to depend on the internal implementation of Backtrace internal
+     * LogLevel types.
+     *
+     */
+    @Deprecated
+    public static void setLevel(LogLevel level) {
+        logger.setLevel(level);
     }
 }
