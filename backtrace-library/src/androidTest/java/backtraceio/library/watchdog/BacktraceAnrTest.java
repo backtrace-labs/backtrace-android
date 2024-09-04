@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.logger.BacktraceLogLogger;
+import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 
@@ -30,7 +30,7 @@ public class BacktraceAnrTest {
 
     @Before
     public void setUp() {
-        BacktraceLogger.setLogger(new BacktraceLogLogger(LogLevel.DEBUG));
+        BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.backtraceClient = new BacktraceClient(this.context, credentials);
     }

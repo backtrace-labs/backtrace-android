@@ -13,5 +13,4 @@ public interface Logger {
     int w(String tag, String message);
     int e(String tag, String message);
     int e(String tag, String message, Throwable tr);
-    void setLevel(LogLevel level);
 }

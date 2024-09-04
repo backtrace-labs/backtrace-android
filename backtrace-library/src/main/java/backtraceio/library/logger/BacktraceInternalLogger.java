@@ -12,20 +12,25 @@ import org.jetbrains.annotations.NotNull;
  * from within the library, making it easier to track and diagnose issues.
  * </p>
  */
-public class BacktraceLogLogger implements Logger {
+public class BacktraceInternalLogger implements Logger {
 
     private static final String BASE_TAG = "BacktraceLogger: ";
+
     /**
      * Level from which all information is logged
      */
     private int logLevel;
 
-    public BacktraceLogLogger() {
+    public BacktraceInternalLogger() {
         this(LogLevel.OFF);
     }
 
-    public BacktraceLogLogger(@NotNull LogLevel logLevel) {
+    public BacktraceInternalLogger(@NotNull LogLevel logLevel) {
         this.logLevel = logLevel.ordinal();
+    }
+
+    public int getLogLevel() {
+        return logLevel;
     }
 
     /**
@@ -93,6 +98,6 @@ public class BacktraceLogLogger implements Logger {
     }
 
     private String getTag(String tag) {
-        return BacktraceLogLogger.BASE_TAG + tag;
+        return BacktraceInternalLogger.BASE_TAG + tag;
     }
 }

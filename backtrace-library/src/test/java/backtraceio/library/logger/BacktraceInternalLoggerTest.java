@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class BacktraceLogLoggerTest {
+public class BacktraceInternalLoggerTest {
     private final int LOG_ENABLED = 12345;
     private final int LOG_DISABLED = 0;
 
@@ -29,7 +29,7 @@ public class BacktraceLogLoggerTest {
 
     @Mock
     private static MockedStatic<Log> mockLog;
-    private BacktraceLogLogger logger;
+    private BacktraceInternalLogger logger;
 
     @BeforeClass
     public static void init() {
@@ -43,7 +43,7 @@ public class BacktraceLogLoggerTest {
 
     @Before
     public void setUp() {
-        logger = new BacktraceLogLogger();
+        logger = new BacktraceInternalLogger();
         mockLogMethods();
     }
 

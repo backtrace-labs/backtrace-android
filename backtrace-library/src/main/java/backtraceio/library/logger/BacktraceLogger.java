@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * {@code BacktraceLogger} acts as a wrapper around a {@link Logger} implementation,
  * providing a centralized logging mechanism throughout the library. By default, it uses
- * the {@link BacktraceLogLogger}, which relies on {@code android.util.Log} for logging.
+ * the {@link BacktraceInternalLogger}, which relies on {@code android.util.Log} for logging.
  * However, the logger can be replaced with a custom implementation by using the
  * {@link #setLogger(Logger)} method.
  * </p>
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BacktraceLogger {
 
-    private static Logger logger = new BacktraceLogLogger();
+    private static Logger logger = new BacktraceInternalLogger();
 
     public static Logger getLogger() {
         return logger;
@@ -85,6 +85,8 @@ public class BacktraceLogger {
      */
     @Deprecated
     public static void setLevel(@NotNull LogLevel level) {
-        logger.setLevel(level);
+        if (logger instanceof BacktraceInternalLogger) {
+            ((BacktraceInternalLogger) logger).setLevel(level);
+        }
     }
 }

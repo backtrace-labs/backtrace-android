@@ -22,6 +22,4 @@ public class BacktraceMockLogger implements Logger {
         return MOCK_VALUE;
     }
 
-    @Override
-    public void setLevel(LogLevel level) { };
 }

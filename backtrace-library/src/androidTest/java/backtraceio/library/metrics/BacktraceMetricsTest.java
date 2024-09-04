@@ -20,7 +20,7 @@ import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.logger.BacktraceLogLogger;
+import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceMetricsSettings;
@@ -46,7 +46,7 @@ public class BacktraceMetricsTest {
 
     @Before
     public void setUp() {
-        BacktraceLogger.setLogger(new BacktraceLogLogger(LogLevel.DEBUG));
+        BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
         BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());

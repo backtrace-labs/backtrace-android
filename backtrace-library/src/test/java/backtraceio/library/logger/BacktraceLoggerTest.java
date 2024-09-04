@@ -33,4 +33,16 @@ public class BacktraceLoggerTest {
     public void testNullCustomLogger() {
         BacktraceLogger.setLogger(null);
     }
+
+    @Test
+    public void testSetLevel() {
+        // GIVEN
+        final BacktraceInternalLogger logger = new BacktraceInternalLogger();
+        BacktraceLogger.setLogger(logger);
+        // WHEN
+        BacktraceLogger.setLevel(LogLevel.WARN);
+
+        // THEN
+        Assert.assertEquals(logger.getLogLevel(), LogLevel.WARN.ordinal());
+    }
 }
