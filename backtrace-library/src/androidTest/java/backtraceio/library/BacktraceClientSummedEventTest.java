@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
+import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceMetricsSettings;
@@ -49,13 +50,12 @@ public class BacktraceClientSummedEventTest {
 
     @Before
     public void setUp() {
+        BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
         BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
-
-        BacktraceLogger.setLevel(LogLevel.DEBUG);
     }
 
     public class MockRequestHandler implements EventsRequestHandler {

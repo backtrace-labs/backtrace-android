@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
+import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 
@@ -29,6 +30,7 @@ public class BacktraceAnrTest {
 
     @Before
     public void setUp() {
+        BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.backtraceClient = new BacktraceClient(this.context, credentials);
     }
@@ -38,7 +40,6 @@ public class BacktraceAnrTest {
     public void checkIfANRIsDetectedCorrectly() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        BacktraceLogger.setLevel(LogLevel.DEBUG);
         BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 500);
         watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
             @Override
@@ -67,7 +68,6 @@ public class BacktraceAnrTest {
     public void checkIfANRIsDetectedCorrectlyWithBacktraceClient() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        BacktraceLogger.setLevel(LogLevel.DEBUG);
         this.backtraceClient.enableAnr(500, new OnApplicationNotRespondingEvent() {
             @Override
             public void onEvent(BacktraceWatchdogTimeoutException exception) {
@@ -96,7 +96,6 @@ public class BacktraceAnrTest {
         // GIVEN
         final int numberOfIterations = 5;
         final Waiter waiter = new Waiter();
-        BacktraceLogger.setLevel(LogLevel.DEBUG);
         BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 5000);
         watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
             @Override
@@ -128,7 +127,6 @@ public class BacktraceAnrTest {
     public void checkIsDisableWorks() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        BacktraceLogger.setLevel(LogLevel.DEBUG);
 
         backtraceClient.enableAnr(1000, new OnApplicationNotRespondingEvent() {
             @Override
