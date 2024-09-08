@@ -78,8 +78,8 @@ public class BacktraceLogger {
      * Set logging level from which all messages should be logged to the console
      * @param level login level (debug, warn, error, off)
      *
-     * @deprecated setting the logging level should be done directly in the passed custom logger
-     * implementation so as not to depend on the internal implementation of
+     * @deprecated Setting the logging level should now be done directly in the passed custom logger
+     * implementation. LogLevel should not depend on the internal implementation of
      * Backtrace internal logger and used LogLevel types.
      *
      */
