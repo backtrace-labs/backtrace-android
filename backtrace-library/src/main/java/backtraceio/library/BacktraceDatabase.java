@@ -258,7 +258,7 @@ public class BacktraceDatabase implements Database {
             return;
         }
 
-        this.loadReports(); // load reports from internal storage
+        this.loadReports();
 
         this.removeOrphaned();
 
@@ -437,6 +437,17 @@ public class BacktraceDatabase implements Database {
     }
 
     private void loadReports() {
+        final long startLoadingReportsTime = System.currentTimeMillis();
+
+        this.loadReportsToDbContext();
+
+        final long endLoadingReportsTime = System.currentTimeMillis();
+
+        BacktraceLogger.d(LOG_TAG, "Loading "  + backtraceDatabaseContext.count() +
+                " reports took " + (endLoadingReportsTime - startLoadingReportsTime) + " milliseconds");
+    }
+
+    private void loadReportsToDbContext() {
         Iterable<File> files = backtraceDatabaseFileContext.getRecords();
 
         for (File file : files) {
@@ -453,6 +464,7 @@ public class BacktraceDatabase implements Database {
             validateDatabaseSize();
             record.close();
         }
+
     }
 
     /**
