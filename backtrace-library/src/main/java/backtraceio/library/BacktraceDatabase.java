@@ -14,6 +14,7 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.common.TypeHelper;
+import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -173,6 +174,7 @@ public class BacktraceDatabase implements Database {
             return false;
         }
 
+        final long startSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
         if (minidumpSubmissionUrl == null) {
             return false;
@@ -215,6 +217,10 @@ public class BacktraceDatabase implements Database {
                 this.addAttribute("breadcrumbs.lastId", Long.toString((breadcrumbId)));
             });
         }
+
+        final long endSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
+        BacktraceLogger.d(LOG_TAG, "Setup native integration took " + (endSetupNativeIntegrationTime - startSetupNativeIntegrationTime) + " milliseconds");
+
         return _enabledNativeIntegration;
     }
 
