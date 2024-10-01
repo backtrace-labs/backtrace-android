@@ -1,5 +1,14 @@
 # Backtrace Android Release Notes
 
+## Version 3.8.4
+- Add getter method for `BacktraceReport` field in `BacktraceData` class
+- Update libraries (GSON and androidx.test.*)
+- Bugfix for ConcurrentModificationException when deleting records from BacktraceDatabaseContext within the BacktraceHandlerThread
+- Remove unsupported Android Manifest package value in Example App
+- Add custom debug logger - introduces support for replacing the internal logger of the Backtrace Android SDK with a custom implementation.
+- Add debug log with measured time of loading db, native integration setup and enabling metrics
+- Fix license description in POM
+
 ## Version 3.8.3
 - Update native crash repeating to a new strategy. Now we don't require to extract native executables.
 - Add a new native crash handler that allows to generate a crash dump by using Java class name
