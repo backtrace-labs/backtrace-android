@@ -90,7 +90,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation 'org.mockito:mockito-core:5.2.0'
     androidTestImplementation "org.mockito:mockito-android:2.28.2"
-    testImplementation "com.google.guava:guava:33.2.1-jre"
+    testImplementation "com.google.guava:guava:33.3.1-jre"
 }
 
 apply from: 'publish.gradle'
