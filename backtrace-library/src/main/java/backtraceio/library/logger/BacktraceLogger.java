@@ -1,25 +1,34 @@
 package backtraceio.library.logger;
 
-import android.util.Log;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Backtrace Logger class for logging messages from inside library
+ * A global logging utility for the Backtrace library.
+ * <p>
+ * {@code BacktraceLogger} acts as a wrapper around a {@link Logger} implementation,
+ * providing a centralized logging mechanism throughout the library. By default, it uses
+ * the {@link BacktraceInternalLogger}, which relies on {@code android.util.Log} for logging.
+ * However, the logger can be replaced with a custom implementation by using the
+ * {@link #setLogger(Logger)} method.
+ * </p>
+ * <p>
+ * This allows for flexibility in logging strategies, enabling developers to integrate
+ * their preferred logging framework or customize log handling as needed.
+ * </p>
  */
 public class BacktraceLogger {
 
-    private static final String BASE_TAG = "BacktraceLogger: ";
-    /**
-     * Level from which all information is logged
-     */
-    private static LogLevel logLevel = LogLevel.OFF;
+    private static Logger logger = new BacktraceInternalLogger();
 
-    /**
-     * set logging level from which all messages should be logged to the console
-     *
-     * @param level login level
-     */
-    public static void setLevel(LogLevel level) {
-        BacktraceLogger.logLevel = level;
+    public static Logger getLogger() {
+        return logger;
+    }
+
+    public static void setLogger(@NotNull Logger logger) {
+        if (logger == null) {
+           throw new IllegalArgumentException("Passed custom logger implementation can`t be null");
+        }
+        BacktraceLogger.logger = logger;
     }
 
     /**
@@ -28,10 +37,7 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int d(String tag, String message) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.DEBUG.ordinal()) {
-            return Log.d(getTag(tag), message);
-        }
-        return 0;
+        return logger.d(tag, message);
     }
 
     /**
@@ -42,10 +48,7 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int w(String tag, String message) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.WARN.ordinal()) {
-            return Log.w(getTag(tag), message);
-        }
-        return 0;
+        return logger.w(tag, message);
     }
 
     /**
@@ -56,10 +59,7 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int e(String tag, String message) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.ERROR.ordinal()) {
-            return Log.e(getTag(tag), message);
-        }
-        return 0;
+        return logger.e(tag, message);
     }
 
     /**
@@ -71,13 +71,22 @@ public class BacktraceLogger {
      * @return the number of bytes written
      */
     public static int e(String tag, String message, Throwable tr) {
-        if (BacktraceLogger.logLevel.ordinal() <= LogLevel.ERROR.ordinal()) {
-            return Log.e(getTag(tag), message, tr);
-        }
-        return 0;
+        return logger.e(tag, message, tr);
     }
 
-    private static String getTag(String tag) {
-        return BacktraceLogger.BASE_TAG + tag;
+    /**
+     * Set logging level from which all messages should be logged to the console
+     * @param level login level (debug, warn, error, off)
+     *
+     * @deprecated Setting the logging level should now be done directly in the passed custom logger
+     * implementation. LogLevel should not depend on the internal implementation of
+     * Backtrace internal logger and used LogLevel types.
+     *
+     */
+    @Deprecated
+    public static void setLevel(@NotNull LogLevel level) {
+        if (logger instanceof BacktraceInternalLogger) {
+            ((BacktraceInternalLogger) logger).setLevel(level);
+        }
     }
 }

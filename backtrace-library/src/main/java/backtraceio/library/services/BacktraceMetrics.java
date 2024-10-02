@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
+import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.interfaces.Api;
@@ -169,6 +170,7 @@ public final class BacktraceMetrics implements Metrics {
         if (uniqueEventName == null || uniqueEventName.length() == 0) {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
+        final long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
 
         setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
@@ -180,6 +182,8 @@ public final class BacktraceMetrics implements Metrics {
         } catch (Exception e) {
             BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
         }
+        final long endMetricsSetup = DebugHelper.getCurrentTimeMillis();
+        BacktraceLogger.d(LOG_TAG, "Setup metrics integration took " + (endMetricsSetup - startMetricsSetup) + " milliseconds");
     }
 
     private void verifyIfMetricsAvailable() {

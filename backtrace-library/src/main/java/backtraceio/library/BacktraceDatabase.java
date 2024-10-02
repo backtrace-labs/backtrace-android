@@ -14,6 +14,7 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.common.TypeHelper;
+import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -172,6 +173,7 @@ public class BacktraceDatabase implements Database {
             return false;
         }
 
+        final long startSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
         String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
         if (minidumpSubmissionUrl == null) {
             return false;
@@ -214,6 +216,10 @@ public class BacktraceDatabase implements Database {
                 this.addAttribute("breadcrumbs.lastId", Long.toString((breadcrumbId)));
             });
         }
+
+        final long endSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
+        BacktraceLogger.d(LOG_TAG, "Setup native integration took " + (endSetupNativeIntegrationTime - startSetupNativeIntegrationTime) + " milliseconds");
+
         return _enabledNativeIntegration;
     }
 
@@ -257,7 +263,7 @@ public class BacktraceDatabase implements Database {
             return;
         }
 
-        this.loadReports(); // load reports from internal storage
+        this.loadReports();
 
         this.removeOrphaned();
 
@@ -436,6 +442,17 @@ public class BacktraceDatabase implements Database {
     }
 
     private void loadReports() {
+        final long startLoadingReportsTime = System.currentTimeMillis();
+
+        this.loadReportsToDbContext();
+
+        final long endLoadingReportsTime = System.currentTimeMillis();
+
+        BacktraceLogger.d(LOG_TAG, "Loading "  + backtraceDatabaseContext.count() +
+                " reports took " + (endLoadingReportsTime - startLoadingReportsTime) + " milliseconds");
+    }
+
+    private void loadReportsToDbContext() {
         Iterable<File> files = backtraceDatabaseFileContext.getRecords();
 
         for (File file : files) {
@@ -452,6 +469,7 @@ public class BacktraceDatabase implements Database {
             validateDatabaseSize();
             record.close();
         }
+
     }
 
     /**

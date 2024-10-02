@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.events.OnSuccessfulBreadcrumbAddEventListener;
@@ -32,12 +33,12 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     private EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes;
 
     /**
-     * The Backtrace BroadcastReciever instance
+     * The Backtrace BroadcastReceiver instance
      */
     private BacktraceBroadcastReceiver backtraceBroadcastReceiver;
 
     /**
-     * The Backtrace ComponentCallbacks2 listener
+     * The Backtrace ComponentCallbacks listener
      */
     private BacktraceComponentListener backtraceComponentListener;
 
@@ -147,6 +148,19 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     @Override
     public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
         this.context = context;
+
+        final long startEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
+
+        final boolean enabled = enableBreadcrumbs(breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+
+        final long endEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
+
+        BacktraceLogger.d(LOG_TAG, "Enabling breadcrumbs took " + (endEnablingReportsTime - startEnablingReportsTime) + " milliseconds");
+
+        return enabled;
+    }
+
+    private boolean enableBreadcrumbs(EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
         if (backtraceBreadcrumbsLogManager == null) {
             try {
                 backtraceBreadcrumbsLogManager = new BacktraceBreadcrumbsLogManager(
