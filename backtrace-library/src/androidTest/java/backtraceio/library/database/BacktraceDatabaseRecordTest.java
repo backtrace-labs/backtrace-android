@@ -172,6 +172,6 @@ public class BacktraceDatabaseRecordTest {
         final BacktraceData dataFromFile = recordFromFile.getBacktraceData();
 
         // THEN
-        assertEquals(data.getReport().message, dataFromFile.report.message);
+        assertEquals(data.getReport().message, dataFromFile.getReport().message);
     }
 }

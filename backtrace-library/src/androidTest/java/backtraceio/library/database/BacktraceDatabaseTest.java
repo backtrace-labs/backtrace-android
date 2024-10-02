@@ -106,8 +106,8 @@ public class BacktraceDatabaseTest {
         database.add(report, null);
 
         // THEN
-        assertEquals(report, database.get().iterator().next().getBacktraceData().report);
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().report.message);
+        assertEquals(report, database.get().iterator().next().getBacktraceData().getReport());
+        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
         assertEquals(1, database.count());
     }
 
@@ -142,8 +142,8 @@ public class BacktraceDatabaseTest {
 
         final BacktraceDatabaseRecord recordFromDatabase = database.get().iterator().next();
         assertEquals(record2, recordFromDatabase);
-        assertEquals(report2, recordFromDatabase.getBacktraceData().report);
-        assertEquals(report2.exception.getMessage(), recordFromDatabase.getBacktraceData().report.exception.getMessage());
+        assertEquals(report2, recordFromDatabase.getBacktraceData().getReport());
+        assertEquals(report2.exception.getMessage(), recordFromDatabase.getBacktraceData().getReport().exception.getMessage());
     }
 
 
@@ -235,7 +235,7 @@ public class BacktraceDatabaseTest {
 
         // THEN
         assertEquals(1, database.count());
-        assertEquals(report2.message, database.get().iterator().next().getBacktraceData().report.message);
+        assertEquals(report2.message, database.get().iterator().next().getBacktraceData().getReport().message);
     }
 
     @Test
