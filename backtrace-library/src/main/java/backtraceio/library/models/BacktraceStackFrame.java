@@ -41,7 +41,19 @@ public class BacktraceStackFrame {
      * Create new instance of BacktraceStackFrame
      */
     @SuppressWarnings({"UnusedDeclaration"})
-    public BacktraceStackFrame() {
+    public BacktraceStackFrame() {}
+
+
+    @Deprecated
+    public BacktraceStackFrame(StackTraceElement frame) {
+        BacktraceStackFrame obj = BacktraceStackFrame.fromStackTraceElement(frame);
+        if (obj == null) {
+            throw new IllegalArgumentException("Wrong stacktrace element frame - can`t be null");
+        }
+        this.functionName = obj.functionName;
+        this.sourceCodeFileName = obj.sourceCodeFileName;
+        this.sourceCode = obj.sourceCode;
+        this.line = obj.line;
     }
 
     /**
