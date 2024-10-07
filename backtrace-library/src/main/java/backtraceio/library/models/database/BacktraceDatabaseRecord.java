@@ -1,5 +1,7 @@
 package backtraceio.library.models.database;
 
+import android.content.Context;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
@@ -124,6 +126,11 @@ public class BacktraceDatabaseRecord {
         return size;
     }
 
+    @Deprecated
+    // TODO: Add description
+    public BacktraceData getBacktraceData(Context context) {
+        return getBacktraceData();
+    }
     /**
      * Get valid BacktraceData from current record
      * @return valid BacktraceData object

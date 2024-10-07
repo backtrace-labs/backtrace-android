@@ -53,9 +53,7 @@ public class BacktraceDatabase implements Database {
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
     private Breadcrumbs breadcrumbs;
-
     private CrashHandlerConfiguration crashHandlerConfiguration;
-
     private boolean _enabledNativeIntegration = false;
     private NativeCommunication nativeCommunication = new BacktraceCrashHandlerWrapper();
 
