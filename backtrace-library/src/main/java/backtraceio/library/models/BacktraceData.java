@@ -105,6 +105,28 @@ public class BacktraceData {
     @SerializedName("threads")
     Map<String, ThreadInformation> threadInformationMap;
 
+    @Deprecated
+    // TODO: Add description
+    public BacktraceData(Context context, BacktraceReport report, Map<String, Object> clientAttributes) {
+        BacktraceData obj = new Builder(
+                context,
+                report,
+                clientAttributes
+        ).build();
+
+        this.uuid = obj.uuid;
+        this.symbolication = obj.symbolication;
+        this.timestamp = obj.timestamp;
+        this.langVersion = obj.langVersion;
+        this.agentVersion = obj.agentVersion;
+        this.attributes = obj.attributes;
+        this.mainThread = obj.mainThread;
+        this.report = obj.report;
+        this.classifiers = obj.classifiers;
+        this.annotations = obj.annotations;
+        this.sourceCode = obj.sourceCode;
+        this.threadInformationMap = obj.threadInformationMap;
+    }
 
     public BacktraceData(String uuid, String symbolication, long timestamp, String langVersion,
                          String agentVersion, Map<String, String> attributes, String mainThread,
