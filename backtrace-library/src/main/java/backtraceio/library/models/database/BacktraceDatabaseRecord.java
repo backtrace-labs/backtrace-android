@@ -70,6 +70,18 @@ public class BacktraceDatabaseRecord {
      * Stored record
      */
     private transient BacktraceData record;
+
+    public BacktraceDatabaseRecord() {
+        // TODO: to verify
+//        this.id = UUID.fromString(data.getUuid());
+//
+//
+//        this._path = "";
+//        this.recordPath = ;
+//        this.diagnosticDataPath = ;
+//        this(UUID.randomUUID(), "", String.format("%s-record.json", this.id), String.format("%s-attachment", this.id), 0)
+
+    }
     public BacktraceDatabaseRecord(BacktraceData data, String path) {
         this.id = UUID.fromString(data.getUuid());
         this.record = data;
