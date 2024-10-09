@@ -21,13 +21,15 @@ public class Annotations {
 }
 
 class AnnotationException {
-    private Object message;
+
+    public final Object message;
 
     AnnotationException(Object message) {
-        setMessage(message);
-    }
-
-    void setMessage(Object message) {
         this.message = message;
     }
+
+    public Object getMessage() {
+        return message;
+    }
+
 }

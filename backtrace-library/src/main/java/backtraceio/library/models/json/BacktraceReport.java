@@ -2,11 +2,11 @@ package backtraceio.library.models.json;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.lang.Exception;
 
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.CollectionUtils;
@@ -65,7 +65,7 @@ public class BacktraceReport {
     /**
      * Current report exception stack
      */
-    public ArrayList<BacktraceStackFrame> diagnosticStack;
+    public List<BacktraceStackFrame> diagnosticStack;
 
     /**
      * Create new instance of Backtrace report to send a report with custom client message
@@ -188,12 +188,23 @@ public class BacktraceReport {
         this.setDefaultErrorTypeAttribute();
     }
 
-    public String getExceptionClassifier(Exception exception) {
-        if (exception instanceof UnhandledThrowableWrapper) {
-            return ((UnhandledThrowableWrapper) exception).getClassifier();
-        }
-        return exception.getClass().getCanonicalName();
+    public BacktraceReport(UUID uuid, long timestamp,
+                           boolean exceptionTypeReport, String classifier,
+                           Map<String, Object> attributes,
+                           String message, Exception exception,
+                           List<String> attachmentPaths,
+                           List<BacktraceStackFrame> diagnosticStack) {
+        this.uuid = uuid;
+        this.timestamp = timestamp;
+        this.exceptionTypeReport = exceptionTypeReport;
+        this.classifier = classifier;
+        this.attributes = attributes;
+        this.message = message;
+        this.exception = exception;
+        this.attachmentPaths = attachmentPaths;
+        this.diagnosticStack = diagnosticStack;
     }
+
     /**
      * To avoid serialization issues with custom exceptions, our goal is to always
      * prepare exception in a way potential serialization won't break it
@@ -208,6 +219,13 @@ public class BacktraceReport {
         reportException.setStackTrace(exception.getStackTrace());
 
         return reportException;
+    }
+
+    public String getExceptionClassifier(Exception exception) {
+        if (exception instanceof UnhandledThrowableWrapper) {
+            return ((UnhandledThrowableWrapper) exception).getClassifier();
+        }
+        return exception.getClass().getCanonicalName();
     }
 
     /**
@@ -236,7 +254,7 @@ public class BacktraceReport {
     public static Map<String, Object> concatAttributes(
             BacktraceReport report, Map<String, Object> attributes) {
         Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
-                new HashMap<String, Object>();
+                new HashMap<>();
         if (attributes == null) {
             return reportAttributes;
         }
@@ -249,8 +267,7 @@ public class BacktraceReport {
     }
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
-        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
-        return backtraceData;
+        final String symbolication = isProguardEnabled ? "proguard" : null;
+        return new BacktraceData.Builder(context, this, symbolication, clientAttributes).build();
     }
 }
