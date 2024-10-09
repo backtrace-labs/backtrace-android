@@ -1,5 +1,7 @@
 package backtraceio.library.services;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +50,12 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Record order
      */
     private final RetryOrder retryOrder;
+
+    @Deprecated
+    // TODO: Add description Context not used
+    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
+        this(settings);
+    }
 
     /**
      * Initialize new instance of Backtrace Database Context
