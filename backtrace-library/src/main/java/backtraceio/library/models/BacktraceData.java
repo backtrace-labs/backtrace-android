@@ -16,6 +16,7 @@ import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
+import backtraceio.library.services.BacktraceApi;
 
 /**
  * Serializable Backtrace API data object
@@ -105,8 +106,13 @@ public class BacktraceData {
     @SerializedName("threads")
     Map<String, ThreadInformation> threadInformationMap;
 
+
+    /**
+     * Create new instance of BacktraceData
+     * @deprecated
+     * This method is no longer way of creating new BacktraceData instance and will be removed soon
+     */
     @Deprecated
-    // TODO: Add description
     public BacktraceData(Context context, BacktraceReport report, Map<String, Object> clientAttributes) {
         BacktraceData obj = new Builder(
                 context,
