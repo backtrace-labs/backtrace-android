@@ -30,10 +30,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final int _retryNumber;
 
-    /**
-     * Application context
-     */
-    private final Context _applicationContext;
 
     /**
      * Database cache
@@ -55,13 +51,19 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final RetryOrder retryOrder;
 
+    @Deprecated
+    // TODO: Add description Context not used
+    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
+        this(settings);
+    }
+
     /**
      * Initialize new instance of Backtrace Database Context
      *
      * @param settings database settings
      */
-    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
-        this(context, settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
+    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings) {
+        this(settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
     }
 
     /**
@@ -71,8 +73,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @param retryNumber total number of retries
      * @param retryOrder  record order
      */
-    private BacktraceDatabaseContext(Context context, String path, int retryNumber, RetryOrder retryOrder) {
-        this._applicationContext = context;
+    private BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
         this._path = path;
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;
@@ -88,7 +89,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
 
         for (int i = 0; i < _retryNumber; i++) {
-            this.batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            this.batchRetry.put(i, new ArrayList<>());
         }
     }
 

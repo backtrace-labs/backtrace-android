@@ -1,0 +1,15 @@
+{
+  "name": "main",
+  "fault": true,
+  "stack": [
+    {
+      "funcName": "backtraceio.backtraceio.MainActivity.handledException",
+      "line": 150,
+      "sourceCode": "cde23509-3dcc-494d-af1f-4b4e2af4cc5e"
+    },
+    {
+      "funcName": "java.lang.reflect.Method.invoke",
+      "sourceCode": "7fc374ec-e276-46da-8d1a-05b37425927e"
+    }
+  ]
+}

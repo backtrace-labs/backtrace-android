@@ -2,6 +2,7 @@ package backtraceio.library.models.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.models.BacktraceStackFrame;
@@ -14,7 +15,7 @@ public class ThreadData {
     /**
      * All collected application threads information
      */
-    public HashMap<String, ThreadInformation> threadInformation = new HashMap<>();
+    public Map<String, ThreadInformation> threadInformation = new HashMap<>();
 
     /**
      * Application Id for current thread.
@@ -27,7 +28,7 @@ public class ThreadData {
      *
      * @param exceptionStack current BacktraceReport exception stack
      */
-    public ThreadData(ArrayList<BacktraceStackFrame> exceptionStack) {
+    public ThreadData(List<BacktraceStackFrame> exceptionStack) {
         generateCurrentThreadInformation(exceptionStack);
         processThreads();
     }
@@ -46,7 +47,7 @@ public class ThreadData {
      *
      * @param exceptionStack current BacktraceReport exception stack
      */
-    private void generateCurrentThreadInformation(ArrayList<BacktraceStackFrame> exceptionStack) {
+    private void generateCurrentThreadInformation(List<BacktraceStackFrame> exceptionStack) {
         Thread currThread = Thread.currentThread();
         mainThread = currThread.getName().toLowerCase();
         this.threadInformation.put(mainThread,
@@ -73,7 +74,7 @@ public class ThreadData {
             }
             if (stack != null && stack.length != 0) {
                 for (StackTraceElement stackTraceElement : stack) {
-                    stackFrame.add(new BacktraceStackFrame(stackTraceElement));
+                    stackFrame.add(BacktraceStackFrame.fromStackTraceElement(stackTraceElement));
                 }
             }
             this.threadInformation.put(threadName, new ThreadInformation(thread, stackFrame,

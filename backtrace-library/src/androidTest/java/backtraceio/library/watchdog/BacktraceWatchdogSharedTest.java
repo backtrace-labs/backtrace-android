@@ -62,7 +62,7 @@ public class BacktraceWatchdogSharedTest {
             String breadcrumbPath = data.getReport().attachmentPaths.get(0);
 
             assertTrue(breadcrumbPath.contains("bt-breadcrumbs"));
-            assertEquals(data.attributes.get("error.type"), AnrAttributeType);
+            assertEquals(data.getAttributes().get("error.type"), AnrAttributeType);
             assertEquals("ANR detected - thread is blocked", getANRBreadcrumb());
 
             waiter.resume();
