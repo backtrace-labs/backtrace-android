@@ -16,7 +16,6 @@ import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
-import backtraceio.library.services.BacktraceApi;
 
 /**
  * Serializable Backtrace API data object

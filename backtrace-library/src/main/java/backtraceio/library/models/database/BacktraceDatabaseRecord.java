@@ -126,9 +126,14 @@ public class BacktraceDatabaseRecord {
     public long getSize() {
         return size;
     }
-
+    
+    /**
+     * Get BacktraceData object related to db record
+     * @deprecated Context param is not used, use getBacktraceData() method
+     * @param context Android context
+     * @return BacktraceData object related to db record
+     */
     @Deprecated
-    // TODO: Add description
     public BacktraceData getBacktraceData(Context context) {
         return getBacktraceData();
     }
