@@ -51,8 +51,17 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final RetryOrder retryOrder;
 
+    /**
+     * @deprecated This constructor will be removed in future versions.
+     * The {@code context} parameter is no longer used.
+     * Please use the constructor without the {@code context} parameter.
+     *
+     * <p>Use {@link #BacktraceDatabaseContext(BacktraceDatabaseSettings)} instead.</p>
+     *
+     * @param context The unused Android context parameter.
+     * @param settings The database settings.
+     */
     @Deprecated
-    // TODO: Add description Context not used
     public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
         this(settings);
     }
