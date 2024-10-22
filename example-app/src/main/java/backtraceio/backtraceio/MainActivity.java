@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
+        BacktraceCredentials credentials = new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
+                "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 
@@ -149,7 +150,12 @@ public class MainActivity extends AppCompatActivity {
                 throw new IndexOutOfBoundsException("Invalid index of selected element!");
             }
         } catch (IndexOutOfBoundsException e) {
-            backtraceClient.send(new BacktraceReport(e), this.listener);
+            Map<String, Object> attr = new HashMap<>();
+            attr.put("XYZ", "ATTR");
+            String path = "/asdas.txt";
+            List<String> l = new ArrayList<>();
+            l.add(path);
+            backtraceClient.send(new BacktraceReport(e, attr, l), this.listener);
         }
     }
 

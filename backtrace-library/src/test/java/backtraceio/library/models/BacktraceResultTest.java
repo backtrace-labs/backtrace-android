@@ -25,6 +25,17 @@ public class BacktraceResultTest {
     }
 
     @Test
+    public void createFromBacktraceApiResultStatusLowercase() {
+        // GIVEN
+        BacktraceApiResult example = new BacktraceApiResult("95000000-eb43-390b-0000-000000000000", "ok");
+        // WHEN
+        BacktraceResult result = new BacktraceResult(example);
+        // THEN
+        assertEquals(example.getRxId(), result.getRxId());
+        assertEquals(BacktraceResultStatus.Ok, result.getStatus());
+    }
+
+    @Test
     public void serialize() {
         // GIVEN
         BacktraceResult example = new BacktraceResult("95000000-eb43-390b-0000-000000000000", "Ok");

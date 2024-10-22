@@ -42,7 +42,7 @@ public class BacktraceResult {
     }
 
     public BacktraceResult(String rxId, String status) {
-        this(null, rxId, null, BacktraceResultStatus.valueOf(status));
+        this(null, rxId, null, BacktraceResultStatus.enumOf(status));
     }
 
     /**
