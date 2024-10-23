@@ -56,12 +56,45 @@ public class BacktraceDataTest {
         assertEquals(backtraceData.getAnnotations().size(), 3);
         assertEquals(backtraceData.getMainThread(), "instr: androidx.test.runner.androidjunitrunner");
         assertEquals(backtraceData.getSourceCode().size(), 34);
+        assertEquals(backtraceData.getThreadInformationMap().size(), 15);
+        assertEquals(backtraceData.getAttachmentPaths().size(), 3);
+        assertEquals(backtraceData.getAttributes().get("attr-1"), "1");
+        assertEquals(backtraceData.getAttributes().get("attr-2"), "true");
+        assertEquals(backtraceData.getAttributes().get("attr-3"), "test");
+    }
+    @Test
+    public void testBacktraceDataConstructor() {
+        // GIVEN
+        List<String> attachmentsPath = Arrays.asList("one", "two", "three");
+        BacktraceReport report = new BacktraceReport(new IllegalAccessException("test-message"), attachmentsPath);
+
+        Map<String, Object> clientAttributes = new HashMap<>();
+        clientAttributes.put("attr-1", 1);
+        clientAttributes.put("attr-2", true);
+        clientAttributes.put("attr-3", "test");
+
+        // WHEN
+        BacktraceData backtraceData = new BacktraceData(context, report, clientAttributes);
+
+        // THEN
+        assertArrayEquals(backtraceData.getClassifiers(), new String[]{"java.lang.IllegalAccessException"});
+        assertEquals(backtraceData.getReport(), report);
+        assertEquals(backtraceData.getAttributes().get("classifier"), "java.lang.IllegalAccessException");
+        assertEquals(backtraceData.getAgent(), "backtrace-android");
+        assertEquals(backtraceData.getAgentVersion(), backtraceio.library.BuildConfig.VERSION_NAME);
+        assertEquals(backtraceData.getLang(), "java");
+        assertEquals(backtraceData.getLangVersion(), "0");
+        assertEquals(backtraceData.getSymbolication(), "");
+        assertEquals(backtraceData.getTimestamp(), report.timestamp);
+        assertEquals(backtraceData.getUuid(), report.uuid.toString());
+        assertEquals(backtraceData.getAttributes().size(), 43);
+        assertEquals(backtraceData.getAnnotations().size(), 3);
+        assertEquals(backtraceData.getMainThread(), "instr: androidx.test.runner.androidjunitrunner");
+        assertEquals(backtraceData.getSourceCode().size(), 34);
         assertEquals(backtraceData.getThreadInformationMap().size(), 13);
         assertEquals(backtraceData.getAttachmentPaths().size(), 3);
         assertEquals(backtraceData.getAttributes().get("attr-1"), "1");
         assertEquals(backtraceData.getAttributes().get("attr-2"), "true");
         assertEquals(backtraceData.getAttributes().get("attr-3"), "test");
     }
-
-    // TODO: Add test with BacktraceData constructor
 }
