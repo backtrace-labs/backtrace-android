@@ -149,12 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 throw new IndexOutOfBoundsException("Invalid index of selected element!");
             }
         } catch (IndexOutOfBoundsException e) {
-            Map<String, Object> attr = new HashMap<>();
-            attr.put("XYZ", "ATTR");
-            String path = "/asdas.txt";
-            List<String> l = new ArrayList<>();
-            l.add(path);
-            backtraceClient.send(new BacktraceReport(e, attr, l), this.listener);
+            backtraceClient.send(new BacktraceReport(e), this.listener);
         }
     }
 
