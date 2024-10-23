@@ -3,12 +3,19 @@ package backtraceio.library.models;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.BacktraceMockLogger;
 
 public class BacktraceStackFrameTest {
+    @Before
+    public void setUp() {
+        BacktraceLogger.setLogger(new BacktraceMockLogger());
+    }
     private final String JSON_FILE = "backtraceStackFrame.json";
     @Test
     public void serialize() {
