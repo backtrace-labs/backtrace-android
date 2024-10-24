@@ -7,6 +7,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,10 +39,9 @@ public class TestUtils {
         return null;
     }
 
-    public static String unifyJsonString(String json) {
-        return json.replace("\n", "")
-                .replace(" ", "")
-                .replace("\t", "");
+    public static String minifyJsonString(String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        return jsonObject.toString();
     }
 
     public static boolean compareJson(String json1, String json2) {

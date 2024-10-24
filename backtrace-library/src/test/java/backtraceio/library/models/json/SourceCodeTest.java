@@ -2,6 +2,7 @@ package backtraceio.library.models.json;
 
 import static org.junit.Assert.assertEquals;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import backtraceio.library.TestUtils;
@@ -11,15 +12,15 @@ public class SourceCodeTest {
 
     private final String JSON_FILE = "sourceCode.json";
     @Test
-    public void serialize() {
+    public void serialize() throws JSONException {
         // GIVEN
         SourceCode obj = new SourceCode(17, "InvokeMethod.java");
 
         // WHEN
-        String json = BacktraceSerializeHelper.toJson(obj);
+        String json = TestUtils.minifyJsonString(BacktraceSerializeHelper.toJson(obj));
 
         // THEN
-        String expectedJson = TestUtils.unifyJsonString(
+        String expectedJson = TestUtils.minifyJsonString(
                 TestUtils.readFileAsString(this, JSON_FILE)
         );
 

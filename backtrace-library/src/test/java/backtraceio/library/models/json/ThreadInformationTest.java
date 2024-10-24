@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import backtraceio.library.models.BacktraceStackFrame;
 public class ThreadInformationTest {
 
     @Test
-    public void serialize() {
+    public void serialize() throws JSONException {
         // GIVEN
         List<BacktraceStackFrame> frames = new ArrayList<>();
         frames.add(new BacktraceStackFrame("backtraceio.backtraceio.MainActivity.handledException", null, 150, "cde23509-3dcc-494d-af1f-4b4e2af4cc5e"));
@@ -25,10 +26,10 @@ public class ThreadInformationTest {
         ThreadInformation obj = new ThreadInformation("main", true, frames);
 
         // WHEN
-        String json = BacktraceSerializeHelper.toJson(obj);
+        String json = TestUtils.minifyJsonString(BacktraceSerializeHelper.toJson(obj));
 
         // THEN
-        String expectedJson = TestUtils.unifyJsonString(
+        String expectedJson = TestUtils.minifyJsonString(
                 TestUtils.readFileAsString(this, "threadInformation.json")
         );
 

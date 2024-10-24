@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import backtraceio.library.models.BacktraceStackFrame;
 public class BacktraceReportTest {
     private final String JSON_FILE = "backtraceReport.json";
     @Test
-    public void serialize() {
+    public void serialize() throws JSONException {
         // GIVEN
         final List<BacktraceStackFrame> diagnosticStack = new ArrayList<>();
 
@@ -40,7 +41,7 @@ public class BacktraceReportTest {
         String json = BacktraceSerializeHelper.toJson(report);
 
         // THEN
-        String expectedJson = TestUtils.unifyJsonString(
+        String expectedJson = TestUtils.minifyJsonString(
                 TestUtils.readFileAsString(this, JSON_FILE)
         );
 

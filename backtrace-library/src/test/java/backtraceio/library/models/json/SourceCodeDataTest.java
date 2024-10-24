@@ -3,6 +3,7 @@ package backtraceio.library.models.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import backtraceio.library.models.BacktraceStackFrame;
 public class SourceCodeDataTest {
     private final String JSON_FILE = "sourceCodeData.json";
     @Test
-    public void serialize() {
+    public void serialize() throws JSONException {
         // GIVEN
         List<BacktraceStackFrame> frames = new ArrayList<BacktraceStackFrame>() {{
             add(new BacktraceStackFrame(null, "VMStack.java", null, "8751bea6-d6f6-48f4-9f96-1355c3408a9a"));
@@ -24,10 +25,10 @@ public class SourceCodeDataTest {
 
         SourceCodeData obj = new SourceCodeData(frames);
         // WHEN
-        String json = BacktraceSerializeHelper.toJson(obj);
+        String json = TestUtils.minifyJsonString(BacktraceSerializeHelper.toJson(obj));
 
         // THEN
-        String expectedJson = TestUtils.unifyJsonString(
+        String expectedJson = TestUtils.minifyJsonString(
                 TestUtils.readFileAsString(this, JSON_FILE)
         );
 
