@@ -39,11 +39,20 @@ public class BacktraceStackFrame {
 
     /**
      * Create new instance of BacktraceStackFrame
+     *
+     * @deprecated
+     * Use {@link #fromStackTraceElement(StackTraceElement frame)} instead.
      */
     @SuppressWarnings({"UnusedDeclaration"})
+    @Deprecated
     public BacktraceStackFrame() {}
 
-
+    /**
+     * Create new instance of BacktraceStackFrame
+     *
+     * @deprecated
+     * Use {@link #fromStackTraceElement(StackTraceElement frame)} instead.
+     */
     @Deprecated
     public BacktraceStackFrame(StackTraceElement frame) {
         BacktraceStackFrame obj = BacktraceStackFrame.fromStackTraceElement(frame);
