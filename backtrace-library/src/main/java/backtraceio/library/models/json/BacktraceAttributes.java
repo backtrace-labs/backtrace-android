@@ -25,7 +25,7 @@ import backtraceio.library.logger.BacktraceLogger;
  * Class instance to get a built-in attributes from current application
  */
 public class BacktraceAttributes {
-    private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
+    private static final String LOG_TAG = BacktraceAttributes.class.getSimpleName();
 
     /**
      * Get built-in primitive attributes
@@ -43,14 +43,9 @@ public class BacktraceAttributes {
     private final Context context;
 
     /**
-     * Are metrics enabled?
-     */
-    private static boolean isMetricsEnabled = false;
-
-    /**
      * Metrics session ID
      */
-    private static String sessionId = UUID.randomUUID().toString();
+    private static final String sessionId = UUID.randomUUID().toString();
 
     /**
      * Create instance of Backtrace Attribute
@@ -136,7 +131,7 @@ public class BacktraceAttributes {
         this.attributes.put("screen.width", String.valueOf(metrics.widthPixels));
         this.attributes.put("screen.height", String.valueOf(metrics.heightPixels));
         this.attributes.put("screen.dpi", String.valueOf(metrics.densityDpi));
-        if (includeDynamicAttributes == false) {
+        if (!includeDynamicAttributes) {
             return;
         }
         this.attributes.put("screen.orientation", getScreenOrientation().toString());

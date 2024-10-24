@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
 
         symlinkAndWriteFile();
@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
-
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 

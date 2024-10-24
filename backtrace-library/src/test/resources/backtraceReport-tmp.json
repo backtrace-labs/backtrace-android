@@ -1,0 +1,238 @@
+{
+  "attachment-paths": [
+    "abc.txt"
+  ],
+  "attributes": {
+    "error.type": "Exception"
+  },
+  "classifier": "java.lang.IllegalAccessException",
+  "diagnostic-stack": [
+    {
+      "funcName": "backtraceio.library.SettingAttributesTest.tmpGsonTest",
+      "line": 75,
+      "sourceCode": "c37b9ae3-eab1-4928-9533-f1c14b6149f5"
+    },
+    {
+      "funcName": "java.lang.reflect.Method.invoke",
+      "sourceCode": "6f280747-feee-4f4b-9eff-dda0d8eaa535"
+    }
+  ],
+  "exception": {
+    "stack-trace": [
+      {
+        "declaring-class": "backtraceio.library.SettingAttributesTest",
+        "file-name": "SettingAttributesTest.java",
+        "line-number": 75,
+        "method-name": "tmpGsonTest"
+      },
+      {
+        "declaring-class": "java.lang.reflect.Method",
+        "file-name": "Method.java",
+        "line-number": -2,
+        "method-name": "invoke"
+      },
+      {
+        "declaring-class": "org.junit.runners.model.FrameworkMethod$1",
+        "file-name": "FrameworkMethod.java",
+        "line-number": 59,
+        "method-name": "runReflectiveCall"
+      },
+      {
+        "declaring-class": "org.junit.internal.runners.model.ReflectiveCallable",
+        "file-name": "ReflectiveCallable.java",
+        "line-number": 12,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "org.junit.runners.model.FrameworkMethod",
+        "file-name": "FrameworkMethod.java",
+        "line-number": 56,
+        "method-name": "invokeExplosively"
+      },
+      {
+        "declaring-class": "org.junit.internal.runners.statements.InvokeMethod",
+        "file-name": "InvokeMethod.java",
+        "line-number": 17,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "androidx.test.internal.runner.junit4.statement.RunBefores",
+        "file-name": "RunBefores.java",
+        "line-number": 80,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$3",
+        "file-name": "ParentRunner.java",
+        "line-number": 306,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner$1",
+        "file-name": "BlockJUnit4ClassRunner.java",
+        "line-number": 100,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 366,
+        "method-name": "runLeaf"
+      },
+      {
+        "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner",
+        "file-name": "BlockJUnit4ClassRunner.java",
+        "line-number": 103,
+        "method-name": "runChild"
+      },
+      {
+        "declaring-class": "org.junit.runners.BlockJUnit4ClassRunner",
+        "file-name": "BlockJUnit4ClassRunner.java",
+        "line-number": 63,
+        "method-name": "runChild"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$4",
+        "file-name": "ParentRunner.java",
+        "line-number": 331,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$1",
+        "file-name": "ParentRunner.java",
+        "line-number": 79,
+        "method-name": "schedule"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 329,
+        "method-name": "runChildren"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 66,
+        "method-name": "access$100"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$2",
+        "file-name": "ParentRunner.java",
+        "line-number": 293,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$3",
+        "file-name": "ParentRunner.java",
+        "line-number": 306,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 413,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "androidx.test.ext.junit.runners.AndroidJUnit4",
+        "file-name": "AndroidJUnit4.java",
+        "line-number": 162,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "org.junit.runners.Suite",
+        "file-name": "Suite.java",
+        "line-number": 128,
+        "method-name": "runChild"
+      },
+      {
+        "declaring-class": "org.junit.runners.Suite",
+        "file-name": "Suite.java",
+        "line-number": 27,
+        "method-name": "runChild"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$4",
+        "file-name": "ParentRunner.java",
+        "line-number": 331,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$1",
+        "file-name": "ParentRunner.java",
+        "line-number": 79,
+        "method-name": "schedule"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 329,
+        "method-name": "runChildren"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 66,
+        "method-name": "access$100"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$2",
+        "file-name": "ParentRunner.java",
+        "line-number": 293,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner$3",
+        "file-name": "ParentRunner.java",
+        "line-number": 306,
+        "method-name": "evaluate"
+      },
+      {
+        "declaring-class": "org.junit.runners.ParentRunner",
+        "file-name": "ParentRunner.java",
+        "line-number": 413,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "org.junit.runner.JUnitCore",
+        "file-name": "JUnitCore.java",
+        "line-number": 137,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "org.junit.runner.JUnitCore",
+        "file-name": "JUnitCore.java",
+        "line-number": 115,
+        "method-name": "run"
+      },
+      {
+        "declaring-class": "androidx.test.internal.runner.TestExecutor",
+        "file-name": "TestExecutor.java",
+        "line-number": 67,
+        "method-name": "execute"
+      },
+      {
+        "declaring-class": "androidx.test.internal.runner.TestExecutor",
+        "file-name": "TestExecutor.java",
+        "line-number": 58,
+        "method-name": "execute"
+      },
+      {
+        "declaring-class": "androidx.test.runner.AndroidJUnitRunner",
+        "file-name": "AndroidJUnitRunner.java",
+        "line-number": 446,
+        "method-name": "onStart"
+      },
+      {
+        "declaring-class": "android.app.Instrumentation$InstrumentationThread",
+        "file-name": "Instrumentation.java",
+        "line-number": 2205,
+        "method-name": "run"
+      }
+    ],
+    "suppressed-exceptions": []
+  },
+  "exception-type-report": true,
+  "timestamp": 1709680251,
+  "uuid": "a62a533a-a7b8-415c-9a99-253c51f00827"
+}
