@@ -161,6 +161,19 @@ public class BacktraceData {
         return report.attachmentPaths;
     }
 
+    /**
+     * Get paths to report attachments
+     *
+     * @deprecated
+     * Please use {@link #getAttachmentPaths()} instead.
+     *
+     * @return paths to attachments
+     */
+    @Deprecated
+    public List<String> getAttachments() {
+        return this.getAttachmentPaths();
+    }
+    
     public Map<String, ThreadInformation> getThreadInformationMap() {
         return threadInformationMap;
     }
