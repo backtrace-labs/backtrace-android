@@ -43,12 +43,10 @@ public class BacktraceStackFrameTest {
         assertEquals(expectedJson, json);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void createFromNullStackTraceElement() {
         // GIVEN
         BacktraceStackFrame obj = BacktraceStackFrame.fromStackTraceElement(null);
-        // THEN
-        assertNull(obj);
     }
 
     @Test

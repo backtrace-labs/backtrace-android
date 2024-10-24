@@ -63,8 +63,8 @@ public class BacktraceStackFrame {
      */
     public static BacktraceStackFrame fromStackTraceElement(StackTraceElement frame) {
         if (frame == null || frame.getMethodName() == null) {
-            BacktraceLogger.w(LOG_TAG, "Frame or method name is null");
-            return null;
+            BacktraceLogger.e(LOG_TAG, "Frame or method name is null");
+            throw new IllegalArgumentException("Frame or method name is null");
         }
         final String functionName = frame.getClassName() + "." + frame.getMethodName();
         final String fileName = frame.getFileName();

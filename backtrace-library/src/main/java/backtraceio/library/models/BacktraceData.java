@@ -173,7 +173,7 @@ public class BacktraceData {
     public List<String> getAttachments() {
         return this.getAttachmentPaths();
     }
-    
+
     public Map<String, ThreadInformation> getThreadInformationMap() {
         return threadInformationMap;
     }
