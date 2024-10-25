@@ -113,11 +113,10 @@ public class BacktraceData {
      */
     @Deprecated
     public BacktraceData(Context context, BacktraceReport report, Map<String, Object> clientAttributes) {
-        BacktraceData obj = new Builder(
-                context,
-                report,
-                clientAttributes
-        ).build();
+        BacktraceData obj = new Builder(report)
+                .setAttributes(context, clientAttributes)
+                .setSymbolication("")
+                .build();
 
         this.uuid = obj.uuid;
         this.symbolication = obj.symbolication;
@@ -234,7 +233,7 @@ public class BacktraceData {
     public static class Builder {
         private final BacktraceReport report;
 
-        private final String symbolication;
+        private String symbolication = "";
 
         private String uuid;
 
@@ -252,18 +251,11 @@ public class BacktraceData {
         private Map<String, String> attributes;
         private String mainThread;
 
-        public Builder(Context context, BacktraceReport report, Map<String, Object>
-                clientAttributes) {
-            this(context, report, "", clientAttributes);
-        }
-        public Builder(Context context, BacktraceReport report, String symbolication, Map<String, Object>
-                clientAttributes) {
+        public Builder(BacktraceReport report) {
             this.report = report;
-            this.symbolication = symbolication;
 
             this.setDefaultReportInformation(this.report);
             this.setDefaultThreadsInformation();
-            this.setAttributes(context, clientAttributes);
         }
 
         public BacktraceData build() {
@@ -283,21 +275,27 @@ public class BacktraceData {
             );
         }
 
+        public Builder setSymbolication(String symbolication) {
+            this.symbolication = symbolication;
+            return this;
+        }
+
         /**
          * Set report information such as report identifier (UUID), timestamp, classifier
          */
-        private void setDefaultReportInformation(BacktraceReport report) {
+        private Builder setDefaultReportInformation(BacktraceReport report) {
             this.uuid = report.uuid.toString();
             this.timestamp = report.timestamp;
             this.classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
             this.langVersion = System.getProperty("java.version");
             this.agentVersion = BacktraceClient.version;
+            return this;
         }
 
         /**
         * Set information about all threads
         */
-        private void setDefaultThreadsInformation() {
+        private Builder setDefaultThreadsInformation() {
             BacktraceLogger.d(LOG_TAG, "Setting threads information");
 
             ThreadData threadData = new ThreadData(report.diagnosticStack);
@@ -306,9 +304,10 @@ public class BacktraceData {
             this.mainThread = threadData.getMainThread();
             this.threadInformationMap = threadData.threadInformation;
             this.sourceCode = sourceCodeData.data.isEmpty() ? null : sourceCodeData.data;
+            return this;
         }
 
-        private void setAttributes(Context context, Map<String, Object> clientAttributes) {
+        public Builder setAttributes(Context context, Map<String, Object> clientAttributes) {
             BacktraceLogger.d(LOG_TAG, "Setting attributes");
             BacktraceAttributes backtraceAttributes = new BacktraceAttributes(
                     context,
@@ -317,9 +316,10 @@ public class BacktraceData {
             this.attributes = backtraceAttributes.attributes;
 
             setAnnotations(backtraceAttributes.getComplexAttributes());
+            return this;
         }
 
-        private void setAnnotations(Map<String, Object> complexAttributes) {
+        private Builder setAnnotations(Map<String, Object> complexAttributes) {
             BacktraceLogger.d(LOG_TAG, "Setting annotations");
             Object exceptionMessage = null;
 
@@ -328,6 +328,7 @@ public class BacktraceData {
                 exceptionMessage = this.attributes.get("error.message");
             }
             this.annotations = Annotations.getAnnotations(exceptionMessage, complexAttributes);
+            return this;
         }
     }
 }

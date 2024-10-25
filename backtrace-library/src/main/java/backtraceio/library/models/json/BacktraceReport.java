@@ -268,6 +268,6 @@ public class BacktraceReport {
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
         final String symbolication = isProguardEnabled ? "proguard" : null;
-        return new BacktraceData.Builder(context, this, symbolication, clientAttributes).build();
+        return new BacktraceData.Builder(this).setAttributes(context, clientAttributes).setSymbolication(symbolication).build();
     }
 }

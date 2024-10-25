@@ -145,7 +145,7 @@ public class BacktraceDatabaseContextTest {
         // GIVEN
         fillDatabase();
         BacktraceReport report = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -234,7 +234,7 @@ public class BacktraceDatabaseContextTest {
         // GIVEN
         fillDatabase();
         BacktraceReport report = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -259,9 +259,9 @@ public class BacktraceDatabaseContextTest {
         BacktraceReport report = new BacktraceReport(this.testMessage);
         BacktraceReport report2 = new BacktraceReport(this.testMessage);
         BacktraceReport report3 = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
-        BacktraceData data2 = new BacktraceData.Builder(this.context, report2, null).build();
-        BacktraceData data3 = new BacktraceData.Builder(this.context, report3, null).build();
+        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
+        BacktraceData data2 = new BacktraceData.Builder(report2).setAttributes(this.context, null).build();
+        BacktraceData data3 = new BacktraceData.Builder(report3).setAttributes(this.context, null).build();
         result.add(databaseContext.add(data));
         result.add(databaseContext.add(data2));
         result.add(databaseContext.add(data3));

@@ -40,7 +40,7 @@ public class BacktraceDataTest {
         clientAttributes.put("attr-2", true);
         clientAttributes.put("attr-3", "test");
         // WHEN
-        BacktraceData backtraceData = new BacktraceData.Builder(context, report, clientAttributes).build();
+        BacktraceData backtraceData = new BacktraceData.Builder(report).setAttributes(context, clientAttributes).build();
 
         // THEN
         assertArrayEquals( new String[]{"java.lang.IllegalAccessException"} , backtraceData.getClassifiers());

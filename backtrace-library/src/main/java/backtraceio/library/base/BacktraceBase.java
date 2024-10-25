@@ -584,7 +584,7 @@ public class BacktraceBase implements Client {
         addReportAttachments(report);
 
         String symbolication = this.isProguardEnabled ? "proguard" : null;
-        BacktraceData backtraceData = new BacktraceData.Builder(context, report, symbolication, this.attributes).build();
+        BacktraceData backtraceData = new BacktraceData.Builder(report).setAttributes(context, this.attributes).setSymbolication(symbolication).build();
 
         final BacktraceDatabaseRecord record = this.database.add(report, this.attributes, this.isProguardEnabled);
 

@@ -51,7 +51,7 @@ public class BacktraceDatabaseRecordTest {
     public void saveAndGetRecord() {
         // GIVEN
         final BacktraceReport report = new BacktraceReport(testMessage);
-        final BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        final BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
@@ -85,7 +85,7 @@ public class BacktraceDatabaseRecordTest {
         }
 
         final BacktraceReport report = new BacktraceReport(testMessage, attachments);
-        final BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        final BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
@@ -107,7 +107,7 @@ public class BacktraceDatabaseRecordTest {
     public void deleteFileDiagnosticPathToCorruptRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
@@ -125,7 +125,7 @@ public class BacktraceDatabaseRecordTest {
     public void deleteFileReportPathToCorruptRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
@@ -143,7 +143,7 @@ public class BacktraceDatabaseRecordTest {
     public void createAndDeleteRecordFiles() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
@@ -163,7 +163,7 @@ public class BacktraceDatabaseRecordTest {
     public void readFileAndDeserialize() {
         // GIVEN
         final BacktraceReport report = new BacktraceReport(testMessage);
-        final BacktraceData data = new BacktraceData.Builder(this.context, report, null).build();
+        final BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
         final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
         record.save();
 
