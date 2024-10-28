@@ -170,20 +170,26 @@ public final class BacktraceMetrics implements Metrics {
         if (uniqueEventName == null || uniqueEventName.length() == 0) {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
-        final long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
 
+        long startExeuction = DebugHelper.getCurrentTimeMillis();
         setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
         this.enabled = true;
+        long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         try {
             startMetricsEventHandlers(backtraceApi);
+
+            BacktraceLogger.w(LOG_TAG, "ENABLE: startMetricsEventHandlers took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
+            startMetricsSetup = DebugHelper.getCurrentTimeMillis();
+
             sendStartupEvent();
+
+            BacktraceLogger.w(LOG_TAG, "ENABLE: sendStartupEvent took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
             BacktraceLogger.d(LOG_TAG, "Metrics enabled");
         } catch (Exception e) {
             BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
         }
-        final long endMetricsSetup = DebugHelper.getCurrentTimeMillis();
-        BacktraceLogger.d(LOG_TAG, "Setup metrics integration took " + (endMetricsSetup - startMetricsSetup) + " milliseconds");
+        BacktraceLogger.w(LOG_TAG, "TOTAL: Setup metrics integration took " + (DebugHelper.getCurrentTimeMillis() - startExeuction) + " milliseconds");
     }
 
     private void verifyIfMetricsAvailable() {
@@ -194,8 +200,13 @@ public final class BacktraceMetrics implements Metrics {
 
     private void startMetricsEventHandlers(Api backtraceApi) {
         verifyIfMetricsAvailable();
+        long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         uniqueEventsHandler = backtraceApi.enableUniqueEvents(this);
+
+        BacktraceLogger.w(LOG_TAG, "startMetricsEventHandlers: uniqueEventsHandler took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
+        startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         summedEventsHandler = backtraceApi.enableSummedEvents(this);
+        BacktraceLogger.w(LOG_TAG, "startMetricsEventHandlers: enableSummedEvents took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
     }
 
     public void setStartupUniqueEventName(String startupUniqueEventName) {
@@ -211,10 +222,17 @@ public final class BacktraceMetrics implements Metrics {
      */
     public void sendStartupEvent() {
         verifyIfMetricsAvailable();
+        long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         addUniqueEvent(startupUniqueEventName);
         addSummedEvent(startupSummedEventName);
+        BacktraceLogger.w(LOG_TAG, "sendStartupEvent: adding elements took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
+        startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         uniqueEventsHandler.send();
+        BacktraceLogger.w(LOG_TAG, "sendStartupEvent: sending uniqueEventsHandler took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
+        startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         summedEventsHandler.send();
+
+        BacktraceLogger.w(LOG_TAG, "sendStartupEvent: sending summedEventsHandler took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
     }
 
     /**

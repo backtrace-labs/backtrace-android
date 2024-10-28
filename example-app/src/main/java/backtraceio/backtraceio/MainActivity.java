@@ -29,6 +29,8 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
 
         symlinkAndWriteFile();
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
+
+        BacktraceLogger.setLevel(LogLevel.DEBUG);
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 

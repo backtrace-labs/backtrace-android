@@ -22,17 +22,11 @@ public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
     @Override
     protected SummedEventsPayload getEventsPayload() {
         Map<String, Object> attributes = backtraceMetrics.createLocalAttributes(null);
+        String application = attributes.get("application").toString();
+        String appVersion = attributes.get("application.version").toString();
 
-        ConcurrentLinkedDeque<SummedEvent> eventsCopy = new ConcurrentLinkedDeque<>();
-
-        for (SummedEvent event : events) {
-            event.addAttributes(attributes);
-            eventsCopy.addLast(new SummedEvent((SummedEvent) event));
-        }
+        SummedEventsPayload payload = new SummedEventsPayload(events, application, appVersion);
         events.clear();
-
-        SummedEventsPayload payload = new SummedEventsPayload(eventsCopy, application, appVersion);
-
         return payload;
     }
 
