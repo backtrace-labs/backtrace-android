@@ -11,10 +11,11 @@ androidGitVersion {
 
 android {
 
-    compileSdkVersion 33
+    compileSdkVersion 34
     namespace "backtraceio.library"
     defaultConfig {
         minSdkVersion 21
+        compileSdk 34
         targetSdkVersion 33
         versionName androidGitVersion.name()
         versionCode androidGitVersion.code()
