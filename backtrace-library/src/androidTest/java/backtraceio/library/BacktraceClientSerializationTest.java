@@ -9,8 +9,6 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.google.gson.annotations.SerializedName;
-
 import net.jodah.concurrentunit.Waiter;
 
 import org.junit.Before;
@@ -22,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;

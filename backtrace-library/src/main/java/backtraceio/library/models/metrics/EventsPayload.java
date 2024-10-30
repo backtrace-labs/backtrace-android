@@ -1,8 +1,8 @@
 package backtraceio.library.models.metrics;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+import backtraceio.library.common.serializers.SerializedName;
 
 public abstract class EventsPayload<T extends Event> {
 

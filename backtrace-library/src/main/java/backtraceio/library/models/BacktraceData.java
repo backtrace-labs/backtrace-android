@@ -2,12 +2,11 @@ package backtraceio.library.models;
 
 import android.content.Context;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;
@@ -16,6 +15,9 @@ import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
+
+
+// TODO: replace direct access with getters
 
 /**
  * Serializable Backtrace API data object

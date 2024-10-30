@@ -25,7 +25,7 @@ import backtraceio.library.logger.BacktraceLogger;
  * Class instance to get a built-in attributes from current application
  */
 public class BacktraceAttributes {
-    private static final String LOG_TAG = BacktraceAttributes.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
 
     /**
      * Get built-in primitive attributes

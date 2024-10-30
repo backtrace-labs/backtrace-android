@@ -1,10 +1,9 @@
 package backtraceio.library.models;
 
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.UUID;
 
+import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 
 /**

@@ -2,7 +2,8 @@ package backtraceio.library.common;
 
 import com.google.gson.Gson;
 
-import backtraceio.library.common.serialization.BacktraceGsonBuilder;
+import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
+import backtraceio.library.common.serializers.BacktraceOrgJsonSerializer;
 
 /**
  * Helper class for serialize and deserialize objects
@@ -16,19 +17,25 @@ public class BacktraceSerializeHelper {
      * @return serialized object in JSON string format
      */
     public static String toJson(Object object) {
-        return BacktraceSerializeHelper.toJson(new BacktraceGsonBuilder().buildGson(), object);
+        return BacktraceOrgJsonSerializer.toJson(object);
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
-        return BacktraceSerializeHelper.fromJson(new BacktraceGsonBuilder().buildGson(), json, type);
-    }
-
-    public static String toJson(Gson gson, Object object) {
-        return gson.toJson(object);
+        try {
+            return BacktraceOrgJsonDeserializer.deserialize(json, type);
+        } catch (Exception e) {
+            //TODO: remove this try-catch
+            return null;
+        }
     }
 
     public static <T> T fromJson(Gson gson, String json, Class<T> type) {
-        return gson.fromJson(json, type);
+        try {
+            return BacktraceOrgJsonDeserializer.deserialize(json, type);
+        } catch (Exception e) {
+            //TODO: remove this try-catch
+            return null;
+        }
     }
 
 }
