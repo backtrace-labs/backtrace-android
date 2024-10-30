@@ -23,7 +23,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     private static final transient String LOG_TAG = BacktraceBreadcrumbs.class.getSimpleName();
 
     /**
-     * Event which will be executed after storing successfully breadcurmbs
+     * Event which will be executed after storing successfully breadcrumbs
      */
     private OnSuccessfulBreadcrumbAddEventListener onSuccessfulBreadcrumbAddEventListener = null;
 
