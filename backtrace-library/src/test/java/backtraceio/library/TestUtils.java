@@ -25,12 +25,12 @@ public class TestUtils {
 
         if (inputStream != null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                StringBuilder jsonStringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    jsonStringBuilder.append(line);
+                    stringBuilder.append(line);
                 }
-                return jsonStringBuilder.toString();
+                return stringBuilder.toString();
 
             } catch (IOException e) {
                 e.printStackTrace();
