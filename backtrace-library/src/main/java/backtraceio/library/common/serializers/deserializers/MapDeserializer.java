@@ -12,6 +12,10 @@ import java.util.Map;
 
 public class MapDeserializer {
     public static Map<String, Object> toMap(JSONObject jsonObj)  throws JSONException {
+        if (jsonObj == null) {
+            return null;
+        }
+
         Map<String, Object> map = new HashMap<>();
         Iterator<String> keys = jsonObj.keys();
         while(keys.hasNext()) {

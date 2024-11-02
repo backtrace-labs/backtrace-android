@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
+import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.SourceCode;
@@ -38,19 +39,18 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
     public BacktraceData deserialize(JSONObject obj) throws JSONException {
         return new BacktraceData(
                 obj.optString(fieldNameLoader.get(Fields.uuid)),
-                obj.optString(fieldNameLoader.get(Fields.symbolication)),
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.symbolication)),
                 obj.optLong(fieldNameLoader.get(Fields.timestamp)),
-                obj.optString(fieldNameLoader.get(Fields.langVersion)), // TODO: fix or improve casing should get from annotation
-                obj.optString(fieldNameLoader.get(Fields.agentVersion)), // TODO: fix or improve casing should get from annotation
-                // TODO: fix all below and maybe add fallback
+                obj.optString(fieldNameLoader.get(Fields.langVersion)),
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.agentVersion)),
                 getAttributes(obj.optJSONObject(fieldNameLoader.get(Fields.attributes))),
-                obj.optString(fieldNameLoader.get(Fields.mainThread)),
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.mainThread)),
                 getClassifiers(obj.optJSONArray(fieldNameLoader.get(Fields.classifiers))),
                 getBacktraceReport(obj.optJSONObject(fieldNameLoader.get(Fields.report))),
                 getAnnotations(obj.optJSONObject(fieldNameLoader.get(Fields.annotations))),
                 getSourceCode(obj.optJSONObject(fieldNameLoader.get(Fields.sourceCode))),
                 getThreadInformation(obj.optJSONObject(fieldNameLoader.get(Fields.threadInformationMap)))
-        ); // TODO
+        );
     }
 
     public BacktraceReport getBacktraceReport(JSONObject obj) throws JSONException {
@@ -88,7 +88,6 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
     }
 
     public Map<String, ThreadInformation> getThreadInformation(JSONObject obj) {
-        // TODO: what if obj == null
         if (obj == null) {
             return null;
         }

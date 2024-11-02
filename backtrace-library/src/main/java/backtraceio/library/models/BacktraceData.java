@@ -31,7 +31,7 @@ public class BacktraceData {
     @SerializedName("uuid")
     public String uuid;
 
-    private static final transient String LOG_TAG = BacktraceData.class.getSimpleName();
+    private static final String LOG_TAG = BacktraceData.class.getSimpleName();
     /**
      * Name of programming language/environment this error comes from.
      */

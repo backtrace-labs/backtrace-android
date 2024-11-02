@@ -47,7 +47,7 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         }
         final String uuid = JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.uuid));
 
-        final long timestamp = obj.optLong(fieldNameLoader.get(Fields.timestamp), 0);
+        final long timestamp = obj.optLong(fieldNameLoader.get(Fields.timestamp));
         final String message = JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.message));
         final String classifier = JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.classifier));
         final boolean exceptionTypeReport = obj.optBoolean(fieldNameLoader.get(Fields.exceptionTypeReport));
