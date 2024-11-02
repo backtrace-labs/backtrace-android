@@ -8,20 +8,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import backtraceio.library.TestUtils;
 import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
-// TODO: move to standard unit tests not instrumented
-// TODO: use from resources
 public class BacktraceApiResultDeserializerTest {
-
-    private final String JSON_1 = "{\"response\":\"Ok\",\"_rxid\":\"01000000-5360-240b-0000-000000000000\"}";
     @Test
     public void deserializeCoronerApiJsonResponse() throws JSONException {
         // GIVEN
-        String json = JSON_1;
+        String json = TestUtils.readFileAsString(this, "backtraceApiResult.json");
 
         // WHEN
         BacktraceApiResultDeserializer deserializer = new BacktraceApiResultDeserializer();
@@ -29,27 +26,40 @@ public class BacktraceApiResultDeserializerTest {
 
         // THEN
         assertNotNull(result);
-        assertEquals(BacktraceResultStatus.Ok.toString(), result.getResponse());
-        assertEquals("01000000-5360-240b-0000-000000000000", result.getRxId());
+        assertEquals("ok", result.getResponse());
+        assertEquals("95000000-eb43-390b-0000-000000000000", result.getRxId());
     }
 
     @Test
     public void deserializeCoronerApiJsonResponseUsingOrgDeserializer() throws JSONException {
         // GIVEN
-        String json = JSON_1;
+        String json = TestUtils.readFileAsString(this, "backtraceApiResult.json");;
 
         // WHEN
         BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceApiResult.class);
 
         // THEN
         assertNotNull(result);
-        assertEquals(BacktraceResultStatus.Ok.toString(), result.getResponse());
-        assertEquals("01000000-5360-240b-0000-000000000000", result.getRxId());
+        assertEquals("ok", result.getResponse());
+        assertEquals("95000000-eb43-390b-0000-000000000000", result.getRxId());
     }
 
     @Test
-    public void deserializeCoronerApiErrorResponse() throws JSONException {
-        String json = "{ \"error\": { \"code\": 6, \"message\": \"invalid token\" } }"; // TODO: add proper error json
+    public void deserializeCoronerApiErrorResponseInvalidToken() throws JSONException {
+        String json = TestUtils.readFileAsString(this, "backtraceApiResultInvalidToken.error.json");
+
+        // WHEN
+        BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceApiResult.class);
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(BacktraceResultStatus.ServerError.toString(), result.getResponse());
+        assertNull(result.getRxId());
+    }
+
+    @Test
+    public void deserializeCoronerApiErrorResponseUnauthorized() throws JSONException {
+        String json = TestUtils.readFileAsString(this, "backtraceApiResultUnauthorized.error.json");
 
         // WHEN
         BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceApiResult.class);

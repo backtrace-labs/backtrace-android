@@ -42,7 +42,7 @@ public class BacktraceDataSerializerTest {
         attachments.add("test-path");
         attachments.add("test-path2");
         final BacktraceReport report = new BacktraceReport(exception, attributes, attachments);
-        final BacktraceData  data = new BacktraceData.Builder(context, report, null).build();
+        final BacktraceData  data = new BacktraceData.Builder(report).setAttributes(context, null).build();
 
         // WHEN
         final String jsonFromGson = BacktraceSerializeHelper.toJson(data);
@@ -93,7 +93,7 @@ public class BacktraceDataSerializerTest {
             attachments.add(Integer.toString(i));
             attachments.add(Integer.toString(i * 10));
             final BacktraceReport report = new BacktraceReport(exception, attributes, attachments);
-            final BacktraceData  data = new BacktraceData.Builder(context, report, null).build();
+            final BacktraceData  data = new BacktraceData.Builder(report).setAttributes(context, null).build();
 
             // GSON
             long startTime = System.currentTimeMillis();

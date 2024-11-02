@@ -16,7 +16,6 @@ import backtraceio.library.common.serialization.BacktraceGsonBuilder;
 import backtraceio.library.common.serializers.deserializers.BacktraceReportDeserializer;
 import backtraceio.library.models.json.BacktraceReport;
 
-// TODO: move to standard unit tests not instrumented
 public class BacktraceReportDeserializerTest {
     @Test
     public void deserializeCoronerApiJsonResponse() throws JSONException {
