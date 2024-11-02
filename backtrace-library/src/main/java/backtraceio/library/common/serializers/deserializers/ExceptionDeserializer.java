@@ -6,19 +6,23 @@ import org.json.JSONObject;
 
 public class ExceptionDeserializer implements Deserializable<Exception> {
     static class Fields {
-        final static String startLine = "startLine";
-        final static String sourceCodeFileName = "sourceCodeFileName";
+        final static String detailMessage = "detail-message";
+        final static String stackTrace = "stack-trace";
+        final static String declaringClass = "declaring-class";
+        final static String methodName = "method-name";
+        final static String fileName = "file-name";
+        final static String lineNumber = "line-number";
     }
+
     @Override
     public Exception deserialize(JSONObject obj) {
-        final String message = obj.optString("detail-message", "");
+        final String message = obj.optString(Fields.detailMessage, "");
 
         final Exception exception = new Exception(message);
 
         try {
-            exception.setStackTrace(getStacktrace(obj.optJSONArray("stack-trace")));
-        }
-        catch (JSONException jsonException) {
+            exception.setStackTrace(getStacktrace(obj.optJSONArray(Fields.stackTrace)));
+        } catch (JSONException jsonException) {
             //TODO: handle
             System.out.println(jsonException.toString());
         }
@@ -26,19 +30,18 @@ public class ExceptionDeserializer implements Deserializable<Exception> {
     }
 
     public StackTraceElement[] getStacktrace(JSONArray array) throws JSONException {
-        if (array == null || array.length() == 0) {
-            // TODO:
+        if (array == null) {
             return null;
         }
 
         StackTraceElement[] result = new StackTraceElement[array.length()];
-        for(int idx = 0; idx < array.length(); idx++) {
+        for (int idx = 0; idx < array.length(); idx++) {
             JSONObject obj = (JSONObject) array.get(idx);
             result[idx] = new StackTraceElement(
-                obj.optString("declaring-class"), // TODO: make something to not hardcode in this way
-                    obj.getString("method-name"), // TODO: make something to not hardcode in this way
-                    obj.optString("file-name"), // TODO: make something to not hardcode in this way
-                    obj.getInt("line-number") // TODO: make something to not hardcode in this way
+                    obj.optString(Fields.declaringClass),
+                    obj.getString(Fields.methodName),
+                    obj.optString(Fields.fileName),
+                    obj.getInt(Fields.lineNumber)
             );
         }
 

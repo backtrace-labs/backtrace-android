@@ -22,7 +22,7 @@ public class BacktraceStackFrameDeserializer implements Deserializable<Backtrace
         return new BacktraceStackFrame(
                 JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.functionName)),
                 JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCodeFileName)),
-                obj.optInt(fieldNameLoader.get(Fields.line)), // TODO: check fallback warning
+                obj.optInt(fieldNameLoader.get(Fields.line)),
                 JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCode)));
     }
 }
