@@ -61,6 +61,7 @@ public class BacktraceReport {
     /**
      * Get all paths to attachments
      */
+    @SerializedName("attachment-paths")
     public List<String> attachmentPaths;
 
     /**

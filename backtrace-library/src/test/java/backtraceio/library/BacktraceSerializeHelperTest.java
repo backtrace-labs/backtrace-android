@@ -27,7 +27,7 @@ public class BacktraceSerializeHelperTest {
         String json = "{\"_rxid\": \"12345\", \"message\":\"result-message\",\"status\":\"Ok\"}";
 
         // WHEN
-        BacktraceResult result = BacktraceSerializeHelper.fromJson(json ,BacktraceResult.class);
+        BacktraceResult result = BacktraceSerializeHelper.fromJson(json, BacktraceResult.class);
 
         // THEN
         assertNotNull(result);

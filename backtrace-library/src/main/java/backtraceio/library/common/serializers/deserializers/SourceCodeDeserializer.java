@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
+import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.json.SourceCode;
 
 public class SourceCodeDeserializer  implements Deserializable<SourceCode> {
@@ -15,8 +16,8 @@ public class SourceCodeDeserializer  implements Deserializable<SourceCode> {
     }
     public SourceCode deserialize(JSONObject obj) throws JSONException {
         return new SourceCode(
-                obj.optInt(fieldNameLoader.get(Fields.startLine)),
-                obj.optString(fieldNameLoader.get(Fields.sourceCodeFileName))
+                JSONObjectExtensions.optIntegerOrNull(obj, fieldNameLoader.get(Fields.startLine)),
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCodeFileName))
         );
     }
 }

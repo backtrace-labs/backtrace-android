@@ -40,7 +40,6 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         this.stackFrameDeserializer = new BacktraceStackFrameDeserializer();
     }
     @Override
-    // TODO: fix all null warnings
     public BacktraceReport deserialize(JSONObject obj) throws JSONException {
         if (obj == null) {
             return null;

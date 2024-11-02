@@ -2,7 +2,9 @@ package backtraceio.library.database;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import backtraceio.library.TestUtils;
@@ -16,7 +18,7 @@ public class BacktraceDatabaseRecordTest {
 
     private final int expectedSize = 25362;
     @Test
-    public void serialize() {
+    public void serialize() throws JSONException {
         // GIVEN
         final BacktraceDatabaseRecord obj = new BacktraceDatabaseRecord(
                 uuid,
@@ -28,11 +30,11 @@ public class BacktraceDatabaseRecordTest {
         );
 
         // WHEN
-        String json = BacktraceSerializeHelper.toJson(obj);
+        String json = TestUtils.minifyJsonString(BacktraceSerializeHelper.toJson(obj));
 
         // THEN
-        String expectedJson = TestUtils.readFileAsString(this, JSON_FILE);
-        assertEquals(expectedJson, json);
+        String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, JSON_FILE));
+        assertTrue(TestUtils.compareJson(expectedJson, json));
     }
 
     @Test

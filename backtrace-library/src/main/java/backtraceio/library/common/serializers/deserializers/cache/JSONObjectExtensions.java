@@ -13,6 +13,14 @@ public class JSONObjectExtensions {
         return fallback;
     }
 
+    public static Integer optIntegerOrNull(JSONObject jsonObject, String key) {
+        Object obj = jsonObject.opt(key);
+        if (obj != null && obj instanceof Integer) {
+            return (Integer) obj;
+        }
+        return null;
+    }
+
     public static String optStringOrNull(JSONObject jsonObject, String key) {
         return JSONObjectExtensions.optStringOrNull(jsonObject, key, null);
     }
