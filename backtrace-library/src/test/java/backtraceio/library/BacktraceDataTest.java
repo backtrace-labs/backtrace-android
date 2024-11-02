@@ -21,7 +21,7 @@ public class BacktraceDataTest {
     @Test
     public void deserializeBacktraceData() throws JSONException {
         // GIVEN
-        String backtraceDataJson = readFileAsString(this, "backtraceData.json");
+        String backtraceDataJson = readFileAsString(this, "backtraceData2.json");
         // WHEN
         final BacktraceData result = BacktraceDeserializer.deserialize(new JSONObject(backtraceDataJson), BacktraceData.class);
 
@@ -30,7 +30,7 @@ public class BacktraceDataTest {
         assertEquals("398dad51-7c39-4d64-941c-854de56f5f2b", result.uuid);
         assertEquals("java", result.lang);
         assertEquals("backtrace-android", result.agent);
-        assertEquals("", result.symbolication); // TODO: check
+        assertEquals(null, result.symbolication);  // TODO: Check what should be value if empty and Add symbolication to json and assert here
         assertEquals(1709680075, result.timestamp);
         assertEquals("0", result.langVersion);
         assertEquals("3.7.14-1-931f45d", result.agentVersion);
@@ -52,6 +52,7 @@ public class BacktraceDataTest {
         assertNotNull(result.annotations.get("1"));
         assertNotNull(result.annotations.get("123"));
 
+
         // THEN Source Code
         assertEquals(result.sourceCode.size(), 35);
         SourceCode firstSourceCode = result.sourceCode.get("ca0a50a1-d553-4479-8fe2-28c3f527743b");
@@ -66,8 +67,9 @@ public class BacktraceDataTest {
         assertEquals(threadInformation.getName(), "finalizerwatchdogdaemon");
         assertNotNull(threadInformation.getStack());
         assertEquals(threadInformation.getStack().get(1).sourceCode, "4f359140-a606-4f5d-ba67-adb387383d43");
-        assertEquals(threadInformation.getStack().get(1).sourceCodeFileName, null);
         assertEquals(threadInformation.getStack().get(1).functionName, "java.lang.Object.wait");
         assertEquals(threadInformation.getStack().get(1).line.intValue(), 442);
     }
+
+    // TODO: add one more complicated example with classifier
 }

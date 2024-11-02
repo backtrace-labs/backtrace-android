@@ -14,13 +14,16 @@ public class BacktraceStackFrameDeserializer implements Deserializable<Backtrace
     static class Fields {
         final static String functionName = "functionName";
         final static String line = "line";
+        final static String sourceCodeFileName = "sourceCodeFileName";
+
         final static String sourceCode = "sourceCode";
     }
     public BacktraceStackFrame deserialize(JSONObject obj) throws JSONException {
         return new BacktraceStackFrame(
                 JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.functionName)),
-                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCode)),
-                obj.optInt(fieldNameLoader.get(Fields.line))); // TODO: check fallback warning
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCodeFileName)),
+                obj.optInt(fieldNameLoader.get(Fields.line)), // TODO: check fallback warning
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCode)));
     }
 }
 
