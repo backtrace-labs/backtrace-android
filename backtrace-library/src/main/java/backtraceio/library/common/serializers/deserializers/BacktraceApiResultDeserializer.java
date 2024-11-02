@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
+import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -17,7 +18,7 @@ public class BacktraceApiResultDeserializer implements Deserializable<BacktraceA
     }
     public BacktraceApiResult deserialize(JSONObject obj) throws JSONException {
         return new BacktraceApiResult(
-                obj.optString(fieldNameLoader.get(Fields.rxId), null), // TODO: check fallback warning
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.rxId)),
                 obj.optString(fieldNameLoader.get(Fields.response), BacktraceResultStatus.ServerError.toString())
         );
     }

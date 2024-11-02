@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
+import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.BacktraceStackFrame;
 
 public class BacktraceStackFrameDeserializer implements Deserializable<BacktraceStackFrame> {
@@ -17,8 +18,8 @@ public class BacktraceStackFrameDeserializer implements Deserializable<Backtrace
     }
     public BacktraceStackFrame deserialize(JSONObject obj) throws JSONException {
         return new BacktraceStackFrame(
-                obj.optString(fieldNameLoader.get(Fields.functionName), null), // TODO: check fallback warning
-                obj.optString(fieldNameLoader.get(Fields.sourceCode), null), // TODO: check fallback warning  // todo: should be null in case of empty
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.functionName)),
+                JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.sourceCode)),
                 obj.optInt(fieldNameLoader.get(Fields.line))); // TODO: check fallback warning
     }
 }

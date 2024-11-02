@@ -1,5 +1,7 @@
 package backtraceio.library.models.database;
 
+import android.content.Context;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;

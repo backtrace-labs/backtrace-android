@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
+import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -44,10 +45,11 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         if (obj == null) {
             return null;
         }
-        final String uuid = obj.optString(fieldNameLoader.get(Fields.uuid), null);
+        final String uuid = JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.uuid));
+
         final long timestamp = obj.optLong(fieldNameLoader.get(Fields.timestamp), 0);
-        final String message = obj.optString(fieldNameLoader.get(Fields.message), null);
-        final String classifier = obj.optString(fieldNameLoader.get(Fields.classifier), "");
+        final String message = JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.message));
+        final String classifier = JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.classifier));
         final boolean exceptionTypeReport = obj.optBoolean(fieldNameLoader.get(Fields.exceptionTypeReport));
         final Exception exception = getException(obj.optJSONObject(fieldNameLoader.get(Fields.exception)));
         final Map<String, Object> attributes = this.getAttributes(obj.optJSONObject(fieldNameLoader.get(Fields.attributes)));
