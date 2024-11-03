@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,6 +43,11 @@ public class TestUtils {
     public static String minifyJsonString(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
         return jsonObject.toString();
+    }
+
+    public static String minifyJsonArrayString(String json) throws JSONException {
+        JSONArray jsonArray = new JSONArray(json);
+        return jsonArray.toString();
     }
 
     public static boolean compareJson(String json1, String json2) {

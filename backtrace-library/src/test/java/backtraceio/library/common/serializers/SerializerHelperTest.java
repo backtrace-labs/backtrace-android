@@ -2,6 +2,7 @@ package backtraceio.library.common.serializers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +31,7 @@ public class SerializerHelperTest {
             add(3);
         }};
         // WHEN
-        JSONArray result = (JSONArray) SerializerHelper.serialize(namingPolicy, list);
+        final JSONArray result = (JSONArray) SerializerHelper.serialize(namingPolicy, list);
 
         // THEN
         assertEquals("[1,2,3]", result.toString());
@@ -43,7 +44,7 @@ public class SerializerHelperTest {
         final SourceCode sourceCode = new SourceCode(BacktraceStackFrame.fromStackTraceElement(new StackTraceElement("sample-class", "sample-method", "sample-file", 123)));
 
         // WHEN
-        JSONObject jsonObject = (JSONObject) SerializerHelper.serialize(namingPolicy, sourceCode);
+        final JSONObject jsonObject = (JSONObject) SerializerHelper.serialize(namingPolicy, sourceCode);
 
         // THEN
         assertEquals("{\"path\":\"sample-file\",\"startLine\":123}", jsonObject.toString());
@@ -64,6 +65,7 @@ public class SerializerHelperTest {
         jsonObject.put("sample-exception", new Exception("msg"));
 
         // WHEN
+//        final String gsonResult = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create().toJson(jsonObject); // TODO: delete we dont need it
         final JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, jsonObject);
 
         // THEN
@@ -86,7 +88,9 @@ public class SerializerHelperTest {
         final JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, object);
 
         // THEN
-        assertEquals("", result.toString());
+        final String expectedJson = "{\"exception-value\":{\"detail-message\":\"test\",\"stack-trace\":[],\"suppressed-exceptions\":[]},\"boolean-value\":false,\"string-value\":\"123\",\"int-value\":123}";
+
+        assertTrue(TestUtils.compareJson(TestUtils.minifyJsonString(expectedJson), TestUtils.minifyJsonString(result.toString())));
     }
 
     @Test
@@ -96,11 +100,14 @@ public class SerializerHelperTest {
         objList.add(new Exception("1"));
         objList.add(new Exception("2"));
         objList.add(new Exception("3"));
+
         // WHEN
-        final JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, objList);
+        final JSONArray result = (JSONArray) SerializerHelper.serialize(namingPolicy, objList);
 
         // THEN
-        assertEquals("", result.toString());
+        final String expectedJson = "[{\"detail-message\":\"1\",\"stack-trace\":[],\"suppressed-exceptions\":[]},{\"detail-message\":\"2\",\"stack-trace\":[],\"suppressed-exceptions\":[]},{\"detail-message\":\"3\",\"stack-trace\":[],\"suppressed-exceptions\":[]}]";
+
+        assertTrue(TestUtils.compareJson(TestUtils.minifyJsonArrayString(expectedJson), TestUtils.minifyJsonArrayString(result.toString())));
     }
 
     @Test
@@ -109,7 +116,7 @@ public class SerializerHelperTest {
         final ArrayIndexOutOfBoundsException exception = new ArrayIndexOutOfBoundsException("test");
 
         // WHEN
-        JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, exception);
+        final JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, exception);
 
         // THEN
         assertNotNull(result);

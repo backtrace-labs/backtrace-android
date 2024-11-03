@@ -1,13 +1,13 @@
 {
-  "name-value-pairs": {
-    "sample-int": 1,
+  "map": {
     "sample-boolean": true,
-    "sample-string": "example",
     "sample-array": [
       "1",
       "2",
       "3"
     ],
+    "sample-string": "example",
+    "sample-int": 1,
     "sample-exception": {
       "detail-message": "msg",
       "stack-trace": [],
