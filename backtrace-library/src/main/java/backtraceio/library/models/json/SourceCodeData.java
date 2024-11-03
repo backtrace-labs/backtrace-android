@@ -11,12 +11,15 @@ import backtraceio.library.models.BacktraceStackFrame;
  * Collect all source data information about current program
  */
 public class SourceCodeData {
-    private static transient final String LOG_TAG = SourceCodeData.class.getSimpleName();
+    private static final String LOG_TAG = SourceCodeData.class.getSimpleName();
 
     /**
      * Source code information about current executed program
      */
     public final Map<String, SourceCode> data = new HashMap<>();
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    public SourceCodeData() {}
 
     public SourceCodeData(List<BacktraceStackFrame> exceptionStack) {
         BacktraceLogger.d(LOG_TAG, "Initialization source code data");

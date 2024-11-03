@@ -1,11 +1,17 @@
 package backtraceio.library.common.serializers.deserializers;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.serializers.SerializerHelper;
 
 
 public final class ReflectionDeserializer implements Deserializable<Object> {
@@ -35,14 +41,19 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 // Make the field accessible (public, private, etc.)
                 field.setAccessible(true);
 
+                if (java.lang.reflect.Modifier.isTransient(field.getModifiers()) ||
+                        java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+
                 // Get the field name
                 String fieldName = field.getName();
-
+                new JSONObject();
                 // Check if the JSON object has a key with the field name
                 if (obj.has(fieldName)) {
                     // Set the field value using reflection
                     try {
-                        field.set(instance, obj.get(fieldName)); // TODO: what if obj.get(fieldNAme) is JSONObject e.g. in BacktraceResult
+                        field.set(instance, this.deserialize(obj.get(fieldName), field.getType(), field)); // TODO: what if obj.get(fieldNAme) is JSONObject e.g. in BacktraceResult
                     } catch (IllegalArgumentException exception) {
                         // TODO: log error
                         continue;
@@ -76,5 +87,52 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
         }
 
         return null;
+    }
+
+    public Object deserialize(Object object, Class<?> clazz, Field field) throws JSONException {
+        if (object == null) {
+            return null;
+        }
+
+        // TODO: check if all of the types
+        if (SerializerHelper.isPrimitiveType(object)) {
+            return object;
+        }
+
+        if (clazz == JSONObject.class) {
+            return this.deserialize(object, JSONObject.class, field);
+        }
+
+        if (clazz == Map.class && object.getClass() == JSONObject.class) {
+            return this.deserializeMap((JSONObject) object, clazz, field);
+        }
+        if (clazz == UUID.class && (object instanceof String || object instanceof UUID)) {
+            return UUID.fromString(object.toString());
+        }
+
+        // TODO: check other types
+        return object;
+    }
+
+    private Map<?, ?> deserializeMap(JSONObject map, Class<?> clazz, Field field) throws JSONException {
+
+        Map<String, Object> result = new HashMap<>();
+
+        JSONArray keys = map.names();
+
+        if (keys == null) {
+            return null;
+        }
+
+        for (int i = 0; i < keys.length (); i++) {
+            String key = keys.getString (i);
+            Object value = map.get(key);
+
+            if(value instanceof JSONObject) {
+                result.put(key, deserialize(value, clazz, field));
+            }
+        }
+
+        return result;
     }
 }

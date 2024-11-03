@@ -27,6 +27,7 @@ public class BacktraceDeserializer {
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
 //        put(SourceCode.class, new SourceCodeDeserializer());
+//        put(SourceCodeData.class, new SourceCodeDeserializer()),
         put(Exception.class, new ExceptionDeserializer());
         put(ThreadInformation.class, new ThreadInformationDeserializer());
         put(BacktraceDatabaseRecord.class, new BacktraceDatabaseRecordDeserializer());
