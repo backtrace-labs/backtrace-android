@@ -1,27 +1,23 @@
-package backtraceio.library.common;
+package backtraceio.library.common.serializers;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import backtraceio.library.common.serializers.SerializerHelper;
+import backtraceio.library.TestUtils;
 import backtraceio.library.common.serializers.naming.NamingPolicy;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.SourceCode;
 
-@RunWith(AndroidJUnit4.class)
 public class SerializerHelperTest {
     public final static NamingPolicy namingPolicy = new NamingPolicy();
 
@@ -71,12 +67,13 @@ public class SerializerHelperTest {
         final JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, jsonObject);
 
         // THEN
-        final String expectedJson = "{\"name-value-pairs\":{\"sample-int\":1,\"sample-boolean\":true,\"sample-string\":\"example\",\"sample-array\":[\"1\",\"2\",\"3\"],\"sample-exception\":{\"detail-message\":\"msg\",\"stack-trace\":[],\"suppressed-exceptions\":[]}}}";
-        assertEquals(expectedJson, result.toString()); // TODO:
+        final String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "exampleObject.json"));
+        assertEquals(expectedJson, TestUtils.minifyJsonString(result.toString()));
     }
 
 
 
+    @Test
     public void serializeMap() throws JSONException {
         // GIVEN
         Map<String, Object> object = new HashMap<>();
@@ -92,6 +89,7 @@ public class SerializerHelperTest {
         assertEquals("", result.toString());
     }
 
+    @Test
     public void serializeObjectList() throws JSONException {
         // GIVEN
         List<Object> objList = new ArrayList<>();
@@ -105,6 +103,7 @@ public class SerializerHelperTest {
         assertEquals("", result.toString());
     }
 
+    @Test
     public void serializeException() throws JSONException {
         // GIVEN
         final ArrayIndexOutOfBoundsException exception = new ArrayIndexOutOfBoundsException("test");
@@ -115,7 +114,7 @@ public class SerializerHelperTest {
         // THEN
         assertNotNull(result);
 
-        assertEquals("test", result.get("message"));
-        assertEquals("\"message\":\"test\"", result.toString());
+        assertEquals("test", result.get("detail-message"));
+        assertEquals("{\"detail-message\":\"test\",\"stack-trace\":[],\"suppressed-exceptions\":[]}", result.toString());
     }
 }
