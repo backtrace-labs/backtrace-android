@@ -21,12 +21,12 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDeserializer {
 
-    public final static Deserializable<Object> DEFAULT_DESERIALIZER = new ReflectionDeserializer();
+    public final static ReflectionDeserializer DEFAULT_DESERIALIZER = new ReflectionDeserializer();
     public static HashMap<Class, Deserializable> deserializers = new HashMap<Class, Deserializable>() {{
         put(BacktraceApiResult.class, new BacktraceApiResultDeserializer());
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
-
+//        put(SourceCode.class, new SourceCodeDeserializer());
         put(Exception.class, new ExceptionDeserializer());
         put(ThreadInformation.class, new ThreadInformationDeserializer());
         put(BacktraceDatabaseRecord.class, new BacktraceDatabaseRecordDeserializer());
@@ -45,11 +45,11 @@ public class BacktraceDeserializer {
         if (deserializers.containsKey(clazz)) {
             Deserializable<T> deserializer = deserializers.get(clazz);
             if (deserializer == null) {
-                return (T) DEFAULT_DESERIALIZER.deserialize(obj);
+                return (T) DEFAULT_DESERIALIZER.deserialize(obj, clazz);
             }
             return (T) deserializer.deserialize(obj);
         }
         // todo: maybe return unsupported
-        return (T) DEFAULT_DESERIALIZER.deserialize(obj);
+        return (T) DEFAULT_DESERIALIZER.deserialize(obj, clazz);
     }
 }

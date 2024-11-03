@@ -12,9 +12,11 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
 
     @Override
     public Object deserialize(JSONObject obj) throws JSONException {
-        try {
-            Class<?> clazz = Object.class;
+        return this.deserialize(obj, Object.class);
+    }
 
+    public Object deserialize(JSONObject obj, Class<?> clazz) throws JSONException {
+        try {
             // Get the class type from the JSON object if available
             if (obj.has("classType")) {
                 String className = obj.getString("classType");
@@ -22,6 +24,9 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
             }
 
             // Create an instance of the class using reflection
+            clazz.getDeclaredConstructor().getModifiers();
+
+            // TODO: what if constructor is private?
             Object instance = clazz.getDeclaredConstructor().newInstance();
             // Assuming that the class has a default (no-argument) constructor
 
@@ -36,7 +41,12 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 // Check if the JSON object has a key with the field name
                 if (obj.has(fieldName)) {
                     // Set the field value using reflection
-                    field.set(instance, obj.get(fieldName));
+                    try {
+                        field.set(instance, obj.get(fieldName)); // TODO: what if obj.get(fieldNAme) is JSONObject e.g. in BacktraceResult
+                    } catch (IllegalArgumentException exception) {
+                        // TODO: log error
+                        continue;
+                    }
                     continue;
                 }
 

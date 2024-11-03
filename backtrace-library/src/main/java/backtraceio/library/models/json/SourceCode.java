@@ -19,6 +19,8 @@ public class SourceCode {
     @SerializedName("path")
     public String sourceCodeFileName;
 
+    @SuppressWarnings({"UnusedDeclaration"})
+    private SourceCode() { }
 
     public SourceCode(BacktraceStackFrame stackFrame) {
         this(stackFrame.line, stackFrame.sourceCodeFileName);

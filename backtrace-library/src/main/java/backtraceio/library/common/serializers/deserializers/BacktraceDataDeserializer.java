@@ -110,7 +110,7 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
 
     public String[] getClassifiers(JSONArray jsonArray) {
         if (jsonArray == null) {
-            return new String[0];
+            return null;
         }
 
         String[] result = new String[jsonArray.length()];
