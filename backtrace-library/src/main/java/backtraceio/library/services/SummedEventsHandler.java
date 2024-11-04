@@ -1,5 +1,7 @@
 package backtraceio.library.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -21,11 +23,14 @@ public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
 
     @Override
     protected SummedEventsPayload getEventsPayload() {
-        Map<String, Object> attributes = backtraceMetrics.createLocalAttributes(null);
-        String application = attributes.get("application").toString();
-        String appVersion = attributes.get("application.version").toString();
-
-        SummedEventsPayload payload = new SummedEventsPayload(events, application, appVersion);
+        Map<String, String> attributes = backtraceMetrics.createLocalAttributes(null);
+        for (SummedEvent event: events) {
+            event.addAttributes(attributes);
+        }
+        SummedEventsPayload payload = new SummedEventsPayload(
+                new ConcurrentLinkedDeque<>(events),
+                backtraceMetrics.getApplicationName(),
+                backtraceMetrics.getApplicationVersion());
         events.clear();
         return payload;
     }

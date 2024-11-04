@@ -22,16 +22,13 @@ public class UniqueEventsHandler extends BacktraceEventsHandler<UniqueEvent> {
 
     @Override
     protected UniqueEventsPayload getEventsPayload() {
-        Map<String, Object> attributes = backtraceMetrics.createLocalAttributes(null);
-        String application = attributes.get("application").toString();
-        String appVersion = attributes.get("application.version").toString();
+        Map<String, String> attributes = backtraceMetrics.createLocalAttributes(null);
 
         for (UniqueEvent event : events) {
             event.update(BacktraceTimeHelper.getTimestampSeconds(), attributes);
         }
 
-        UniqueEventsPayload payload = new UniqueEventsPayload(events, application, appVersion);
-        return payload;
+        return new UniqueEventsPayload(events, backtraceMetrics.getApplicationName(), backtraceMetrics.getApplicationVersion());
     }
 
     @Override

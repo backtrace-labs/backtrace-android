@@ -13,14 +13,14 @@ public final class SummedEvent extends Event {
     private final String name;
 
     public SummedEvent(String name) {
-        this(name, new HashMap<String, Object>());
+        this(name, null);
     }
 
-    public SummedEvent(String name, Map<String, Object> attributes) {
+    public SummedEvent(String name, Map<String, String> attributes) {
         this(name, BacktraceTimeHelper.getTimestampSeconds(), attributes);
     }
 
-    public SummedEvent(String name, long timestamp, Map<String, Object> attributes) {
+    public SummedEvent(String name, long timestamp, Map<String, String> attributes) {
         super(timestamp);
         this.name = name;
         addAttributesImpl(attributes);
@@ -35,7 +35,7 @@ public final class SummedEvent extends Event {
         return this.name;
     }
 
-    public void addAttributes(Map<String, Object> attributes) {
+    public void addAttributes(Map<String, String> attributes) {
         addAttributesImpl(attributes);
     }
 }

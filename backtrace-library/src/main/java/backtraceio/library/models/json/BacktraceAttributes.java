@@ -15,18 +15,18 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.common.ApplicationHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
 import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.Tuple;
 
 /**
  * Class instance to get a built-in attributes from current application
  */
 public class BacktraceAttributes {
-    private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
-
     /**
      * Get built-in primitive attributes
      */
@@ -43,14 +43,9 @@ public class BacktraceAttributes {
     private final Context context;
 
     /**
-     * Are metrics enabled?
-     */
-    private static boolean isMetricsEnabled = false;
-
-    /**
      * Metrics session ID
      */
-    private static String sessionId = UUID.randomUUID().toString();
+    private final static String sessionId = UUID.randomUUID().toString();
 
     /**
      * Create instance of Backtrace Attribute
@@ -112,8 +107,8 @@ public class BacktraceAttributes {
     private void setAppInformation() {
         this.attributes.put("application.package", this.context.getApplicationContext()
                 .getPackageName());
-        this.attributes.put("application", getApplicationName());
-        String version = getApplicationVersionOrEmpty();
+        this.attributes.put("application", ApplicationHelper.getApplicationName(this.context));
+        String version = ApplicationHelper.getApplicationVersion(this.context);
         if (!BacktraceStringHelper.isNullOrEmpty(version)) {
             // We want to standardize application.version attribute name
             this.attributes.put("application.version", version);
@@ -211,41 +206,12 @@ public class BacktraceAttributes {
         }
     }
 
-    /**
-     * Divide custom user attributes into primitive and complex attributes and add to this object
-     *
-     * @param attributes client's attributes
-     */
-    private void convertAttributes(Map<String, Object> attributes) {
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            Object value = entry.getValue();
-            if (value == null) {
-                continue;
-            }
-            Class type = value.getClass();
-            if (TypeHelper.isPrimitiveOrPrimitiveWrapperOrString(type)) {
-                this.attributes.put(entry.getKey(), value.toString());
-            } else {
-                this.complexAttributes.put(entry.getKey(), value);
-            }
-        }
+    private void convertAttributes(Map<String, Object> clientAttributes) {
+        Tuple<Map<String, String>, Map<String, Object>> reportData = ReportDataBuilder.getReportAttribues(clientAttributes);
+        this.attributes.putAll(reportData.first);
+        this.complexAttributes.putAll(reportData.second);
     }
 
-    public String getApplicationName() {
-        return this.context.getApplicationInfo().loadLabel(this.context
-                .getPackageManager()).toString();
-    }
-
-    public String getApplicationVersionOrEmpty() {
-        try {
-            return this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     public Map<String, Object> getAllAttributes() {
         Map<String, Object> attributes = new HashMap<String, Object>();

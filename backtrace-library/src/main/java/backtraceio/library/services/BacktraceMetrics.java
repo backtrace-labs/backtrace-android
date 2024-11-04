@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.BacktraceCredentials;
+import backtraceio.library.common.ApplicationHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.serialization.DebugHelper;
@@ -19,6 +20,7 @@ import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
+import backtraceio.library.models.json.ReportDataBuilder;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
 
@@ -84,7 +86,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Custom attributes provided by the user to BacktraceBase
      */
-    Map<String, Object> customReportAttributes;
+    Map<String, String> customReportAttributes;
 
     /**
      * The application context
@@ -118,6 +120,16 @@ public final class BacktraceMetrics implements Metrics {
     private final BacktraceCredentials credentials;
 
     /**
+     * Application name
+     */
+    private String applicationName;
+
+    /**
+     * Application version
+     */
+    private String applicationVersion;
+
+    /**
      * Create new Backtrace metrics instance
      *
      * @param context                Application context
@@ -126,7 +138,8 @@ public final class BacktraceMetrics implements Metrics {
      */
     public BacktraceMetrics(Context context, @NotNull Map<String, Object> customReportAttributes, Api backtraceApi, BacktraceCredentials credentials) {
         this.context = context;
-        this.customReportAttributes = customReportAttributes;
+        // use only attributes, ignore annotations
+        this.customReportAttributes = ReportDataBuilder.getReportAttribues(customReportAttributes).first;
         this.backtraceApi = backtraceApi;
         this.credentials = credentials;
     }
@@ -172,6 +185,8 @@ public final class BacktraceMetrics implements Metrics {
         }
 
         long startExeuction = DebugHelper.getCurrentTimeMillis();
+        this.applicationName = ApplicationHelper.getApplicationName(this.getContext());
+        this.applicationVersion = ApplicationHelper.getApplicationVersion(this.getContext());
         setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
         this.enabled = true;
@@ -269,7 +284,9 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, Object> localAttributes = createLocalAttributes(attributes);
+        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttribues(attributes).first;
+
+        Map<String, String> localAttributes = createLocalAttributes(metricsAttributes);
 
         // validate if unique event attribute is available and
         // prevent undefined attributes
@@ -322,7 +339,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Add a summed event to the next Backtrace Metrics request
      *
-     * @param metricGroupName
+     * @param metricGroupName name of the metrics group
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName) {
@@ -332,8 +349,8 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Add a summed event to the next Backtrace Metrics request
      *
-     * @param metricGroupName
-     * @param attributes
+     * @param metricGroupName name of the metrics group
+     * @param attributes metrics attributes
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
@@ -344,12 +361,10 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, Object> localAttributes = new HashMap<>();
-        if (attributes != null) {
-            localAttributes.putAll(attributes);
-        }
+        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttribues(attributes).first;
 
-        SummedEvent summedEvent = new SummedEvent(metricGroupName, BacktraceTimeHelper.getTimestampSeconds(), localAttributes);
+        SummedEvent summedEvent = new SummedEvent(metricGroupName);
+        summedEvent.addAttributes(metricsAttributes);
         summedEventsHandler.events.addLast(summedEvent);
         if (count() == maximumNumberOfEvents) {
             uniqueEventsHandler.send();
@@ -404,17 +419,27 @@ public final class BacktraceMetrics implements Metrics {
         return true;
     }
 
-    protected Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
-        Map<String, Object> localAttributes = new HashMap<>();
+    protected Map<String, String> createLocalAttributes(Map<String, String> attributes) {
+        final long start = DebugHelper.getCurrentTimeMillis();
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null);
 
-        if (attributes != null) {
-            localAttributes.putAll(attributes);
+        Map<String, String> result = backtraceAttributes.attributes;
+        result.putAll(customReportAttributes);
+
+        if (attributes != null && !attributes.isEmpty()) {
+            result.putAll(attributes);
         }
 
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
-        localAttributes.putAll(backtraceAttributes.getAllAttributes());
+        BacktraceLogger.w(LOG_TAG, "createLocalAttributes:  took:" + (DebugHelper.getCurrentTimeMillis() - start) + " milliseconds");
+        return result;
+    }
 
-        return localAttributes;
+    protected String getApplicationName() {
+        return applicationName;
+    }
+
+    protected String getApplicationVersion() {
+        return applicationVersion;
     }
 
     /**
