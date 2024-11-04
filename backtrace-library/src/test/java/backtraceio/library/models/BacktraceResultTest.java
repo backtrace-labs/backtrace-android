@@ -44,6 +44,7 @@ public class BacktraceResultTest {
         // WHEN
         String result = TestUtils.minifyJsonString(BacktraceSerializeHelper.toJson(example));
         // THEN
+
         String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "backtraceResult.json"));
         assertTrue(TestUtils.compareJson(expectedJson, result));
     }

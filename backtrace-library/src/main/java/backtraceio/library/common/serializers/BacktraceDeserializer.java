@@ -12,11 +12,13 @@ import backtraceio.library.common.serializers.deserializers.BacktraceReportDeser
 import backtraceio.library.common.serializers.deserializers.Deserializable;
 import backtraceio.library.common.serializers.deserializers.ExceptionDeserializer;
 import backtraceio.library.common.serializers.deserializers.ReflectionDeserializer;
+import backtraceio.library.common.serializers.deserializers.SourceCodeDeserializer;
 import backtraceio.library.common.serializers.deserializers.ThreadInformationDeserializer;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDeserializer {
@@ -26,7 +28,7 @@ public class BacktraceDeserializer {
         put(BacktraceApiResult.class, new BacktraceApiResultDeserializer());
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
-//        put(SourceCode.class, new SourceCodeDeserializer());
+        put(SourceCode.class, new SourceCodeDeserializer());
 //        put(SourceCodeData.class, new SourceCodeDeserializer()),
         put(Exception.class, new ExceptionDeserializer());
         put(ThreadInformation.class, new ThreadInformationDeserializer());

@@ -190,6 +190,10 @@ public class SerializerHelper {
             return serializeException(namingPolicy, (Exception) obj);
         }
 
+        if (obj instanceof Enum) {
+            return ((Enum<?>) obj).name();
+        }
+
         Class<?> clazz = obj.getClass();
         JSONObject jsonObject = getAllFields(namingPolicy, clazz, obj, serializationDepth);
         Map<String, Object> getters = executeAndGetMethods(namingPolicy, obj);
