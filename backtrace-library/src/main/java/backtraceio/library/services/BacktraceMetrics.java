@@ -86,7 +86,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Custom attributes provided by the user to BacktraceBase
      */
-    Map<String, String> customReportAttributes;
+    Map<String, Object> customReportAttributes;
 
     /**
      * The application context
@@ -138,8 +138,7 @@ public final class BacktraceMetrics implements Metrics {
      */
     public BacktraceMetrics(Context context, @NotNull Map<String, Object> customReportAttributes, Api backtraceApi, BacktraceCredentials credentials) {
         this.context = context;
-        // use only attributes, ignore annotations
-        this.customReportAttributes = ReportDataBuilder.getReportAttribues(customReportAttributes).first;
+        this.customReportAttributes = customReportAttributes;
         this.backtraceApi = backtraceApi;
         this.credentials = credentials;
     }
@@ -206,6 +205,18 @@ public final class BacktraceMetrics implements Metrics {
         }
         BacktraceLogger.w(LOG_TAG, "TOTAL: Setup metrics integration took " + (DebugHelper.getCurrentTimeMillis() - startExeuction) + " milliseconds");
     }
+
+    /**
+     * Attributes are passed by the reference from the Backtrace client instance.
+     * If we modify them in the constructor, we won't be able to get "up to date"
+     * version from the client anymore. 
+     * 
+     * Due to that, we need to have a getter that will always transform attributes to a simple format.
+     */
+    private Map<String, String> getClientMetricsAttributes() {
+        return ReportDataBuilder.getReportAttribues(customReportAttributes).first;
+    }
+
 
     private void verifyIfMetricsAvailable() {
         if (!enabled) {
@@ -421,10 +432,10 @@ public final class BacktraceMetrics implements Metrics {
 
     protected Map<String, String> createLocalAttributes(Map<String, String> attributes) {
         final long start = DebugHelper.getCurrentTimeMillis();
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null);
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null, true);
 
         Map<String, String> result = backtraceAttributes.attributes;
-        result.putAll(customReportAttributes);
+        result.putAll(this.getClientMetricsAttributes());
 
         if (attributes != null && !attributes.isEmpty()) {
             result.putAll(attributes);
