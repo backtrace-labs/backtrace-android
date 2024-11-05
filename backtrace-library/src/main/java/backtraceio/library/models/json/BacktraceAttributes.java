@@ -18,9 +18,7 @@ import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
-import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
-import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.Tuple;
 
 /**
@@ -105,8 +103,7 @@ public class BacktraceAttributes {
     }
 
     private void setAppInformation() {
-        this.attributes.put("application.package", this.context.getApplicationContext()
-                .getPackageName());
+        this.attributes.put("application.package", ApplicationHelper.getPackageName(this.context));
         this.attributes.put("application", ApplicationHelper.getApplicationName(this.context));
         String version = ApplicationHelper.getApplicationVersion(this.context);
         if (!BacktraceStringHelper.isNullOrEmpty(version)) {

@@ -19,6 +19,11 @@ public class ApplicationHelper {
     private static String applicationVersion;
 
     /**
+     * Cached package name
+     */
+    private static String packageName;
+
+    /**
      * Retrieves application name from context. The name will be cached over checks
      * @param context application context
      * @return application name
@@ -32,6 +37,11 @@ public class ApplicationHelper {
         return  applicationName;
     }
 
+    /**
+     * Retrieves application version from the context. If the version name is not defined, the version code will be used instead.
+     * @param context application context
+     * @return current application version.
+     */
     public static String getApplicationVersion(Context context) {
         if(!BacktraceStringHelper.isNullOrEmpty(applicationVersion)) {
             return applicationVersion;
@@ -43,9 +53,22 @@ public class ApplicationHelper {
 
             return applicationVersion;
         } catch (PackageManager.NameNotFoundException e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
-            e.printStackTrace();
+            BacktraceLogger.e(LOG_TAG, "Could not resolve application version", e);
             return "";
         }
+    }
+
+    /**
+     * Retrieves package name from the context.
+     * @param context application context
+     * @return current package name.
+     */
+    public static String getPackageName(Context context) {
+        if(!BacktraceStringHelper.isNullOrEmpty(packageName)) {
+            return packageName;
+        }
+        packageName = context.getApplicationContext().getPackageName();
+
+        return packageName;
     }
 }
