@@ -12,7 +12,6 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.ApplicationHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.interfaces.Api;
@@ -183,34 +182,23 @@ public final class BacktraceMetrics implements Metrics {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
 
-        long startExeuction = DebugHelper.getCurrentTimeMillis();
         this.applicationName = ApplicationHelper.getApplicationName(this.getContext());
         this.applicationVersion = ApplicationHelper.getApplicationVersion(this.getContext());
         setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
         this.enabled = true;
-        long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         try {
             startMetricsEventHandlers(backtraceApi);
-
-            BacktraceLogger.w(LOG_TAG, "ENABLE: startMetricsEventHandlers took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
-            startMetricsSetup = DebugHelper.getCurrentTimeMillis();
-
             sendStartupEvent();
-
-            BacktraceLogger.w(LOG_TAG, "ENABLE: sendStartupEvent took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
-            BacktraceLogger.d(LOG_TAG, "Metrics enabled");
         } catch (Exception e) {
             BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
         }
-        BacktraceLogger.w(LOG_TAG, "TOTAL: Setup metrics integration took " + (DebugHelper.getCurrentTimeMillis() - startExeuction) + " milliseconds");
     }
 
     /**
      * Attributes are passed by the reference from the Backtrace client instance.
      * If we modify them in the constructor, we won't be able to get "up to date"
-     * version from the client anymore. 
-     * 
+     * version from the client anymore.
      * Due to that, we need to have a getter that will always transform attributes to a simple format.
      */
     private Map<String, String> getClientMetricsAttributes() {
@@ -226,13 +214,8 @@ public final class BacktraceMetrics implements Metrics {
 
     private void startMetricsEventHandlers(Api backtraceApi) {
         verifyIfMetricsAvailable();
-        long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         uniqueEventsHandler = backtraceApi.enableUniqueEvents(this);
-
-        BacktraceLogger.w(LOG_TAG, "startMetricsEventHandlers: uniqueEventsHandler took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
-        startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         summedEventsHandler = backtraceApi.enableSummedEvents(this);
-        BacktraceLogger.w(LOG_TAG, "startMetricsEventHandlers: enableSummedEvents took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
     }
 
     public void setStartupUniqueEventName(String startupUniqueEventName) {
@@ -248,17 +231,11 @@ public final class BacktraceMetrics implements Metrics {
      */
     public void sendStartupEvent() {
         verifyIfMetricsAvailable();
-        long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
         addUniqueEvent(startupUniqueEventName);
         addSummedEvent(startupSummedEventName);
-        BacktraceLogger.w(LOG_TAG, "sendStartupEvent: adding elements took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
-        startMetricsSetup = DebugHelper.getCurrentTimeMillis();
-        uniqueEventsHandler.send();
-        BacktraceLogger.w(LOG_TAG, "sendStartupEvent: sending uniqueEventsHandler took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
-        startMetricsSetup = DebugHelper.getCurrentTimeMillis();
-        summedEventsHandler.send();
 
-        BacktraceLogger.w(LOG_TAG, "sendStartupEvent: sending summedEventsHandler took:" + (DebugHelper.getCurrentTimeMillis() - startMetricsSetup) + " milliseconds");
+        uniqueEventsHandler.send();
+        summedEventsHandler.send();
     }
 
     /**
@@ -361,7 +338,7 @@ public final class BacktraceMetrics implements Metrics {
      * Add a summed event to the next Backtrace Metrics request
      *
      * @param metricGroupName name of the metrics group
-     * @param attributes metrics attributes
+     * @param attributes      metrics attributes
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
@@ -431,7 +408,6 @@ public final class BacktraceMetrics implements Metrics {
     }
 
     protected Map<String, String> createLocalAttributes(Map<String, String> attributes) {
-        final long start = DebugHelper.getCurrentTimeMillis();
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null, true);
 
         Map<String, String> result = backtraceAttributes.attributes;
@@ -441,7 +417,6 @@ public final class BacktraceMetrics implements Metrics {
             result.putAll(attributes);
         }
 
-        BacktraceLogger.w(LOG_TAG, "createLocalAttributes:  took:" + (DebugHelper.getCurrentTimeMillis() - start) + " milliseconds");
         return result;
     }
 
