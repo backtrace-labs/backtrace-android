@@ -30,10 +30,10 @@ public class BacktraceReportDeserializerTest {
 
         // THEN
         assertNotNull(resultCustom);
-        assertEquals("39407c49-0999-438b-bfac-140c83d2521b", resultCustom.uuid.toString());
-        assertEquals(1704901251, resultCustom.timestamp);
+        assertEquals("444d7674-378c-48fd-9b51-d961c3bba3ab", resultCustom.uuid.toString());
+        assertEquals(1704905258, resultCustom.timestamp);
         assertTrue(resultCustom.exceptionTypeReport);
-        assertEquals("java.lang.Exception", resultCustom.classifier);
+        assertEquals("java.lang.IllegalAccessException", resultCustom.classifier);
         assertNull(resultCustom.message);
 //        assertNull(result.getBacktraceReport());
 //        assertNull(result.message);
