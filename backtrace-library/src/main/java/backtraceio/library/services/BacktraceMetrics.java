@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -12,6 +11,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.ApplicationHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
+import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.interfaces.Api;
@@ -185,14 +185,20 @@ public final class BacktraceMetrics implements Metrics {
         this.applicationName = ApplicationHelper.getApplicationName(this.getContext());
         this.applicationVersion = ApplicationHelper.getApplicationVersion(this.getContext());
         setStartupUniqueEventName(uniqueEventName);
+        final long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
+
+        setStartupUniqueEventName(uniqueEventName);
         this.settings = settings;
         this.enabled = true;
         try {
             startMetricsEventHandlers(backtraceApi);
             sendStartupEvent();
+            BacktraceLogger.d(LOG_TAG, "Metrics enabled");
         } catch (Exception e) {
             BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
         }
+        final long endMetricsSetup = DebugHelper.getCurrentTimeMillis();
+        BacktraceLogger.d(LOG_TAG, "Setup metrics integration took " + (endMetricsSetup - startMetricsSetup) + " milliseconds");
     }
 
     /**
