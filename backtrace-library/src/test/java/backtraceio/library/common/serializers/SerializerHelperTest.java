@@ -65,7 +65,6 @@ public class SerializerHelperTest {
         jsonObject.put("sample-exception", new Exception("msg"));
 
         // WHEN
-//        final String gsonResult = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create().toJson(jsonObject); // TODO: delete we dont need it
         final JSONObject result = (JSONObject) SerializerHelper.serialize(namingPolicy, jsonObject);
 
         // THEN

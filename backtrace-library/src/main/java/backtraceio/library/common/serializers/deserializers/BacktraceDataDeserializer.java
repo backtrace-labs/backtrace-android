@@ -81,6 +81,7 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
                     result.put(key, deserializer.deserialize((JSONObject) obj.get(key)));
                 }
             } catch (JSONException e) {
+//                BacktraceLogger.e(LOG,)
                 // TODO:
             }
         }

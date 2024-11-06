@@ -14,6 +14,7 @@ import java.util.List;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.common.serialization.BacktraceGsonBuilder;
 import backtraceio.library.models.BacktraceStackFrame;
 
 public class SourceCodeDataTest {
@@ -65,6 +66,7 @@ public class SourceCodeDataTest {
         String json = BacktraceSerializeHelper.toJson(obj);
         String gson = new GsonBuilder().create().toJson(obj);
 
+        SourceCodeData resultGson = new BacktraceGsonBuilder().buildGson().fromJson(json, SourceCodeData.class);
         SourceCodeData result = BacktraceSerializeHelper.fromJson(json, SourceCodeData.class);
 
         // THEN

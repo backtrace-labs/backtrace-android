@@ -22,21 +22,19 @@ import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDeserializer {
-
     public final static ReflectionDeserializer DEFAULT_DESERIALIZER = new ReflectionDeserializer();
     public static HashMap<Class, Deserializable> deserializers = new HashMap<Class, Deserializable>() {{
         put(BacktraceApiResult.class, new BacktraceApiResultDeserializer());
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
         put(SourceCode.class, new SourceCodeDeserializer());
-//        put(SourceCodeData.class, new SourceCodeDeserializer()),
         put(Exception.class, new ExceptionDeserializer());
         put(ThreadInformation.class, new ThreadInformationDeserializer());
         put(BacktraceDatabaseRecord.class, new BacktraceDatabaseRecordDeserializer());
     }};
 
     // TODO: Check if we need it?
-//    public static void registerDeserializer(Class clazz, Deserializable obj) {
+//    public static void registerCustomDeserializer(Class clazz, Deserializable obj) {
 //        deserializers.put(clazz, obj);
 //    }
 
