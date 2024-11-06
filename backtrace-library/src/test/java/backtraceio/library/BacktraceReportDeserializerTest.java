@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
+import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.common.serializers.deserializers.BacktraceReportDeserializer;
 import backtraceio.library.models.json.BacktraceReport;
 
@@ -25,9 +28,19 @@ public class BacktraceReportDeserializerTest {
         // WHEN
         String json2 = BacktraceSerializeHelper.toJson(new BacktraceReport(new IllegalAccessException("test"), new HashMap<String, Object>() {{ put("test", new Exception("123")); }} ));
         BacktraceReportDeserializer deserializer = new BacktraceReportDeserializer();
-        BacktraceReport resultGson = BacktraceSerializeHelper.fromJson(new BacktraceGsonBuilder().buildGson(), json, BacktraceReport.class);
-        BacktraceReport resultCustom = deserializer.deserialize(new JSONObject(json));
+        Gson g = new BacktraceGsonBuilder().buildGson();
+        final long g1 = DebugHelper.getCurrentTimeMillis();
+        BacktraceReport resultGson = g.fromJson(json, BacktraceReport.class);
+        final long g2 = DebugHelper.getCurrentTimeMillis();
 
+        final long c1 = DebugHelper.getCurrentTimeMillis();
+        BacktraceReport resultCustom = deserializer.deserialize(new JSONObject(json));
+        final long c2 = DebugHelper.getCurrentTimeMillis();
+
+        final long g_diff = g2 - g1;
+        final long c_diff = c2 - c1;
+        System.out.println(" GSON took " + (g_diff) + " milliseconds");
+        System.out.println(" Custom took " + (c_diff) + " milliseconds");
         // THEN
         assertNotNull(resultCustom);
         assertEquals("444d7674-378c-48fd-9b51-d961c3bba3ab", resultCustom.uuid.toString());
