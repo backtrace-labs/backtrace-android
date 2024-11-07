@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.BacktraceClient;
-import backtraceio.library.common.ApplicationHelper;
+import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.enums.ScreenOrientation;
@@ -103,9 +103,10 @@ public class BacktraceAttributes {
     }
 
     private void setAppInformation() {
-        this.attributes.put("application.package", ApplicationHelper.getPackageName(this.context));
-        this.attributes.put("application", ApplicationHelper.getApplicationName(this.context));
-        String version = ApplicationHelper.getApplicationVersion(this.context);
+        ApplicationMetadataCache applicationMetadata = ApplicationMetadataCache.getInstance(this.context);
+        this.attributes.put("application.package", applicationMetadata.getPackageName());
+        this.attributes.put("application", applicationMetadata.getApplicationName());
+        String version = applicationMetadata.getApplicationVersion();
         if (!BacktraceStringHelper.isNullOrEmpty(version)) {
             // We want to standardize application.version attribute name
             this.attributes.put("application.version", version);

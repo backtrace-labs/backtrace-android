@@ -6,30 +6,53 @@ import android.content.pm.PackageManager;
 
 import backtraceio.library.logger.BacktraceLogger;
 
-public class ApplicationHelper {
-    private static final transient String LOG_TAG = ApplicationHelper.class.getSimpleName();
+public class ApplicationMetadataCache {
+
+    private static final transient String LOG_TAG = ApplicationMetadataCache.class.getSimpleName();
+
+    private static ApplicationMetadataCache instance;
+
     /**
      * Cached application name
      */
-    private static String applicationName;
+    private String applicationName;
 
     /**
      * Cached application version
      */
-    private static String applicationVersion;
+    private String applicationVersion;
 
     /**
      * Cached package name
      */
-    private static String packageName;
+    private String packageName;
+
+    /**
+     * Returns current application cache. This instance is a singleton since we can only operate
+     * in a single application scope.
+     *
+     * @param context Application context
+     * @return Application metadata cache
+     */
+    public static ApplicationMetadataCache getInstance(Context context) {
+        if (instance == null) {
+            instance = new ApplicationMetadataCache(context);
+        }
+        return instance;
+    }
+
+    private final Context context;
+
+    public ApplicationMetadataCache(Context context) {
+        this.context = context;
+    }
 
     /**
      * Retrieves application name from context. The name will be cached over checks
      *
-     * @param context application context
      * @return application name
      */
-    public static String getApplicationName(Context context) {
+    public String getApplicationName() {
         if (!BacktraceStringHelper.isNullOrEmpty(applicationName)) {
             return applicationName;
         }
@@ -41,10 +64,9 @@ public class ApplicationHelper {
     /**
      * Retrieves application version from the context. If the version name is not defined, the version code will be used instead.
      *
-     * @param context application context
      * @return current application version.
      */
-    public static String getApplicationVersion(Context context) {
+    public String getApplicationVersion() {
         if (!BacktraceStringHelper.isNullOrEmpty(applicationVersion)) {
             return applicationVersion;
         }
@@ -63,10 +85,9 @@ public class ApplicationHelper {
     /**
      * Retrieves package name from the context.
      *
-     * @param context application context
      * @return current package name.
      */
-    public static String getPackageName(Context context) {
+    public String getPackageName() {
         if (!BacktraceStringHelper.isNullOrEmpty(packageName)) {
             return packageName;
         }

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.common.ApplicationHelper;
+import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.serialization.DebugHelper;
@@ -182,8 +182,9 @@ public final class BacktraceMetrics implements Metrics {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
 
-        this.applicationName = ApplicationHelper.getApplicationName(this.getContext());
-        this.applicationVersion = ApplicationHelper.getApplicationVersion(this.getContext());
+        ApplicationMetadataCache applicationMetadata = ApplicationMetadataCache.getInstance(this.getContext());
+        this.applicationName = applicationMetadata.getApplicationName();
+        this.applicationVersion = applicationMetadata.getApplicationVersion();
         setStartupUniqueEventName(uniqueEventName);
         final long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
 
