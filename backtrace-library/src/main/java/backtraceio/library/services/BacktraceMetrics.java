@@ -19,7 +19,7 @@ import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
-import backtraceio.library.models.json.ReportDataBuilder;
+import backtraceio.library.models.attributes.ReportDataBuilder;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
 
@@ -208,7 +208,7 @@ public final class BacktraceMetrics implements Metrics {
      * Due to that, we need to have a getter that will always transform attributes to a simple format.
      */
     private Map<String, String> getClientMetricsAttributes() {
-        return ReportDataBuilder.getReportAttribues(customReportAttributes).first;
+        return ReportDataBuilder.getReportAttributes(customReportAttributes, true).getAttributes();
     }
 
 
@@ -278,7 +278,7 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttribues(attributes).first;
+        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
 
         Map<String, String> localAttributes = createLocalAttributes(metricsAttributes);
 
@@ -355,7 +355,7 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttribues(attributes).first;
+        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
 
         SummedEvent summedEvent = new SummedEvent(metricGroupName);
         summedEvent.addAttributes(metricsAttributes);

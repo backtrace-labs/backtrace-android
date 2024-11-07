@@ -1,7 +1,6 @@
 package backtraceio.library.models.json;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.provider.Settings;
@@ -19,7 +18,8 @@ import backtraceio.library.common.ApplicationHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.enums.ScreenOrientation;
-import backtraceio.library.models.Tuple;
+import backtraceio.library.models.attributes.ReportDataAttributes;
+import backtraceio.library.models.attributes.ReportDataBuilder;
 
 /**
  * Class instance to get a built-in attributes from current application
@@ -204,9 +204,9 @@ public class BacktraceAttributes {
     }
 
     private void convertAttributes(Map<String, Object> clientAttributes) {
-        Tuple<Map<String, String>, Map<String, Object>> reportData = ReportDataBuilder.getReportAttribues(clientAttributes);
-        this.attributes.putAll(reportData.first);
-        this.complexAttributes.putAll(reportData.second);
+        ReportDataAttributes data = ReportDataBuilder.getReportAttributes(clientAttributes);
+        this.attributes.putAll(data.getAttributes());
+        this.complexAttributes.putAll(data.getAnnotations());
     }
 
 

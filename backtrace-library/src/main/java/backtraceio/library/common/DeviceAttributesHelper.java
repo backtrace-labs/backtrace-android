@@ -39,7 +39,7 @@ public class DeviceAttributesHelper {
     /*
      * Current Device id
      */
-    private static String guid;
+    private static String uuid;
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;
@@ -262,8 +262,8 @@ public class DeviceAttributesHelper {
      * @return unique device identifier
      */
     private String generateDeviceId() {
-        if (!BacktraceStringHelper.isNullOrEmpty(guid)) {
-            return guid;
+        if (!BacktraceStringHelper.isNullOrEmpty(uuid)) {
+            return uuid;
         }
 
         String androidId = Settings.Secure.getString(this.context.getContentResolver(),
@@ -271,11 +271,11 @@ public class DeviceAttributesHelper {
 
         // if the android id is not defined we want to cache at least guid 
         // for the current session
-        guid = TextUtils.isEmpty(androidId)
+        uuid = TextUtils.isEmpty(androidId)
                 ? UUID.randomUUID().toString()
                 : UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
 
-        return guid;
+        return uuid;
     }
 
     private ActivityManager.MemoryInfo getMemoryInformation() {
