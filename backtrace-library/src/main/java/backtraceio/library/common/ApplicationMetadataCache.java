@@ -10,7 +10,7 @@ public class ApplicationMetadataCache {
 
     private static final transient String LOG_TAG = ApplicationMetadataCache.class.getSimpleName();
 
-    private static ApplicationMetadataCache instance;
+    private static volatile ApplicationMetadataCache instance;
 
     /**
      * Cached application name
@@ -36,7 +36,11 @@ public class ApplicationMetadataCache {
      */
     public static ApplicationMetadataCache getInstance(Context context) {
         if (instance == null) {
-            instance = new ApplicationMetadataCache(context);
+            synchronized (ApplicationMetadataCache.class) {
+                if (instance == null) {
+                    instance = new ApplicationMetadataCache(context);
+                }
+            }
         }
         return instance;
     }

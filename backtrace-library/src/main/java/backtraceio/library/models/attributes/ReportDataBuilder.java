@@ -20,12 +20,12 @@ public class ReportDataBuilder {
      * Divide custom user attributes into primitive and complex attributes and add to this object
      *
      * @param attributes   client's attributes
-     * @param skipNullable define attributes behavior on nullable value. By default all nullable attributes
+     * @param skipNull define attributes behavior on nullable value. By default all nullable attributes
      *                     will be included in the report. For some features like metrics, we don't want to send
      *                     nullable values, because they can generate invalid behavior/incorrect information.
      * @return Report data attributes divided into attributes and annotations
      */
-    public static ReportDataAttributes getReportAttributes(Map<String, Object> attributes, boolean skipNullable) {
+    public static ReportDataAttributes getReportAttributes(Map<String, Object> attributes, boolean skipNull) {
         ReportDataAttributes reportDataAttributes = new ReportDataAttributes();
 
         if (attributes == null) {
@@ -36,7 +36,7 @@ public class ReportDataBuilder {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (value == null) {
-                if (!skipNullable) {
+                if (!skipNull) {
                     reportDataAttributes.addAttribute(key, null);
                 }
                 continue;

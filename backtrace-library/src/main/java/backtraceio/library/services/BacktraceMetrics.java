@@ -185,7 +185,7 @@ public final class BacktraceMetrics implements Metrics {
         ApplicationMetadataCache applicationMetadata = ApplicationMetadataCache.getInstance(this.getContext());
         this.applicationName = applicationMetadata.getApplicationName();
         this.applicationVersion = applicationMetadata.getApplicationVersion();
-        setStartupUniqueEventName(uniqueEventName);
+        
         final long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
 
         setStartupUniqueEventName(uniqueEventName);
