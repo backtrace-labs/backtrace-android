@@ -10,7 +10,7 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 public class BacktraceApiResultDeserializer implements Deserializable<BacktraceApiResult> {
 
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceApiResult.class); // TODO: maybe we can reuse it
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceApiResult.class);
 
     static class Fields {
         final static String rxId = "rxId";

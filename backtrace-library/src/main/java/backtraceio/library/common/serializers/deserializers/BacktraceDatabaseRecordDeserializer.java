@@ -8,7 +8,7 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
 public class BacktraceDatabaseRecordDeserializer implements Deserializable<BacktraceDatabaseRecord> {
 
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceDatabaseRecord.class); // TODO: maybe we can reuse it
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceDatabaseRecord.class);
     static class Fields {
         final static String id = "id";
         final static String path = "path";

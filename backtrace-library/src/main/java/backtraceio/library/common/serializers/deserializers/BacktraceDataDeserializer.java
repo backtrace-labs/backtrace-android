@@ -18,7 +18,7 @@ import backtraceio.library.models.json.ThreadInformation;
 // TODO: check if methods should be private
 public class BacktraceDataDeserializer implements Deserializable<BacktraceData> {
 
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceData.class); // TODO: maybe we can reuse it
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceData.class);
 
     static class Fields {
         final static String uuid = "uuid";

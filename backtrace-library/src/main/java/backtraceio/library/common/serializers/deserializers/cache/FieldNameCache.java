@@ -24,8 +24,11 @@ public class FieldNameCache {
                 try {
                     Field field = clazz.getDeclaredField(fieldName);
                     if (field.isAnnotationPresent(SerializedName.class)) {
-                        cachedFieldName = field.getAnnotation(SerializedName.class).value();
-                        fieldNameMap.put(key, cachedFieldName);
+                        SerializedName annotation = field.getAnnotation(SerializedName.class);
+                        if (annotation != null) {
+                            cachedFieldName = annotation.value();
+                            fieldNameMap.put(key, cachedFieldName);
+                        }
                     } else {
                         cachedFieldName = field.getName();
                     }

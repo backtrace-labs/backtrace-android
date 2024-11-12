@@ -18,7 +18,7 @@ import backtraceio.library.models.json.BacktraceReport;
 
 public class BacktraceReportDeserializer implements Deserializable<BacktraceReport> {
 
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceReport.class); // TODO: maybe we can reuse it
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceReport.class);
     final ExceptionDeserializer exceptionDeserializer;
 
     final BacktraceStackFrameDeserializer stackFrameDeserializer;

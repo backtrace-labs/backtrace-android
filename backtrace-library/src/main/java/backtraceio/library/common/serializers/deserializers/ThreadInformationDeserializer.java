@@ -13,7 +13,7 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class ThreadInformationDeserializer implements Deserializable<ThreadInformation> {
 
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(ThreadInformation.class); // TODO: maybe we can reuse it
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(ThreadInformation.class);
     final BacktraceStackFrameDeserializer stackFrameDeserializer;
     static class Fields {
         final static String name = "name";

@@ -10,9 +10,9 @@ public class BacktraceOrgJsonSerializer {
             return null;
         }
 
-        try {
+//        try {
             NamingPolicy namingPolicy = new NamingPolicy();
-            Class clazz = object.getClass();
+            Class<?> clazz = object.getClass();
 
             if (clazz.equals(BacktraceData.class)) {
                 BacktraceDataSerializer dataSerializer = new BacktraceDataSerializer(namingPolicy);
@@ -20,10 +20,10 @@ public class BacktraceOrgJsonSerializer {
             }
 
             return SerializerHelper.serialize(namingPolicy, object).toString();
-        }
-        catch (Exception ex) { // TODO: improve error handling
-            ex.printStackTrace();
-            return null;
-        }
+//        }
+//        catch (Exception ex) { // TODO: improve error handling
+//            ex.printStackTrace();
+//            return null;
+//        }
     }
 }

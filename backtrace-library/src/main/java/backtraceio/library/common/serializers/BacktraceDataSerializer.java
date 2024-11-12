@@ -24,7 +24,7 @@ public class BacktraceDataSerializer {
     }
 
 
-    public JSONObject toJson(BacktraceData data) throws JSONException, IllegalAccessException {
+    public JSONObject toJson(BacktraceData data) throws JSONException {
         {
             if (data == null) {
                 return null;
@@ -116,7 +116,7 @@ public class BacktraceDataSerializer {
         return sourceCodeJson;
     }
 
-    private JSONObject serializeAnnotations(Map<String, Object> annotations) throws JSONException, IllegalAccessException {
+    private JSONObject serializeAnnotations(Map<String, Object> annotations) throws JSONException {
         JSONObject annotationsJson = new JSONObject();
         for (Map.Entry<String, Object> entry : annotations.entrySet()) {
             annotationsJson.put(entry.getKey(), serialize(this.namingPolicy, entry.getValue()));

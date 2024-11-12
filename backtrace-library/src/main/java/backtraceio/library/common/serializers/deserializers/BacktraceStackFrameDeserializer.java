@@ -9,7 +9,7 @@ import backtraceio.library.models.BacktraceStackFrame;
 
 public class BacktraceStackFrameDeserializer implements Deserializable<BacktraceStackFrame> {
 
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceStackFrame.class); // TODO: maybe we can reuse it
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceStackFrame.class);
 
     static class Fields {
         final static String functionName = "functionName";

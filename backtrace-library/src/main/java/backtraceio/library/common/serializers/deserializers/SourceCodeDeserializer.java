@@ -7,9 +7,8 @@ import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoade
 import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.json.SourceCode;
 
-public class SourceCodeDeserializer  implements Deserializable<SourceCode> {
-    private final FieldNameLoader fieldNameLoader = new FieldNameLoader(SourceCode.class); // TODO: maybe we can reuse it
-
+public class SourceCodeDeserializer implements Deserializable<SourceCode> {
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(SourceCode.class);
     static class Fields {
         final static String startLine = "startLine";
         final static String sourceCodeFileName = "sourceCodeFileName";
