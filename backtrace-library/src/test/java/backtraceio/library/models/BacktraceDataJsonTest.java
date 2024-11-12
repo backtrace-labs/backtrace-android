@@ -95,7 +95,7 @@ public class BacktraceDataJsonTest {
         assertEquals("3.8.3", obj.getAgentVersion());
         assertEquals("backtrace-android", obj.getAgent());
         assertEquals("instr: androidx.test.runner.androidjunitrunner", obj.getMainThread());
-        assertNull(obj.classifiers);
+        assertNull(obj.getClassifiers());
         assertEquals(2, obj.getAnnotations().size());
         assertEquals("/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar", ((Map<String, Object>) obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
         assertEquals("Example test string", ((Map<String, Object>) obj.getAnnotations().get("Exception")).get("message"));
@@ -153,7 +153,7 @@ public class BacktraceDataJsonTest {
         assertEquals("3.8.3", obj.getAgentVersion());
         assertEquals("backtrace-android", obj.getAgent());
         assertEquals("instr: androidx.test.runner.androidjunitrunner", obj.getMainThread());
-        assertNull(obj.classifiers);
+        assertNull(obj.getClassifiers());
         assertEquals(2, obj.getAnnotations().size());
         assertEquals("/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar", ((Map<String, Object>) obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
         assertEquals("Example test string", ((Map<String, Object>) obj.getAnnotations().get("Exception")).get("message"));

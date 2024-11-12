@@ -64,14 +64,14 @@ public class BacktraceDataDeserializerTest {
 
         BacktraceData gsonDataJson = (new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)).create().fromJson(content, BacktraceData.class); // GSON backup
 
-        assertEquals(dataJson.uuid, "079e41e2-bef1-4062-9e20-f2e1b3a93582");
-        assertEquals(dataJson.report, null);
-        assertEquals(dataJson.lang, "java");
-        assertEquals(dataJson.agent, "backtrace-android");
-        assertEquals(dataJson.langVersion, "0");
-        assertEquals(dataJson.agentVersion, "3.7.7-8-3f67d73-org-json-serializer");
-        assertEquals(dataJson.mainThread, "instr: androidx.test.runner.androidjunitrunner");
-        assertEquals(dataJson.timestamp, 1694983723);
+        assertEquals(dataJson.getUuid(), "079e41e2-bef1-4062-9e20-f2e1b3a93582");
+        assertEquals(dataJson.getReport(), null);
+        assertEquals(dataJson.getLang(), "java");
+        assertEquals(dataJson.getAgent(), "backtrace-android");
+        assertEquals(dataJson.getLangVersion(), "0");
+        assertEquals(dataJson.getAgentVersion(), "3.7.7-8-3f67d73-org-json-serializer");
+        assertEquals(dataJson.getMainThread(), "instr: androidx.test.runner.androidjunitrunner");
+        assertEquals(dataJson.getTimestamp(), 1694983723);
 //        assertEquals(dataJson.);
 
 //        assertEquals(dataJson.symbolication, "");
@@ -81,7 +81,7 @@ public class BacktraceDataDeserializerTest {
 
 //        BacktraceData backtraceData = BacktraceDataDeserializer.deserialize(context, jsonObj);
 
-        System.out.println(dataJson.report);
+        System.out.println(dataJson.getReport());
         // THEN
 //        assertEquals(backtraceData.report.message, );
     }

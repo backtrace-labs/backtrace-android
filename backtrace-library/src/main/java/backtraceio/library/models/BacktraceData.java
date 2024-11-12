@@ -36,13 +36,13 @@ public class BacktraceData {
      * Name of programming language/environment this error comes from.
      */
     @SerializedName("lang")
-    public final String lang = "java";
+    public  final String lang = "java";
 
     /**
      * Name of the client that is sending this error report.
      */
     @SerializedName("agent")
-    public final String agent = "backtrace-android";
+    public  final String agent = "backtrace-android";
 
     /**
      * If sending a Proguard obfuscated callstack, we need
@@ -105,7 +105,7 @@ public class BacktraceData {
      * Application thread details
      */
     @SerializedName("threads")
-    Map<String, ThreadInformation> threadInformationMap;
+    public Map<String, ThreadInformation> threadInformationMap;
 
 
     /**
@@ -231,6 +231,9 @@ public class BacktraceData {
         return report;
     }
 
+    public void setReport(BacktraceReport report) {
+        this.report = report;
+    }
 
     public static class Builder {
         private final BacktraceReport report;

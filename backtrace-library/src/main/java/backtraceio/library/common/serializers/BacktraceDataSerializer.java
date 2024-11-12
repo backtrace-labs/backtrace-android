@@ -33,33 +33,33 @@ public class BacktraceDataSerializer {
             JSONObject json = new JSONObject();
 
             // Serialize simple fields
-            json.put("lang", data.lang);
-            json.put("agent", data.agent);
-            json.put("symbolication", data.symbolication);
-            json.put("uuid", data.uuid);
-            json.put("timestamp", data.timestamp);
-            json.put("langVersion", data.langVersion);
-            json.put("agentVersion", data.agentVersion);
-            json.put("mainThread", data.mainThread);
+            json.put("lang", data.getLang());
+            json.put("agent", data.getAgent());
+            json.put("symbolication", data.getSymbolication());
+            json.put("uuid", data.getUuid());
+            json.put("timestamp", data.getTimestamp());
+            json.put("langVersion", data.getLangVersion());
+            json.put("agentVersion", data.getAgentVersion());
+            json.put("mainThread", data.getMainThread());
 
-            if (data.classifiers != null) {
+            if (data.getClassifiers() != null) {
                 final JSONArray classifiers = new JSONArray();
-                for (String classifier : data.classifiers) {
+                for (String classifier : data.getClassifiers()) {
                     classifiers.put(classifier);
                 }
                 json.put("classifiers", classifiers);
             }
 
-            if (data.attributes != null) {
-                json.put("attributes", serializeAttributes(data.attributes));
+            if (data.getAttributes() != null) {
+                json.put("attributes", serializeAttributes(data.getAttributes()));
             }
 
-            if (data.annotations != null) {
-                json.put("annotations", serializeAnnotations(data.annotations));
+            if (data.getAnnotations() != null) {
+                json.put("annotations", serializeAnnotations(data.getAnnotations()));
             }
 
-            if (data.sourceCode != null) {
-                json.put("sourceCode", serializeSourceCode(data.sourceCode));
+            if (data.getSourceCode() != null) {
+                json.put("sourceCode", serializeSourceCode(data.getSourceCode()));
             }
 
             if (data.getThreadInformationMap() != null) {

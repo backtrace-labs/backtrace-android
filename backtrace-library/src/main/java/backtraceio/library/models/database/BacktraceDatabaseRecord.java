@@ -167,8 +167,7 @@ public class BacktraceDatabaseRecord {
             // because we have easier way to serialize and deserialize data
             // and no problem/condition with serialization when BacktraceApi want to send
             // diagnostic data to API
-            diagnosticData.report = BacktraceSerializeHelper.fromJson(jsonReport,
-                    BacktraceReport.class);
+            diagnosticData.setReport(BacktraceSerializeHelper.fromJson(jsonReport, BacktraceReport.class));
             return diagnosticData;
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception occurs on deserialization of diagnostic data", ex);

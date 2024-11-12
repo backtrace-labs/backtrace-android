@@ -27,35 +27,35 @@ public class BacktraceDataTest {
 
         // THEN
         assertNotNull(result);
-        assertEquals("398dad51-7c39-4d64-941c-854de56f5f2b", result.uuid);
-        assertEquals("java", result.lang);
-        assertEquals("backtrace-android", result.agent);
-        assertEquals(null, result.symbolication);  // TODO: Check what should be value if empty and Add symbolication to json and assert here
-        assertEquals(1709680075, result.timestamp);
-        assertEquals("0", result.langVersion);
-        assertEquals("3.7.14-1-931f45d", result.agentVersion);
-        assertEquals("instr: androidx.test.runner.androidjunitrunner", result.mainThread);
-        assertEquals(1, result.classifiers.length);
-        assertEquals("java.lang.IllegalAccessException", result.classifiers[0]);
-        assertNull(result.report);
+        assertEquals("398dad51-7c39-4d64-941c-854de56f5f2b", result.getUuid());
+        assertEquals("java", result.getLang());
+        assertEquals("backtrace-android", result.getAgent());
+        assertEquals(null, result.getSymbolication());  // TODO: Check what should be value if empty and Add symbolication to json and assert here
+        assertEquals(1709680075, result.getTimestamp());
+        assertEquals("0", result.getLangVersion());
+        assertEquals("3.7.14-1-931f45d", result.getAgentVersion());
+        assertEquals("instr: androidx.test.runner.androidjunitrunner", result.getMainThread());
+        assertEquals(1, result.getClassifiers().length);
+        assertEquals("java.lang.IllegalAccessException", result.getClassifiers()[0]);
+        assertNull(result.getReport());
 
-        // THEN Attributes
-        assertEquals(result.attributes.size(), 41);
-        assertEquals(result.attributes.get("application"), "backtraceio.library.test");
-        assertEquals(result.attributes.get("error.type"), "Exception");
+        // THEN getAttributes()
+        assertEquals(result.getAttributes().size(), 41);
+        assertEquals(result.getAttributes().get("application"), "backtraceio.library.test");
+        assertEquals(result.getAttributes().get("error.type"), "Exception");
 
-        // THEN Annotations
-        assertEquals(5, result.annotations.size());
-        assertEquals("Test", ((Map<String, String>) result.annotations.get("Exception")).get("message"));
-        assertNotNull(result.annotations.get("Exception properties"));
-        assertEquals("Test", ((Map<String, String>) result.annotations.get("Exception properties")).get("detail-message"));
-        assertNotNull(result.annotations.get("1"));
-        assertNotNull(result.annotations.get("123"));
+        // THEN getAnnotations()
+        assertEquals(5, result.getAnnotations().size());
+        assertEquals("Test", ((Map<String, String>) result.getAnnotations().get("Exception")).get("message"));
+        assertNotNull(result.getAnnotations().get("Exception properties"));
+        assertEquals("Test", ((Map<String, String>) result.getAnnotations().get("Exception properties")).get("detail-message"));
+        assertNotNull(result.getAnnotations().get("1"));
+        assertNotNull(result.getAnnotations().get("123"));
 
 
         // THEN Source Code
-        assertEquals(result.sourceCode.size(), 35);
-        SourceCode firstSourceCode = result.sourceCode.get("ca0a50a1-d553-4479-8fe2-28c3f527743b");
+        assertEquals(result.getSourceCode().size(), 35);
+        SourceCode firstSourceCode = result.getSourceCode().get("ca0a50a1-d553-4479-8fe2-28c3f527743b");
 
         assertEquals(firstSourceCode.sourceCodeFileName, "ParentRunner.java");
         assertEquals(firstSourceCode.startLine.intValue(), 306);
