@@ -36,13 +36,13 @@ public class BacktraceData {
      * Name of programming language/environment this error comes from.
      */
     @SerializedName("lang")
-    public  final String lang = "java";
+    public final String lang = "java";
 
     /**
      * Name of the client that is sending this error report.
      */
     @SerializedName("agent")
-    public  final String agent = "backtrace-android";
+    public final String agent = "backtrace-android";
 
     /**
      * If sending a Proguard obfuscated callstack, we need
@@ -110,8 +110,8 @@ public class BacktraceData {
 
     /**
      * Create new instance of BacktraceData
-     * @deprecated
-     * This method is no longer way of creating new BacktraceData instance and will be removed soon
+     *
+     * @deprecated This method is no longer way of creating new BacktraceData instance and will be removed soon
      */
     @Deprecated
     public BacktraceData(Context context, BacktraceReport report, Map<String, Object> clientAttributes) {
@@ -165,10 +165,8 @@ public class BacktraceData {
     /**
      * Get paths to report attachments
      *
-     * @deprecated
-     * Please use {@link #getAttachmentPaths()} instead.
-     *
      * @return paths to attachments
+     * @deprecated Please use {@link #getAttachmentPaths()} instead.
      */
     @Deprecated
     public List<String> getAttachments() {
@@ -298,8 +296,8 @@ public class BacktraceData {
         }
 
         /**
-        * Set information about all threads
-        */
+         * Set information about all threads
+         */
         private Builder setDefaultThreadsInformation() {
             BacktraceLogger.d(LOG_TAG, "Setting threads information");
 
