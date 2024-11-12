@@ -69,7 +69,7 @@ public class BacktraceAttributes {
             this.setExceptionAttributes(report);
         }
         if (clientAttributes != null) {
-            this.convertClientAttributes(clientAttributes);
+            this.convertAttributes(clientAttributes);
         }
         if (report != null && clientAttributes != null) {
             BacktraceReport.concatAttributes(report, clientAttributes);
@@ -182,15 +182,6 @@ public class BacktraceAttributes {
     }
 
     /**
-     * Divide client attributes into primitive and complex attributes and add to this object
-     *
-     * @param clientAttributes client's attributes
-     */
-    private void convertClientAttributes(Map<String, Object> clientAttributes) {
-        convertAttributes(clientAttributes);
-    }
-
-    /**
      * Divide report attributes into primitive and complex attributes and add to this object
      *
      * @param report report to extract attributes from
@@ -205,6 +196,9 @@ public class BacktraceAttributes {
     }
 
     private void convertAttributes(Map<String, Object> clientAttributes) {
+        if (clientAttributes == null || clientAttributes.isEmpty()) {
+            return;
+        }
         ReportDataAttributes data = ReportDataBuilder.getReportAttributes(clientAttributes);
         this.attributes.putAll(data.getAttributes());
         this.complexAttributes.putAll(data.getAnnotations());
