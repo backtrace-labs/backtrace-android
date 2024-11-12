@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import backtraceio.library.common.serializers.BacktraceDeserializer;
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
 import backtraceio.library.models.BacktraceData;
@@ -54,8 +55,7 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
     }
 
     public BacktraceReport getBacktraceReport(JSONObject obj) throws JSONException {
-        // TODO: reuse deserializer ?
-        BacktraceReportDeserializer deserializer = new BacktraceReportDeserializer();
+        Deserializable<BacktraceReport> deserializer = BacktraceDeserializer.getDeserializer(BacktraceReport.class);
         return deserializer.deserialize(obj);
     }
 
