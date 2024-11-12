@@ -27,6 +27,12 @@ public class ApplicationMetadataCache {
      */
     private String packageName;
 
+    private final Context context;
+
+    private ApplicationMetadataCache(Context context) {
+        this.context = context;
+    }
+
     /**
      * Returns current application cache. This instance is a singleton since we can only operate
      * in a single application scope.
@@ -43,12 +49,6 @@ public class ApplicationMetadataCache {
             }
         }
         return instance;
-    }
-
-    private final Context context;
-
-    public ApplicationMetadataCache(Context context) {
-        this.context = context;
     }
 
     /**

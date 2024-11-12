@@ -19,10 +19,10 @@ public class ReportDataBuilder {
     /**
      * Divide custom user attributes into primitive and complex attributes and add to this object
      *
-     * @param attributes   client's attributes
-     * @param skipNull define attributes behavior on null value. By default all null values
-     *                     will be included in the report. For some features like metrics, we don't want to send
-     *                     null values, because they can generate invalid behavior/incorrect information.
+     * @param attributes client's attributes
+     * @param skipNull   define attributes behavior on null value. By default all null values
+     *                   will be included in the report. For some features like metrics, we don't want to send
+     *                   null values, because they can generate invalid behavior/incorrect information.
      * @return Report data attributes divided into attributes and annotations
      */
     public static ReportDataAttributes getReportAttributes(Map<String, Object> attributes, boolean skipNull) {
@@ -49,6 +49,5 @@ public class ReportDataBuilder {
         }
 
         return reportDataAttributes;
-
     }
 }
