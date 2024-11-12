@@ -4,7 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import backtraceio.library.logger.BacktraceLogger;
+
 public class ExceptionDeserializer implements Deserializable<Exception> {
+    private final static String LOG_TAG = ExceptionDeserializer.class.getSimpleName();
     static class Fields {
         final static String detailMessage = "detail-message";
         final static String stackTrace = "stack-trace";
@@ -23,8 +26,7 @@ public class ExceptionDeserializer implements Deserializable<Exception> {
         try {
             exception.setStackTrace(getStacktrace(obj.optJSONArray(Fields.stackTrace)));
         } catch (JSONException jsonException) {
-            //TODO: handle
-            System.out.println(jsonException.toString());
+            BacktraceLogger.e(LOG_TAG, String.format("Error during setting exception stacktrace during deserialization of %s. Error %s", obj, jsonException));
         }
         return exception;
     }

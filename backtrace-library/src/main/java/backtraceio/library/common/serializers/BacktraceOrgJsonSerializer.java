@@ -1,16 +1,19 @@
 package backtraceio.library.common.serializers;
 
+import org.json.JSONException;
+
 import backtraceio.library.common.serializers.naming.NamingPolicy;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 
 public class BacktraceOrgJsonSerializer {
-
-    public static String toJson(Object object) { // TODO: remove IllegalAccessException
+    private final static String LOG_TAG = BacktraceOrgJsonSerializer.class.getSimpleName();
+    public static String toJson(Object object) {
         if (object == null) {
             return null;
         }
 
-//        try {
+        try {
             NamingPolicy namingPolicy = new NamingPolicy();
             Class<?> clazz = object.getClass();
 
@@ -20,10 +23,14 @@ public class BacktraceOrgJsonSerializer {
             }
 
             return SerializerHelper.serialize(namingPolicy, object).toString();
-//        }
-//        catch (Exception ex) { // TODO: improve error handling
-//            ex.printStackTrace();
-//            return null;
-//        }
+        }
+        catch (JSONException jsonException) {
+            BacktraceLogger.e(LOG_TAG, String.format("Can not serialize object %s", object), jsonException); // TODO: test it
+            return null;
+        }
+        catch (Exception ex) {
+            BacktraceLogger.e(LOG_TAG, String.format("Exception during serialization of object %s", object), ex); // TODO: test it
+            return null;
+        }
     }
 }

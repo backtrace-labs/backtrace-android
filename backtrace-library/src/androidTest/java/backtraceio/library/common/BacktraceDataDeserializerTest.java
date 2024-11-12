@@ -23,8 +23,6 @@ import backtraceio.library.models.database.BacktraceDatabaseRecord;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDataDeserializerTest {
 
-
-
     @Test
     public void deserializeDatabaseRecord() throws JSONException {
         // GIVEN

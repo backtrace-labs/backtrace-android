@@ -1,7 +1,5 @@
 package backtraceio.library.common.serializers;
 
-import android.os.Build;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,7 +105,9 @@ public class SerializerHelper {
         if (field.isAnnotationPresent(SerializedName.class)) {
             // Get the SerializedName value
             SerializedName annotation = field.getAnnotation(SerializedName.class);
-            return annotation.value();
+            if (annotation != null) {
+                return annotation.value();
+            }
         }
         return namingPolicy.convert(field.getName());
     }
@@ -131,23 +131,21 @@ public class SerializerHelper {
         Map<String, Object> fields = new HashMap<>();
         Method[] methods = clazz.getMethods();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // TODO: check if needed
-            for (Method method : methods) {
-                String methodName = method.getName();
+        for (Method method : methods) {
+            String methodName = method.getName();
 
-                if (methodName.equals("getClass") || methodName.equals("getClassName")) {
-                    continue;
-                }
+            if (methodName.equals("getClass") || methodName.equals("getClassName")) {
+                continue;
+            }
 
-                if (methodName.startsWith("get") && method.getParameterCount() == 0) {
-                    try {
-                        Object result = method.invoke(obj);
-                        String propertyName = methodName.substring(3); // Remove 'get' prefix
-                        fields.put(namingPolicy.convert(propertyName), serialize(namingPolicy, result));
-                    } catch (Exception e) {
-                        // TODO: error handling
-                        e.printStackTrace();
-                    }
+            if (methodName.startsWith("get") && method.getParameterCount() == 0) {
+                try {
+                    Object result = method.invoke(obj);
+                    String propertyName = methodName.substring(3); // Remove 'get' prefix
+                    fields.put(namingPolicy.convert(propertyName), serialize(namingPolicy, result));
+                } catch (Exception e) {
+                    // TODO: error handling
+                    e.printStackTrace();
                 }
             }
         }

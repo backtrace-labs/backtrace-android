@@ -1,7 +1,5 @@
 package backtraceio.library.common;
 
-import com.google.gson.Gson;
-
 import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
 import backtraceio.library.common.serializers.BacktraceOrgJsonSerializer;
 
@@ -21,21 +19,10 @@ public class BacktraceSerializeHelper {
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
-        try {
-            return BacktraceOrgJsonDeserializer.deserialize(json, type);
-        } catch (Exception e) {
-            //TODO: remove this try-catch
-            return null;
-        }
+        return BacktraceOrgJsonDeserializer.deserialize(json, type);
     }
 
-    public static <T> T fromJson(Gson gson, String json, Class<T> type) {
-        try {
-            return BacktraceOrgJsonDeserializer.deserialize(json, type);
-        } catch (Exception e) {
-            //TODO: remove this try-catch
-            return null;
-        }
-    }
-
+//    public static <T> T fromJson(Gson gson, String json, Class<T> type) {
+//        return BacktraceOrgJsonDeserializer.deserialize(json, type);
+//    }
 }

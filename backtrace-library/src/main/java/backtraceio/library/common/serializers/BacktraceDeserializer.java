@@ -23,7 +23,7 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDeserializer {
     public final static ReflectionDeserializer DEFAULT_DESERIALIZER = new ReflectionDeserializer();
-    public static HashMap<Class, Deserializable> deserializers = new HashMap<Class, Deserializable>() {{
+    public static final HashMap<Class<?>, Deserializable<?>> deserializers = new HashMap<Class<?>, Deserializable<?>>() {{
         put(BacktraceApiResult.class, new BacktraceApiResultDeserializer());
         put(BacktraceReport.class, new BacktraceReportDeserializer());
         put(BacktraceData.class, new BacktraceDataDeserializer());
@@ -37,20 +37,30 @@ public class BacktraceDeserializer {
 //    public static void registerCustomDeserializer(Class clazz, Deserializable obj) {
 //        deserializers.put(clazz, obj);
 //    }
+    @SuppressWarnings("unchecked")
+    public static <T> Deserializable<T> getDeserializer(Class<T> clazz) {
+        if (deserializers.containsKey(clazz)) {
+            Deserializable<?> deserializer = deserializers.get(clazz);
+
+            if (deserializer == null) {
+                return null;
+            }
+            return (Deserializable<T>) deserializer;
+        }
+        return null;
+    }
 
     @SuppressWarnings("unchecked")
     public static <T> T deserialize(JSONObject obj, Class<T> clazz) throws JSONException {
         if (obj == null) {
             return null;
         }
-        if (deserializers.containsKey(clazz)) {
-            Deserializable<T> deserializer = deserializers.get(clazz);
-            if (deserializer == null) {
-                return (T) DEFAULT_DESERIALIZER.deserialize(obj, clazz);
-            }
+        Deserializable<T> deserializer = BacktraceDeserializer.getDeserializer(clazz);
+
+        if (deserializer != null) {
             return (T) deserializer.deserialize(obj);
         }
-        // todo: maybe return unsupported
+
         return (T) DEFAULT_DESERIALIZER.deserialize(obj, clazz);
     }
 }

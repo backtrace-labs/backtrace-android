@@ -11,6 +11,9 @@ import org.junit.Test;
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
+import backtraceio.library.logger.BacktraceInternalLogger;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -47,9 +50,11 @@ public class BacktraceApiResultDeserializerTest {
     @Test
     public void deserializeCoronerApiErrorResponseInvalidToken() throws JSONException {
         String json = TestUtils.readFileAsString(this, "backtraceApiResultInvalidToken.error.json");
-
+        BacktraceInternalLogger x = new BacktraceInternalLogger();
+        x.setLevel(LogLevel.DEBUG);
+        BacktraceLogger.setLogger(x);
         // WHEN
-        BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceApiResult.class);
+        BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize("sdfsdf", BacktraceApiResult.class);
 
         // THEN
         assertNotNull(result);
