@@ -19,56 +19,56 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDataSerializer {
     NamingPolicy namingPolicy;
+
     public BacktraceDataSerializer(NamingPolicy policy) {
         namingPolicy = policy;
     }
 
 
     public JSONObject toJson(BacktraceData data) throws JSONException {
-        {
-            if (data == null) {
-                return null;
-            }
-
-            JSONObject json = new JSONObject();
-
-            // Serialize simple fields
-            json.put("lang", data.getLang());
-            json.put("agent", data.getAgent());
-            json.put("symbolication", data.getSymbolication());
-            json.put("uuid", data.getUuid());
-            json.put("timestamp", data.getTimestamp());
-            json.put("langVersion", data.getLangVersion());
-            json.put("agentVersion", data.getAgentVersion());
-            json.put("mainThread", data.getMainThread());
-
-            if (data.getClassifiers() != null) {
-                final JSONArray classifiers = new JSONArray();
-                for (String classifier : data.getClassifiers()) {
-                    classifiers.put(classifier);
-                }
-                json.put("classifiers", classifiers);
-            }
-
-            if (data.getAttributes() != null) {
-                json.put("attributes", serializeAttributes(data.getAttributes()));
-            }
-
-            if (data.getAnnotations() != null) {
-                json.put("annotations", serializeAnnotations(data.getAnnotations()));
-            }
-
-            if (data.getSourceCode() != null) {
-                json.put("sourceCode", serializeSourceCode(data.getSourceCode()));
-            }
-
-            if (data.getThreadInformationMap() != null) {
-                JSONObject threadInformationJson = serializeThreadInformation(data.getThreadInformationMap());
-                json.put("threads", threadInformationJson);
-            }
-
-            return json;
+        if (data == null) {
+            return null;
         }
+
+        JSONObject json = new JSONObject();
+
+        // Serialize simple fields
+        json.put("lang", data.getLang());
+        json.put("agent", data.getAgent());
+        json.put("symbolication", data.getSymbolication());
+        json.put("uuid", data.getUuid());
+        json.put("timestamp", data.getTimestamp());
+        json.put("langVersion", data.getLangVersion());
+        json.put("agentVersion", data.getAgentVersion());
+        json.put("mainThread", data.getMainThread());
+
+        if (data.getClassifiers() != null) {
+            final JSONArray classifiers = new JSONArray();
+            for (String classifier : data.getClassifiers()) {
+                classifiers.put(classifier);
+            }
+            json.put("classifiers", classifiers);
+        }
+
+        if (data.getAttributes() != null) {
+            json.put("attributes", serializeAttributes(data.getAttributes()));
+        }
+
+        if (data.getAnnotations() != null) {
+            json.put("annotations", serializeAnnotations(data.getAnnotations()));
+        }
+
+        if (data.getSourceCode() != null) {
+            json.put("sourceCode", serializeSourceCode(data.getSourceCode()));
+        }
+
+        if (data.getThreadInformationMap() != null) {
+            JSONObject threadInformationJson = serializeThreadInformation(data.getThreadInformationMap());
+            json.put("threads", threadInformationJson);
+        }
+
+        return json;
+
     }
 
     @NonNull

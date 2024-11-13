@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         Thread.sleep(anrTimeout + 2000);
     }
 
-    public void enableBreadcrumbs(View view) throws Exception {
+    public void enable Breadcrumbs(View view) throws Exception {
         Context appContext = view.getContext().getApplicationContext();
         if (backtraceClient == null) {
             throw new Exception("Backtrace client integration is not initialized");
