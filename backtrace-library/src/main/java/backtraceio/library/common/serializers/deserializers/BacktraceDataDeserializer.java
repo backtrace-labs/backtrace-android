@@ -11,15 +11,17 @@ import java.util.Map;
 import backtraceio.library.common.serializers.BacktraceDeserializer;
 import backtraceio.library.common.serializers.deserializers.cache.FieldNameLoader;
 import backtraceio.library.common.serializers.deserializers.cache.JSONObjectExtensions;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
 
-// TODO: check if methods should be private
 public class BacktraceDataDeserializer implements Deserializable<BacktraceData> {
 
     private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceData.class);
+
+    private static final String LOG_TAG = BacktraceDataDeserializer.class.getSimpleName();
 
     static class Fields {
         final static String uuid = "uuid";
@@ -54,17 +56,16 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
         );
     }
 
-    public BacktraceReport getBacktraceReport(JSONObject obj) throws JSONException {
+    private BacktraceReport getBacktraceReport(JSONObject obj) throws JSONException {
         Deserializable<BacktraceReport> deserializer = BacktraceDeserializer.getDeserializer(BacktraceReport.class);
         return deserializer.deserialize(obj);
     }
 
-    public Map<String, Object> getAnnotations(JSONObject obj) throws JSONException {
-        // TODO: Fix: throwing exception
+    private Map<String, Object> getAnnotations(JSONObject obj) {
         return MapDeserializer.toMap(obj);
     }
 
-    public Map<String, SourceCode> getSourceCode(JSONObject obj) {
+    private Map<String, SourceCode> getSourceCode(JSONObject obj) {
         if (obj == null) {
             return null;
         }
@@ -81,14 +82,14 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
                     result.put(key, deserializer.deserialize((JSONObject) obj.get(key)));
                 }
             } catch (JSONException e) {
-//                BacktraceLogger.e(LOG,)
-                // TODO:
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on deserialization of source code, " +
+                        "key %s, object %s", key, obj), e);
             }
         }
         return result;
     }
 
-    public Map<String, ThreadInformation> getThreadInformation(JSONObject obj) {
+    private Map<String, ThreadInformation> getThreadInformation(JSONObject obj) {
         if (obj == null) {
             return null;
         }
@@ -103,13 +104,14 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
                     result.put(key, deserializer.deserialize((JSONObject) obj.get(key)));
                 }
             } catch (JSONException e) {
-                // TODO:
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on deserialization of thread information, " +
+                        "key %s, object %s", key, obj), e);
             }
         }
         return result;
     }
 
-    public String[] getClassifiers(JSONArray jsonArray) {
+    private String[] getClassifiers(JSONArray jsonArray) {
         if (jsonArray == null) {
             return null;
         }
@@ -120,15 +122,16 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
             try {
                 Object object = jsonArray.get(i);
                 result[i] = object.toString();
-            } catch (JSONException exception) {
-                // todo: error handling
+            } catch (JSONException e) {
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on deserialization of classifiers, " +
+                        "array index %s, object %s", i, jsonArray), e);
             }
         }
 
         return result;
     }
 
-    public Map<String, String> getAttributes(JSONObject obj) {
+    private Map<String, String> getAttributes(JSONObject obj) {
         Map<String, String> result = new HashMap<>();
 
         if (obj == null) {
@@ -142,7 +145,8 @@ public class BacktraceDataDeserializer implements Deserializable<BacktraceData> 
             try {
                 result.put(key, obj.get(key).toString());
             } catch (JSONException e) {
-                // TODO: error handling
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on deserialization of attributes, " +
+                        "key %s, object %s", key, obj), e);
             }
         }
 

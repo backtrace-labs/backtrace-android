@@ -10,8 +10,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.logger.BacktraceLogger;
+
 public class MapDeserializer {
-    public static Map<String, Object> toMap(JSONObject jsonObj) throws JSONException {
+    private static final String LOG_TAG = BacktraceDataDeserializer.class.getSimpleName();
+    public static Map<String, Object> toMap(JSONObject jsonObj) {
         if (jsonObj == null) {
             return null;
         }
@@ -20,27 +23,37 @@ public class MapDeserializer {
         Iterator<String> keys = jsonObj.keys();
         while (keys.hasNext()) {
             String key = keys.next();
-            Object value = jsonObj.get(key);
-            if (value instanceof JSONArray) {
-                value = toList((JSONArray) value);
-            } else if (value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
+            try {
+                Object value = jsonObj.get(key);
+                if (value instanceof JSONArray) {
+                    value = toList((JSONArray) value);
+                } else if (value instanceof JSONObject) {
+                    value = toMap((JSONObject) value);
+                }
+                map.put(key, value);
+            } catch (JSONException e) {
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on deserialization map, " +
+                        "key %s, object %s", key, jsonObj), e);
             }
-            map.put(key, value);
         }
         return map;
     }
 
-    public static List<Object> toList(JSONArray array) throws JSONException {
+    public static List<Object> toList(JSONArray array) {
         List<Object> list = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
-            Object value = array.get(i);
-            if (value instanceof JSONArray) {
-                value = toList((JSONArray) value);
-            } else if (value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
+            try {
+                Object value = array.get(i);
+                if (value instanceof JSONArray) {
+                    value = toList((JSONArray) value);
+                } else if (value instanceof JSONObject) {
+                    value = toMap((JSONObject) value);
+                }
+                list.add(value);
+            } catch (JSONException e) {
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on deserialization list, " +
+                        "index %s, object %s", i, array), e);
             }
-            list.add(value);
         }
         return list;
     }
