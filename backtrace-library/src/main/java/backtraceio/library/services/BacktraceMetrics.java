@@ -4,11 +4,11 @@ import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.BacktraceCredentials;
+import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.serialization.DebugHelper;
@@ -19,6 +19,7 @@ import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
+import backtraceio.library.models.attributes.ReportDataBuilder;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
 
@@ -118,6 +119,16 @@ public final class BacktraceMetrics implements Metrics {
     private final BacktraceCredentials credentials;
 
     /**
+     * Application name
+     */
+    private String applicationName;
+
+    /**
+     * Application version
+     */
+    private String applicationVersion;
+
+    /**
      * Create new Backtrace metrics instance
      *
      * @param context                Application context
@@ -170,6 +181,11 @@ public final class BacktraceMetrics implements Metrics {
         if (uniqueEventName == null || uniqueEventName.length() == 0) {
             throw new IllegalArgumentException("Unique event name must be defined!");
         }
+
+        ApplicationMetadataCache applicationMetadata = ApplicationMetadataCache.getInstance(this.getContext());
+        this.applicationName = applicationMetadata.getApplicationName();
+        this.applicationVersion = applicationMetadata.getApplicationVersion();
+        
         final long startMetricsSetup = DebugHelper.getCurrentTimeMillis();
 
         setStartupUniqueEventName(uniqueEventName);
@@ -185,6 +201,17 @@ public final class BacktraceMetrics implements Metrics {
         final long endMetricsSetup = DebugHelper.getCurrentTimeMillis();
         BacktraceLogger.d(LOG_TAG, "Setup metrics integration took " + (endMetricsSetup - startMetricsSetup) + " milliseconds");
     }
+
+    /**
+     * Attributes are passed by the reference from the Backtrace client instance.
+     * If we modify them in the constructor, we won't be able to get "up to date"
+     * version from the client anymore.
+     * Due to that, we need to have a getter that will always transform attributes to a simple format.
+     */
+    private Map<String, String> getClientMetricsAttributes() {
+        return ReportDataBuilder.getReportAttributes(customReportAttributes, true).getAttributes();
+    }
+
 
     private void verifyIfMetricsAvailable() {
         if (!enabled) {
@@ -213,6 +240,7 @@ public final class BacktraceMetrics implements Metrics {
         verifyIfMetricsAvailable();
         addUniqueEvent(startupUniqueEventName);
         addSummedEvent(startupSummedEventName);
+
         uniqueEventsHandler.send();
         summedEventsHandler.send();
     }
@@ -251,7 +279,9 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, Object> localAttributes = createLocalAttributes(attributes);
+        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
+
+        Map<String, String> localAttributes = createLocalAttributes(metricsAttributes);
 
         // validate if unique event attribute is available and
         // prevent undefined attributes
@@ -304,7 +334,7 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Add a summed event to the next Backtrace Metrics request
      *
-     * @param metricGroupName
+     * @param metricGroupName name of the metrics group
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName) {
@@ -314,8 +344,8 @@ public final class BacktraceMetrics implements Metrics {
     /**
      * Add a summed event to the next Backtrace Metrics request
      *
-     * @param metricGroupName
-     * @param attributes
+     * @param metricGroupName name of the metrics group
+     * @param attributes      metrics attributes
      * @return true if success
      */
     public boolean addSummedEvent(String metricGroupName, Map<String, Object> attributes) {
@@ -326,12 +356,10 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, Object> localAttributes = new HashMap<>();
-        if (attributes != null) {
-            localAttributes.putAll(attributes);
-        }
+        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
 
-        SummedEvent summedEvent = new SummedEvent(metricGroupName, BacktraceTimeHelper.getTimestampSeconds(), localAttributes);
+        SummedEvent summedEvent = new SummedEvent(metricGroupName);
+        summedEvent.addAttributes(metricsAttributes);
         summedEventsHandler.events.addLast(summedEvent);
         if (count() == maximumNumberOfEvents) {
             uniqueEventsHandler.send();
@@ -386,17 +414,25 @@ public final class BacktraceMetrics implements Metrics {
         return true;
     }
 
-    protected Map<String, Object> createLocalAttributes(Map<String, Object> attributes) {
-        Map<String, Object> localAttributes = new HashMap<>();
+    protected Map<String, String> createLocalAttributes(Map<String, String> attributes) {
+        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, null, true);
 
-        if (attributes != null) {
-            localAttributes.putAll(attributes);
+        Map<String, String> result = backtraceAttributes.attributes;
+        result.putAll(this.getClientMetricsAttributes());
+
+        if (attributes != null && !attributes.isEmpty()) {
+            result.putAll(attributes);
         }
 
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, customReportAttributes);
-        localAttributes.putAll(backtraceAttributes.getAllAttributes());
+        return result;
+    }
 
-        return localAttributes;
+    protected String getApplicationName() {
+        return applicationName;
+    }
+
+    protected String getApplicationVersion() {
+        return applicationVersion;
     }
 
     /**

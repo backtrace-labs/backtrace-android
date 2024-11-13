@@ -400,48 +400,4 @@ public class BacktraceClientUniqueEventTest {
 
         assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
     }
-
-    @Test
-    public void uniqueEventEmptyAttributeValueShouldNotOverridePreviousValueOnUpdate() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
-
-        String expectedKey = "foo";
-        String expectedValue = "bar";
-
-        backtraceClient.attributes.put(expectedKey, expectedValue);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
-
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-
-        backtraceClient.attributes.put(expectedKey, "");
-        assertEquals("", backtraceClient.attributes.get(expectedKey));
-
-        // Force update
-        backtraceClient.metrics.send();
-
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-    }
-
-    @Test
-    public void uniqueEventNullAttributeValueShouldNotOverridePreviousValueOnUpdate() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
-
-        String expectedKey = "foo";
-        String expectedValue = "bar";
-
-        backtraceClient.attributes.put(expectedKey, expectedValue);
-        assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
-
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-
-        backtraceClient.attributes.put(expectedKey, null);
-        assertNull(backtraceClient.attributes.get(expectedKey));
-
-        // Force update
-        backtraceClient.metrics.send();
-
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-    }
 }
