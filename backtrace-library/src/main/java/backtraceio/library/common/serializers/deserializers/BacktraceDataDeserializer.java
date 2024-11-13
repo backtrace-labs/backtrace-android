@@ -19,9 +19,8 @@ import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDataDeserializer implements Deserializable<BacktraceData> {
 
-    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceData.class);
-
     private static final String LOG_TAG = BacktraceDataDeserializer.class.getSimpleName();
+    private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceData.class);
 
     static class Fields {
         final static String uuid = "uuid";

@@ -73,15 +73,15 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         if (obj == null) {
             return null;
         }
-        return this.exceptionDeserializer.deserialize(obj); // TODO: fix usage
+        return this.exceptionDeserializer.deserialize(obj);
     }
 
-    public Map<String, Object> getAttributes(JSONObject obj) throws JSONException {
+    public Map<String, Object> getAttributes(JSONObject obj) {
         if (obj == null) {
             return null;
         }
 
-        return MapDeserializer.toMap(obj); // TODO: check exception
+        return MapDeserializer.toMap(obj);
     }
 
     public List<String> getAttachmentList(JSONArray array) {

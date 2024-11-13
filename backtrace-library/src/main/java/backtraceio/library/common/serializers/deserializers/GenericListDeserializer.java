@@ -19,7 +19,7 @@ public class GenericListDeserializer<T> {
                 try {
                     result.add(deserializer.deserialize(obj));
                 } catch (Exception e) {
-                    BacktraceLogger.e(LOG_TAG, String.format("Can not deserialize object %s, error is %s", obj, e)); // TODO: test it
+                    BacktraceLogger.e(LOG_TAG, String.format("Can not deserialize object %s, reason is %s", obj, e.getMessage()), e);
                 }
             }
         }

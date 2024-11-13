@@ -74,7 +74,7 @@ public class BacktraceDataSerializerTest {
     }
 
     @Test
-    public void testGsonPerformanceSerializer() throws JSONException, IllegalAccessException { // TODO: fix name
+    public void testGsonPerformanceSerializer() throws JSONException { // TODO: fix name
         // GIVEN
         final Context context = InstrumentationRegistry.getInstrumentation().getContext();
         long timeGson = 0;

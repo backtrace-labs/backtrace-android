@@ -1,5 +1,7 @@
 package backtraceio.library.common.serializers;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,8 +17,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.common.serializers.naming.NamingPolicy;
+import backtraceio.library.logger.BacktraceLogger;
 
 public class SerializerHelper {
+    private static final String LOG_TAG = SerializerHelper.class.getSimpleName();
     public static int MAX_SERIALIZATION_LEVEL = 5;
     private static final Map<Class<?>, Class<?>> WRAPPER_TYPE_MAP;
 
@@ -70,8 +74,6 @@ public class SerializerHelper {
     }
 
     private static JSONObject getAllFields(NamingPolicy namingPolicy, Class<?> serializedClass, Object obj, int serializationDepth) {
-        // TODO: improve naming
-
         List<Field> fields = new ArrayList<>();
         for (Class<?> clazz = serializedClass; clazz != null; clazz = clazz.getSuperclass()) {
             fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
@@ -87,14 +89,14 @@ public class SerializerHelper {
             }
 
             try {
-                Object value = field.get(obj);
-                if (value == obj) {
+                Object fieldValue = field.get(obj);
+                if (fieldValue == obj) {
                     continue;
                 }
-                result.put(getFieldName(namingPolicy, field), serialize(namingPolicy, value, serializationDepth));
-            } catch (Exception ex) {
-                // TODO: error handling
-//                ex.printStackTrace();
+                result.put(getFieldName(namingPolicy, field), serialize(namingPolicy, fieldValue, serializationDepth));
+            } catch (Exception e) {
+                BacktraceLogger.e(LOG_TAG, String.format("Exception on getting object fields, " +
+                        "field %s, object %s", field.getName(), obj), e);
             }
         }
 
@@ -103,7 +105,6 @@ public class SerializerHelper {
 
     private static String getFieldName(NamingPolicy namingPolicy, Field field) {
         if (field.isAnnotationPresent(SerializedName.class)) {
-            // Get the SerializedName value
             SerializedName annotation = field.getAnnotation(SerializedName.class);
             if (annotation != null) {
                 return annotation.value();
@@ -144,8 +145,8 @@ public class SerializerHelper {
                     String propertyName = methodName.substring(3); // Remove 'get' prefix
                     fields.put(namingPolicy.convert(propertyName), serialize(namingPolicy, result));
                 } catch (Exception e) {
-                    // TODO: error handling
-                    e.printStackTrace();
+                    BacktraceLogger.e(LOG_TAG, String.format("Exception on executing getters, " +
+                            "class %s, method name %s, object %s", clazz, methodName, obj), e);
                 }
             }
         }
@@ -161,7 +162,6 @@ public class SerializerHelper {
             return new JSONObject();
         }
 
-        // TODO: check if all of the types
         if (SerializerHelper.isPrimitiveType(obj)) {
             return obj;
         }
@@ -192,7 +192,11 @@ public class SerializerHelper {
             return ((Enum<?>) obj).name();
         }
 
-        Class<?> clazz = obj.getClass();
+        return extractFieldsAndGetters(namingPolicy, obj, serializationDepth, obj.getClass());
+    }
+
+    @NonNull
+    private static JSONObject extractFieldsAndGetters(NamingPolicy namingPolicy, Object obj, int serializationDepth, Class<?> clazz) throws JSONException {
         JSONObject jsonObject = getAllFields(namingPolicy, clazz, obj, serializationDepth);
         Map<String, Object> getters = executeAndGetMethods(namingPolicy, obj);
 

@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -15,9 +14,12 @@ import java.util.UUID;
 
 import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.common.serializers.SerializerHelper;
+import backtraceio.library.logger.BacktraceLogger;
 
 
 public final class ReflectionDeserializer implements Deserializable<Object> {
+
+    private final static String LOG_TAG = ReflectionDeserializer.class.getSimpleName();
 
     @Override
     public Object deserialize(JSONObject obj) throws JSONException {
@@ -48,6 +50,17 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                     continue;
                 }
 
+                if (field.isAnnotationPresent(SerializedName.class)) {
+                    SerializedName annotation = field.getAnnotation(SerializedName.class);
+                    if (annotation != null) {
+                        String customName = annotation.value();
+                        if (obj.has(customName)) {
+                            field.set(instance, this.deserialize(obj.get(customName), field.getType(), field));
+                            continue;
+                        }
+                    }
+                }
+
                 // Get the field name
                 String fieldName = field.getName();
                 // Check if the JSON object has a key with the field name
@@ -55,37 +68,17 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                     // Set the field value using reflection
                     try {
                         field.set(instance, this.deserialize(obj.get(fieldName), field.getType(), field)); // TODO: what if obj.get(fieldNAme) is JSONObject e.g. in BacktraceResult
-                    } catch (IllegalArgumentException exception) {
-                        // TODO: log error
-                        continue;
+                    } catch (IllegalArgumentException e) {
+                        BacktraceLogger.e(LOG_TAG, String.format("IllegalArgumentException on reflection deserialization of object %s, " +
+                                "field %s, reason %s", obj, fieldName, e.getMessage()), e);
                     }
-                    continue;
-                }
-
-
-                if (field.isAnnotationPresent(SerializedName.class)) {
-                    SerializedName annotation = field.getAnnotation(SerializedName.class);
-                    if (annotation != null) {
-                        String customName = annotation.value();
-                        if (obj.has(customName)) {
-                            field.set(instance, obj.get(customName));
-                        }
-                    }
-
                 }
             }
 
             return instance;
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace(); // Handle the exception appropriately
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e){
+            BacktraceLogger.e(LOG_TAG, String.format("Exception on reflection deserialization of object %s, " +
+                    "exception type %s, reason %s", obj, e.getClass(), e.getMessage()), e);
         }
 
         return null;
@@ -115,7 +108,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
             return UUID.fromString(object.toString());
         }
 
-        // TODO: check other types
+        // TODO: check other types e.g. List/Array
         return object;
     }
 
