@@ -1,6 +1,9 @@
 package backtraceio.library.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.BacktraceClient;
@@ -52,9 +55,10 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
 
         BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-        BacktraceReport report = new BacktraceReport(this.getCausedException(throwable), BacktraceExceptionHandler.customAttributes);
-        report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
-        this.client.send(report, callback);
+        for (BacktraceReport report :
+                this.transformExceptionIntoReports(throwable)) {
+            this.client.send(report, callback);
+        }
         BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
 
         try {
@@ -79,5 +83,27 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
             rootHandler.uncaughtException(thread, throwable);
             signal.countDown();
         };
+    }
+
+    private List<BacktraceReport> transformExceptionIntoReports(Throwable throwable) {
+        final String exceptionTrace = UUID.randomUUID().toString();
+        BacktraceReport parent = null;
+
+        List<BacktraceReport> reports = new ArrayList<>();
+        while (throwable != null) {
+            Exception currentException = throwable instanceof Exception ? (Exception) throwable : new UnhandledThrowableWrapper(throwable);
+            BacktraceReport report = new BacktraceReport(currentException, BacktraceExceptionHandler.customAttributes);
+
+            report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+            report.attributes.put("error.trace", exceptionTrace);
+            report.attributes.put("error.id", report.uuid.toString());
+            report.attributes.put("error.parent", parent != null ? parent.uuid.toString() : null);
+            reports.add(report);
+
+            throwable = throwable.getCause();
+            parent = report;
+        }
+
+        return reports;
     }
 }
