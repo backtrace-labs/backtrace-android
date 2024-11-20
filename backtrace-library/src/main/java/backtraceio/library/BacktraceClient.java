@@ -312,7 +312,7 @@ public class BacktraceClient extends BacktraceBase {
 
     private List<BacktraceReport> transformExceptionIntoReports(Throwable exception, Map<String, Object> attributes) {
         final String exceptionTrace = UUID.randomUUID().toString();
-        BacktraceReport parent = null;
+        String parentId = null;
         final List<BacktraceReport> reports = new ArrayList<>();
 
         while (exception != null) {
@@ -320,11 +320,11 @@ public class BacktraceClient extends BacktraceBase {
 
             report.attributes.put("error.trace", exceptionTrace);
             report.attributes.put("error.id", report.uuid.toString());
-            report.attributes.put("error.parent", parent != null ? parent.uuid.toString() : null);
+            report.attributes.put("error.parent", parentId);
             reports.add(report);
 
             exception = exception.getCause();
-            parent = report;
+            parentId = report.uuid.toString();
         }
 
         return reports;
