@@ -33,12 +33,6 @@ public class UncaughtExceptionHandlerTest {
     private Context context;
     private BacktraceCredentials credentials;
 
-    @Before
-    public void setUp() {
-        context = InstrumentationRegistry.getInstrumentation().getContext();
-        credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
-    }
-
     private static void setRootHandler(Thread.UncaughtExceptionHandler customRootHandler, Thread.UncaughtExceptionHandler newRootHandler) {
         try {
             Field field = BacktraceExceptionHandler.class.getDeclaredField("rootHandler");
@@ -49,7 +43,6 @@ public class UncaughtExceptionHandlerTest {
         }
     }
 
-
     private static BacktraceExceptionHandler createBacktraceExceptionHandler(BacktraceClient client) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Constructor<BacktraceExceptionHandler> constructor = BacktraceExceptionHandler.class.getDeclaredConstructor(BacktraceClient.class);
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
@@ -57,6 +50,12 @@ public class UncaughtExceptionHandlerTest {
         BacktraceExceptionHandler exceptionHandler = constructor.newInstance(client);
         setRootHandler(exceptionHandler, new SkipExceptionHandler());
         return exceptionHandler;
+    }
+
+    @Before
+    public void setUp() {
+        context = InstrumentationRegistry.getInstrumentation().getContext();
+        credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     }
 
     @Test()
@@ -137,6 +136,7 @@ public class UncaughtExceptionHandlerTest {
     @Test()
     public void testUncaughtInnerExceptionsGeneration() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         // GIVEN
+        final int expectedNumberOfExceptions = 2;
         final Waiter waiter = new Waiter();
         final String innerExceptionMessage = "Cause exception message";
         final Exception cause = new IllegalArgumentException(innerExceptionMessage);
@@ -147,7 +147,9 @@ public class UncaughtExceptionHandlerTest {
         final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
         client.setOnRequestHandler(data -> {
             unhandledExceptionData.add(data);
-            waiter.resume();
+            if (unhandledExceptionData.size() == expectedNumberOfExceptions) {
+                waiter.resume();
+            }
             return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         });
@@ -165,7 +167,7 @@ public class UncaughtExceptionHandlerTest {
         }
 
         // THEN
-        assertEquals(2, unhandledExceptionData.size());
+        assertEquals(expectedNumberOfExceptions, unhandledExceptionData.size());
 
         final BacktraceData outerException = unhandledExceptionData.get(0);
         final BacktraceData innerException = unhandledExceptionData.get(unhandledExceptionData.size() - 1);
@@ -176,6 +178,7 @@ public class UncaughtExceptionHandlerTest {
     @Test()
     public void testUncaughtInnerExceptionsErrorAttributes() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         // GIVEN
+        final int expectedNumberOfExceptions = 2;
         final Waiter waiter = new Waiter();
         final String innerExceptionMessage = "Cause exception message";
         final Exception cause = new IllegalArgumentException(innerExceptionMessage);
@@ -186,7 +189,9 @@ public class UncaughtExceptionHandlerTest {
         final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
         client.setOnRequestHandler(data -> {
             unhandledExceptionData.add(data);
-            waiter.resume();
+            if (unhandledExceptionData.size() == expectedNumberOfExceptions) {
+                waiter.resume();
+            }
             return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         });

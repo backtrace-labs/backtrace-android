@@ -2,9 +2,11 @@ package backtraceio.library;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
@@ -201,7 +203,7 @@ public class BacktraceClient extends BacktraceBase {
      *
      * @param exception current exception
      */
-    public void send(Exception exception) {
+    public void send(Throwable exception) {
         this.send(exception, null);
     }
 
@@ -211,9 +213,24 @@ public class BacktraceClient extends BacktraceBase {
      * @param exception                   current exception
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
-    public void send(Exception exception, OnServerResponseEventListener
+    public void send(Throwable exception, OnServerResponseEventListener
             serverResponseEventListener) {
-        super.send(new BacktraceReport(exception), serverResponseEventListener);
+        this.send(exception, null, serverResponseEventListener);
+    }
+
+    /**
+     * Sending an exception to Backtrace API
+     *
+     * @param exception                   current exception
+     * @param attributes                  exception attributes
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
+     */
+    public void send(Throwable exception, Map<String, Object> attributes, OnServerResponseEventListener
+            serverResponseEventListener) {
+        for (BacktraceReport report :
+                this.transformExceptionIntoReports(exception, attributes)) {
+            super.send(report, serverResponseEventListener);
+        }
     }
 
     /**
@@ -291,5 +308,25 @@ public class BacktraceClient extends BacktraceBase {
         if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
             this.anrWatchdog.stopMonitoringAnr();
         }
+    }
+
+    private List<BacktraceReport> transformExceptionIntoReports(Throwable exception, Map<String, Object> attributes) {
+        final String exceptionTrace = UUID.randomUUID().toString();
+        BacktraceReport parent = null;
+        final List<BacktraceReport> reports = new ArrayList<>();
+
+        while (exception != null) {
+            BacktraceReport report = new BacktraceReport(exception, attributes);
+
+            report.attributes.put("error.trace", exceptionTrace);
+            report.attributes.put("error.id", report.uuid.toString());
+            report.attributes.put("error.parent", parent != null ? parent.uuid.toString() : null);
+            reports.add(report);
+
+            exception = exception.getCause();
+            parent = report;
+        }
+
+        return reports;
     }
 }

@@ -133,7 +133,7 @@ public class BacktraceReport {
      * @param exception current exception
      */
     public BacktraceReport(
-            Exception exception) {
+            Throwable exception) {
         this(exception, null, null);
     }
 
@@ -145,7 +145,7 @@ public class BacktraceReport {
      * @param attributes additional information about application state
      */
     public BacktraceReport(
-            Exception exception,
+            Throwable exception,
             Map<String, Object> attributes) {
         this(exception, attributes, null);
     }
@@ -167,18 +167,14 @@ public class BacktraceReport {
      * Create new instance of Backtrace report to send a report
      * with application exception, attributes and attachments
      *
-     * @param exception       current exception
+     * @param throwable       current throwable
      * @param attributes      additional information about application state
      * @param attachmentPaths path to all report attachments
      */
-    public BacktraceReport(
-            Exception exception,
-            Map<String, Object> attributes,
-            List<String> attachmentPaths) {
-
+    public BacktraceReport(Throwable throwable, Map<String, Object> attributes, List<String> attachmentPaths) {
         this.attributes = CollectionUtils.copyMap(attributes);
         this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
-        this.exception = this.prepareException(exception);
+        this.exception = this.prepareException(throwable);
         this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
 
@@ -188,19 +184,38 @@ public class BacktraceReport {
         this.setDefaultErrorTypeAttribute();
     }
 
+    /**
+     * Concat two dictionaries with attributes
+     *
+     * @param report     current report
+     * @param attributes attributes to concatenate
+     * @return concatenated map of attributes from report and from passed attributes
+     */
+    public static Map<String, Object> concatAttributes(
+            BacktraceReport report, Map<String, Object> attributes) {
+        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
+                new HashMap<String, Object>();
+        if (attributes == null) {
+            return reportAttributes;
+        }
+        reportAttributes.putAll(attributes);
+        return reportAttributes;
+    }
+
     public String getExceptionClassifier(Exception exception) {
         if (exception instanceof UnhandledThrowableWrapper) {
             return ((UnhandledThrowableWrapper) exception).getClassifier();
         }
         return exception.getClass().getCanonicalName();
     }
+
     /**
      * To avoid serialization issues with custom exceptions, our goal is to always
      * prepare exception in a way potential serialization won't break it
      *
      * @param exception captured client-side exception
      */
-    private Exception prepareException(Exception exception) {
+    private Exception prepareException(Throwable exception) {
         if (exception == null) {
             return null;
         }
@@ -224,24 +239,6 @@ public class BacktraceReport {
                 this.exceptionTypeReport
                         ? BacktraceAttributeConsts.HandledExceptionAttributeType
                         : BacktraceAttributeConsts.MessageAttributeType);
-    }
-
-    /**
-     * Concat two dictionaries with attributes
-     *
-     * @param report     current report
-     * @param attributes attributes to concatenate
-     * @return concatenated map of attributes from report and from passed attributes
-     */
-    public static Map<String, Object> concatAttributes(
-            BacktraceReport report, Map<String, Object> attributes) {
-        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
-                new HashMap<String, Object>();
-        if (attributes == null) {
-            return reportAttributes;
-        }
-        reportAttributes.putAll(attributes);
-        return reportAttributes;
     }
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
