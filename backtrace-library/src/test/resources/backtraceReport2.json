@@ -1,0 +1,227 @@
+{
+  "diagnostic-stack": [
+    {
+      "funcName": "java.lang.Thread.getStackTrace",
+      "sourceCode": "ca33f105-2ef0-4bd5-9295-aca9a52c1d64"
+    },
+    {
+      "funcName": "jdk.internal.reflect.NativeMethodAccessorImpl.invoke0",
+      "sourceCode": "9782dbe0-7e81-4f36-b24f-e23efc5a0ac8"
+    },
+    {
+      "funcName": "jdk.internal.reflect.NativeMethodAccessorImpl.invoke",
+      "sourceCode": "7ebf884c-ac5e-4316-899a-f60421a83523"
+    },
+    {
+      "funcName": "jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke",
+      "sourceCode": "d538fe68-a694-49a3-aa20-ce47a01c2fbd"
+    },
+    {
+      "funcName": "java.lang.reflect.Method.invoke",
+      "sourceCode": "8321a20b-491b-4996-81af-b2bcce91165e"
+    },
+    {
+      "funcName": "org.junit.runners.model.FrameworkMethod$1.runReflectiveCall",
+      "sourceCode": "62bace60-2661-40c2-a6e5-912bb91132e5",
+      "line": 59
+    },
+    {
+      "funcName": "org.junit.internal.runners.model.ReflectiveCallable.run",
+      "sourceCode": "d5bb52f6-d5f5-48a3-8d7f-4dfbc087167d",
+      "line": 12
+    },
+    {
+      "funcName": "org.junit.runners.model.FrameworkMethod.invokeExplosively",
+      "sourceCode": "163a9905-76c6-4013-bc6b-5f34268c62f5",
+      "line": 56
+    },
+    {
+      "funcName": "org.junit.internal.runners.statements.InvokeMethod.evaluate",
+      "sourceCode": "17df9f97-d0c6-4604-864d-e9f39eaa8fe6",
+      "line": 17
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner$3.evaluate",
+      "sourceCode": "7c4e104e-9c01-4035-af25-7a62629cbc1c",
+      "line": 306
+    },
+    {
+      "funcName": "org.junit.runners.BlockJUnit4ClassRunner$1.evaluate",
+      "sourceCode": "1986c796-0c4f-4cd8-9845-ca43f31bfb40",
+      "line": 100
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner.runLeaf",
+      "sourceCode": "3e2f3ec1-8683-4bde-b341-8c81b5f80d32",
+      "line": 366
+    },
+    {
+      "funcName": "org.junit.runners.BlockJUnit4ClassRunner.runChild",
+      "sourceCode": "50ff69a9-4b34-484d-ab6d-4ee9f9fcbd85",
+      "line": 103
+    },
+    {
+      "funcName": "org.junit.runners.BlockJUnit4ClassRunner.runChild",
+      "sourceCode": "f5a8182c-f259-4314-bae3-4d0f0e62e495",
+      "line": 63
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner$4.run",
+      "sourceCode": "b3042d05-9c5e-48e8-9695-d57c66022511",
+      "line": 331
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner$1.schedule",
+      "sourceCode": "d23e342d-63e0-485b-93d1-4d56fa929f3b",
+      "line": 79
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner.runChildren",
+      "sourceCode": "0a6080e7-8c99-4053-a9a7-ec82c4c7df71",
+      "line": 329
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner.access$100",
+      "sourceCode": "978de1f4-e486-419e-b762-3512a35401a8",
+      "line": 66
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner$2.evaluate",
+      "sourceCode": "269f3577-027b-49f2-a9a6-e999fcbc8a78",
+      "line": 293
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner$3.evaluate",
+      "sourceCode": "042ba8f4-bb7c-4a1a-bb0e-34e749d4f70a",
+      "line": 306
+    },
+    {
+      "funcName": "org.junit.runners.ParentRunner.run",
+      "sourceCode": "8d92993f-fddf-4327-93c6-84025f5a9c11",
+      "line": 413
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.runTestClass",
+      "sourceCode": "e862ff55-104f-4327-b64d-29bdea7e99a8",
+      "line": 112
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute",
+      "sourceCode": "0210d246-4e3f-4873-b0f9-04d531bbc960",
+      "line": 58
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor.execute",
+      "sourceCode": "3f21632e-69ab-474c-b37e-574873f369bc",
+      "line": 40
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.junit.AbstractJUnitTestClassProcessor.processTestClass",
+      "sourceCode": "2128303e-bc7c-463f-a453-19f6e73c7aab",
+      "line": 60
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass",
+      "sourceCode": "55e9195a-f5da-4ddf-a785-854159be62df",
+      "line": 52
+    },
+    {
+      "funcName": "jdk.internal.reflect.NativeMethodAccessorImpl.invoke0",
+      "sourceCode": "c4791a49-e5cc-4eee-8909-78548cfba490"
+    },
+    {
+      "funcName": "jdk.internal.reflect.NativeMethodAccessorImpl.invoke",
+      "sourceCode": "8f566598-6b1a-4d8b-a586-eb0ad32c4a57"
+    },
+    {
+      "funcName": "jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke",
+      "sourceCode": "756054da-9fe5-4657-ac3e-63d5a8d68912"
+    },
+    {
+      "funcName": "java.lang.reflect.Method.invoke",
+      "sourceCode": "ee7dd599-6871-4b6e-ae5a-f0901f37ea01"
+    },
+    {
+      "funcName": "org.gradle.internal.dispatch.ReflectionDispatch.dispatch",
+      "sourceCode": "5934c099-741a-4662-8add-af5003970178",
+      "line": 36
+    },
+    {
+      "funcName": "org.gradle.internal.dispatch.ReflectionDispatch.dispatch",
+      "sourceCode": "155ea60a-e4d2-47b3-9bbe-827e726fcd10",
+      "line": 24
+    },
+    {
+      "funcName": "org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch",
+      "sourceCode": "344b5740-6912-409c-ac85-ce0806161f0e",
+      "line": 33
+    },
+    {
+      "funcName": "org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke",
+      "sourceCode": "e953c9d7-d629-45b1-b837-4a03b40d9dd9",
+      "line": 94
+    },
+    {
+      "funcName": "jdk.proxy2.$Proxy5.processTestClass",
+      "sourceCode": "5c46e60f-a97b-4835-8eba-2add91819048"
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.worker.TestWorker$2.run",
+      "sourceCode": "f93312fb-de69-46b6-93d0-26115faf1403",
+      "line": 176
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName",
+      "sourceCode": "2bc004c4-a8df-402e-9559-d05de03c6735",
+      "line": 129
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.worker.TestWorker.execute",
+      "sourceCode": "d16a45f3-43fb-4950-994a-0e6aa5f96f1d",
+      "line": 100
+    },
+    {
+      "funcName": "org.gradle.api.internal.tasks.testing.worker.TestWorker.execute",
+      "sourceCode": "9fe066a0-8e43-4c5b-91c7-b731ce11c845",
+      "line": 60
+    },
+    {
+      "funcName": "org.gradle.process.internal.worker.child.ActionExecutionWorker.execute",
+      "sourceCode": "ea91fef9-e91a-4736-85bb-6d2955bd63a2",
+      "line": 56
+    },
+    {
+      "funcName": "org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call",
+      "sourceCode": "f214069c-1ae7-4df7-b016-13c489f121c6",
+      "line": 113
+    },
+    {
+      "funcName": "org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call",
+      "sourceCode": "b0d0f5b7-790f-4ee0-a8fb-5ec6fc9720a5",
+      "line": 65
+    },
+    {
+      "funcName": "worker.org.gradle.process.internal.worker.GradleWorkerMain.run",
+      "sourceCode": "38fedc39-e7b2-4136-9d7c-c9ffc8297cab",
+      "line": 69
+    },
+    {
+      "funcName": "worker.org.gradle.process.internal.worker.GradleWorkerMain.main",
+      "sourceCode": "b1bfa4aa-825a-4556-a290-59e9911dc47e",
+      "line": 74
+    }
+  ],
+  "classifier": "",
+  "attachment-paths": [
+    "1"
+  ],
+  "attributes": {
+    "1": 1,
+    "2": 2,
+    "error.type": "Message"
+  },
+  "message": "example-message",
+  "uuid": "e8e77163-8c50-47c5-9814-3b9f64b83825",
+  "exception-type-report": false,
+  "timestamp": 1732135979
+}

@@ -69,14 +69,14 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         );
     }
 
-    public Exception getException(JSONObject obj) {
+    private Exception getException(JSONObject obj) {
         if (obj == null) {
             return null;
         }
         return this.exceptionDeserializer.deserialize(obj);
     }
 
-    public Map<String, Object> getAttributes(JSONObject obj) {
+    private Map<String, Object> getAttributes(JSONObject obj) {
         if (obj == null) {
             return null;
         }
@@ -84,7 +84,7 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         return MapDeserializer.toMap(obj);
     }
 
-    public List<String> getAttachmentList(JSONArray array) {
+    private List<String> getAttachmentList(JSONArray array) {
         if (array == null) {
             return new ArrayList<>();
         }
@@ -98,7 +98,7 @@ public class BacktraceReportDeserializer implements Deserializable<BacktraceRepo
         return result;
     }
 
-    public List<BacktraceStackFrame> getDiagnosticStack(JSONArray array) {
+    private List<BacktraceStackFrame> getDiagnosticStack(JSONArray array) {
         if (array == null) {
             return null;
         }
