@@ -30,7 +30,7 @@ public class BacktraceDataTest {
         assertEquals("398dad51-7c39-4d64-941c-854de56f5f2b", result.getUuid());
         assertEquals("java", result.getLang());
         assertEquals("backtrace-android", result.getAgent());
-        assertEquals(null, result.getSymbolication());  // TODO: Check what should be value if empty and Add symbolication to json and assert here
+        assertEquals("proguard", result.getSymbolication());
         assertEquals(1709680075, result.getTimestamp());
         assertEquals("0", result.getLangVersion());
         assertEquals("3.7.14-1-931f45d", result.getAgentVersion());
@@ -57,12 +57,15 @@ public class BacktraceDataTest {
         assertEquals(result.getSourceCode().size(), 35);
         SourceCode firstSourceCode = result.getSourceCode().get("ca0a50a1-d553-4479-8fe2-28c3f527743b");
 
+        assertNotNull(firstSourceCode);
         assertEquals(firstSourceCode.sourceCodeFileName, "ParentRunner.java");
         assertEquals(firstSourceCode.startLine.intValue(), 306);
 
         // THEN Thread information
         assertEquals(result.getThreadInformationMap().size(), 13);
         ThreadInformation threadInformation = result.getThreadInformationMap().get("finalizerwatchdogdaemon");
+
+        assertNotNull(threadInformation);
         assertEquals(threadInformation.getFault(), false);
         assertEquals(threadInformation.getName(), "finalizerwatchdogdaemon");
         assertNotNull(threadInformation.getStack());

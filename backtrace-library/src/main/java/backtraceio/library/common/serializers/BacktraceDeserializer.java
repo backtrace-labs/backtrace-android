@@ -33,10 +33,11 @@ public class BacktraceDeserializer {
         put(BacktraceDatabaseRecord.class, new BacktraceDatabaseRecordDeserializer());
     }};
 
-    // TODO: Check if we need it?
-//    public static void registerCustomDeserializer(Class clazz, Deserializable obj) {
-//        deserializers.put(clazz, obj);
-//    }
+    @SuppressWarnings("unused") // TODO: Discuss with team if we need it
+    public static void registerCustomDeserializer(Class<?> clazz, Deserializable<?> obj) {
+        deserializers.put(clazz, obj);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> Deserializable<T> getDeserializer(Class<T> clazz) {
         if (deserializers.containsKey(clazz)) {

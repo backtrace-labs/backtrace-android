@@ -25,11 +25,11 @@ public class BacktraceOrgJsonSerializer {
             return SerializerHelper.serialize(namingPolicy, object).toString();
         }
         catch (JSONException jsonException) {
-            BacktraceLogger.e(LOG_TAG, String.format("Can not serialize object %s", object), jsonException); // TODO: test it
+            BacktraceLogger.e(LOG_TAG, String.format("Can not serialize object %s", object), jsonException);
             return null;
         }
         catch (Exception ex) {
-            BacktraceLogger.e(LOG_TAG, String.format("Exception during serialization of object %s", object), ex); // TODO: test it
+            BacktraceLogger.e(LOG_TAG, String.format("Exception during serialization of object %s", object), ex);
             return null;
         }
     }

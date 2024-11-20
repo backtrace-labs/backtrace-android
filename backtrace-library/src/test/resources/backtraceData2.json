@@ -838,5 +838,6 @@
     }
   },
   "timestamp": 1709680075,
-  "uuid": "398dad51-7c39-4d64-941c-854de56f5f2b"
+  "uuid": "398dad51-7c39-4d64-941c-854de56f5f2b",
+  "symbolication": "proguard"
 }
