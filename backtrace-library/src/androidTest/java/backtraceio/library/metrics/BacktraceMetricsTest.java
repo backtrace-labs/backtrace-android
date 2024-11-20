@@ -57,7 +57,7 @@ public class BacktraceMetricsTest {
     @Test
     public void addAttributesSummedEvent() {
         SummedEvent summedEvent = new SummedEvent(summedEventName, null);
-        Map<String, Object> attributes = new HashMap<String, Object>() {{
+        Map<String, String> attributes = new HashMap<String, String>() {{
             put("foo", "bar");
         }};
         summedEvent.addAttributes(attributes);
@@ -67,7 +67,7 @@ public class BacktraceMetricsTest {
     @Test
     public void addAttributesUniqueEvent() {
         UniqueEvent uniqueEvent = new UniqueEvent(uniqueAttributeName[0], null);
-        Map<String, Object> attributes = new HashMap<String, Object>() {{
+        Map<String, String> attributes = new HashMap<String, String>() {{
             put("foo", "bar");
         }};
         uniqueEvent.update(BacktraceTimeHelper.getTimestampSeconds(), attributes);

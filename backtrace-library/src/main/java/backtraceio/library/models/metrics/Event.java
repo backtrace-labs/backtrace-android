@@ -11,8 +11,11 @@ public abstract class Event {
     @SerializedName("timestamp")
     protected long timestamp;
 
+    /**
+     * The event should always have attributes. Event without attributes won't be processed
+     */
     @SerializedName("attributes")
-    protected Map<String, Object> attributes;
+    protected Map<String, String> attributes = new HashMap<>();
 
     public Event(long timestamp) {
         this.timestamp = timestamp;
@@ -22,30 +25,16 @@ public abstract class Event {
         return this.timestamp;
     }
 
-    public Map<String, Object> getAttributes() {
+    public Map<String, String> getAttributes() {
         return this.attributes;
     }
 
     public abstract String getName();
 
-    protected void addAttributesImpl(Map<String, Object> attributes) {
-        if (attributes == null || attributes.size() == 0) {
+    protected void addAttributesImpl(Map<String, String> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
             return;
         }
-
-        Map<String, Object> attributesNoEmpty = new HashMap<String, Object>();
-
-        for (String key : attributes.keySet()) {
-            Object value = attributes.get(key);
-            if (BacktraceStringHelper.isObjectNotNullOrNotEmptyString(value)) {
-                attributesNoEmpty.put(key, value);
-            }
-        }
-
-        if (this.attributes == null) {
-            this.attributes = attributesNoEmpty;
-        } else {
-            this.attributes.putAll(attributesNoEmpty);
-        }
+        this.attributes.putAll(attributes);
     }
 }

@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 34
     namespace "backtraceio.backtraceio"
     defaultConfig {
+        compileSdk 34
         applicationId "backtraceio.backtraceio"
         minSdkVersion 21
         targetSdkVersion 34

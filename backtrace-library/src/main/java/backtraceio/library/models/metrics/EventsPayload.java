@@ -33,5 +33,13 @@ public abstract class EventsPayload<T extends Event> {
         this.eventsMetadata.setDroppedEvents(droppedEvents);
     }
 
+    public String getApplicationVersion() {
+        return appVersion;
+    }
+
+    public String getApplicationName() {
+        return application;
+    }
+
     public abstract ConcurrentLinkedDeque<T> getEvents();
 }

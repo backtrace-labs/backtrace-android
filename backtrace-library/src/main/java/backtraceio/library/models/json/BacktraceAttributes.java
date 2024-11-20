@@ -1,7 +1,6 @@
 package backtraceio.library.models.json;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.provider.Settings;
@@ -15,18 +14,17 @@ import java.util.Map;
 import java.util.UUID;
 
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.DeviceAttributesHelper;
-import backtraceio.library.common.TypeHelper;
 import backtraceio.library.enums.ScreenOrientation;
-import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.attributes.ReportDataAttributes;
+import backtraceio.library.models.attributes.ReportDataBuilder;
 
 /**
  * Class instance to get a built-in attributes from current application
  */
 public class BacktraceAttributes {
-    private static final transient String LOG_TAG = BacktraceAttributes.class.getSimpleName();
-
     /**
      * Get built-in primitive attributes
      */
@@ -45,7 +43,7 @@ public class BacktraceAttributes {
     /**
      * Metrics session ID
      */
-    private static final String sessionId = UUID.randomUUID().toString();
+    private final static String sessionId = UUID.randomUUID().toString();
 
     /**
      * Create instance of Backtrace Attribute
@@ -71,7 +69,7 @@ public class BacktraceAttributes {
             this.setExceptionAttributes(report);
         }
         if (clientAttributes != null) {
-            this.convertClientAttributes(clientAttributes);
+            this.convertAttributes(clientAttributes);
         }
         if (report != null && clientAttributes != null) {
             BacktraceReport.concatAttributes(report, clientAttributes);
@@ -105,10 +103,10 @@ public class BacktraceAttributes {
     }
 
     private void setAppInformation() {
-        this.attributes.put("application.package", this.context.getApplicationContext()
-                .getPackageName());
-        this.attributes.put("application", getApplicationName());
-        String version = getApplicationVersionOrEmpty();
+        ApplicationMetadataCache applicationMetadata = ApplicationMetadataCache.getInstance(this.context);
+        this.attributes.put("application.package", applicationMetadata.getPackageName());
+        this.attributes.put("application", applicationMetadata.getApplicationName());
+        String version = applicationMetadata.getApplicationVersion();
         if (!BacktraceStringHelper.isNullOrEmpty(version)) {
             // We want to standardize application.version attribute name
             this.attributes.put("application.version", version);
@@ -184,15 +182,6 @@ public class BacktraceAttributes {
     }
 
     /**
-     * Divide client attributes into primitive and complex attributes and add to this object
-     *
-     * @param clientAttributes client's attributes
-     */
-    private void convertClientAttributes(Map<String, Object> clientAttributes) {
-        convertAttributes(clientAttributes);
-    }
-
-    /**
      * Divide report attributes into primitive and complex attributes and add to this object
      *
      * @param report report to extract attributes from
@@ -206,41 +195,15 @@ public class BacktraceAttributes {
         }
     }
 
-    /**
-     * Divide custom user attributes into primitive and complex attributes and add to this object
-     *
-     * @param attributes client's attributes
-     */
-    private void convertAttributes(Map<String, Object> attributes) {
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            Object value = entry.getValue();
-            if (value == null) {
-                continue;
-            }
-            Class type = value.getClass();
-            if (TypeHelper.isPrimitiveOrPrimitiveWrapperOrString(type)) {
-                this.attributes.put(entry.getKey(), value.toString());
-            } else {
-                this.complexAttributes.put(entry.getKey(), value);
-            }
+    private void convertAttributes(Map<String, Object> clientAttributes) {
+        if (clientAttributes == null || clientAttributes.isEmpty()) {
+            return;
         }
+        ReportDataAttributes data = ReportDataBuilder.getReportAttributes(clientAttributes);
+        this.attributes.putAll(data.getAttributes());
+        this.complexAttributes.putAll(data.getAnnotations());
     }
 
-    public String getApplicationName() {
-        return this.context.getApplicationInfo().loadLabel(this.context
-                .getPackageManager()).toString();
-    }
-
-    public String getApplicationVersionOrEmpty() {
-        try {
-            return this.context.getPackageManager()
-                    .getPackageInfo(this.context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            BacktraceLogger.e(LOG_TAG, "Could not resolve application version");
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     public Map<String, Object> getAllAttributes() {
         Map<String, Object> attributes = new HashMap<String, Object>();

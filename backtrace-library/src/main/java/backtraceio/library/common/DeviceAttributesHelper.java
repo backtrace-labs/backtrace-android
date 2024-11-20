@@ -19,7 +19,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -35,6 +35,11 @@ import backtraceio.library.enums.WifiStatus;
  */
 public class DeviceAttributesHelper {
     private final Context context;
+
+    /*
+     * Current Device id
+     */
+    private static String uuid;
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;
@@ -61,15 +66,17 @@ public class DeviceAttributesHelper {
         result.put("device.cpu.temperature", String.valueOf(getCpuTemperature()));
         result.put("device.is_power_saving_mode", String.valueOf(isPowerSavingMode()));
         result.put("device.wifi.status", getWifiStatus().toString());
-        result.put("system.memory.total", getMaxRamSize());
-        result.put("system.memory.free", getDeviceFreeRam());
-        result.put("system.memory.active", getDeviceActiveRam());
         result.put("app.storage_used", getAppUsedStorageSize());
         result.put("battery.level", String.valueOf(getBatteryLevel()));
         result.put("battery.state", getBatteryState().toString());
         result.put("cpu.boottime", String.valueOf(java.lang.System.currentTimeMillis() - android.os.SystemClock
                 .elapsedRealtime()));
 
+
+        ActivityManager.MemoryInfo memoryInfo = getMemoryInformation();
+        result.put("system.memory.total", Long.toString(memoryInfo.totalMem));
+        result.put("system.memory.free", Long.toString(memoryInfo.availMem));
+        result.put("system.memory.active", Long.toString(memoryInfo.totalMem - memoryInfo.availMem));
         return result;
     }
 
@@ -144,14 +151,14 @@ public class DeviceAttributesHelper {
     private float getCpuTemperature() {
         Process p;
         try {
-            p = Runtime.getRuntime().exec("cat sys/class/thermal/thermal_zone0/temp");
-            p.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
+            BufferedReader reader = new BufferedReader(new FileReader("/sys/class/thermal/thermal_zone0/temp"));
             String line = reader.readLine();
             if (line == null) {
                 return 0.0f;
             }
+            reader.close();
+
             return Float.parseFloat(line) / 1000.0f;
         } catch (Exception e) {
             return 0.0f;
@@ -254,33 +261,20 @@ public class DeviceAttributesHelper {
      * @return unique device identifier
      */
     private String generateDeviceId() {
+        if (!BacktraceStringHelper.isNullOrEmpty(uuid)) {
+            return uuid;
+        }
+
         String androidId = Settings.Secure.getString(this.context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        if (TextUtils.isEmpty(androidId)) {
-            return null;
-        }
+        // if the android id is not defined we want to cache at least guid 
+        // for the current session
+        uuid = TextUtils.isEmpty(androidId)
+                ? UUID.randomUUID().toString()
+                : UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
 
-        return UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
-    }
-
-    /**
-     * Get RAM size of current device
-     * available from API 16
-     *
-     * @return device RAM size
-     */
-    private String getMaxRamSize() {
-        return Long.toString(getMemoryInformation().totalMem);
-    }
-
-    private String getDeviceFreeRam() {
-        return Long.toString(getMemoryInformation().availMem);
-    }
-
-    private String getDeviceActiveRam() {
-        ActivityManager.MemoryInfo mi = getMemoryInformation();
-        return Long.toString(mi.totalMem - mi.availMem);
+        return uuid;
     }
 
     private ActivityManager.MemoryInfo getMemoryInformation() {
