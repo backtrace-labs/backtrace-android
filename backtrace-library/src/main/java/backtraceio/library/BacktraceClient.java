@@ -312,8 +312,8 @@ public class BacktraceClient extends BacktraceBase {
 
     private List<BacktraceReport> transformExceptionIntoReports(Throwable exception, Map<String, Object> attributes) {
         final String exceptionTrace = UUID.randomUUID().toString();
-        String parentId = null;
         final List<BacktraceReport> reports = new ArrayList<>();
+        String parentId = null;
 
         while (exception != null) {
             BacktraceReport report = new BacktraceReport(exception, attributes);

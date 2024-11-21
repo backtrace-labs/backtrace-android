@@ -54,9 +54,8 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
 
         BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-        Exception exception = throwable instanceof Exception ? (Exception) throwable : new UnhandledThrowableWrapper(throwable);
 
-        this.client.send(exception, customAttributes, callback);
+        this.client.send(throwable, customAttributes, callback);
 
         BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
 
@@ -66,14 +65,6 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
-    }
-
-    private Exception getCausedException(Throwable throwable) {
-        if (throwable instanceof Exception) {
-            return (Exception) throwable;
-        }
-
-        return new UnhandledThrowableWrapper(throwable);
     }
 
     private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
