@@ -6,9 +6,9 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -34,10 +34,16 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 clazz = Class.forName(className);
             }
 
+            Object instance = createNewInstance(clazz);
+
+//            if (clazz.getConstructors().length == 0) {
+//                BacktraceLogger.e(LOG_TAG, String.format("Can`t find constructor for %s when deserializing object %s", clazz, obj));
+//                return null;
+//            }
             // Create an instance of the class using reflection
-            Constructor<?> constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            Object instance = constructor.newInstance();
+//            Constructor<?> constructor = clazz.getDeclaredConstructor();
+//            constructor.setAccessible(true);
+//            Object instance = constructor.newInstance();
             // Assuming that the class has a default (no-argument) constructor
 
             // Iterate through the fields of the class
@@ -84,29 +90,57 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
         return null;
     }
 
+    public Object createNewInstance(Class<?> clazz) {
+        try{
+            if (clazz.getConstructors().length == 0) {
+                Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+                Field f = unsafeClass.getDeclaredField("theUnsafe");
+                f.setAccessible(true);
+                Object unsafe = f.get(null);
+                Method allocateInstance = unsafeClass.getMethod("allocateInstance", Class.class);
+                return allocateInstance.invoke(unsafe, clazz);
+            }
+            // Create an instance of the class using reflection
+            Constructor<?> constructor = clazz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (Exception e) {
+            // TODO:
+            return null;
+        }
+    }
+
     public Object deserialize(Object object, Class<?> clazz, Field field) throws JSONException {
         if (object == null) {
             return null;
         }
 
+        // TODO: check if all of the types
+        if (SerializerHelper.isPrimitiveType(object)) {
+            // Do proper casting
+            return clazz.cast(object);
+//            return (clazz.getClass()) object;
+        }
+
         if (field.getType().isEnum() && object instanceof String) {
             return Enum.valueOf((Class<Enum>) field.getType(), (String) object);
         }
-        // TODO: check if all of the types
-        if (SerializerHelper.isPrimitiveType(object)) {
-            return object;
-        }
 
-        if (clazz == JSONObject.class) {
+        if (clazz == JSONObject.class && field != null) {
             return this.deserialize(object, JSONObject.class, field);
         }
 
-        if (clazz == Map.class && object.getClass() == JSONObject.class) {
+        if (Map.class.isAssignableFrom(clazz) && object.getClass() == JSONObject.class && field != null) {
             return this.deserializeMap((JSONObject) object, clazz, field);
         }
+
         if (clazz == UUID.class && (object instanceof String || object instanceof UUID)) {
             return UUID.fromString(object.toString());
         }
+
+//        if (clazz == )
+
+
 
         // TODO: check other types e.g. List/Array
         return object;
@@ -114,7 +148,11 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
 
     private Map<?, ?> deserializeMap(JSONObject map, Class<?> clazz, Field field) throws JSONException {
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = (Map<String, Object>) createNewInstance(clazz);
+
+        if (result == null) {
+            return null;
+        }
 
         Type genericType = field.getGenericType();
         if (genericType instanceof ParameterizedType) {
@@ -138,12 +176,12 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 String key = keys.getString(i);
                 Object value = map.get(key);
 
-                if (value instanceof JSONObject && valueType instanceof Class && ((Class) keyType).isInstance(key)) {
-                    result.put(key, deserialize((JSONObject) value, (Class) valueType));
+                if (value instanceof JSONObject && valueType instanceof Class && ((Class<?>) keyType).isInstance(key)) {
+                    result.put(key,  deserialize((JSONObject) value, (Class<?>) valueType));
+                } else {
+                    result.put(key, deserialize(value, (Class<?>) valueType, null));
                 }
             }
-
-            return result;
         }
         return result;
     }

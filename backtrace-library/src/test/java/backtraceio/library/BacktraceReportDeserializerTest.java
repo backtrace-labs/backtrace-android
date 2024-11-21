@@ -2,6 +2,7 @@ package backtraceio.library;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static backtraceio.library.TestUtils.readFileAsString;
 
 import org.json.JSONException;
@@ -15,11 +16,10 @@ public class BacktraceReportDeserializerTest {
     private final String JSON_FILE = "backtraceReport2.json";
 
     @Test
-    public void xyz() throws JSONException {
+    public void testReportDeserializer() throws JSONException {
         // GIVEN
         String json = readFileAsString(this, JSON_FILE);
         BacktraceReportDeserializer deserializer = new BacktraceReportDeserializer();
-
 
         // WHEN
         BacktraceReport report = deserializer.deserialize(new JSONObject(json));
@@ -31,11 +31,10 @@ public class BacktraceReportDeserializerTest {
         assertEquals("example-message", report.message);
         assertEquals(false, report.exceptionTypeReport);
         assertEquals("", report.classifier);
-        assertEquals(null, report.exception);
+        assertNull(report.exception);
         assertEquals(1, report.attachmentPaths.size());
         assertEquals(3, report.attributes.size());
         assertEquals(1732135979, report.timestamp);
-
     }
     // TODO: check and fix test
     @Test
