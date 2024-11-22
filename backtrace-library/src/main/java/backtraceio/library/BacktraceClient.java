@@ -199,18 +199,18 @@ public class BacktraceClient extends BacktraceBase {
     }
 
     /**
-     * Sending an exception to Backtrace API
+     * Sending an throwable to Backtrace API
      *
-     * @param throwable current exception
+     * @param throwable current throwable
      */
     public void send(Throwable throwable) {
         this.send(throwable, null);
     }
 
     /**
-     * Sending an exception to Backtrace API
+     * Sending an throwable to Backtrace API
      *
-     * @param throwable                   current exception
+     * @param throwable                   current throwable
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
     public void send(Throwable throwable, OnServerResponseEventListener
@@ -219,10 +219,10 @@ public class BacktraceClient extends BacktraceBase {
     }
 
     /**
-     * Sending an exception to Backtrace API
+     * Sending an throwable to Backtrace API
      *
      * @param throwable                   current throwable
-     * @param attributes                  exception attributes
+     * @param attributes                  throwable attributes
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
     public void send(Throwable throwable, Map<String, Object> attributes, OnServerResponseEventListener
