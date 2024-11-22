@@ -21,46 +21,42 @@ import backtraceio.library.models.BacktraceStackTrace;
 public class BacktraceReport {
 
     /**
+     * Reference to the original exception. This field is internally used by the library.
+     */
+    private final transient Throwable originalException;
+    /**
      * 16 bytes of randomness in human readable UUID format
      * server will reject request if uuid is already found
      */
     public UUID uuid = UUID.randomUUID();
-
     /**
      * UTC timestamp in seconds
      */
     public long timestamp = BacktraceTimeHelper.getTimestampSeconds();
-
     /**
      * Get information about report type. If value is true the BacktraceReport has an error
      */
     public Boolean exceptionTypeReport = false;
-
     /**
      * Get a report classification
      */
     public String classifier = "";
-
     /**
      * Get an report attributes
      */
-    public Map<String, Object> attributes;
-
+    public Map<String, Object> attributes = new HashMap<>();
     /**
      * Get a custom client message
      */
     public String message;
-
     /**
      * Get a report exception
      */
     public Exception exception;
-
     /**
      * Get all paths to attachments
      */
-    public List<String> attachmentPaths;
-
+    public List<String> attachmentPaths = new ArrayList<>();
     /**
      * Current report exception stack
      */
@@ -173,6 +169,7 @@ public class BacktraceReport {
     public BacktraceReport(Throwable throwable, Map<String, Object> attributes, List<String> attachmentPaths) {
         this.attributes = CollectionUtils.copyMap(attributes);
         this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
+        this.originalException = throwable;
         this.exception = this.prepareException(throwable);
         if (throwable != null) {
             this.classifier = getExceptionClassifier(throwable);
@@ -235,6 +232,16 @@ public class BacktraceReport {
                 this.exceptionTypeReport
                         ? BacktraceAttributeConsts.HandledExceptionAttributeType
                         : BacktraceAttributeConsts.MessageAttributeType);
+    }
+
+    /**
+     * Returns report exception - original exception if possible or serializable exception if
+     * the report was loaded from JSON.
+     *
+     * @return throwable object
+     */
+    public Throwable getException() {
+        return this.originalException != null ? this.originalException : this.exception;
     }
 
     public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {

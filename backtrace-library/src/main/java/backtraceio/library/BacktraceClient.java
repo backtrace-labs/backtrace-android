@@ -11,7 +11,6 @@ import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.services.ExceptionTransformer;
 import backtraceio.library.watchdog.BacktraceANRWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
@@ -20,7 +19,6 @@ import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
  */
 public class BacktraceClient extends BacktraceBase {
 
-    private final ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
     /**
      * Backtrace ANR watchdog instance
      */
@@ -227,10 +225,7 @@ public class BacktraceClient extends BacktraceBase {
      */
     public void send(Throwable throwable, Map<String, Object> attributes, OnServerResponseEventListener
             serverResponseEventListener) {
-        for (BacktraceReport report :
-                this.exceptionTransformer.transformExceptionIntoReports(throwable, attributes)) {
-            super.send(report, serverResponseEventListener);
-        }
+        super.send(new BacktraceReport(throwable, attributes), serverResponseEventListener);
     }
 
     /**
@@ -310,21 +305,4 @@ public class BacktraceClient extends BacktraceBase {
         }
     }
 
-    /**
-     * Determine if Reports should be generated for inner exceptions. By default the value is set to true.
-     *
-     * @param sendInnerExceptions boolean flag that enabled/disable sending inner exceptions
-     */
-    public void sendInnerExceptions(boolean sendInnerExceptions) {
-        this.exceptionTransformer.sendInnerExceptions(sendInnerExceptions);
-    }
-
-    /**
-     * Determine if Reports should be generated for suppressed exceptions. By default the value is set to true.
-     *
-     * @param sendSuppressedExceptions boolean flag that enabled/disable sending suppressed exceptions
-     */
-    public void sendSuppressedExceptions(boolean sendSuppressedExceptions) {
-        this.exceptionTransformer.sendSuppressedExceptions(sendSuppressedExceptions);
-    }
 }

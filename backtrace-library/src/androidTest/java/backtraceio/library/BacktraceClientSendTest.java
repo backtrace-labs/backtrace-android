@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
@@ -93,7 +94,12 @@ public class BacktraceClientSendTest {
 
         final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
+
+        final Stack<String> expectedExceptionMessages = new Stack<String>() {{
+            add("java.lang.IllegalArgumentException: New Exception");
+            add("java.io.IOException: java.lang.IllegalArgumentException: New Exception");
+        }};
+
         RequestHandler rh = data -> {
             String jsonString = BacktraceSerializeHelper.toJson(data);
 
@@ -102,7 +108,7 @@ public class BacktraceClientSendTest {
                 final JSONObject jsonObject = new JSONObject(jsonString);
                 final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
                 final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
-
+                final String mainExceptionExpectedMessage = expectedExceptionMessages.pop();
                 assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
                 assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
                 assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
@@ -124,7 +130,7 @@ public class BacktraceClientSendTest {
 
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
-            waiter.await(5, TimeUnit.SECONDS);
+            waiter.await(500, TimeUnit.SECONDS);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

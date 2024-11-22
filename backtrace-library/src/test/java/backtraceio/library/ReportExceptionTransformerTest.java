@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.services.ExceptionTransformer;
+import backtraceio.library.services.ReportExceptionTransformer;
 
-public class ExceptionTransformerTest {
+public class ReportExceptionTransformerTest {
 
     final String innerExceptionMessage = "Inner exception message";
     final String outerExceptionMessage = "Outer exception message";
@@ -26,15 +26,15 @@ public class ExceptionTransformerTest {
     @Test
     public void generateReportOnlyForExceptionWithoutInnerExceptions() {
         final Exception exception = new Exception("Exception without inner or suppressed exceptions");
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(exception, attributes);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(exception, attributes));
 
         BacktraceReport exceptionReport = reports.get(0);
         assertEquals(exception.getMessage(), exceptionReport.exception.getMessage());
-        assertNull(exceptionReport.attributes.get(ExceptionTransformer.ErrorParentIdAttribute));
-        assertEquals(exceptionReport.uuid.toString(), exceptionReport.attributes.get(ExceptionTransformer.ErrorIdAttribute));
-        assertNotNull(exceptionReport.attributes.get(ExceptionTransformer.ErrorTraceAttribute));
+        assertNull(exceptionReport.attributes.get(ReportExceptionTransformer.ErrorParentIdAttribute));
+        assertEquals(exceptionReport.uuid.toString(), exceptionReport.attributes.get(ReportExceptionTransformer.ErrorIdAttribute));
+        assertNotNull(exceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute));
     }
 
     @Test
@@ -42,10 +42,10 @@ public class ExceptionTransformerTest {
         final int expectedNumberOfReports = 2;
         Exception innerException = new Exception(innerExceptionMessage);
         Exception outerException = new Exception(outerExceptionMessage, innerException);
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        exceptionTransformer.sendInnerExceptions(true);
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(outerException, attributes);
+        reportExceptionTransformer.sendInnerExceptions(true);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -53,23 +53,23 @@ public class ExceptionTransformerTest {
 
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                innerExceptionReport.attributes.get(ExceptionTransformer.ErrorParentIdAttribute));
+                innerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorParentIdAttribute));
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                outerExceptionReport.attributes.get(ExceptionTransformer.ErrorIdAttribute));
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorIdAttribute));
         assertEquals(
-                innerExceptionReport.attributes.get(ExceptionTransformer.ErrorTraceAttribute),
-                outerExceptionReport.attributes.get(ExceptionTransformer.ErrorTraceAttribute));
+                innerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute),
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute));
     }
 
     @Test
     public void DoNotGenerateInnerExceptionIfDisabled() {
         Exception innerException = new Exception(innerExceptionMessage);
         Exception outerException = new Exception(outerExceptionMessage, innerException);
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        exceptionTransformer.sendInnerExceptions(false);
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(outerException, attributes);
+        reportExceptionTransformer.sendInnerExceptions(false);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
 
         assertEquals(1, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -82,10 +82,10 @@ public class ExceptionTransformerTest {
         Exception suppressedException = new Exception(suppressedExceptionMessage);
         Exception exception = new Exception(outerExceptionMessage);
         exception.addSuppressed(suppressedException);
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        exceptionTransformer.sendSuppressedExceptions(true);
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(exception, attributes);
+        reportExceptionTransformer.sendSuppressedExceptions(true);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(exception, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -94,13 +94,13 @@ public class ExceptionTransformerTest {
         assertEquals(suppressedExceptionMessage, suppressedExceptionReport.exception.getMessage());
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                suppressedExceptionReport.attributes.get(ExceptionTransformer.ErrorParentIdAttribute));
+                suppressedExceptionReport.attributes.get(ReportExceptionTransformer.ErrorParentIdAttribute));
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                outerExceptionReport.attributes.get(ExceptionTransformer.ErrorIdAttribute));
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorIdAttribute));
         assertEquals(
-                suppressedExceptionReport.attributes.get(ExceptionTransformer.ErrorTraceAttribute),
-                outerExceptionReport.attributes.get(ExceptionTransformer.ErrorTraceAttribute));
+                suppressedExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute),
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute));
     }
 
     @Test
@@ -108,10 +108,10 @@ public class ExceptionTransformerTest {
         Exception suppressedException = new Exception(suppressedExceptionMessage);
         Exception exception = new Exception(outerExceptionMessage);
         exception.addSuppressed(suppressedException);
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        exceptionTransformer.sendSuppressedExceptions(false);
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(exception, attributes);
+        reportExceptionTransformer.sendSuppressedExceptions(false);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(exception, attributes));
 
         assertEquals(1, reports.size());
         BacktraceReport exceptionReport = reports.get(0);
@@ -125,11 +125,11 @@ public class ExceptionTransformerTest {
         Exception innerException = new Exception(innerExceptionMessage);
         innerException.addSuppressed(suppressedException);
         Exception outerException = new Exception(outerExceptionMessage, innerException);
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        exceptionTransformer.sendInnerExceptions(true);
-        exceptionTransformer.sendSuppressedExceptions(true);
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(outerException, attributes);
+        reportExceptionTransformer.sendInnerExceptions(true);
+        reportExceptionTransformer.sendSuppressedExceptions(true);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -147,11 +147,11 @@ public class ExceptionTransformerTest {
         Exception innerException = new Exception(innerExceptionMessage);
         innerException.addSuppressed(suppressedException);
         Exception outerException = new Exception(outerExceptionMessage, innerException);
-        ExceptionTransformer exceptionTransformer = new ExceptionTransformer();
+        ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        exceptionTransformer.sendInnerExceptions(true);
-        exceptionTransformer.sendSuppressedExceptions(true);
-        List<BacktraceReport> reports = exceptionTransformer.transformExceptionIntoReports(outerException, attributes);
+        reportExceptionTransformer.sendInnerExceptions(true);
+        reportExceptionTransformer.sendSuppressedExceptions(true);
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
