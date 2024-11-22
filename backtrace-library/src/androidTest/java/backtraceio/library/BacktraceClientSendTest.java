@@ -20,7 +20,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -34,12 +36,12 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientSendTest {
-    private Context context;
-    private BacktraceCredentials credentials;
     private final String resultMessage = "From request handler";
     private final Map<String, Object> attributes = new HashMap<String, Object>() {{
         put("test", "value");
     }};
+    private Context context;
+    private BacktraceCredentials credentials;
 
     @Before
     public void setUp() {
@@ -275,6 +277,44 @@ public class BacktraceClientSendTest {
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
+    }
+
+    @Test
+    public void sendExceptionWithInnerException() {
+        // GIVEN
+        final int expectedNumberOfReports = 2;
+        final String innerExceptionMessage = "inner exception";
+        final String outerExceptionMessage = "outer exception";
+        final Exception innerException = new Exception(innerExceptionMessage);
+        final Exception outerException = new Exception(outerExceptionMessage, innerException);
+        final List<BacktraceData> reportData = new ArrayList<>();
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+        final Waiter waiter = new Waiter();
+
+
+        backtraceClient.setOnRequestHandler(new RequestHandler() {
+            @Override
+            public BacktraceResult onRequest(BacktraceData data) {
+                reportData.add(data);
+                if (reportData.size() == expectedNumberOfReports) {
+                    waiter.resume();
+                }
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
+                        BacktraceResultStatus.Ok);
+            }
+        });
+        backtraceClient.send(outerException);
+
+        try {
+            waiter.await(5, TimeUnit.SECONDS, 1);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+        assertEquals(expectedNumberOfReports, reportData.size());
+        BacktraceData outerExceptionData = reportData.get(0);
+        assertEquals(outerExceptionMessage, outerExceptionData.attributes.get("error.message"));
+        BacktraceData innerExceptionData = reportData.get(reportData.size() - 1);
+        assertEquals(innerExceptionMessage, innerExceptionData.attributes.get("error.message"));
     }
 
     @Test
