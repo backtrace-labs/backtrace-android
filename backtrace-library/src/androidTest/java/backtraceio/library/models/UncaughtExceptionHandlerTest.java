@@ -214,5 +214,7 @@ public class UncaughtExceptionHandlerTest {
         assertEquals(outerException.attributes.get("error.trace"), innerException.attributes.get("error.trace"));
         assertEquals(outerException.uuid, innerException.attributes.get("error.parent"));
         assertNull(outerException.attributes.get("error.parent"));
+        assertEquals(BacktraceAttributeConsts.UnhandledExceptionAttributeType, outerException.attributes.get("error.type"));
+        assertEquals(BacktraceAttributeConsts.UnhandledExceptionAttributeType, innerException.attributes.get("error.type"));
     }
 }
