@@ -96,6 +96,7 @@ public class BacktraceClientSendTest {
         final Waiter waiter = new Waiter();
 
         final Stack<String> expectedExceptionMessages = new Stack<String>() {{
+            add("New Exception");
             add("java.lang.IllegalArgumentException: New Exception");
             add("java.io.IOException: java.lang.IllegalArgumentException: New Exception");
         }};
