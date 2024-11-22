@@ -63,7 +63,7 @@ public class ReportExceptionTransformerTest {
     }
 
     @Test
-    public void DoNotGenerateInnerExceptionIfDisabled() {
+    public void doNotGenerateInnerExceptionIfDisabled() {
         Exception innerException = new Exception(innerExceptionMessage);
         Exception outerException = new Exception(outerExceptionMessage, innerException);
         ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
@@ -104,7 +104,7 @@ public class ReportExceptionTransformerTest {
     }
 
     @Test
-    public void DoNotGenerateSuppressedExceptionIfDisabled() {
+    public void doNotGenerateSuppressedExceptionIfDisabled() {
         Exception suppressedException = new Exception(suppressedExceptionMessage);
         Exception exception = new Exception(outerExceptionMessage);
         exception.addSuppressed(suppressedException);

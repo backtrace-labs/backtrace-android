@@ -131,7 +131,7 @@ public class BacktraceClientSendTest {
 
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
-            waiter.await(500, TimeUnit.SECONDS);
+            waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

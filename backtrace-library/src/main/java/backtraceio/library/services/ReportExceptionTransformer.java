@@ -53,7 +53,6 @@ public class ReportExceptionTransformer {
      * @return list of Backtrace reports
      */
     public List<BacktraceReport> transformReportWithInnerExceptions(BacktraceReport sourceReport) {
-        final String exceptionTrace = UUID.randomUUID().toString();
         final List<BacktraceReport> reports = new ArrayList<BacktraceReport>() {{
             add(sourceReport);
         }};
@@ -65,16 +64,16 @@ public class ReportExceptionTransformer {
         if (throwable == null) {
             return reports;
         }
+        final String exceptionTrace = UUID.randomUUID().toString();
         this.extendReportWithNestedExceptionAttributes(sourceReport, exceptionTrace, null);
-        /**
+        /*
          * To keep the original report, we're not re-creating it but rather, we copy all known possible values
          * that should be also available in inner exceptions. We should keep the original report, in case of potential
-         * changes that could
+         * changes made by the user that we're not aware of.
          */
         String parentId = sourceReport.uuid.toString();
         Map<String, Object> attributes = sourceReport.attributes;
-        List<String> attachments = sourceReport.attachmentPaths;
-        reports.addAll(this.getSuppressedReports(throwable, attachments, attributes, exceptionTrace, parentId));
+        reports.addAll(this.getSuppressedReports(throwable, attributes, exceptionTrace, parentId));
         if (!sendInnerExceptions) {
             return reports;
         }
@@ -82,13 +81,12 @@ public class ReportExceptionTransformer {
 
         while (throwable != null) {
             BacktraceReport report = new BacktraceReport(throwable, attributes);
-            report.attachmentPaths.addAll(attachments);
             this.extendReportWithNestedExceptionAttributes(report, exceptionTrace, parentId);
 
             reports.add(report);
 
             parentId = report.uuid.toString();
-            reports.addAll(this.getSuppressedReports(throwable, attachments, attributes, exceptionTrace, parentId));
+            reports.addAll(this.getSuppressedReports(throwable, attributes, exceptionTrace, parentId));
 
             throwable = throwable.getCause();
         }
@@ -98,7 +96,6 @@ public class ReportExceptionTransformer {
 
     private List<BacktraceReport> getSuppressedReports(
             Throwable throwable,
-            List<String> attachments,
             Map<String, Object> attributes,
             String exceptionTrace,
             String parentId) {
@@ -111,7 +108,6 @@ public class ReportExceptionTransformer {
                 throwable.getSuppressed()) {
             BacktraceReport suppressedExceptionReport = new BacktraceReport(suppressedException, attributes);
             this.extendReportWithNestedExceptionAttributes(suppressedExceptionReport, exceptionTrace, parentId);
-            suppressedExceptionReport.attachmentPaths.addAll(attachments);
             reports.add(suppressedExceptionReport);
         }
 
