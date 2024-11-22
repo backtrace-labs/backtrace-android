@@ -304,5 +304,4 @@ public class BacktraceClient extends BacktraceBase {
             this.anrWatchdog.stopMonitoringAnr();
         }
     }
-
 }

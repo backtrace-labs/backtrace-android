@@ -65,6 +65,7 @@ public class ReportExceptionTransformer {
         if (throwable == null) {
             return reports;
         }
+        this.extendReportWithNestedExceptionAttributes(sourceReport, exceptionTrace, null);
         /**
          * To keep the original report, we're not re-creating it but rather, we copy all known possible values
          * that should be also available in inner exceptions. We should keep the original report, in case of potential
@@ -74,21 +75,21 @@ public class ReportExceptionTransformer {
         Map<String, Object> attributes = sourceReport.attributes;
         List<String> attachments = sourceReport.attachmentPaths;
         reports.addAll(this.getSuppressedReports(throwable, attachments, attributes, exceptionTrace, parentId));
-
+        if (!sendInnerExceptions) {
+            return reports;
+        }
         throwable = throwable.getCause();
 
         while (throwable != null) {
             BacktraceReport report = new BacktraceReport(throwable, attributes);
             report.attachmentPaths.addAll(attachments);
             this.extendReportWithNestedExceptionAttributes(report, exceptionTrace, parentId);
+
             reports.add(report);
 
             parentId = report.uuid.toString();
             reports.addAll(this.getSuppressedReports(throwable, attachments, attributes, exceptionTrace, parentId));
 
-            if (!sendInnerExceptions) {
-                break;
-            }
             throwable = throwable.getCause();
         }
 
