@@ -28,7 +28,7 @@ public class ExceptionTransformer {
     private boolean sendInnerExceptions = true;
 
     /**
-     * Determine if Reports should be generated for inner exceptions
+     * Determine if reports should be generated for inner exceptions
      *
      * @param sendInnerExceptions boolean flag that enabled/disable sending inner exceptions
      */
@@ -37,7 +37,7 @@ public class ExceptionTransformer {
     }
 
     /**
-     * Determine if Reports should be generated for suppressed exceptions
+     * Determine if reports should be generated for suppressed exceptions
      *
      * @param sendSuppressedExceptions boolean flag that enabled/disable sending suppressed exceptions
      */
@@ -46,7 +46,7 @@ public class ExceptionTransformer {
     }
 
     /**
-     * Transforms throwable into an array of Backtrace Reports. During the transformation, inner exception and suppressed exceptions
+     * Transforms throwable into an array of Backtrace reports. During the transformation, inner exception and suppressed exceptions
      * are being converted into Backtrace reports with a proper exception reference.
      *
      * @param throwable  throwable
