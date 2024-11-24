@@ -32,9 +32,9 @@ public class ReportExceptionTransformerTest {
 
         BacktraceReport exceptionReport = reports.get(0);
         assertEquals(exception.getMessage(), exceptionReport.exception.getMessage());
-        assertNull(exceptionReport.attributes.get(ReportExceptionTransformer.ErrorParentIdAttribute));
-        assertEquals(exceptionReport.uuid.toString(), exceptionReport.attributes.get(ReportExceptionTransformer.ErrorIdAttribute));
-        assertNotNull(exceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute));
+        assertNull(exceptionReport.attributes.get(ReportExceptionTransformer.errorParentIdAttribute));
+        assertEquals(exceptionReport.uuid.toString(), exceptionReport.attributes.get(ReportExceptionTransformer.errorIdAttribute));
+        assertNotNull(exceptionReport.attributes.get(ReportExceptionTransformer.errorTraceAttribute));
     }
 
     @Test
@@ -53,13 +53,13 @@ public class ReportExceptionTransformerTest {
 
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                innerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorParentIdAttribute));
+                innerExceptionReport.attributes.get(ReportExceptionTransformer.errorParentIdAttribute));
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorIdAttribute));
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.errorIdAttribute));
         assertEquals(
-                innerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute),
-                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute));
+                innerExceptionReport.attributes.get(ReportExceptionTransformer.errorTraceAttribute),
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.errorTraceAttribute));
     }
 
     @Test
@@ -94,13 +94,13 @@ public class ReportExceptionTransformerTest {
         assertEquals(suppressedExceptionMessage, suppressedExceptionReport.exception.getMessage());
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                suppressedExceptionReport.attributes.get(ReportExceptionTransformer.ErrorParentIdAttribute));
+                suppressedExceptionReport.attributes.get(ReportExceptionTransformer.errorParentIdAttribute));
         assertEquals(
                 outerExceptionReport.uuid.toString(),
-                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorIdAttribute));
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.errorIdAttribute));
         assertEquals(
-                suppressedExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute),
-                outerExceptionReport.attributes.get(ReportExceptionTransformer.ErrorTraceAttribute));
+                suppressedExceptionReport.attributes.get(ReportExceptionTransformer.errorTraceAttribute),
+                outerExceptionReport.attributes.get(ReportExceptionTransformer.errorTraceAttribute));
     }
 
     @Test

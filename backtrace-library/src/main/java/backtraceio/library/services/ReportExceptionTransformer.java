@@ -12,17 +12,17 @@ public class ReportExceptionTransformer {
     /**
      * Error trace attribute key
      */
-    public static final String ErrorTraceAttribute = "error.trace";
+    public static final String errorTraceAttribute = "error.trace";
 
     /**
      * Current error id attribute key
      */
-    public static final String ErrorIdAttribute = "error.id";
+    public static final String errorIdAttribute = "error.id";
 
     /**
      * Parent id attribute key
      */
-    public static final String ErrorParentIdAttribute = "error.parent";
+    public static final String errorParentIdAttribute = "error.parent";
 
     private boolean sendSuppressedExceptions = true;
     private boolean sendInnerExceptions = true;
@@ -53,9 +53,11 @@ public class ReportExceptionTransformer {
      * @return list of Backtrace reports
      */
     public List<BacktraceReport> transformReportWithInnerExceptions(BacktraceReport sourceReport) {
-        final List<BacktraceReport> reports = new ArrayList<BacktraceReport>() {{
-            add(sourceReport);
-        }};
+        final List<BacktraceReport> reports = new ArrayList<>();
+        if (sourceReport == null) {
+            return reports;
+        }
+        reports.add(sourceReport);
 
         if (!sourceReport.exceptionTypeReport) {
             return reports;
@@ -123,8 +125,8 @@ public class ReportExceptionTransformer {
      * @param parentId       parent id
      */
     private void extendReportWithNestedExceptionAttributes(BacktraceReport report, String exceptionTrace, String parentId) {
-        report.attributes.put(ErrorTraceAttribute, exceptionTrace);
-        report.attributes.put(ErrorIdAttribute, report.uuid.toString());
-        report.attributes.put(ErrorParentIdAttribute, parentId);
+        report.attributes.put(errorTraceAttribute, exceptionTrace);
+        report.attributes.put(errorIdAttribute, report.uuid.toString());
+        report.attributes.put(errorParentIdAttribute, parentId);
     }
 }

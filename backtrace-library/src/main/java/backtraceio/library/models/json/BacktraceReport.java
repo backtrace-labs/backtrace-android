@@ -170,11 +170,11 @@ public class BacktraceReport {
         this.attributes = CollectionUtils.copyMap(attributes);
         this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
         this.originalException = throwable;
-        this.exception = this.prepareException(throwable);
         if (throwable != null) {
-            this.classifier = getExceptionClassifier(throwable);
+            this.exception = this.prepareException(throwable);
+            this.classifier = this.getExceptionClassifier(throwable);
+            this.exceptionTypeReport = true;
         }
-        this.exceptionTypeReport = exception != null;
         this.diagnosticStack = new BacktraceStackTrace(exception).getStackFrames();
 
         this.setDefaultErrorTypeAttribute();
@@ -198,7 +198,27 @@ public class BacktraceReport {
         return reportAttributes;
     }
 
-    public String getExceptionClassifier(Throwable exception) {
+    /**
+     * Returns report exception - original exception if possible or serializable exception if
+     * the report was loaded from JSON.
+     *
+     * @return throwable object
+     */
+    public Throwable getException() {
+        return this.originalException != null ? this.originalException : this.exception;
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
+        return toBacktraceData(context, clientAttributes, false);
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
+        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
+        return backtraceData;
+    }
+
+    private String getExceptionClassifier(Throwable exception) {
         return exception.getClass().getCanonicalName();
     }
 
@@ -232,25 +252,5 @@ public class BacktraceReport {
                 this.exceptionTypeReport
                         ? BacktraceAttributeConsts.HandledExceptionAttributeType
                         : BacktraceAttributeConsts.MessageAttributeType);
-    }
-
-    /**
-     * Returns report exception - original exception if possible or serializable exception if
-     * the report was loaded from JSON.
-     *
-     * @return throwable object
-     */
-    public Throwable getException() {
-        return this.originalException != null ? this.originalException : this.exception;
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-        return toBacktraceData(context, clientAttributes, false);
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
-        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
-        return backtraceData;
     }
 }
