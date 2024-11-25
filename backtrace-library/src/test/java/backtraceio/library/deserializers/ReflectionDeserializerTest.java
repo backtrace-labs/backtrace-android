@@ -3,8 +3,6 @@ package backtraceio.library.deserializers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.google.gson.Gson;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -47,12 +45,9 @@ public class ReflectionDeserializerTest {
     public void deserializeObject () throws JSONException { // TODO: fix name
         // GIVEN
         String json = TestUtils.readFileAsString(this, "testObject.json");
-
         ReflectionDeserializer deserializer = new ReflectionDeserializer();
 
         // WHEN
-        TestReflectionClass object2 = new Gson().newBuilder().create().fromJson("{'exceptions': [{'detailMessage': 'test'}, {'detailMessage': 'test2'}]}", TestReflectionClass.class);
-
         TestReflectionClass deserializedObject = (TestReflectionClass) deserializer.deserialize(new JSONObject(json), TestReflectionClass.class);
 
         // THEN
