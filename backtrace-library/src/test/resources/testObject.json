@@ -3,14 +3,14 @@
   "A": 100,
   "b": "Sample string",
   "c": ["string1", "string2", "string3"],
-  "d": {
+  "d-renamed": {
     "key1": {
       "first": 1.1,
-      "second": "value1"
+      "second-renamed": "value1"
     },
     "key2": {
       "first": 2.2,
-      "second": "value2"
+      "second-renamed": "value2"
     }
   },
   "e": 3.14,
@@ -18,11 +18,11 @@
   "objArray": [
     {
       "first": 4.4,
-      "second": "arrayValue1"
+      "second-renamed": "arrayValue1"
     },
     {
       "first": 5.5,
-      "second": "arrayValue2"
+      "second-renamed": "arrayValue2"
     }
   ],
   "exceptions": [

@@ -13,11 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import backtraceio.library.TestUtils;
+import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.common.serializers.deserializers.ReflectionDeserializer;
 
 public class ReflectionDeserializerTest {
     private class TmpObject {
         double first;
+
+        @SerializedName("second-renamed")
         String second;
     }
     private class TestReflectionClass {
@@ -28,6 +31,7 @@ public class ReflectionDeserializerTest {
 
         public List<String> c;
 
+        @SerializedName("d-renamed")
         public HashMap<String, TmpObject> d;
 
         public float e;
@@ -47,16 +51,7 @@ public class ReflectionDeserializerTest {
         ReflectionDeserializer deserializer = new ReflectionDeserializer();
 
         // WHEN
-//        TestReflectionClass object2 = new Gson().newBuilder().create().fromJson("{'a': 1, 'b': '2', 'c': [1, 2, 3], 'd': {'1': 'test'}, 'e': 123}", TestReflectionClass.class);
         TestReflectionClass object2 = new Gson().newBuilder().create().fromJson("{'exceptions': [{'detailMessage': 'test'}, {'detailMessage': 'test2'}]}", TestReflectionClass.class);
-
-//        Object object = deserializer.deserialize(new JSONObject("{'a': 1, 'b': '2', 'c': [1, 2, 3], 'd': {'1': 'test'}, 'e': 123.123}"), TestReflectionClass.class);
-//        Object object = deserializer.deserialize(new JSONObject("{'d': {'1': 'test'}, 'e': 123}"), TestReflectionClass.class);
-//        Object object3 = deserializer.deserialize(new JSONObject("{'c': [1, 2, 3], 'e': 123}"), TestReflectionClass.class);
-//        Object object4 = deserializer.deserialize(new JSONObject("{'exceptions': [{'detailMessage': 'test'}, {'detailMessage': 'test2'}]}"), TestReflectionClass.class);
-//        Object object3 = deserializer.deserialize(new JSONObject("{'A': 1, 'stringArray': ['5', '6']}"), TestReflectionClass.class);
-//        Object object3 = deserializer.deserialize(new JSONObject("{'A': 1, 'stringArray': ['5', '6']}"), TestReflectionClass.class);
-
 
         TestReflectionClass deserializedObject = (TestReflectionClass) deserializer.deserialize(new JSONObject(json), TestReflectionClass.class);
 

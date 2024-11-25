@@ -209,19 +209,16 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 if (clazz.getComponentType() != null){
                     objType = clazz.getComponentType();
                 } else {
-                    objType = Class.forName(((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName());
+                    objType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                 }
 
                 Object obj = jsonArray.get(i);
-
-//                Field f = (Class<?>) (((ParameterizedType) field.getGenericType()).getRawType());
                 if (obj instanceof JSONObject) {
                     result.add(objType.cast(deserialize((JSONObject) obj, objType)));
                 } else {
                     result.add(objType.cast(deserialize(obj, objType, null)));
                 }
             } catch (Exception e) {
-
                 BacktraceLogger.w(LOG_TAG, ""); // TODO: add error msg
             }
         }
