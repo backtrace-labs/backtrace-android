@@ -143,6 +143,8 @@ public class UncaughtExceptionHandlerTest {
         final String outerExceptionMessage = "Outer exception";
         final Exception exception = new IllegalArgumentException(outerExceptionMessage, cause);
         final BacktraceClient client = new BacktraceClient(context, credentials);
+        client.sendInnerExceptions(true);
+        client.sendSuppressedExceptions(true);
 
         final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
         client.setOnRequestHandler(data -> {
@@ -185,7 +187,9 @@ public class UncaughtExceptionHandlerTest {
         final String outerExceptionMessage = "Outer exception";
         final Exception exception = new IllegalArgumentException(outerExceptionMessage, cause);
         final BacktraceClient client = new BacktraceClient(context, credentials);
-
+        client.sendInnerExceptions(true);
+        client.sendSuppressedExceptions(true);
+        
         final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
         client.setOnRequestHandler(data -> {
             unhandledExceptionData.add(data);

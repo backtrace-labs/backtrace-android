@@ -296,6 +296,8 @@ public class BacktraceClientSendTest {
         final Exception outerException = new Exception(outerExceptionMessage, innerException);
         final List<BacktraceData> reportData = new ArrayList<>();
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+        backtraceClient.sendInnerExceptions(true);
+        backtraceClient.sendSuppressedExceptions(true);
         final Waiter waiter = new Waiter();
 
 
