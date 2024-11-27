@@ -4,6 +4,8 @@
 
 - Added a support for nested and suppressed exceptions (#158)
 - Improved attribute performance and metrics startup (#157)
+- Added metrics initialization debug information (#153)
+- Changed Android SDK to 34 (#155)
 
 ## Version 3.8.4
 - Add getter method for `BacktraceReport` field in `BacktraceData` class
