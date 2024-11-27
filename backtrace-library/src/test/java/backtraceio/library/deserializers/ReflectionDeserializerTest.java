@@ -42,9 +42,11 @@ public class ReflectionDeserializerTest {
     }
 
     @Test
-    public void deserializeObject () throws JSONException { // TODO: fix name
+    public void deserializeObject() throws JSONException { // TODO: fix name
         // GIVEN
         String json = TestUtils.readFileAsString(this, "testObject.json");
+
+        assertNotNull(json);
         ReflectionDeserializer deserializer = new ReflectionDeserializer();
 
         // WHEN
