@@ -197,23 +197,35 @@ public class BacktraceClient extends BacktraceBase {
     }
 
     /**
-     * Sending an exception to Backtrace API
+     * Sending an throwable to Backtrace API
      *
-     * @param exception current exception
+     * @param throwable current throwable
      */
-    public void send(Exception exception) {
-        this.send(exception, null);
+    public void send(Throwable throwable) {
+        this.send(throwable, null);
     }
 
     /**
-     * Sending an exception to Backtrace API
+     * Sending an throwable to Backtrace API
      *
-     * @param exception                   current exception
+     * @param throwable                   current throwable
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
-    public void send(Exception exception, OnServerResponseEventListener
+    public void send(Throwable throwable, OnServerResponseEventListener
             serverResponseEventListener) {
-        super.send(new BacktraceReport(exception), serverResponseEventListener);
+        this.send(throwable, null, serverResponseEventListener);
+    }
+
+    /**
+     * Sending an throwable to Backtrace API
+     *
+     * @param throwable                   current throwable
+     * @param attributes                  throwable attributes
+     * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
+     */
+    public void send(Throwable throwable, Map<String, Object> attributes, OnServerResponseEventListener
+            serverResponseEventListener) {
+        super.send(new BacktraceReport(throwable, attributes), serverResponseEventListener);
     }
 
     /**
