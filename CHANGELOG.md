@@ -1,5 +1,10 @@
 # Backtrace Android Release Notes
 
+## Version 3.9.0
+
+- Added a support for nested and suppressed exceptions (#158)
+- Improved attribute performance and metrics startup (#157)
+
 ## Version 3.8.4
 - Add getter method for `BacktraceReport` field in `BacktraceData` class
 - Update libraries (GSON and androidx.test.*)
