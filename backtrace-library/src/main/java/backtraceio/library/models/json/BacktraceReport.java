@@ -192,12 +192,14 @@ public class BacktraceReport {
                            String message, Exception exception,
                            List<String> attachmentPaths,
                            List<BacktraceStackFrame> diagnosticStack) {
+
         this.uuid = uuid;
         this.timestamp = timestamp;
         this.exceptionTypeReport = exceptionTypeReport;
         this.classifier = classifier;
         this.attributes = attributes;
         this.message = message;
+        this.originalException = exception; // TODO: Confirm with Konrad how it should behave because originalException is transient
         this.exception = exception;
         this.attachmentPaths = attachmentPaths;
         this.diagnosticStack = diagnosticStack;
