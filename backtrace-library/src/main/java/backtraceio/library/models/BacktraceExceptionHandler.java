@@ -1,12 +1,12 @@
 package backtraceio.library.models;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.json.BacktraceReport;
 
 /**
  * Backtrace UncaughtExceptionHandler which will be invoked when a Thread abruptly terminates due
@@ -14,8 +14,10 @@ import backtraceio.library.models.json.BacktraceReport;
  */
 public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private static final transient String LOG_TAG = BacktraceExceptionHandler.class.getSimpleName();
-    private static Map<String, Object> customAttributes;
+    private static final String LOG_TAG = BacktraceExceptionHandler.class.getSimpleName();
+    private static final Map<String, Object> customAttributes = new HashMap<String, Object>() {{
+        put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+    }};
     private final Thread.UncaughtExceptionHandler rootHandler;
     private final CountDownLatch signal = new CountDownLatch(1);
     private final BacktraceClient client;
@@ -28,7 +30,7 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
     }
 
     public static void setCustomAttributes(Map<String, Object> attributes) {
-        BacktraceExceptionHandler.customAttributes = attributes;
+        BacktraceExceptionHandler.customAttributes.putAll(attributes);
     }
 
     /**
@@ -52,9 +54,9 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         OnServerResponseEventListener callback = getCallbackToDefaultHandler(thread, throwable);
 
         BacktraceLogger.e(LOG_TAG, "Sending uncaught exception to Backtrace API", throwable);
-        BacktraceReport report = new BacktraceReport(this.getCausedException(throwable), BacktraceExceptionHandler.customAttributes);
-        report.attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
-        this.client.send(report, callback);
+
+        this.client.send(throwable, customAttributes, callback);
+
         BacktraceLogger.d(LOG_TAG, "Uncaught exception sent to Backtrace API");
 
         try {
@@ -63,14 +65,6 @@ public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandle
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception during waiting for response", ex);
         }
-    }
-
-    private Exception getCausedException(Throwable throwable) {
-        if (throwable instanceof Exception) {
-            return (Exception) throwable;
-        }
-
-        return new UnhandledThrowableWrapper(throwable);
     }
 
     private OnServerResponseEventListener getCallbackToDefaultHandler(final Thread thread, final Throwable throwable) {
