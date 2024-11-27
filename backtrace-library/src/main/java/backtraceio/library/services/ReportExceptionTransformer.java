@@ -24,8 +24,8 @@ public class ReportExceptionTransformer {
      */
     public static final String errorParentIdAttribute = "error.parent";
 
-    private boolean sendSuppressedExceptions = true;
-    private boolean sendInnerExceptions = true;
+    private boolean sendSuppressedExceptions = false;
+    private boolean sendInnerExceptions = false;
 
     /**
      * Determine if reports should be generated for inner exceptions

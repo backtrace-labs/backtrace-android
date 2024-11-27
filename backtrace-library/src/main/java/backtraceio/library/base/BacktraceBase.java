@@ -624,7 +624,7 @@ public class BacktraceBase implements Client {
 
 
     /**
-     * Determine if Reports should be generated for inner exceptions. By default the value is set to true.
+     * Determine if Reports should be generated for inner exceptions. By default the value is set to false.
      *
      * @param sendInnerExceptions boolean flag that enabled/disable sending inner exceptions
      */
@@ -633,7 +633,7 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Determine if Reports should be generated for suppressed exceptions. By default the value is set to true.
+     * Determine if Reports should be generated for suppressed exceptions. By default the value is set to false.
      *
      * @param sendSuppressedExceptions boolean flag that enabled/disable sending suppressed exceptions
      */
