@@ -199,10 +199,29 @@ public class BacktraceReport {
         this.classifier = classifier;
         this.attributes = attributes;
         this.message = message;
+
         this.originalException = exception; // TODO: Confirm with Konrad how it should behave because originalException is transient
         this.exception = exception;
         this.attachmentPaths = attachmentPaths;
         this.diagnosticStack = diagnosticStack;
+    }
+
+    /**
+     * Concat two dictionaries with attributes
+     *
+     * @param report     current report
+     * @param attributes attributes to concatenate
+     * @return concatenated map of attributes from report and from passed attributes
+     */
+    public static Map<String, Object> concatAttributes(
+            BacktraceReport report, Map<String, Object> attributes) {
+        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
+                new HashMap<>();
+        if (attributes == null) {
+            return reportAttributes;
+        }
+        reportAttributes.putAll(attributes);
+        return reportAttributes;
     }
 
     /**
@@ -213,15 +232,6 @@ public class BacktraceReport {
      */
     public Throwable getException() {
         return this.originalException != null ? this.originalException : this.exception;
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-        return toBacktraceData(context, clientAttributes, false);
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-        final String symbolication = isProguardEnabled ? "proguard" : null;
-        return new BacktraceData.Builder(this).setAttributes(context, clientAttributes).setSymbolication(symbolication).build();
     }
 
     private String getExceptionClassifier(Throwable exception) {
@@ -244,6 +254,7 @@ public class BacktraceReport {
         return reportException;
     }
 
+
     /**
      * Sets error.type attribute depends on the type of the report
      */
@@ -260,21 +271,12 @@ public class BacktraceReport {
                         : BacktraceAttributeConsts.MessageAttributeType);
     }
 
-    /**
-     * Concat two dictionaries with attributes
-     *
-     * @param report     current report
-     * @param attributes attributes to concatenate
-     * @return concatenated map of attributes from report and from passed attributes
-     */
-    public static Map<String, Object> concatAttributes(
-            BacktraceReport report, Map<String, Object> attributes) {
-        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
-                new HashMap<>();
-        if (attributes == null) {
-            return reportAttributes;
-        }
-        reportAttributes.putAll(attributes);
-        return reportAttributes;
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
+        return toBacktraceData(context, clientAttributes, false);
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+        final String symbolication = isProguardEnabled ? "proguard" : null;
+        return new BacktraceData.Builder(this).setAttributes(context, clientAttributes).setSymbolication(symbolication).build();
     }
 }
