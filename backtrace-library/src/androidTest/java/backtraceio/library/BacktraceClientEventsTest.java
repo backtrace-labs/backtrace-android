@@ -86,7 +86,7 @@ public class BacktraceClientEventsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(null, data.attributes.get(attributeKey),
+                return new BacktraceResult(null, data.getAttributes().get(attributeKey),
                         BacktraceResultStatus.Ok);
             }
         };
@@ -95,7 +95,7 @@ public class BacktraceClientEventsTest {
         backtraceClient.setOnBeforeSendEventListener(new OnBeforeSendEventListener() {
             @Override
             public BacktraceData onEvent(BacktraceData data) {
-                data.attributes.put(attributeKey, resultMessage);
+                data.getAttributes().put(attributeKey, resultMessage);
                 return data;
             }
         });

@@ -12,5 +12,18 @@ public enum BacktraceResultStatus {
     /**
      * Set when data were send to API
      */
-    Ok,
+    Ok;
+
+    public static BacktraceResultStatus enumOf(String val) {
+        switch (val.toLowerCase()) {
+            case "ok":
+                return BacktraceResultStatus.Ok;
+
+            case "servererror":
+                return BacktraceResultStatus.ServerError;
+
+            default:
+                throw new IllegalArgumentException("Invalid BacktraceResultStatus enum value");
+        }
+    }
 }

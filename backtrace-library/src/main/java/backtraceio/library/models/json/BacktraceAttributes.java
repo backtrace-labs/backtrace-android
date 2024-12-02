@@ -43,7 +43,7 @@ public class BacktraceAttributes {
     /**
      * Metrics session ID
      */
-    private final static String sessionId = UUID.randomUUID().toString();
+    private static final String sessionId = UUID.randomUUID().toString();
 
     /**
      * Create instance of Backtrace Attribute
@@ -129,7 +129,7 @@ public class BacktraceAttributes {
         this.attributes.put("screen.width", String.valueOf(metrics.widthPixels));
         this.attributes.put("screen.height", String.valueOf(metrics.heightPixels));
         this.attributes.put("screen.dpi", String.valueOf(metrics.densityDpi));
-        if (includeDynamicAttributes == false) {
+        if (!includeDynamicAttributes) {
             return;
         }
         this.attributes.put("screen.orientation", getScreenOrientation().toString());

@@ -201,7 +201,6 @@ public class DeviceAttributesHelper {
      *
      * @return is power saving mode activated
      */
-    // TODO: replace bool to enum
     private boolean isPowerSavingMode() {
         if (Build.VERSION.SDK_INT < 21) {
             return false;

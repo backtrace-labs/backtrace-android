@@ -1,5 +1,6 @@
 package backtraceio.library.models;
 
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
@@ -38,9 +39,30 @@ public class BacktraceStackFrame {
 
     /**
      * Create new instance of BacktraceStackFrame
+     *
+     * @deprecated
+     * Use {@link #fromStackTraceElement(StackTraceElement frame)} instead.
      */
     @SuppressWarnings({"UnusedDeclaration"})
-    public BacktraceStackFrame() {
+    @Deprecated
+    public BacktraceStackFrame() {}
+
+    /**
+     * Create new instance of BacktraceStackFrame
+     *
+     * @deprecated
+     * Use {@link #fromStackTraceElement(StackTraceElement frame)} instead.
+     */
+    @Deprecated
+    public BacktraceStackFrame(StackTraceElement frame) {
+        BacktraceStackFrame obj = BacktraceStackFrame.fromStackTraceElement(frame);
+        if (obj == null) {
+            throw new IllegalArgumentException("Wrong stacktrace element frame - can`t be null");
+        }
+        this.functionName = obj.functionName;
+        this.sourceCodeFileName = obj.sourceCodeFileName;
+        this.sourceCode = obj.sourceCode;
+        this.line = obj.line;
     }
 
     /**
@@ -48,14 +70,25 @@ public class BacktraceStackFrame {
      *
      * @param frame single stacktrace element
      */
-    public BacktraceStackFrame(StackTraceElement frame) {
+    public static BacktraceStackFrame fromStackTraceElement(StackTraceElement frame) {
         if (frame == null || frame.getMethodName() == null) {
-            BacktraceLogger.w(LOG_TAG, "Frame or method name is null");
-            return;
+            BacktraceLogger.e(LOG_TAG, "Frame or method name is null");
+            throw new IllegalArgumentException("Frame or method name is null");
         }
-        this.functionName = frame.getClassName() + "." + frame.getMethodName();
-        this.sourceCodeFileName = frame.getFileName();
-        this.sourceCode = UUID.randomUUID().toString();
-        this.line = frame.getLineNumber() > 0 ? frame.getLineNumber() : null;
+        final String functionName = frame.getClassName() + "." + frame.getMethodName();
+        final String fileName = frame.getFileName();
+        final Integer line = frame.getLineNumber() > 0 ? frame.getLineNumber() : null;
+        return new BacktraceStackFrame(functionName, fileName, line);
+    }
+
+    public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line) {
+        this(functionName, sourceCodeFileName, line, UUID.randomUUID().toString());
+    }
+
+    public BacktraceStackFrame(String functionName, String sourceCodeFileName, Integer line, String sourceCodeUuid) {
+        this.functionName = functionName;
+        this.sourceCodeFileName = sourceCodeFileName;
+        this.sourceCode = sourceCodeUuid;
+        this.line = line;
     }
 }
