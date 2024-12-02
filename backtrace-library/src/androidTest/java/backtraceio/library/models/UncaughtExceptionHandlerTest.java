@@ -19,6 +19,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,12 +33,6 @@ public class UncaughtExceptionHandlerTest {
     private Context context;
     private BacktraceCredentials credentials;
 
-    @Before
-    public void setUp() {
-        context = InstrumentationRegistry.getInstrumentation().getContext();
-        credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
-    }
-
     private static void setRootHandler(Thread.UncaughtExceptionHandler customRootHandler, Thread.UncaughtExceptionHandler newRootHandler) {
         try {
             Field field = BacktraceExceptionHandler.class.getDeclaredField("rootHandler");
@@ -47,7 +43,6 @@ public class UncaughtExceptionHandlerTest {
         }
     }
 
-
     private static BacktraceExceptionHandler createBacktraceExceptionHandler(BacktraceClient client) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Constructor<BacktraceExceptionHandler> constructor = BacktraceExceptionHandler.class.getDeclaredConstructor(BacktraceClient.class);
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
@@ -55,6 +50,12 @@ public class UncaughtExceptionHandlerTest {
         BacktraceExceptionHandler exceptionHandler = constructor.newInstance(client);
         setRootHandler(exceptionHandler, new SkipExceptionHandler());
         return exceptionHandler;
+    }
+
+    @Before
+    public void setUp() {
+        context = InstrumentationRegistry.getInstrumentation().getContext();
+        credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     }
 
     @Test()
@@ -130,5 +131,94 @@ public class UncaughtExceptionHandlerTest {
         assertEquals("java.lang.OutOfMemoryError", testedReportData.getReport().classifier);
         assertEquals("Unhandled Exception", testedReportData.getReport().attributes.get("error.type"));
         assertTrue(testedReportData.getReport().exceptionTypeReport);
+    }
+
+    @Test()
+    public void testUncaughtInnerExceptionsGeneration() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        // GIVEN
+        final int expectedNumberOfExceptions = 2;
+        final Waiter waiter = new Waiter();
+        final String innerExceptionMessage = "Cause exception message";
+        final Exception cause = new IllegalArgumentException(innerExceptionMessage);
+        final String outerExceptionMessage = "Outer exception";
+        final Exception exception = new IllegalArgumentException(outerExceptionMessage, cause);
+        final BacktraceClient client = new BacktraceClient(context, credentials);
+        client.sendInnerExceptions(true);
+        client.sendSuppressedExceptions(true);
+
+        final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
+        client.setOnRequestHandler(data -> {
+            unhandledExceptionData.add(data);
+            if (unhandledExceptionData.size() == expectedNumberOfExceptions) {
+                waiter.resume();
+            }
+            return new BacktraceResult(data.getReport(), data.getReport().message,
+                    BacktraceResultStatus.Ok);
+        });
+
+        final BacktraceExceptionHandler handler = createBacktraceExceptionHandler(client);
+
+        // WHEN
+        handler.uncaughtException(Thread.currentThread(), exception);
+
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+
+        // THEN
+        assertEquals(expectedNumberOfExceptions, unhandledExceptionData.size());
+
+        final BacktraceData outerException = unhandledExceptionData.get(0);
+        final BacktraceData innerException = unhandledExceptionData.get(unhandledExceptionData.size() - 1);
+        assertEquals(outerExceptionMessage, outerException.attributes.get("error.message"));
+        assertEquals(innerExceptionMessage, innerException.attributes.get("error.message"));
+    }
+
+    @Test()
+    public void testUncaughtInnerExceptionsErrorAttributes() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        // GIVEN
+        final int expectedNumberOfExceptions = 2;
+        final Waiter waiter = new Waiter();
+        final String innerExceptionMessage = "Cause exception message";
+        final Exception cause = new IllegalArgumentException(innerExceptionMessage);
+        final String outerExceptionMessage = "Outer exception";
+        final Exception exception = new IllegalArgumentException(outerExceptionMessage, cause);
+        final BacktraceClient client = new BacktraceClient(context, credentials);
+        client.sendInnerExceptions(true);
+        client.sendSuppressedExceptions(true);
+        
+        final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
+        client.setOnRequestHandler(data -> {
+            unhandledExceptionData.add(data);
+            if (unhandledExceptionData.size() == expectedNumberOfExceptions) {
+                waiter.resume();
+            }
+            return new BacktraceResult(data.getReport(), data.getReport().message,
+                    BacktraceResultStatus.Ok);
+        });
+
+        final BacktraceExceptionHandler handler = createBacktraceExceptionHandler(client);
+
+        // WHEN
+        handler.uncaughtException(Thread.currentThread(), exception);
+
+        // WAIT FOR THE RESULT FROM ANOTHER THREAD
+        try {
+            waiter.await(5, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+
+        // THEN
+        final BacktraceData outerException = unhandledExceptionData.get(0);
+        final BacktraceData innerException = unhandledExceptionData.get(unhandledExceptionData.size() - 1);
+        assertEquals(outerException.attributes.get("error.trace"), innerException.attributes.get("error.trace"));
+        assertEquals(outerException.uuid, innerException.attributes.get("error.parent"));
+        assertNull(outerException.attributes.get("error.parent"));
+        assertEquals(BacktraceAttributeConsts.UnhandledExceptionAttributeType, outerException.attributes.get("error.type"));
+        assertEquals(BacktraceAttributeConsts.UnhandledExceptionAttributeType, innerException.attributes.get("error.type"));
     }
 }

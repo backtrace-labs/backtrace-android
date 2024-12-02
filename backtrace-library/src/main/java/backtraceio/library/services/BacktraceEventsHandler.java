@@ -10,7 +10,6 @@ import backtraceio.library.common.BacktraceMathHelper;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.metrics.Event;
 import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.EventsResult;
@@ -53,21 +52,12 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
     private int maximumNumberOfEvents = 350;
 
     /**
-     * The application name
-     */
-    protected String application;
-
-    /**
-     * The application version
-     */
-    protected String appVersion;
-
-    /**
      * Create BacktraceEventsHandler instance
-     * @param backtraceMetrics          Backtrace metrics object
-     * @param api                       Backtrace API object
-     * @param backtraceHandlerThread    Backtrace handler thread object
-     * @param urlPrefix                 Url routing prefix for metrics
+     *
+     * @param backtraceMetrics       Backtrace metrics object
+     * @param api                    Backtrace API object
+     * @param backtraceHandlerThread Backtrace handler thread object
+     * @param urlPrefix              Url routing prefix for metrics
      */
     public BacktraceEventsHandler(BacktraceMetrics backtraceMetrics,
                                   Api api,
@@ -89,11 +79,7 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         this.timeBetweenRetriesMillis = backtraceMetrics.settings.getTimeBetweenRetriesMillis();
 
         long timeIntervalMillis = backtraceMetrics.settings.getTimeIntervalMillis();
-
-        BacktraceAttributes backtraceAttributes = new BacktraceAttributes(backtraceMetrics.getContext(), null, null);
-        this.application = backtraceAttributes.getApplicationName();
-        this.appVersion = backtraceAttributes.getApplicationVersionOrEmpty();
-
+        
         if (timeIntervalMillis != 0) {
             final BacktraceEventsHandler handler = this;
             handler.postDelayed(new Runnable() {

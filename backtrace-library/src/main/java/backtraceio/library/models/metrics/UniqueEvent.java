@@ -22,14 +22,14 @@ public class UniqueEvent extends Event {
     private final List<String> name;
 
     public UniqueEvent(String name) {
-        this(name, new HashMap<String, Object>());
+        this(name, null);
     }
 
-    public UniqueEvent(String name, Map<String, Object> attributes) {
+    public UniqueEvent(String name, Map<String, String> attributes) {
         this(name, BacktraceTimeHelper.getTimestampSeconds(), attributes);
     }
 
-    public UniqueEvent(String name, long timestamp, Map<String, Object> attributes) {
+    public UniqueEvent(String name, long timestamp, Map<String, String> attributes) {
         super(timestamp);
         this.name = new ArrayList<String>() {{
             add(name);
@@ -49,7 +49,7 @@ public class UniqueEvent extends Event {
         return "";
     }
 
-    public void update(long timestamp, Map<String, Object> attributes) {
+    public void update(long timestamp, Map<String, String> attributes) {
         this.timestamp = timestamp;
         addAttributesImpl(attributes);
     }
