@@ -1,4 +1,5 @@
 {
+  "timestamp": 1709680251,
   "attachment-paths": [
     "abc.txt"
   ],
@@ -30,6 +31,5 @@
     "suppressed-exceptions": []
   },
   "exception-type-report": true,
-  "timestamp": 1709680251,
   "uuid": "a62a533a-a7b8-415c-9a99-253c51f00827"
 }

@@ -2,6 +2,9 @@ package backtraceio.library.deserializers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +16,11 @@ import java.util.List;
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.serializers.SerializedName;
 import backtraceio.library.common.serializers.deserializers.ReflectionDeserializer;
+import backtraceio.library.models.BacktraceApiResult;
+import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.BacktraceResultStatus;
 
 public class ReflectionDeserializerTest {
     private class TmpObject {
@@ -42,7 +50,7 @@ public class ReflectionDeserializerTest {
     }
 
     @Test
-    public void deserializeCustomObject() throws JSONException {
+    public void deserializeObject() throws JSONException {
         // GIVEN
         String json = TestUtils.readFileAsString(this, "testObject.json");
 
@@ -112,5 +120,72 @@ public class ReflectionDeserializerTest {
         assertEquals(2, deserializedObject.exceptions.size());
         assertEquals("Exception 1", deserializedObject.exceptions.get(0).getMessage());
         assertEquals("Exception 2", deserializedObject.exceptions.get(1).getMessage());
+    }
+
+    @Test
+    public void deserializeBacktraceResult() throws JSONException {
+        // GIVEN
+        String json = TestUtils.readFileAsString(this, "backtraceResult.json");
+
+        assertNotNull(json);
+        ReflectionDeserializer deserializer = new ReflectionDeserializer();
+
+        // WHEN
+        BacktraceResult deserializedObject = (BacktraceResult) deserializer.deserialize(new JSONObject(json), BacktraceResult.class);
+
+        // THEN
+        assertEquals(BacktraceResultStatus.Ok, deserializedObject.getStatus());
+        assertNull(deserializedObject.getMessage());
+        assertEquals("95000000-eb43-390b-0000-000000000000", deserializedObject.getRxId());
+    }
+
+    @Test
+    public void deserializeBacktraceApiResult() throws JSONException {
+        // GIVEN
+        String json = TestUtils.readFileAsString(this, "backtraceApiResult.json");
+
+        assertNotNull(json);
+        ReflectionDeserializer deserializer = new ReflectionDeserializer();
+
+        // WHEN
+        BacktraceApiResult deserializedObject = (BacktraceApiResult) deserializer.deserialize(new JSONObject(json), BacktraceApiResult.class);
+
+        // THEN
+        assertEquals("ok", deserializedObject.getResponse());
+        assertEquals("95000000-eb43-390b-0000-000000000000", deserializedObject.getRxId());
+    }
+
+    @Test
+    public void deserializeBacktraceReport() throws JSONException {
+        // GIVEN
+        String json = TestUtils.readFileAsString(this, "backtraceReport.json");
+
+        BacktraceReport r = new GsonBuilder().create().fromJson(json, BacktraceReport.class);
+        assertNotNull(json);
+        ReflectionDeserializer deserializer = new ReflectionDeserializer();
+
+        // WHEN
+        BacktraceReport deserializedObject = (BacktraceReport) deserializer.deserialize(new JSONObject(json), BacktraceReport.class);
+
+        // THEN
+        assertEquals("ok", deserializedObject.classifier);
+        // TODO: add asserts
+    }
+
+    @Test
+    public void deserializeBacktraceData() throws JSONException {
+        // GIVEN
+        String json = TestUtils.readFileAsString(this, "backtraceData.json");
+
+        BacktraceReport r = new GsonBuilder().create().fromJson(json, BacktraceReport.class);
+        assertNotNull(json);
+        ReflectionDeserializer deserializer = new ReflectionDeserializer();
+
+        // WHEN
+        BacktraceData deserializedObject = (BacktraceData) deserializer.deserialize(new JSONObject(json), BacktraceData.class);
+
+        // THEN
+        assertEquals("ok", deserializedObject.getClassifiers());
+        // TODO: add asserts
     }
 }

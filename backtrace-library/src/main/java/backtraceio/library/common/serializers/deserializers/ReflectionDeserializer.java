@@ -1,5 +1,9 @@
 package backtraceio.library.common.serializers.deserializers;
 
+import android.os.Build;
+
+import androidx.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,11 +11,13 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -99,22 +105,37 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
 
     public Object createNewInstance(Class<?> clazz) {
         try {
-            if (clazz.getConstructors().length == 0) {
-                Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-                Field f = unsafeClass.getDeclaredField("theUnsafe");
-                f.setAccessible(true);
-                Object unsafe = f.get(null);
-                Method allocateInstance = unsafeClass.getMethod("allocateInstance", Class.class);
-                return allocateInstance.invoke(unsafe, clazz);
+            Constructor<?> nonArgConstructor = getNonArgConstructor(clazz);
+            if (nonArgConstructor != null) {
+                nonArgConstructor.setAccessible(true);
+                return nonArgConstructor.newInstance();
             }
-            // Create an instance of the class using reflection
-            Constructor<?> constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
+            return createInstanceUsingAllocate(clazz);
         } catch (Exception e) {
             // TODO:
             return null;
         }
+    }
+
+    @Nullable
+    private static Object createInstanceUsingAllocate(Class<?> clazz) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+        Field f = unsafeClass.getDeclaredField("theUnsafe");
+        f.setAccessible(true);
+        Object unsafe = f.get(null);
+        Method allocateInstance = unsafeClass.getMethod("allocateInstance", Class.class);
+        return allocateInstance.invoke(unsafe, clazz);
+    }
+
+    public Constructor<?> getNonArgConstructor(Class<?> clazz) {
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if(constructor.getParameters().length == 0) {
+                    return constructor;
+                }
+            }
+        }
+        return null;
     }
 
     public Object deserialize(Object object, Class<?> clazz, Field field) throws JSONException {
@@ -122,8 +143,9 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
             return null;
         }
 
+
         // TODO: check if all of the types
-        if (SerializerHelper.isPrimitiveType(object)) {
+        if (SerializerHelper.isPrimitiveType(object) && (field == null || field.getType().isPrimitive())) {
             return this.handlePrimitiveType(object, clazz);
         }
 
@@ -131,7 +153,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
             return null;
         }
 
-        if (field != null && field.getType().isEnum() && object instanceof String) {
+        if (field.getType().isEnum() && object instanceof String) {
             return Enum.valueOf((Class<Enum>) field.getType(), (String) object);
         }
 
@@ -153,6 +175,10 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
 
         if (field.getType().isArray() && (object instanceof JSONArray)) {
             return this.deserializeArray((JSONArray) object, clazz, field);
+        }
+
+        if (clazz != null && field != null && object != null && object.getClass() == JSONObject.class) {
+            return this.deserialize((JSONObject) object, clazz);
         }
 
         return this.deserialize(object, clazz, null);
@@ -228,11 +254,13 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
 
     private Map<?, ?> deserializeMap(JSONObject map, Class<?> clazz, Field field) throws JSONException {
 
-        Map<String, Object> result = (Map<String, Object>) createNewInstance(clazz);
+        Map<String, Object> result = new HashMap<String, Object>();
 
-        if (result == null) {
-            return null;
-        }
+//        (Map<String, Object>) new HashMap<String, Object>();
+
+//        if (result == null) {
+//            return null;
+//        }
 
         Type genericType = field.getGenericType();
         if (genericType instanceof ParameterizedType) {
@@ -263,7 +291,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 }
             }
         }
-        return result;
+        return (Map<String, Object>) result;
     }
 
     private Object handlePrimitiveType(Object object, Class<?> clazz) {
@@ -287,6 +315,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
         } else if (clazz == String.class) {
             return object.toString();
         }
-        throw new IllegalArgumentException("Unsupported primitive type: " + clazz);
+        return object;
+//        throw new IllegalArgumentException("Unsupported primitive type: " + clazz);
     }
 }
