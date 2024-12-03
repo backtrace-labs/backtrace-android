@@ -73,6 +73,4 @@ public class BacktraceDataTest {
         assertEquals(threadInformation.getStack().get(1).functionName, "java.lang.Object.wait");
         assertEquals(threadInformation.getStack().get(1).line.intValue(), 442);
     }
-
-    // TODO: add one more complicated example with classifier
 }

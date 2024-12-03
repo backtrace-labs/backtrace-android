@@ -42,7 +42,7 @@ public class ReflectionDeserializerTest {
     }
 
     @Test
-    public void deserializeObject() throws JSONException { // TODO: fix name
+    public void deserializeCustomObject() throws JSONException {
         // GIVEN
         String json = TestUtils.readFileAsString(this, "testObject.json");
 
