@@ -3,8 +3,7 @@ package backtraceio.library.deserializers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import com.google.gson.GsonBuilder;
+import static org.junit.Assert.assertTrue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +11,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.serializers.SerializedName;
@@ -151,6 +151,7 @@ public class ReflectionDeserializerTest {
         BacktraceApiResult deserializedObject = (BacktraceApiResult) deserializer.deserialize(new JSONObject(json), BacktraceApiResult.class);
 
         // THEN
+        assertNotNull(deserializedObject);
         assertEquals("ok", deserializedObject.getResponse());
         assertEquals("95000000-eb43-390b-0000-000000000000", deserializedObject.getRxId());
     }
@@ -160,7 +161,6 @@ public class ReflectionDeserializerTest {
         // GIVEN
         String json = TestUtils.readFileAsString(this, "backtraceReport.json");
 
-        BacktraceReport r = new GsonBuilder().create().fromJson(json, BacktraceReport.class);
         assertNotNull(json);
         ReflectionDeserializer deserializer = new ReflectionDeserializer();
 
@@ -168,8 +168,18 @@ public class ReflectionDeserializerTest {
         BacktraceReport deserializedObject = (BacktraceReport) deserializer.deserialize(new JSONObject(json), BacktraceReport.class);
 
         // THEN
-        assertEquals("ok", deserializedObject.classifier);
-        // TODO: add asserts
+        assertNotNull(deserializedObject);
+        assertEquals("java.lang.IllegalAccessException", deserializedObject.classifier);
+        assertEquals(1709680251, deserializedObject.timestamp);
+        assertEquals(1, deserializedObject.attachmentPaths.size());
+        assertEquals("abc.txt", deserializedObject.attachmentPaths.get(0));
+        assertEquals(1, deserializedObject.attributes.size());
+        assertEquals("Exception", deserializedObject.attributes.get("error.type"));
+        assertEquals(2, deserializedObject.diagnosticStack.size());
+        assertNotNull(deserializedObject.exception);
+        assertEquals(UUID.fromString("a62a533a-a7b8-415c-9a99-253c51f00827"), deserializedObject.uuid);
+        assertNull(deserializedObject.message);
+        assertTrue(deserializedObject.exceptionTypeReport);
     }
 
     @Test
@@ -177,7 +187,6 @@ public class ReflectionDeserializerTest {
         // GIVEN
         String json = TestUtils.readFileAsString(this, "backtraceData.json");
 
-        BacktraceReport r = new GsonBuilder().create().fromJson(json, BacktraceReport.class);
         assertNotNull(json);
         ReflectionDeserializer deserializer = new ReflectionDeserializer();
 
@@ -185,7 +194,18 @@ public class ReflectionDeserializerTest {
         BacktraceData deserializedObject = (BacktraceData) deserializer.deserialize(new JSONObject(json), BacktraceData.class);
 
         // THEN
-        assertEquals("ok", deserializedObject.getClassifiers());
-        // TODO: add asserts
+        assertNotNull(deserializedObject);
+        assertEquals("backtrace-android", deserializedObject.agent);
+        assertEquals("3.8.3", deserializedObject.agentVersion);
+        assertEquals(2, deserializedObject.annotations.size());
+        assertEquals(1, deserializedObject.attributes.size());
+        assertEquals("4b965773-539e-4dd3-be1b-f8ab017c2c9f", deserializedObject.attributes.get("application.session"));
+        assertEquals("java", deserializedObject.lang);
+        assertEquals("0", deserializedObject.langVersion);
+        assertEquals("instr: androidx.test.runner.androidjunitrunner", deserializedObject.mainThread);
+        assertEquals(2, deserializedObject.sourceCode.size());
+        assertEquals(2, deserializedObject.threadInformationMap.size());
+        assertEquals(1720419610, deserializedObject.timestamp);
+        assertEquals("ecdf418b-3e22-4c7c-8011-c85dc2b4386f", deserializedObject.uuid);
     }
 }
