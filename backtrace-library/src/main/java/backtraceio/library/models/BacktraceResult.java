@@ -1,7 +1,7 @@
 package backtraceio.library.models;
 
 
-import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.json.serialization.SerializedName;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 

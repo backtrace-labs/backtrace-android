@@ -9,7 +9,7 @@ import java.util.UUID;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.FileHelper;
-import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.json.serialization.SerializedName;
 import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;

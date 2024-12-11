@@ -3,8 +3,7 @@ package backtraceio.library.models.metrics;
 import java.util.HashMap;
 import java.util.Map;
 
-import backtraceio.library.common.BacktraceStringHelper;
-import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.json.serialization.SerializedName;
 
 public abstract class Event {
 

@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import backtraceio.library.common.serializers.BacktraceDeserializer;
+import backtraceio.library.common.json.serialization.BacktraceDeserializer;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;

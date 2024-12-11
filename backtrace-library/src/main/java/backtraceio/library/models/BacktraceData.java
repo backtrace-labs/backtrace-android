@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
-import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.json.serialization.SerializedName;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
 import backtraceio.library.models.json.BacktraceAttributes;

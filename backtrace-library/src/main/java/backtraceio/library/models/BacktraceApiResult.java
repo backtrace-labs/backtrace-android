@@ -1,6 +1,6 @@
 package backtraceio.library.models;
 
-import backtraceio.library.common.serializers.SerializedName;
+import backtraceio.library.common.json.serialization.SerializedName;
 
 /**
  * Coroner API response

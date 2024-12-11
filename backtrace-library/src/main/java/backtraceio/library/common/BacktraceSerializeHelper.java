@@ -1,7 +1,7 @@
 package backtraceio.library.common;
 
-import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
-import backtraceio.library.common.serializers.BacktraceOrgJsonSerializer;
+import backtraceio.library.common.json.serialization.BacktraceOrgJsonDeserializer;
+import backtraceio.library.common.json.serialization.BacktraceOrgJsonSerializer;
 
 /**
  * Helper class for serialize and deserialize objects
