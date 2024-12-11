@@ -14,7 +14,7 @@ import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.common.TypeHelper;
-import backtraceio.library.common.serialization.DebugHelper;
+import backtraceio.library.common.DebugHelper;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.events.OnServerResponseEventListener;

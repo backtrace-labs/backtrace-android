@@ -11,7 +11,7 @@ import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
-import backtraceio.library.common.serialization.DebugHelper;
+import backtraceio.library.common.DebugHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.interfaces.Api;

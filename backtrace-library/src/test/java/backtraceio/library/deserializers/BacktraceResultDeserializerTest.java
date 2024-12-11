@@ -1,15 +1,12 @@
-package backtraceio.library.common.deserializers;
+package backtraceio.library.deserializers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import backtraceio.library.common.serializers.BacktraceOrgJsonDeserializer;
 import backtraceio.library.common.serializers.deserializers.BacktraceApiResultDeserializer;
@@ -17,18 +14,16 @@ import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
-@RunWith(AndroidJUnit4.class)
+
 public class BacktraceResultDeserializerTest {
 
     private final String JSON_1 ="{\"response\":\"ok\",\"_rxid\":\"01000000-5360-240b-0000-000000000000\"}";
 
     @Test
-    public void deserializeCoronerJsonResponse() throws JSONException {
-        // GIVEN
-        String json = JSON_1;
+    public void deserializeCoronerJsonResponse() {
 
         // WHEN
-        BacktraceResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceResult.class);
+        BacktraceResult result = BacktraceOrgJsonDeserializer.deserialize(JSON_1, BacktraceResult.class);
 
         // THEN
         assertNotNull(result);
@@ -42,10 +37,9 @@ public class BacktraceResultDeserializerTest {
     public void deserializeCoronerAPIJsonResponse() throws JSONException {
         // GIVEN
         BacktraceApiResultDeserializer deserializer = new BacktraceApiResultDeserializer();
-        String json = JSON_1;
 
         // WHEN
-        BacktraceApiResult result = deserializer.deserialize(new JSONObject(json));
+        BacktraceApiResult result = deserializer.deserialize(new JSONObject(JSON_1));
 
         // THEN
         assertNotNull(result);

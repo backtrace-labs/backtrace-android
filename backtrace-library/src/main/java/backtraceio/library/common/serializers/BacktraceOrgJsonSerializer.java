@@ -14,8 +14,8 @@ public class BacktraceOrgJsonSerializer {
         }
 
         try {
-            NamingPolicy namingPolicy = new NamingPolicy();
-            Class<?> clazz = object.getClass();
+            final NamingPolicy namingPolicy = new NamingPolicy();
+            final Class<?> clazz = object.getClass();
 
             if (clazz.equals(BacktraceData.class)) {
                 BacktraceDataSerializer dataSerializer = new BacktraceDataSerializer(namingPolicy);

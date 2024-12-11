@@ -136,7 +136,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
         backtraceDatabaseRecord.locked = true;
         this.totalSize += backtraceDatabaseRecord.getSize();
-        if(!this.batchRetry.isEmpty() && this.batchRetry.get(0) != null) {
+        if (!this.batchRetry.isEmpty() && this.batchRetry.get(0) != null) {
             this.batchRetry.get(0).add(backtraceDatabaseRecord);
         }
         this.totalRecords++;

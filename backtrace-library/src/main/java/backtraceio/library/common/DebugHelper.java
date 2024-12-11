@@ -1,4 +1,4 @@
-package backtraceio.library.common.serialization;
+package backtraceio.library.common;
 
 public class DebugHelper {
 

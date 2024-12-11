@@ -36,7 +36,7 @@ public class ExceptionDeserializer implements Deserializable<Exception> {
             return null;
         }
 
-        StackTraceElement[] result = new StackTraceElement[array.length()];
+        final StackTraceElement[] result = new StackTraceElement[array.length()];
         for (int idx = 0; idx < array.length(); idx++) {
             JSONObject obj = (JSONObject) array.get(idx);
             result[idx] = new StackTraceElement(

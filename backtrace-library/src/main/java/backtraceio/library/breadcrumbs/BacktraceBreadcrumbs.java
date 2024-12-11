@@ -10,7 +10,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import backtraceio.library.common.serialization.DebugHelper;
+import backtraceio.library.common.DebugHelper;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.events.OnSuccessfulBreadcrumbAddEventListener;

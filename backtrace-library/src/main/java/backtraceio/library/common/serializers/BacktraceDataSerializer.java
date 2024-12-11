@@ -18,12 +18,11 @@ import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
 
 public class BacktraceDataSerializer {
-    NamingPolicy namingPolicy;
+    final NamingPolicy namingPolicy;
 
     public BacktraceDataSerializer(NamingPolicy policy) {
         namingPolicy = policy;
     }
-
 
     public JSONObject toJson(BacktraceData data) throws JSONException {
         if (data == null) {
@@ -32,7 +31,6 @@ public class BacktraceDataSerializer {
 
         JSONObject json = new JSONObject();
 
-        // Serialize simple fields
         json.put("lang", data.getLang());
         json.put("agent", data.getAgent());
         json.put("symbolication", data.getSymbolication());

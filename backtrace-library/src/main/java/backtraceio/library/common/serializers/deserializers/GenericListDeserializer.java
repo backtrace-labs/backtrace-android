@@ -12,7 +12,7 @@ public class GenericListDeserializer<T> {
     private static final String LOG_TAG = GenericListDeserializer.class.getSimpleName();
 
     List<T> deserialize(JSONArray array, Deserializable<T> deserializer) {
-        List<T> result = new ArrayList<T>();
+        final List<T> result = new ArrayList<T>();
         for (int i = 0; i < array.length(); i++) {
             JSONObject obj = array.optJSONObject(i);
             if (obj != null) {
