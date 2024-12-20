@@ -117,7 +117,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
     public Constructor<?> getNonArgConstructor(Class<?> clazz) {
         for (Constructor<?> constructor : clazz.getConstructors()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if(constructor.getParameters().length == 0) {
+                if (constructor.getParameters().length == 0) {
                     return constructor;
                 }
             }
@@ -174,8 +174,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
         final Collection<?> result = deserializeCollection(jsonArray, clazz, field);
 
         // Create a strongly-typed array of the appropriate type
-        @SuppressWarnings("unchecked")
-        final T[] array = (T[]) Array.newInstance(clazz.getComponentType(), result.size());
+        @SuppressWarnings("unchecked") final T[] array = (T[]) Array.newInstance(clazz.getComponentType(), result.size());
         return result.toArray(array);
     }
 
@@ -188,7 +187,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final Class<?> objType;
-                if (clazz.getComponentType() != null){
+                if (clazz.getComponentType() != null) {
                     objType = clazz.getComponentType();
                 } else {
                     objType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
@@ -239,7 +238,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 }
             }
         }
-        return (Map<String, Object>) result;
+        return result;
     }
 
     private Object handlePrimitiveType(Object object, Class<?> clazz) {
