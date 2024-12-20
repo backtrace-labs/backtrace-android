@@ -45,22 +45,11 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
 
             Object instance = createNewInstance(clazz);
 
-//            if (clazz.getConstructors().length == 0) {
-//                BacktraceLogger.e(LOG_TAG, String.format("Can`t find constructor for %s when deserializing object %s", clazz, obj));
-//                return null;
-//            }
-            // Create an instance of the class using reflection
-//            Constructor<?> constructor = clazz.getDeclaredConstructor();
-//            constructor.setAccessible(true);
-//            Object instance = constructor.newInstance();
-            // Assuming that the class has a default (no-argument) constructor
-
             // Iterate through the fields of the class
             Class<?> currentClass = clazz;
             while (currentClass != null) {
                 for (java.lang.reflect.Field field : currentClass.getDeclaredFields()) {
-                    // Make the field accessible (public, private, etc.)
-                    field.setAccessible(true);
+                    field.setAccessible(true); // Make the field accessible (public, private, etc.)
 
                     if (java.lang.reflect.Modifier.isTransient(field.getModifiers()) ||
                             java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
