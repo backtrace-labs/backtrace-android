@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.json.serialization.BacktraceOrgJsonDeserializer;
-import backtraceio.library.common.json.deserialization.BacktraceApiResultDeserializer;
 import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
@@ -54,7 +53,7 @@ public class BacktraceApiResultDeserializerTest {
         x.setLevel(LogLevel.DEBUG);
         BacktraceLogger.setLogger(x);
         // WHEN
-        BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize("sdfsdf", BacktraceApiResult.class);
+        BacktraceApiResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceApiResult.class);
 
         // THEN
         assertNotNull(result);
