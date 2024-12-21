@@ -88,7 +88,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
 
         for (int i = 0; i < _retryNumber; i++) {
-            this.batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            this.batchRetry.put(i, new ArrayList<>());
         }
     }
 
@@ -126,7 +126,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
         backtraceDatabaseRecord.locked = true;
         this.totalSize += backtraceDatabaseRecord.getSize();
-        this.batchRetry.get(0).add(backtraceDatabaseRecord); // TODO: null
+        this.addToFirstBatch(backtraceDatabaseRecord);
         this.totalRecords++;
         return backtraceDatabaseRecord;
     }
@@ -344,7 +344,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         return getRecordFromCache(true);
     }
 
-
     /**
      * Get record in in-cache BacktraceDatabase
      *
@@ -371,5 +370,22 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             }
         }
         return null;
+    }
+
+    private void addToFirstBatch(BacktraceDatabaseRecord backtraceDatabaseRecord) {
+        final int firstBatch = 0;
+
+        if (this.batchRetry.isEmpty()) {
+            this.batchRetry.put(firstBatch, new ArrayList<>());
+        }
+
+        List<BacktraceDatabaseRecord> batch = this.batchRetry.get(firstBatch);
+
+        if (batch == null) {
+            batch = new ArrayList<>();
+            this.batchRetry.put(firstBatch, batch);
+        }
+
+        batch.add(backtraceDatabaseRecord);
     }
 }
