@@ -198,11 +198,11 @@ public class SerializerHelper {
     @NonNull
     private static JSONObject extractFieldsAndGetters(NamingPolicy namingPolicy, Object obj, int serializationDepth, Class<?> clazz) throws JSONException {
         JSONObject jsonObject = getAllFields(namingPolicy, clazz, obj, serializationDepth);
-        Map<String, Object> getters = executeAndGetMethods(namingPolicy, obj);
+//        Map<String, Object> getters = executeAndGetMethods(namingPolicy, obj);
 
-        for (Map.Entry<String, Object> entry: getters.entrySet()) {
-            jsonObject.put(namingPolicy.convert(entry.getKey()), entry.getValue());
-        }
+//        for (Map.Entry<String, Object> entry: getters.entrySet()) {
+//            jsonObject.put(namingPolicy.convert(entry.getKey()), entry.getValue());
+//        }
 
         return jsonObject;
     }
