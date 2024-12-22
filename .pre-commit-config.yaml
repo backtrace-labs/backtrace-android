@@ -1,13 +1,22 @@
 repos:
   - repo: local
     hooks:
-      - id: spotless-apply
-        name: Spotless Apply
-        entry: ./gradlew spotlessApply
+      - id: test-hook
+        name: test-hook
+        entry: echo 'test'
         language: system
         stages: [pre-commit]
-      - id: spotless-check
-        name: Spotless Check
-        entry: ./gradlew spotlessCheck
-        language: system
-        stages: [pre-commit]
+        pass_filenames: false
+
+#      - id: spotless-apply
+#        name: Spotless Apply
+#        entry: ./gradlew spotlessApply
+#        language: system
+#        stages: [pre-commit]
+#        pass_filenames: false
+#      - id: spotless-check
+#        name: Spotless Check
+#        entry: ./gradlew spotlessCheck
+#        language: system
+#        stages: [pre-commit]
+#        pass_filenames: false
