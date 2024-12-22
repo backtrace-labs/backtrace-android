@@ -16,8 +16,6 @@ import backtraceio.library.models.BacktraceResult;
 
 public class BacktraceHandlerThread extends HandlerThread {
 
-    private static final transient String LOG_TAG = BacktraceHandlerThread.class.getSimpleName();
-
     private final transient Context context;
     private BacktraceHandler mHandler;
     private final String url;

@@ -1,7 +1,5 @@
 package backtraceio.library.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -11,9 +9,6 @@ import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.SummedEventsPayload;
 
 public class SummedEventsHandler extends BacktraceEventsHandler<SummedEvent> {
-
-    private final static transient String LOG_TAG = SummedEventsHandler.class.getSimpleName();
-
     private final static String urlPrefix = "summed-events";
 
     public SummedEventsHandler(BacktraceMetrics backtraceMetrics,
