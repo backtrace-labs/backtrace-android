@@ -15,9 +15,9 @@ public class BacktraceStackFrameDeserializer implements Deserializable<Backtrace
         final static String functionName = "functionName";
         final static String line = "line";
         final static String sourceCodeFileName = "sourceCodeFileName";
-
         final static String sourceCode = "sourceCode";
     }
+
     public BacktraceStackFrame deserialize(JSONObject obj) throws JSONException {
         return new BacktraceStackFrame(
                 JSONObjectExtensions.optStringOrNull(obj, fieldNameLoader.get(Fields.functionName)),
