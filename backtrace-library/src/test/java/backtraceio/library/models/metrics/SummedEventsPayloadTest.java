@@ -13,6 +13,7 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 public class SummedEventsPayloadTest {
 
     private final String JSON_FILE = "summedEvents.json";
+
     @Test
     public void serializeUniqueEventsPayload() {
         // GIVEN
@@ -21,10 +22,10 @@ public class SummedEventsPayloadTest {
                     "example-event",
                     1734877802,
                     new HashMap<String, String>() {{
-                put("application.session", "3521f3e8-f463-4f6c-90f3-b0771ba67a56");
-                put("screen.height", "1834");
-                put("build.type", "Debug");
-            }}));
+                        put("application.session", "3521f3e8-f463-4f6c-90f3-b0771ba67a56");
+                        put("screen.height", "1834");
+                        put("build.type", "Debug");
+                    }}));
         }};
         final String application = "Backtrace.IO";
         final String appVersion = "1.0";

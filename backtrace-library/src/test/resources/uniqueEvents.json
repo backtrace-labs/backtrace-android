@@ -1,1 +1,20 @@
-{"metadata":{"dropped_events":0},"unique_events":[{"unique":["event-name"],"attributes":{"application.session":"3521f3e8-f463-4f6c-90f3-b0771ba67a56","screen.height":"1834","build.type":"Debug"},"timestamp":1734877802}],"application":"Backtrace.IO","appversion":"1.0"}
+{
+  "metadata": {
+    "dropped_events": 0
+  },
+  "unique_events": [
+    {
+      "unique": [
+        "event-name"
+      ],
+      "attributes": {
+        "application.session": "3521f3e8-f463-4f6c-90f3-b0771ba67a56",
+        "screen.height": "1834",
+        "build.type": "Debug"
+      },
+      "timestamp": 1734877802
+    }
+  ],
+  "application": "Backtrace.IO",
+  "appversion": "1.0"
+}

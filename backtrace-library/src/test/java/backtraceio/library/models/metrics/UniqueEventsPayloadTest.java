@@ -13,6 +13,7 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 public class UniqueEventsPayloadTest {
 
     private final String JSON_FILE = "uniqueEvents.json";
+
     @Test
     public void serializeUniqueEventsPayload() {
         // GIVEN
