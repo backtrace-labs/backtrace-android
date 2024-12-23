@@ -4,29 +4,28 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
 ### Getting Started
 
 1. **Clone the Repository**
-    - Clone the repository to your local machine using:
-      ```bash
-      git clone https://github.com/backtrace-labs/backtrace-android.git
-      ```
-
+   Clone the repository to your local machine using:
+   ```bash
+   git clone https://github.com/backtrace-labs/backtrace-android.git
+   ```
 2. **Install pre-commit**
-```bash
-pip install pre-commit
-pre-commit install
-```
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   ```
 
 3. **Create a Branch**
-    - It's good practice to create a new branch for each feature or bugfix, if you have jira ticket put ticket number as branch prefix:
-      ```bash
-      git checkout -b jira-ticket/your-feature-name
-      ```
+   It's good practice to create a new branch for each feature or bugfix, if you have jira ticket put ticket number as branch prefix:
+   ```bash
+   git checkout -b jira-ticket/your-feature-name
+   ```
       
 4. **Update submodules**
-```bash
-git submodule update --recursive --remote
-git submodule update --init --recursive
-```
-
+   ```bash
+   git submodule update --recursive --remote
+   git submodule update --init --recursive
+   ```
+   
 ### Coding Guidelines
 
 1. **Code Formatting**
