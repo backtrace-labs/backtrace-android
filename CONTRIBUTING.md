@@ -3,7 +3,7 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
 
 ### Getting Started
 
-1. **Clone the repository** to your local machine using:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/backtrace-labs/backtrace-android.git
    ```
