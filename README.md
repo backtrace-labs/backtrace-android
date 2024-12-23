@@ -70,12 +70,3 @@ backtraceClient.metrics.enable()
 ## Documentation
 
 For more information about the Android SDK, including installation, usage, and configuration options, see the [Android Integration guide](https://docs.saucelabs.com/error-reporting/platform-integrations/android/setup/) in the Sauce Labs documentation.
-
-## Contribution
-
-TODO: improve
-
-```
-pip install pre-commit
-pre-commit install
-```

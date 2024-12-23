@@ -9,13 +9,19 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
       git clone https://github.com/backtrace-labs/backtrace-android.git
       ```
 
-2. **Create a Branch**
+2. **Install pre-commit
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+3. **Create a Branch**
     - It's good practice to create a new branch for each feature or bugfix, if you have jira ticket put ticket number as branch prefix:
       ```bash
       git checkout -b jira-ticket/your-feature-name
       ```
       
-3. **Update submodules**
+4. **Update submodules**
 ```bash
 git submodule update --recursive --remote
 git submodule update --init --recursive
