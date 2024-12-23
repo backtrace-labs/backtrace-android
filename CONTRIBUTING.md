@@ -9,7 +9,7 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
       git clone https://github.com/backtrace-labs/backtrace-android.git
       ```
 
-2. **Install pre-commit
+2. **Install pre-commit**
 ```bash
 pip install pre-commit
 pre-commit install
