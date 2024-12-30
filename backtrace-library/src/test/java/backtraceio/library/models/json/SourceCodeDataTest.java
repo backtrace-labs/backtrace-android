@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
 import org.junit.Test;
 
@@ -63,9 +61,7 @@ public class SourceCodeDataTest {
         SourceCodeData obj = new SourceCodeData(frames);
         // WHEN
         String json = BacktraceSerializeHelper.toJson(obj);
-        String gson = new GsonBuilder().create().toJson(obj);
 
-//        SourceCodeData resultGson = new BacktraceGsonBuilder().buildGson().fromJson(json, SourceCodeData.class);
         SourceCodeData result = BacktraceSerializeHelper.fromJson(json, SourceCodeData.class);
 
         // THEN
