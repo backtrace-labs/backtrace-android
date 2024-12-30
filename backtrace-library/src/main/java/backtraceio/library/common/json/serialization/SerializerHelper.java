@@ -1,13 +1,10 @@
 package backtraceio.library.common.json.serialization;
 
-import androidx.annotation.NonNull;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -127,32 +124,6 @@ public class SerializerHelper {
         return serialize(namingPolicy, obj, 0);
     }
 
-    public static Map<String, Object> executeAndGetMethods(NamingPolicy namingPolicy, Object obj) {
-        Class<?> clazz = obj.getClass();
-        Map<String, Object> fields = new HashMap<>();
-        Method[] methods = clazz.getMethods();
-
-        for (Method method : methods) {
-            String methodName = method.getName();
-
-            if (methodName.equals("getClass") || methodName.equals("getClassName")) {
-                continue;
-            }
-
-            if (methodName.startsWith("get") && method.getParameterCount() == 0) {
-                try {
-                    Object result = method.invoke(obj);
-                    String propertyName = methodName.substring(3); // Remove 'get' prefix
-                    fields.put(namingPolicy.convert(propertyName), serialize(namingPolicy, result));
-                } catch (Exception e) {
-                    BacktraceLogger.e(LOG_TAG, String.format("Exception on executing getters, " +
-                            "class %s, method name %s, object %s", clazz, methodName, obj), e);
-                }
-            }
-        }
-        return fields;
-    }
-
     public static Object serialize(NamingPolicy namingPolicy, Object obj, int serializationDepth) throws JSONException {
         if (obj == null) {
             return null;
@@ -192,18 +163,6 @@ public class SerializerHelper {
             return ((Enum<?>) obj).name();
         }
 
-        return extractFieldsAndGetters(namingPolicy, obj, serializationDepth, obj.getClass());
-    }
-
-    @NonNull
-    private static JSONObject extractFieldsAndGetters(NamingPolicy namingPolicy, Object obj, int serializationDepth, Class<?> clazz) throws JSONException {
-        JSONObject jsonObject = getAllFields(namingPolicy, clazz, obj, serializationDepth);
-//        Map<String, Object> getters = executeAndGetMethods(namingPolicy, obj);
-
-//        for (Map.Entry<String, Object> entry: getters.entrySet()) {
-//            jsonObject.put(namingPolicy.convert(entry.getKey()), entry.getValue());
-//        }
-
-        return jsonObject;
+        return getAllFields(namingPolicy, obj.getClass(), obj, serializationDepth);
     }
 }
