@@ -15,8 +15,8 @@ import backtraceio.library.common.json.serialization.SerializerHelper;
 
 @RunWith(Parameterized.class)
 public class PrimitiveTypeSerializerHelperTest {
-    private Object testedObj;
-    private boolean expectedResult;
+    private final Object testedObj;
+    private final boolean expectedResult;
 
     // Constructor for the parameterized test
     public PrimitiveTypeSerializerHelperTest(Object testedObj, boolean expectedResult) {

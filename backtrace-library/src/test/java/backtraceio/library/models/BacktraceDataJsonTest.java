@@ -88,7 +88,7 @@ public class BacktraceDataJsonTest {
         // THEN
         assertNotNull(obj);
         assertEquals("ecdf418b-3e22-4c7c-8011-c85dc2b4386f", obj.getUuid());
-        assertEquals(null, obj.getSymbolication());
+        assertNull(obj.getSymbolication());
         assertEquals(1720419610, obj.getTimestamp());
         assertEquals("0", obj.getLangVersion());
         assertEquals("java", obj.getLang());
@@ -107,7 +107,7 @@ public class BacktraceDataJsonTest {
         assertEquals(2, obj.getSourceCode().size());
         assertNull(obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
         assertEquals("VMStack.java", obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
-        assertEquals(new Integer(17), obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
+        assertEquals(Integer.valueOf(17), obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
         assertEquals("InvokeMethod.java", obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
         assertEquals(2, obj.getThreadInformationMap().size());
 
@@ -122,13 +122,13 @@ public class BacktraceDataJsonTest {
         assertEquals(false, resultMainThread.getFault());
         assertEquals("main", resultMainThread.getName());
         assertEquals(2, resultMainThread.getStack().size());
-        assertEquals(null, resultMainThread.getStack().get(0).sourceCodeFileName);
-        assertEquals(null, resultMainThread.getStack().get(0).line);
+        assertNull(resultMainThread.getStack().get(0).sourceCodeFileName);
+        assertNull(resultMainThread.getStack().get(0).line);
         assertEquals("b1a3d84a-fcf3-4d10-90d5-994f1e397607", resultMainThread.getStack().get(0).sourceCode);
         assertEquals("android.os.MessageQueue.nativePollOnce", resultMainThread.getStack().get(0).functionName);
 
-        assertEquals(null, resultMainThread.getStack().get(1).sourceCodeFileName);
-        assertEquals(new Integer(335), resultMainThread.getStack().get(1).line);
+        assertNull(resultMainThread.getStack().get(1).sourceCodeFileName);
+        assertEquals(Integer.valueOf(335), resultMainThread.getStack().get(1).line);
         assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
         assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
@@ -191,7 +191,7 @@ public class BacktraceDataJsonTest {
         assertEquals("android.os.MessageQueue.nativePollOnce", resultMainThread.getStack().get(0).functionName);
 
         assertNull(resultMainThread.getStack().get(1).sourceCodeFileName);
-        assertEquals(new Integer(335), resultMainThread.getStack().get(1).line);
+        assertEquals(Integer.valueOf(335), resultMainThread.getStack().get(1).line);
         assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
         assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
