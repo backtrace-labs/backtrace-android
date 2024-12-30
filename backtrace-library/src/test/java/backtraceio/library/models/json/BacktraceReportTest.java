@@ -25,8 +25,8 @@ public class BacktraceReportTest {
     public void serialize() throws JSONException {
         // GIVEN
         final List<BacktraceStackFrame> diagnosticStack = new ArrayList<BacktraceStackFrame>() {{
-            new BacktraceStackFrame("backtraceio.library.SettingAttributesTest.tmpGsonTest", null, 75, "c37b9ae3-eab1-4928-9533-f1c14b6149f5");
-            new BacktraceStackFrame("java.lang.reflect.Method.invoke", null, null, "6f280747-feee-4f4b-9eff-dda0d8eaa535");
+            add(new BacktraceStackFrame("backtraceio.library.SettingAttributesTest.tmpGsonTest", null, 75, "c37b9ae3-eab1-4928-9533-f1c14b6149f5"));
+            add(new BacktraceStackFrame("java.lang.reflect.Method.invoke", null, null, "6f280747-feee-4f4b-9eff-dda0d8eaa535"));
         }};
 
         final StackTraceElement[] stackTraceElements = new StackTraceElement[1];

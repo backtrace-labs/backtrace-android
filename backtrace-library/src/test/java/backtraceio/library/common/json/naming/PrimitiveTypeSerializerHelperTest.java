@@ -1,4 +1,4 @@
-package backtraceio.library.common.json;
+package backtraceio.library.common.json.naming;
 
 import static junit.framework.TestCase.assertEquals;
 

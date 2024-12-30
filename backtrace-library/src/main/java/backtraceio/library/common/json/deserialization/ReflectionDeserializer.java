@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import backtraceio.library.common.json.naming.NamingPolicy;
 import backtraceio.library.common.json.serialization.SerializedName;
 import backtraceio.library.common.json.serialization.SerializerHelper;
 import backtraceio.library.logger.BacktraceLogger;
@@ -29,6 +30,7 @@ import backtraceio.library.logger.BacktraceLogger;
 public final class ReflectionDeserializer implements Deserializable<Object> {
 
     private final static String LOG_TAG = ReflectionDeserializer.class.getSimpleName();
+    private final static NamingPolicy namingPolicy = new NamingPolicy();
 
     @Override
     public Object deserialize(JSONObject obj) throws JSONException {
@@ -66,16 +68,18 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                             }
                         }
                     }
-
                     String fieldName = field.getName();
+                    try {
+                        if (obj.has(fieldName)) {
 
-                    if (obj.has(fieldName)) {
-                        try {
                             field.set(instance, this.deserialize(obj.get(fieldName), field.getType(), field));
-                        } catch (IllegalArgumentException e) {
-                            BacktraceLogger.e(LOG_TAG, String.format("IllegalArgumentException on reflection deserialization of object %s, " +
-                                    "field %s, reason %s", obj, fieldName, e.getMessage()), e);
+                        } else if (obj.has(namingPolicy.convert(fieldName))) {
+                            field.set(instance, this.deserialize(obj.get(namingPolicy.convert(fieldName)), field.getType(), field));
                         }
+                    }
+                    catch (IllegalArgumentException e) {
+                        BacktraceLogger.e(LOG_TAG, String.format("IllegalArgumentException on reflection deserialization of object %s, " +
+                                "field %s, reason %s", obj, fieldName, e.getMessage()), e);
                     }
                 }
                 currentClass = currentClass.getSuperclass();

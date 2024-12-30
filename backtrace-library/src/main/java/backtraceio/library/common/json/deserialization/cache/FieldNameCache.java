@@ -6,11 +6,14 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtraceio.library.common.json.naming.NamingPolicy;
 import backtraceio.library.common.json.serialization.SerializedName;
 
 public class FieldNameCache {
         // Map to store annotation information
         private final static Map<String, String> fieldNameMap = new HashMap<>();
+
+        private final static NamingPolicy namingPolicy = new NamingPolicy();
 
         // Method to get annotation for a given class and field
         public static String getAnnotation(Class<?> clazz, @NonNull String fieldName) {
@@ -30,7 +33,8 @@ public class FieldNameCache {
                             fieldNameMap.put(key, cachedFieldName);
                         }
                     } else {
-                        cachedFieldName = field.getName();
+                        cachedFieldName = namingPolicy.convert(fieldName);
+                        fieldNameMap.put(key, cachedFieldName);
                     }
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
