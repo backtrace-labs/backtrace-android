@@ -226,16 +226,6 @@ public class BacktraceReport {
         return this.originalException != null ? this.originalException : this.exception;
     }
 
-//    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-//        return toBacktraceData(context, clientAttributes, false);
-//    }
-//
-//    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-//        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
-//        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
-//        return backtraceData;
-//    }
-
     private String getExceptionClassifier(Throwable exception) {
         return exception.getClass().getCanonicalName();
     }
@@ -255,13 +245,6 @@ public class BacktraceReport {
 
         return reportException;
     }
-
-//    public String getExceptionClassifier(Exception exception) {
-//        if (exception instanceof UnhandledThrowableWrapper) {
-//            return ((UnhandledThrowableWrapper) exception).getClassifier();
-//        }
-//        return exception.getClass().getCanonicalName();
-//    }
 
     /**
      * Sets error.type attribute depends on the type of the report
