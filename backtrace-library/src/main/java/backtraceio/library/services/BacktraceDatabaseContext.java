@@ -83,7 +83,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Setup cache
      */
     private void setupBatch() {
-        if (this._retryNumber == 0) {
+        if (this._retryNumber <= 0) {
             throw new IllegalArgumentException("Retry number must be greater than 0!");
         }
 
@@ -304,7 +304,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private void incrementBatches() {
         for (int i = this._retryNumber - 2; i >= 0; i--) {
             List<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
-            batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            batchRetry.put(i, new ArrayList<>());
             batchRetry.put(i + 1, currentBatch);
         }
     }
