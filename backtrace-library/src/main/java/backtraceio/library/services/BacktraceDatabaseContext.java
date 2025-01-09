@@ -93,7 +93,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Setup cache
      */
     private void setupBatch() {
-        if (this._retryNumber == 0) {
+        if (this._retryNumber <= 0) {
             throw new IllegalArgumentException("Retry number must be greater than 0!");
         }
 
@@ -136,7 +136,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
         backtraceDatabaseRecord.locked = true;
         this.totalSize += backtraceDatabaseRecord.getSize();
-        this.batchRetry.get(0).add(backtraceDatabaseRecord); // TODO: null
+        this.addToFirstBatch(backtraceDatabaseRecord);
         this.totalRecords++;
         return backtraceDatabaseRecord;
     }
@@ -314,7 +314,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private void incrementBatches() {
         for (int i = this._retryNumber - 2; i >= 0; i--) {
             List<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
-            batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            batchRetry.put(i, new ArrayList<>());
             batchRetry.put(i + 1, currentBatch);
         }
     }
@@ -354,7 +354,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         return getRecordFromCache(true);
     }
 
-
     /**
      * Get record in in-cache BacktraceDatabase
      *
@@ -381,5 +380,22 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             }
         }
         return null;
+    }
+
+    private void addToFirstBatch(BacktraceDatabaseRecord backtraceDatabaseRecord) {
+        final int firstBatch = 0;
+
+        if (this.batchRetry.isEmpty()) {
+            this.batchRetry.put(firstBatch, new ArrayList<>());
+        }
+
+        List<BacktraceDatabaseRecord> batch = this.batchRetry.get(firstBatch);
+
+        if (batch == null) {
+            batch = new ArrayList<>();
+            this.batchRetry.put(firstBatch, batch);
+        }
+
+        batch.add(backtraceDatabaseRecord);
     }
 }
