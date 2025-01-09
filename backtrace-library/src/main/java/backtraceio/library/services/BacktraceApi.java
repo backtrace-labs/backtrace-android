@@ -1,5 +1,7 @@
 package backtraceio.library.services;
 
+import android.content.Context;
+
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -18,6 +20,7 @@ import backtraceio.library.models.metrics.UniqueEventsPayload;
 public class BacktraceApi implements Api {
 
     private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
+
 
     private final transient BacktraceHandlerThread threadSender;
 
@@ -61,7 +64,7 @@ public class BacktraceApi implements Api {
      *
      * @param credentials API credentials
      */
-    public BacktraceApi(BacktraceCredentials credentials) {
+    public BacktraceApi(Context context, BacktraceCredentials credentials) {
         if (credentials == null) {
             BacktraceLogger.e(LOG_TAG, "BacktraceCredentials parameter passed to BacktraceApi " +
                     "constructor is null");
@@ -69,7 +72,7 @@ public class BacktraceApi implements Api {
         }
         this.reportSubmissionUrl = credentials.getSubmissionUrl().toString();
 
-        threadSender = new BacktraceHandlerThread(BacktraceHandlerThread.class.getSimpleName(),
+        threadSender = new BacktraceHandlerThread(context, BacktraceHandlerThread.class.getSimpleName(),
                 this.reportSubmissionUrl);
     }
 

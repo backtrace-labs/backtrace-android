@@ -30,10 +30,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final int _retryNumber;
 
-    /**
-     * Application context
-     */
-    private final Context _applicationContext;
 
     /**
      * Database cache
@@ -56,12 +52,27 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private final RetryOrder retryOrder;
 
     /**
+     * @deprecated This constructor will be removed in future versions.
+     * The {@code context} parameter is no longer used.
+     * Please use the constructor without the {@code context} parameter.
+     *
+     * <p>Use {@link #BacktraceDatabaseContext(BacktraceDatabaseSettings)} instead.</p>
+     *
+     * @param context The unused Android context parameter.
+     * @param settings The database settings.
+     */
+    @Deprecated
+    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
+        this(settings);
+    }
+
+    /**
      * Initialize new instance of Backtrace Database Context
      *
      * @param settings database settings
      */
-    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
-        this(context, settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
+    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings) {
+        this(settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
     }
 
     /**
@@ -71,8 +82,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @param retryNumber total number of retries
      * @param retryOrder  record order
      */
-    private BacktraceDatabaseContext(Context context, String path, int retryNumber, RetryOrder retryOrder) {
-        this._applicationContext = context;
+    private BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
         this._path = path;
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;

@@ -23,13 +23,13 @@ public class BacktraceDatabaseRecord {
     /**
      * Path to database directory
      */
-    private transient final String _path;
+    private final transient String path;
 
     /**
      * Id
      */
     @SerializedName("Id")
-    public UUID id = UUID.randomUUID();
+    public UUID id;
 
     /**
      * Check if current record is in use
@@ -39,7 +39,8 @@ public class BacktraceDatabaseRecord {
     /**
      * record writer
      */
-    transient DatabaseRecordWriter RecordWriter;
+    private final transient DatabaseRecordWriter recordWriter;
+
 
     /**
      * Path to json stored all information about current record
@@ -70,17 +71,28 @@ public class BacktraceDatabaseRecord {
      */
     private transient BacktraceData record;
 
-    BacktraceDatabaseRecord() {
-        this._path = "";
-        this.recordPath = String.format("%s-record.json", this.id);
-        this.diagnosticDataPath = String.format("%s-attachment", this.id);
+    public BacktraceDatabaseRecord(BacktraceData data, String path) {
+        this.id = UUID.fromString(data.getUuid());
+        this.record = data;
+        this.path = path;
+        this.recordWriter = new BacktraceDatabaseRecordWriter(path);
     }
 
-    public BacktraceDatabaseRecord(BacktraceData data, String path) {
-        this.id = UUID.fromString(data.uuid);
-        this.record = data;
-        this._path = path;
-        RecordWriter = new BacktraceDatabaseRecordWriter(path);
+    public BacktraceDatabaseRecord(String id,
+                                   String path,
+                                   String recordPath,
+                                   String diagnosticDataPath,
+                                   String reportPath,
+                                   long size) {
+        this.id = UUID.fromString(id);
+        this.recordPath = recordPath;
+        this.diagnosticDataPath = diagnosticDataPath;
+        this.reportPath = reportPath;
+        this.path = path;
+        this.size = size;
+        this.recordWriter = new BacktraceDatabaseRecordWriter(path);
+
+        this.record = getBacktraceData();
     }
 
     /**
@@ -115,17 +127,25 @@ public class BacktraceDatabaseRecord {
         return size;
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    /**
+     * Get BacktraceData object related to db record
+     * @deprecated The {@code context} parameter is no longer used and this method will be removed in future versions.
+     * Please use {@link #getBacktraceData()} instead.
+     *
+     * <p>The {@code context} parameter has no effect on the behavior of this method.</p>
+     *
+     * @param context The unused context parameter.
+     * @return The BacktraceData object related to db record
+     */
+    @Deprecated
+    public BacktraceData getBacktraceData(Context context) {
+        return getBacktraceData();
     }
-
     /**
      * Get valid BacktraceData from current record
-     *
-     * @param context
      * @return valid BacktraceData object
      */
-    public BacktraceData getBacktraceData(Context context) {
+    public BacktraceData getBacktraceData() {
         if (this.record != null) {
             return this.record;
         }
@@ -150,8 +170,6 @@ public class BacktraceDatabaseRecord {
             // diagnostic data to API
             diagnosticData.report = BacktraceSerializeHelper.fromJson(jsonReport,
                     BacktraceReport.class);
-            // Serialized data loses the context, give context again when deserializing
-            diagnosticData.context = context;
             return diagnosticData;
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception occurs on deserialization of diagnostic data", ex);
@@ -170,13 +188,13 @@ public class BacktraceDatabaseRecord {
             this.diagnosticDataPath = save(record, String.format("%s-attachment", id));
             this.reportPath = save(record.getReport(), String.format("%s-report", id));
 
-            this.recordPath = new File(this._path,
+            this.recordPath = new File(this.path,
                     String.format("%s-record.json", this.id)).getAbsolutePath();
 
             String json = BacktraceSerializeHelper.toJson(this);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
             this.size += file.length;
-            RecordWriter.write(this, String.format("%s-record", this.id));
+            recordWriter.write(this, String.format("%s-record", this.id));
             BacktraceLogger.d(LOG_TAG, "Saving data to internal app storage successful");
             return true;
         } catch (Exception ex) {
@@ -201,7 +219,7 @@ public class BacktraceDatabaseRecord {
             String json = BacktraceSerializeHelper.toJson(data);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
             this.size += file.length;
-            return RecordWriter.write(file, prefix);
+            return recordWriter.write(file, prefix);
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Received IOException while saving data to database", ex);
             return ""; // TODO: consider a better solution

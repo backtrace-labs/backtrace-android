@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,11 +31,19 @@ public class BacktraceClientAttributeTests {
     private BacktraceCredentials credentials;
     private BacktraceDatabase database;
 
+    private BacktraceClient backtraceClient;
+
     @Before
     public void setUp() {
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
         database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        backtraceClient = new BacktraceClient(context, credentials, database);
+    }
+
+    @After
+    public void cleanUp() {
+        database.clear();
     }
 
     @Test
@@ -42,7 +51,6 @@ public class BacktraceClientAttributeTests {
         // GIVEN
         final String attributeKey = "test-attribute";
         final String attributeValue = "test-value";
-        final BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
 
         // WHEN
         backtraceClient.addAttribute(attributeKey, attributeValue);
@@ -66,7 +74,6 @@ public class BacktraceClientAttributeTests {
             attributes.put(String.format("%s %d", attributeKey, attributeIteration), attributeValue);
         }
         // WHEN
-        final BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
         backtraceClient.addAttribute(attributes);
 
         // THEN
@@ -85,7 +92,6 @@ public class BacktraceClientAttributeTests {
         final String newAttributeValue = "test-value-new";
 
         // WHEN
-        final BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
         backtraceClient.addAttribute(attributeKey, oldAttributeValue);
 
         backtraceClient.addAttribute(attributeKey, newAttributeValue);
@@ -129,14 +135,14 @@ public class BacktraceClientAttributeTests {
         final String errorMessage = "error message";
         final String attributeKey = "test-attribute";
         final String attributeValue = "test-value";
-        final BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database);
+
         backtraceClient.addAttribute(attributeKey, attributeValue);
         RequestHandler rh = data -> {
             // THEN
-            Object value = data.attributes.get(attributeKey);
+            Object value = data.getAttributes().get(attributeKey);
             assertNotNull(value);
             assertEquals(value, attributeValue);
-            return new BacktraceResult(data.getReport(), data.report.exception.getMessage(),
+            return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
                     BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);

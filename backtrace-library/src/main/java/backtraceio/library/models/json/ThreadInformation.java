@@ -3,6 +3,7 @@ package backtraceio.library.models.json;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import backtraceio.library.models.BacktraceStackFrame;
 
@@ -28,7 +29,7 @@ public class ThreadInformation {
      */
     @SerializedName("stack")
     @SuppressWarnings({"UnusedDeclaration"})
-    private final ArrayList<BacktraceStackFrame> stack;
+    private final List<BacktraceStackFrame> stack;
 
     /**
      * Create new instance of ThreadInformation
@@ -37,9 +38,9 @@ public class ThreadInformation {
      * @param fault      denotes whether a thread is a faulting thread - in most cases main thread
      * @param stack      exception stack information
      */
-    private ThreadInformation(String threadName, Boolean fault, ArrayList<BacktraceStackFrame>
+    public ThreadInformation(String threadName, Boolean fault, List<BacktraceStackFrame>
             stack) {
-        this.stack = stack == null ? new ArrayList<BacktraceStackFrame>() : stack;
+        this.stack = stack == null ? new ArrayList<>() : stack;
         this.name = threadName;
         this.fault = fault;
     }
@@ -51,7 +52,19 @@ public class ThreadInformation {
      * @param stack         exception stack information
      * @param currentThread is current thread flag
      */
-    ThreadInformation(Thread thread, ArrayList<BacktraceStackFrame> stack, Boolean currentThread) {
+    ThreadInformation(Thread thread, List<BacktraceStackFrame> stack, Boolean currentThread) {
         this(thread.getName().toLowerCase(), currentThread, stack);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Boolean getFault() {
+        return fault;
+    }
+
+    public List<BacktraceStackFrame> getStack() {
+        return stack;
     }
 }

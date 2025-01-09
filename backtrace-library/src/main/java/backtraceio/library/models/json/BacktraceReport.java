@@ -60,7 +60,7 @@ public class BacktraceReport {
     /**
      * Current report exception stack
      */
-    public ArrayList<BacktraceStackFrame> diagnosticStack;
+    public List<BacktraceStackFrame> diagnosticStack;
 
     /**
      * Create new instance of Backtrace report to send a report with custom client message
@@ -170,6 +170,7 @@ public class BacktraceReport {
         this.attributes = CollectionUtils.copyMap(attributes);
         this.attachmentPaths = CollectionUtils.copyList(attachmentPaths);
         this.originalException = throwable;
+
         if (throwable != null) {
             this.exception = this.prepareException(throwable);
             this.classifier = this.getExceptionClassifier(throwable);
@@ -180,6 +181,23 @@ public class BacktraceReport {
         this.setDefaultErrorTypeAttribute();
     }
 
+    public BacktraceReport(UUID uuid, long timestamp,
+                           boolean exceptionTypeReport, String classifier,
+                           Map<String, Object> attributes,
+                           String message, Exception exception,
+                           List<String> attachmentPaths,
+                           List<BacktraceStackFrame> diagnosticStack) {
+        this.uuid = uuid;
+        this.timestamp = timestamp;
+        this.exceptionTypeReport = exceptionTypeReport;
+        this.classifier = classifier;
+        this.attributes = attributes;
+        this.message = message;
+        this.originalException = exception;
+        this.exception = exception;
+        this.attachmentPaths = attachmentPaths;
+        this.diagnosticStack = diagnosticStack;
+    }
     /**
      * Concat two dictionaries with attributes
      *
@@ -190,7 +208,7 @@ public class BacktraceReport {
     public static Map<String, Object> concatAttributes(
             BacktraceReport report, Map<String, Object> attributes) {
         Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
-                new HashMap<String, Object>();
+                new HashMap<>();
         if (attributes == null) {
             return reportAttributes;
         }
@@ -206,16 +224,6 @@ public class BacktraceReport {
      */
     public Throwable getException() {
         return this.originalException != null ? this.originalException : this.exception;
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
-        return toBacktraceData(context, clientAttributes, false);
-    }
-
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
-        BacktraceData backtraceData = new BacktraceData(context, this, clientAttributes);
-        backtraceData.symbolication = isProguardEnabled ? "proguard" : null;
-        return backtraceData;
     }
 
     private String getExceptionClassifier(Throwable exception) {
@@ -253,4 +261,14 @@ public class BacktraceReport {
                         ? BacktraceAttributeConsts.HandledExceptionAttributeType
                         : BacktraceAttributeConsts.MessageAttributeType);
     }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes) {
+        return toBacktraceData(context, clientAttributes, false);
+    }
+
+    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+        final String symbolication = isProguardEnabled ? "proguard" : null;
+        return new BacktraceData.Builder(this).setAttributes(context, clientAttributes).setSymbolication(symbolication).build();
+    }
 }
+
