@@ -44,10 +44,16 @@ public class SourceCodeDataTest {
         final SourceCodeData obj = BacktraceSerializeHelper.fromJson(json, SourceCodeData.class);
         // THEN
         assertEquals(2, obj.data.size());
-        assertEquals("VMStack.java", obj.data.get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
-        assertNull(obj.data.get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
-        assertEquals("InvokeMethod.java", obj.data.get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
-        assertEquals(17, obj.data.get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine().intValue());
+
+        final SourceCode sourceCode1 = obj.data.get("8751bea6-d6f6-48f4-9f96-1355c3408a9a");
+        assertNotNull(sourceCode1);
+        assertEquals("VMStack.java", sourceCode1.getSourceCodeFileName());
+        assertNull(sourceCode1.getStartLine());
+
+        final SourceCode sourceCode2 = obj.data.get("27948842-7c2b-4898-a74a-ba3ca4afe814");
+        assertNotNull(sourceCode2);
+        assertEquals("InvokeMethod.java", sourceCode2.getSourceCodeFileName());
+        assertEquals(17, sourceCode2.getStartLine().intValue());
     }
 
     @Test
@@ -68,9 +74,14 @@ public class SourceCodeDataTest {
         assertNotNull(result);
         assertEquals(2, result.data.size());
 
-        assertEquals("VMStack.java", result.data.get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
-        assertNull(result.data.get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
-        assertEquals("InvokeMethod.java", result.data.get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
-        assertEquals(17, result.data.get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine().intValue());
+        final SourceCode sourceCode1 = obj.data.get("8751bea6-d6f6-48f4-9f96-1355c3408a9a");
+        assertNotNull(sourceCode1);
+        assertEquals("VMStack.java", sourceCode1.getSourceCodeFileName());
+        assertNull(sourceCode1.getStartLine());
+
+        final SourceCode sourceCode2 = obj.data.get("27948842-7c2b-4898-a74a-ba3ca4afe814");
+        assertNotNull(sourceCode2);
+        assertEquals("InvokeMethod.java", sourceCode2.getSourceCodeFileName());
+        assertEquals(17, sourceCode2.getStartLine().intValue());
     }
 }
