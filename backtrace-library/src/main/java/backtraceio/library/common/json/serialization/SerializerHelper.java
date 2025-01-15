@@ -34,6 +34,52 @@ public class SerializerHelper {
         WRAPPER_TYPE_MAP.put(Void.class, void.class);
     }
 
+    public static Object serialize(NamingPolicy namingPolicy, Object obj) throws JSONException {
+        return serialize(namingPolicy, obj, 0);
+    }
+
+    public static Object serialize(NamingPolicy namingPolicy, Object obj, int serializationDepth) throws JSONException {
+        if (obj == null) {
+            return null;
+        }
+
+        if (serializationDepth > MAX_SERIALIZATION_LEVEL) {
+            return new JSONObject();
+        }
+
+        if (SerializerHelper.isPrimitiveType(obj)) {
+            return obj;
+        }
+
+        serializationDepth++;
+
+        if (obj instanceof UUID) {
+            return obj.toString();
+        }
+
+        if (obj instanceof Map<?, ?>) {
+            return serializeMap(namingPolicy, (Map<?, ?>) obj, serializationDepth);
+        }
+
+        if (obj.getClass().isArray()) {
+            return serializeArray(namingPolicy, (Object[]) obj, serializationDepth);
+        }
+
+        if (obj instanceof Collection<?>) {
+            return serializeCollection(namingPolicy, (Collection<?>) obj, serializationDepth);
+        }
+
+        if (obj instanceof Exception) {
+            return serializeException(namingPolicy, (Exception) obj);
+        }
+
+        if (obj instanceof Enum) {
+            return ((Enum<?>) obj).name();
+        }
+
+        return getAllFields(namingPolicy, obj.getClass(), obj, serializationDepth);
+    }
+
     public static boolean isPrimitiveType(Object source) {
         return WRAPPER_TYPE_MAP.containsKey(source.getClass()) || source instanceof String || source instanceof Number;
     }
@@ -120,49 +166,4 @@ public class SerializerHelper {
         return jsonObject;
     }
 
-    public static Object serialize(NamingPolicy namingPolicy, Object obj) throws JSONException {
-        return serialize(namingPolicy, obj, 0);
-    }
-
-    public static Object serialize(NamingPolicy namingPolicy, Object obj, int serializationDepth) throws JSONException {
-        if (obj == null) {
-            return null;
-        }
-
-        if (serializationDepth > MAX_SERIALIZATION_LEVEL) {
-            return new JSONObject();
-        }
-
-        if (SerializerHelper.isPrimitiveType(obj)) {
-            return obj;
-        }
-
-        serializationDepth++;
-
-        if (obj instanceof UUID) {
-            return obj.toString();
-        }
-
-        if (obj instanceof Map<?, ?>) {
-            return serializeMap(namingPolicy, (Map<?, ?>) obj, serializationDepth);
-        }
-
-        if (obj.getClass().isArray()) {
-            return serializeArray(namingPolicy, (Object[]) obj, serializationDepth);
-        }
-
-        if (obj instanceof Collection<?>) {
-            return serializeCollection(namingPolicy, (Collection<?>) obj, serializationDepth);
-        }
-
-        if (obj instanceof Exception) {
-            return serializeException(namingPolicy, (Exception) obj);
-        }
-
-        if (obj instanceof Enum) {
-            return ((Enum<?>) obj).name();
-        }
-
-        return getAllFields(namingPolicy, obj.getClass(), obj, serializationDepth);
-    }
 }
