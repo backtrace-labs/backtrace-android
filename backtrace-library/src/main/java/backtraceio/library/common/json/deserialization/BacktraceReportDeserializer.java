@@ -19,9 +19,9 @@ import backtraceio.library.models.json.BacktraceReport;
 public class BacktraceReportDeserializer implements Deserializable<BacktraceReport> {
 
     private final static FieldNameLoader fieldNameLoader = new FieldNameLoader(BacktraceReport.class);
-    final ExceptionDeserializer exceptionDeserializer;
+    private final ExceptionDeserializer exceptionDeserializer;
 
-    final BacktraceStackFrameDeserializer stackFrameDeserializer;
+    private final BacktraceStackFrameDeserializer stackFrameDeserializer;
 
     static class Fields {
         final static String uuid = "uuid";

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
 
@@ -195,4 +196,5 @@ public class BacktraceDataJsonTest {
         assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
         assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
+
 }

@@ -71,7 +71,6 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                     String fieldName = field.getName();
                     try {
                         if (obj.has(fieldName)) {
-
                             field.set(instance, this.deserialize(obj.get(fieldName), field.getType(), field));
                         } else if (obj.has(namingPolicy.convert(fieldName))) {
                             field.set(instance, this.deserialize(obj.get(namingPolicy.convert(fieldName)), field.getType(), field));
