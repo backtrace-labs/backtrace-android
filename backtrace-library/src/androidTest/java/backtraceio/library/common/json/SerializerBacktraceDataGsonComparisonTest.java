@@ -22,7 +22,7 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
 
 @RunWith(AndroidJUnit4.class)
-public class SerializerGsonComparisonTest {
+public class SerializerBacktraceDataGsonComparisonTest {
 
     @Test
     public void testGsonPerformanceSerializer() throws JSONException {
