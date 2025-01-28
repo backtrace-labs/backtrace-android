@@ -60,8 +60,8 @@ public class SerializerBacktraceDataGsonComparisonTest {
             timeOrgJson += endTimeOrg - startTimeOrg;
         }
 
-        System.out.println("[GSON] Total execution time: " + timeGson + " milliseconds");
-        System.out.println("[Org.json] total execution time: " + timeOrgJson + " milliseconds");
+        System.out.println("[GSON] Total execution time of serializing BacktraceData object: " + timeGson + " milliseconds");
+        System.out.println("[Org.json] total execution time of serializing BacktraceData object: " + timeOrgJson + " milliseconds");
 
         double averageExecutionTimeGson = (double) timeGson / iterations;
         double averageExecutionTimeOrgJson = (double) timeOrgJson / iterations;

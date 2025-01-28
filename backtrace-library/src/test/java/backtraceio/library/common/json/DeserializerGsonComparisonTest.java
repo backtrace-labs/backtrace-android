@@ -70,7 +70,7 @@ public class DeserializerGsonComparisonTest {
         assertNotNull(backtraceResult);
         assertNotNull(gsonResult);
 
-        System.out.println("Total deserialization time [GSON]: " + totalTimeGson + " milliseconds, [Org.json]: " + totalTimeBacktrace + " milliseconds");
+        System.out.println("Total deserialization time [GSON] of object " + clazz.getSimpleName() + ": " + totalTimeGson + " milliseconds, [Org.json]: " + totalTimeBacktrace + " milliseconds");
 
         assertTrue(totalTimeGson * MAX_INCREASE_TIME_RATIO > totalTimeBacktrace);
     }

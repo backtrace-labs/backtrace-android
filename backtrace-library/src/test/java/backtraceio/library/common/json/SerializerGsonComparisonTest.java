@@ -77,7 +77,7 @@ public class SerializerGsonComparisonTest {
         assertNotNull(backtraceResult);
         assertNotNull(gsonResult);
 
-        System.out.println("Total serialization time [GSON]: " + totalTimeGson + " milliseconds, [Org.json]: " + totalTimeBacktrace + " milliseconds");
+        System.out.println("Total serialization time of object type " + object.getClass().getSimpleName() + " [GSON]: " + totalTimeGson + " milliseconds, [Org.json]: " + totalTimeBacktrace + " milliseconds");
 
         assertTrue(totalTimeGson * MAX_INCREASE_TIME_RATIO > totalTimeBacktrace);
     }
