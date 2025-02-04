@@ -1,0 +1,22 @@
+{
+  "summed_events": [
+    {
+      "metric_group": "sample-name",
+      "timestamp": 123,
+      "attributes": {
+        "attr-2": "val-2",
+        "attr-1": "val-1"
+      }
+    },
+    {
+      "metric_group": "test",
+      "timestamp": 1738703564,
+      "attributes": {}
+    }
+  ],
+  "application": "example-app",
+  "appversion": "v1.0-dev",
+  "metadata": {
+    "dropped_events": 0
+  }
+}

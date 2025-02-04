@@ -13,6 +13,7 @@ import backtraceio.library.common.BacktraceSerializeHelper;
 public class SummedEventsPayloadTest {
 
     private final String JSON_FILE = "summedEvents.json";
+    private final String JSON_FILE2 = "summedEvents2.json";
 
     @Test
     public void serializeUniqueEventsPayload() {
@@ -36,6 +37,27 @@ public class SummedEventsPayloadTest {
 
         // THEN
         String expectedJson = TestUtils.readFileAsString(this, JSON_FILE);
+        assertTrue(TestUtils.compareJson(json, expectedJson));
+    }
+
+    @Test
+    public void serializeMultipleUniqueEventsPayload() {
+        // GIVEN
+        final ConcurrentLinkedDeque<SummedEvent> queue = new ConcurrentLinkedDeque<>();
+        queue.add(new SummedEvent("sample-name", 123, new HashMap<String, String>() {{
+            put("attr-1", "val-1");
+            put("attr-2", "val-2");
+        }}));
+
+        queue.add(new SummedEvent("test", 1738703564, null));
+
+        final SummedEventsPayload payload = new SummedEventsPayload(queue, "example-app", "v1.0-dev");
+
+        // WHEN
+        final String json = BacktraceSerializeHelper.toJson(payload);
+
+        // THEN
+        String expectedJson = TestUtils.readFileAsString(this, JSON_FILE2);
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
 }
