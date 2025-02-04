@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.BacktraceApiResult;
@@ -21,6 +22,10 @@ import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
+import backtraceio.library.models.metrics.SummedEvent;
+import backtraceio.library.models.metrics.SummedEventsPayload;
+import backtraceio.library.models.metrics.UniqueEvent;
+import backtraceio.library.models.metrics.UniqueEventsPayload;
 
 @RunWith(Parameterized.class)
 public class SerializerGsonComparisonTest {
@@ -30,6 +35,30 @@ public class SerializerGsonComparisonTest {
 
     public SerializerGsonComparisonTest(Object object) {
         this.object = object;
+    }
+
+    public static SummedEventsPayload getSummedEventsPayload() {
+        final ConcurrentLinkedDeque<SummedEvent> queue = new ConcurrentLinkedDeque<>();
+        queue.add(new SummedEvent("sample-name", 123, new HashMap<String, String>() {{
+            put("attr-1", "val-1");
+            put("attr-2", "val-2");
+        }}));
+
+        queue.add(new SummedEvent("test", 1738703564, null));
+
+        return new SummedEventsPayload(queue, "example-app", "v1.0-dev");
+    }
+
+    public static UniqueEventsPayload getUniqueEventsPayload() {
+        final ConcurrentLinkedDeque<UniqueEvent> queue = new ConcurrentLinkedDeque<>();
+        queue.add(new UniqueEvent("sample-name", 123, new HashMap<String, String>() {{
+            put("attr-1", "val-1");
+            put("attr-2", "val-2");
+        }}));
+
+        queue.add(new UniqueEvent("test", 1738703564, null));
+
+        return new UniqueEventsPayload(queue, "example-app", "v1.0-dev");
     }
 
     @Parameterized.Parameters
@@ -52,7 +81,9 @@ public class SerializerGsonComparisonTest {
                 {new SourceCode(1, "test")},
                 {new ThreadInformation("main", false, new ArrayList<BacktraceStackFrame>() {{
                     add(BacktraceStackFrame.fromStackTraceElement(new StackTraceElement("class", "method", "file", 1)));
-                }})}
+                }})},
+                {getSummedEventsPayload()},
+                {getUniqueEventsPayload()}
         });
     }
 
