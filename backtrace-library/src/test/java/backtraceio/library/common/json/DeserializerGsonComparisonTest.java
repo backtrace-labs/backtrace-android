@@ -36,6 +36,7 @@ public class DeserializerGsonComparisonTest {
         this.jsonPath = jsonPath;
 
     }
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -52,8 +53,10 @@ public class DeserializerGsonComparisonTest {
                 {UniqueEventsPayload.class, "uniqueEvents2.json"},
         });
     }
+
     @Test
     public void testGsonPerformanceDeserializer() {
+        // GIVEN
         final String json = TestUtils.readFileAsString(this, jsonPath);
         final long norm = 1;
         assertNotNull(json);
@@ -78,4 +81,5 @@ public class DeserializerGsonComparisonTest {
 
         assertTrue(totalTimeGson * MAX_INCREASE_TIME_RATIO > totalTimeBacktrace);
     }
+
 }

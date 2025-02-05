@@ -15,10 +15,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import backtraceio.library.common.json.naming.NamingPolicy;
@@ -54,8 +60,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                     field.setAccessible(true); // Make the field accessible (public, private, etc.)
 
                     if (java.lang.reflect.Modifier.isTransient(field.getModifiers()) ||
-                            java.lang.reflect.Modifier.isStatic(field.getModifiers()) ||
-                            java.lang.reflect.Modifier.isFinal(field.getModifiers())) {
+                            java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                         continue;
                     }
 
@@ -76,8 +81,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                         } else if (obj.has(namingPolicy.convert(fieldName))) {
                             field.set(instance, this.deserialize(obj.get(namingPolicy.convert(fieldName)), field.getType(), field));
                         }
-                    }
-                    catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         BacktraceLogger.e(LOG_TAG, String.format("IllegalArgumentException on reflection deserialization of object %s, " +
                                 "field %s, reason %s", obj, fieldName, e.getMessage()), e);
                     }
@@ -124,8 +128,13 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                 if (constructor.getParameters().length == 0) {
                     return constructor;
                 }
+            } else {
+                if (constructor.getParameterTypes().length == 0) {
+                    return constructor;
+                }
             }
         }
+
         return null;
     }
 
@@ -187,7 +196,7 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
             return null;
         }
 
-        final Collection<Object> result = new ArrayList<>();
+        final Collection<Object> result = newCollection(clazz);
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final Class<?> objType;
@@ -208,7 +217,31 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
             }
         }
 
-        return result;
+        return castCollection(result, clazz);
+    }
+
+    private Collection<Object> newCollection(Class<?> clazz) {
+        if (SortedSet.class.isAssignableFrom(clazz)) {
+            return new TreeSet<>();
+        } else if (Set.class.isAssignableFrom(clazz)) {
+            return new LinkedHashSet<>();
+        } else if (Queue.class.isAssignableFrom(clazz)) {
+            return new ArrayDeque<>();
+        }
+        return new ArrayList<>();
+    }
+
+    private Collection<Object> castCollection(Collection<Object> collection, Class<?> clazz) {
+        if (Collection.class.isAssignableFrom(clazz)) {
+            Object instance = createNewInstance(clazz);
+            if (instance != null && instance instanceof Collection) {
+                Collection<Object> collectionInstance = (Collection<Object>) instance;
+                collectionInstance.addAll(collection);
+                return collectionInstance;
+            }
+        }
+
+        return collection;
     }
 
     private Map<?, ?> deserializeMap(JSONObject map, Class<?> clazz, Field field) throws JSONException {
