@@ -36,15 +36,16 @@ public class BacktraceResultDeserializerTest {
     @Test
     public void deserializeCoronerJsonErrorResponse() {
         // GIVEN
-        String json = TestUtils.readFileAsString(this, "backtraceResult.error.json");
+        String json = TestUtils.readFileAsString(this, "backtraceApiResult.error.json");
 
         // WHEN
-        BacktraceResult result = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceResult.class);
+        BacktraceApiResult apiResult = BacktraceOrgJsonDeserializer.deserialize(json, BacktraceApiResult.class);
+        BacktraceResult result = new BacktraceResult(apiResult);
         // THEN
         assertNotNull(result);
         assertNull(result.getBacktraceReport());
         assertNull(result.message);
-        assertNull(result.status);
+        assertEquals(BacktraceResultStatus.ServerError, result.status);
         assertNull(result.rxId);
     }
 
