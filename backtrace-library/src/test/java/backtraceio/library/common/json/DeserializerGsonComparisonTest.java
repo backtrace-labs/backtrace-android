@@ -21,6 +21,8 @@ import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
+import backtraceio.library.models.metrics.SummedEventsPayload;
+import backtraceio.library.models.metrics.UniqueEventsPayload;
 
 @RunWith(Parameterized.class)
 public class DeserializerGsonComparisonTest {
@@ -45,7 +47,9 @@ public class DeserializerGsonComparisonTest {
                 {BacktraceResult.class, "backtraceResult.json"},
                 {BacktraceStackFrame.class, "backtraceStackFrame.json"},
                 {SourceCode.class, "sourceCode.json"},
-                {ThreadInformation.class, "threadInformation.json"}
+                {ThreadInformation.class, "threadInformation.json"},
+                {SummedEventsPayload.class, "summedEvents2.json"},
+                {UniqueEventsPayload.class, "uniqueEvents2.json"},
         });
     }
     @Test

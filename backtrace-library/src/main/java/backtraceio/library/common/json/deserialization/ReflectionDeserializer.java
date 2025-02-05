@@ -54,7 +54,8 @@ public final class ReflectionDeserializer implements Deserializable<Object> {
                     field.setAccessible(true); // Make the field accessible (public, private, etc.)
 
                     if (java.lang.reflect.Modifier.isTransient(field.getModifiers()) ||
-                            java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                            java.lang.reflect.Modifier.isStatic(field.getModifiers()) ||
+                            java.lang.reflect.Modifier.isFinal(field.getModifiers())) {
                         continue;
                     }
 
