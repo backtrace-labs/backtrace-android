@@ -1,6 +1,7 @@
 package backtraceio.backtraceio;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.system.ErrnoException;
 import android.system.Os;
@@ -34,6 +35,9 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String PREFS_NAME = "MyPrefs";
+    private static final String KEY_NAME = "myKey";
+
     private BacktraceClient backtraceClient;
     private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
@@ -45,6 +49,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void setOnServerResponseEventListener(OnServerResponseEventListener e) {
         this.listener = e;
+    }
+
+    private String readFromSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(KEY_NAME, "Default Value");
+    }
+
+    private void saveToSharedPreferences(String value) {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_NAME, value);
+        editor.apply(); // or editor.commit();
+        editor.commit();
+    }
+
+    public void sharedPreferencesExample() {
+        String val = readFromSharedPreferences();
+        String val2 = val + "1";
+        saveToSharedPreferences(val2);
+        String val3 = readFromSharedPreferences();
+        System.out.println(val3);
     }
 
     @Override
@@ -74,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
+        sharedPreferencesExample();
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
