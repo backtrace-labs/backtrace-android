@@ -47,9 +47,9 @@ public class SettingAttributesTest {
         context = InstrumentationRegistry.getInstrumentation().getContext();
         final String url = "https://backtrace.io/";
         backtraceCredentials = new BacktraceCredentials(url);
-        clientAttributes = new HashMap<>();
-
-        clientAttributes.put(customClientAttributeKey, customClientAttributeValue);
+        clientAttributes = new HashMap<String, Object>() {{
+            put(customClientAttributeKey, customClientAttributeValue);
+        }};
     }
 
     @Test
