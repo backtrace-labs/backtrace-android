@@ -1,6 +1,8 @@
 package backtraceio.backtraceio;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.system.ErrnoException;
 import android.system.Os;
@@ -29,19 +31,21 @@ import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.events.OnServerResponseEventListener;
+import backtraceio.library.models.AnrType;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
-    private BacktraceClient backtraceClient;
-    private OnServerResponseEventListener listener;
-    private final int anrTimeout = 3000;
-
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
     }
+
+    private final int anrTimeout = 3000;
+    private BacktraceClient backtraceClient;
+    private OnServerResponseEventListener listener;
+    private List<String> equippedItems;
 
     public void setOnServerResponseEventListener(OnServerResponseEventListener e) {
         this.listener = e;
@@ -96,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
 
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
+        backtraceClient.sendInnerExceptions(true);
+        backtraceClient.sendSuppressedExceptions(true);
 
         BacktraceExceptionHandler.enable(backtraceClient);
 
@@ -105,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         database.setupNativeIntegration(backtraceClient, credentials, true);
 
         // Enable ANR detection
-        backtraceClient.enableAnr(anrTimeout);
+        backtraceClient.enableAnr(AnrType.Event);
         return backtraceClient;
     }
 
@@ -118,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
     public native boolean addNativeBreadcrumbUserError();
 
     public native void cleanupNativeBreadcrumbHandler();
-
-    private List<String> equippedItems;
 
     public List<String> getWarriorArmor() {
         return new ArrayList<String>(Arrays.asList("Tough Boots", "Strong Sword", "Sturdy Shield", "Magic Wand"));
@@ -163,7 +167,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void unhandledException(View view) throws IOException {
-        getSaveData();
+        try {
+            getSaveData();
+        } catch (Exception e) {
+            IOException ioe = new IOException("Inner exception example", e);
+        }
     }
 
     public void nativeCrash(View view) {
@@ -171,7 +179,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void anr(View view) throws InterruptedException {
-        Thread.sleep(anrTimeout + 2000);
+        Thread.sleep(anrTimeout + 10000);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ((ActivityManager) this.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE)).appNotResponding("not responding");
+        }
     }
 
     public void enableBreadcrumbs(View view) throws Exception {
@@ -214,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
             outputStreamWriter.write(fileData);
             outputStreamWriter.close();
         } catch (IOException e) {
-            Log.e("BacktraceAndroid", "File write failed due to: " + e.toString());
+            Log.e("BacktraceAndroid", "File write failed due to: " + e);
         }
     }
 

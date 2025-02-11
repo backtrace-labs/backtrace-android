@@ -1,5 +1,6 @@
 package backtraceio.library;
 
+import android.app.ActivityManager;
 import android.content.Context;
 
 import java.util.HashMap;
@@ -7,11 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Database;
+import backtraceio.library.models.AnrType;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.watchdog.BacktraceANRWatchdog;
+import backtraceio.library.watchdog.BacktraceANRProcessor;
+import backtraceio.library.watchdog.BacktraceANRProcessorEventProcessor;
+import backtraceio.library.watchdog.BacktraceANRProcessorWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
 /**
@@ -22,7 +27,7 @@ public class BacktraceClient extends BacktraceBase {
     /**
      * Backtrace ANR watchdog instance
      */
-    private BacktraceANRWatchdog anrWatchdog;
+    private BacktraceANRProcessor anrProcessor;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -252,7 +257,16 @@ public class BacktraceClient extends BacktraceBase {
      * Start monitoring if the main thread has been blocked
      */
     public void enableAnr() {
-        this.anrWatchdog = new BacktraceANRWatchdog(this);
+        this.anrProcessor = new BacktraceANRProcessorWatchdog(this);
+    }
+
+
+    public void enableAnr(AnrType type) {
+        if (type == AnrType.Event) {
+            this.anrProcessor = new BacktraceANRProcessorEventProcessor((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE), this, ApplicationMetadataCache.getInstance(context).getPackageName());
+            return;
+        }
+        this.enableAnr();
     }
 
     /**
@@ -292,16 +306,17 @@ public class BacktraceClient extends BacktraceBase {
      * @param debug                           enable debug mode - errors will not be sent if the debugger is connected
      */
     public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
-        this.anrWatchdog = new BacktraceANRWatchdog(this, timeout, debug);
-        this.anrWatchdog.setOnApplicationNotRespondingEvent(onApplicationNotRespondingEvent);
+        BacktraceANRProcessorWatchdog watchdog = new BacktraceANRProcessorWatchdog(this, timeout, debug);
+        watchdog.setOnApplicationNotRespondingEvent(onApplicationNotRespondingEvent);
+        this.anrProcessor = watchdog;
     }
 
     /**
      * Stop monitoring if the main thread has been blocked
      */
     public void disableAnr() {
-        if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
-            this.anrWatchdog.stopMonitoringAnr();
+        if (this.anrProcessor != null) {
+            this.anrProcessor.stopMonitoringAnr();
         }
     }
 }

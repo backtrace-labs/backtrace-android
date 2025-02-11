@@ -24,8 +24,8 @@ import backtraceio.library.logger.LogLevel;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceAnrTest {
-    private Context context;
     private final BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
+    private Context context;
     private BacktraceClient backtraceClient;
 
     @Before
@@ -40,7 +40,7 @@ public class BacktraceAnrTest {
     public void checkIfANRIsDetectedCorrectly() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 500);
+        BacktraceANRProcessorWatchdog watchdog = new BacktraceANRProcessorWatchdog(this.backtraceClient, 500);
         watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
             @Override
             public void onEvent(BacktraceWatchdogTimeoutException exception) {
@@ -96,7 +96,7 @@ public class BacktraceAnrTest {
         // GIVEN
         final int numberOfIterations = 5;
         final Waiter waiter = new Waiter();
-        BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 5000);
+        BacktraceANRProcessorWatchdog watchdog = new BacktraceANRProcessorWatchdog(this.backtraceClient, 5000);
         watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
             @Override
             public void onEvent(BacktraceWatchdogTimeoutException exception) {
