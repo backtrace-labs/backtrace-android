@@ -25,6 +25,7 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.anr.BacktraceAppExitInfoSender;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -125,8 +126,10 @@ public class MainActivity extends AppCompatActivity {
 
         BacktraceExceptionHandler.enable(backtraceClient);
 
-        backtraceClient.metrics.enable();
-
+//        backtraceClient.metrics.enable();
+//        backtraceClient.enableAnr(AnrType.Event);
+        BacktraceAppExitInfoSender backtraceAppExitInfoSender = new BacktraceAppExitInfoSender(backtraceClient, context);
+        backtraceAppExitInfoSender.send();
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
 

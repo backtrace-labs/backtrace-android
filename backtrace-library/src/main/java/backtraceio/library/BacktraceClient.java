@@ -1,12 +1,16 @@
 package backtraceio.library;
 
+import android.app.ActivityManager;
+import android.app.ApplicationExitInfo;
 import android.content.Context;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.anr.AnrType;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -246,6 +250,21 @@ public class BacktraceClient extends BacktraceBase {
     public void send(BacktraceReport report, OnServerResponseEventListener
             serverResponseEventListener) {
         super.send(report, serverResponseEventListener);
+    }
+
+    public void enableAnr(AnrType type) {
+        if (type == AnrType.Event) {
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            String packageName = ApplicationMetadataCache.getInstance(context).getPackageName();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                List<ApplicationExitInfo> applicationExitInfoList = activityManager.getHistoricalProcessExitReasons(packageName, 0, 0);
+
+
+            }
+        } else if (type == AnrType.Threshold){
+            this.enableAnr();
+        }
+        // TODO: to verify what's here
     }
 
     /**
