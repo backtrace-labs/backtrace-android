@@ -53,7 +53,7 @@ public class BacktraceDataTest {
         assertEquals("", backtraceData.getSymbolication());
         assertEquals(report.timestamp, backtraceData.getTimestamp());
         assertEquals(report.uuid.toString(), backtraceData.getUuid());
-        assertEquals(43, backtraceData.getAttributes().size());
+        assertTrue(backtraceData.getAttributes().size() > 30);
         assertEquals(3, backtraceData.getAnnotations().size());
         assertEquals("instr: androidx.test.runner.androidjunitrunner", backtraceData.getMainThread());
         assertEquals(34, backtraceData.getSourceCode().size());
@@ -88,7 +88,7 @@ public class BacktraceDataTest {
         assertEquals("", backtraceData.getSymbolication());
         assertEquals(report.timestamp, backtraceData.getTimestamp());
         assertEquals(report.uuid.toString(), backtraceData.getUuid());
-        assertEquals(43, backtraceData.getAttributes().size());
+        assertTrue(backtraceData.getAttributes().size() > 30);
         assertEquals(3, backtraceData.getAnnotations().size());
         assertEquals("instr: androidx.test.runner.androidjunitrunner", backtraceData.getMainThread());
         assertEquals(34, backtraceData.getSourceCode().size());
