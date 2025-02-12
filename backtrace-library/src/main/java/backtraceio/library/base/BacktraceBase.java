@@ -230,7 +230,7 @@ public class BacktraceBase implements Client {
         this.attributes = CollectionUtils.copyMap(attributes);
         this.attachments = CollectionUtils.copyList(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
-        this.setBacktraceApi(new BacktraceApi(credentials));
+        this.setBacktraceApi(new BacktraceApi(this.context, credentials));
         this.database.start();
         this.metrics = new BacktraceMetrics(context, this.attributes, backtraceApi, credentials);
     }

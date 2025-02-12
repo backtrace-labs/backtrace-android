@@ -119,7 +119,7 @@ public class BacktraceClientSendTest {
                 fail(e.getMessage());
             }
 
-            return new BacktraceResult(data.getReport(), data.report.message,
+            return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);
