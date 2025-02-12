@@ -53,9 +53,7 @@ public class BacktraceDatabase implements Database {
     private BacktraceDatabaseSettings databaseSettings;
     private boolean _enable = false;
     private Breadcrumbs breadcrumbs;
-
     private CrashHandlerConfiguration crashHandlerConfiguration;
-
     private boolean _enabledNativeIntegration = false;
     private NativeCommunication nativeCommunication = new BacktraceCrashHandlerWrapper();
 
@@ -113,8 +111,7 @@ public class BacktraceDatabase implements Database {
 
         this._applicationContext = context;
         this.databaseSettings = databaseSettings;
-        this.backtraceDatabaseContext = new BacktraceDatabaseContext(this._applicationContext,
-                databaseSettings);
+        this.backtraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
         this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
                 this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
                 .getMaxRecordCount());
@@ -318,7 +315,7 @@ public class BacktraceDatabase implements Database {
                 BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
                 while (record != null) {
                     final CountDownLatch threadWaiter = new CountDownLatch(1);
-                    BacktraceData backtraceData = record.getBacktraceData(_applicationContext);
+                    BacktraceData backtraceData = record.getBacktraceData();
                     if (backtraceData == null || backtraceData.getReport() == null) {
                         BacktraceLogger.d(LOG_TAG, "Timer - backtrace data or report is null - " +
                                 "deleting record");
@@ -368,7 +365,7 @@ public class BacktraceDatabase implements Database {
 
         BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
         while (record != null) {
-            BacktraceData backtraceData = record.getBacktraceData(this._applicationContext);
+            BacktraceData backtraceData = record.getBacktraceData();
             this.delete(record);
             if (backtraceData != null) {
                 BacktraceApi.send(backtraceData, null);

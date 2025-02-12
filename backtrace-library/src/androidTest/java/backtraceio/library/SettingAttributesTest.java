@@ -29,6 +29,7 @@ import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceAttributes;
+import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
 
@@ -46,9 +47,9 @@ public class SettingAttributesTest {
         context = InstrumentationRegistry.getInstrumentation().getContext();
         final String url = "https://backtrace.io/";
         backtraceCredentials = new BacktraceCredentials(url);
-        clientAttributes = new HashMap<>();
-
-        clientAttributes.put(customClientAttributeKey, customClientAttributeValue);
+        clientAttributes = new HashMap<String, Object>() {{
+            put(customClientAttributeKey, customClientAttributeValue);
+        }};
     }
 
     @Test
@@ -176,10 +177,13 @@ public class SettingAttributesTest {
                     @Override
                     public BacktraceResult onRequest(BacktraceData data) {
                         // THEN
-                        waiter.assertTrue(data.getReport().attributes.containsKey(customClientAttributeKey));
-                        waiter.assertEquals(customClientAttributeValue, data.getReport().attributes.get(customClientAttributeKey));
+
+                        final BacktraceReport dataReport = data.getReport();
+                        waiter.assertTrue(dataReport.attributes.containsKey(customClientAttributeKey));
+                        waiter.assertEquals(customClientAttributeValue, dataReport.attributes.get(customClientAttributeKey));
                         waiter.assertEquals(exceptionMessage, data.getReport().exception.getMessage());
-                        waiter.assertEquals(data.getReport().attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+                        waiter.assertEquals(dataReport.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+
                         waiter.resume();
                         return new BacktraceResult(data.getReport(), "", BacktraceResultStatus.Ok);
                     }

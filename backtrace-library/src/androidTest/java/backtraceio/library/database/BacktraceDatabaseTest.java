@@ -100,50 +100,50 @@ public class BacktraceDatabaseTest {
         assertEquals(0, database.count());
 
         // GIVEN
-        BacktraceReport report = new BacktraceReport(testMessage);
+        final BacktraceReport report = new BacktraceReport(testMessage);
 
         // WHEN
         database.add(report, null);
 
         // THEN
-        assertEquals(report, database.get().iterator().next().getBacktraceData(context).getReport());
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData(context).getReport().message);
+        assertEquals(report, database.get().iterator().next().getBacktraceData().getReport());
+        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
         assertEquals(1, database.count());
     }
 
     @Test
     public void addWithAttributes() {
         // GIVEN
-        String key = "Example key";
-        String value = "Example value";
-        BacktraceReport report = new BacktraceReport(testMessage);
-        Map<String, Object> attributes = new HashMap<>();
+        final String key = "Example key";
+        final String value = "Example value";
+        final BacktraceReport report = new BacktraceReport(testMessage);
+        final Map<String, Object> attributes = new HashMap<>();
         attributes.put(key, value);
 
         // WHEN
-        BacktraceDatabaseRecord record = database.add(report, attributes);
-        BacktraceData dataFromDatabase = record.getBacktraceData(context);
+        final BacktraceDatabaseRecord record = database.add(report, attributes);
+        final BacktraceData dataFromDatabase = record.getBacktraceData();
 
         // THEN
-        assertEquals(value, dataFromDatabase.attributes.get(key));
+        assertEquals(value, dataFromDatabase.getAttributes().get(key));
     }
 
     @Test
     public void deleteSingleRecord() {
-        BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceReport report2 = new BacktraceReport(new Exception("Example exception"));
+        final BacktraceReport report = new BacktraceReport(testMessage);
+        final BacktraceReport report2 = new BacktraceReport(new Exception("Example exception"));
 
-        BacktraceDatabaseRecord record = database.add(report, null);
-        BacktraceDatabaseRecord record2 = database.add(report2, null);
+        final BacktraceDatabaseRecord record = database.add(report, null);
+        final BacktraceDatabaseRecord record2 = database.add(report2, null);
         assertEquals(2, database.count());
 
         database.delete(record);
         assertEquals(1, database.count());
 
-        BacktraceDatabaseRecord recordFromDatabase = database.get().iterator().next();
+        final BacktraceDatabaseRecord recordFromDatabase = database.get().iterator().next();
         assertEquals(record2, recordFromDatabase);
-        assertEquals(report2, recordFromDatabase.getBacktraceData(context).getReport());
-        assertEquals(report2.exception.getMessage(), recordFromDatabase.getBacktraceData(context).getReport().exception.getMessage());
+        assertEquals(report2, recordFromDatabase.getBacktraceData().getReport());
+        assertEquals(report2.exception.getMessage(), recordFromDatabase.getBacktraceData().getReport().exception.getMessage());
     }
 
 
@@ -235,7 +235,7 @@ public class BacktraceDatabaseTest {
 
         // THEN
         assertEquals(1, database.count());
-        assertEquals(report2.message, database.get().iterator().next().getBacktraceData(context).getReport().message);
+        assertEquals(report2.message, database.get().iterator().next().getBacktraceData().getReport().message);
     }
 
     @Test
