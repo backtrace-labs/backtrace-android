@@ -3,7 +3,10 @@ package backtraceio.library.anr;
 import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,11 +25,31 @@ public class BacktraceAppExitInfoSender {
 
     private final AnrAppExitInfoState anrAppExitInfoState;
 
+
+
     public BacktraceAppExitInfoSender(BacktraceClient client, Context context) {
         this.backtraceClient = client;
         this.packageName = ApplicationMetadataCache.getInstance(context).getPackageName();
         this.activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         this.anrAppExitInfoState = new AnrAppExitInfoState(context);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private boolean isSupportedTypeOfApplicationExit(int reason) {
+        final List<Integer> supportedTypes = Collections.singletonList(ApplicationExitInfo.REASON_ANR);
+        return supportedTypes.contains(reason);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private boolean shouldProcessAppExitInfo(ApplicationExitInfo appExitInfo) {
+        long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
+        long anrTimestamp = appExitInfo.getTimestamp();
+
+        if (lastAnrTimestamp >= anrTimestamp) {
+            return false;
+        }
+
+        return isSupportedTypeOfApplicationExit(appExitInfo.getReason());
     }
 
     public void send() {
@@ -39,16 +62,15 @@ public class BacktraceAppExitInfoSender {
 
         Collections.reverse(applicationExitInfoList);
         for (ApplicationExitInfo appExitInfo : applicationExitInfoList) {
-            long anrTimestamp = appExitInfo.getTimestamp();
-            long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
 
-            if (lastAnrTimestamp >= anrTimestamp) {
+            if (!this.shouldProcessAppExitInfo(appExitInfo)) {
                 continue;
             }
+
             BacktraceANRApplicationExitException exception = new BacktraceANRApplicationExitException(appExitInfo);
             backtraceClient.send(exception, backtraceResult -> {
                 if (backtraceResult.status == BacktraceResultStatus.Ok) {
-                    this.anrAppExitInfoState.saveTimestamp(anrTimestamp);
+                    this.anrAppExitInfoState.saveTimestamp(appExitInfo.getTimestamp());
                 }
             });
         }
