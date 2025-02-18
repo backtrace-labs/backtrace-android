@@ -25,7 +25,7 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.anr.BacktraceAppExitInfoSender;
+import backtraceio.library.anr.BacktraceAppExitInfoSenderHandler;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -101,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
         sharedPreferencesExample();
-        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
+        BacktraceCredentials credentials = new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
+                "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
+
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        backtraceClient.metrics.enable();
 //        backtraceClient.enableAnr(AnrType.Event);
-        BacktraceAppExitInfoSender backtraceAppExitInfoSender = new BacktraceAppExitInfoSender(backtraceClient, context);
+        BacktraceAppExitInfoSenderHandler backtraceAppExitInfoSender = new BacktraceAppExitInfoSenderHandler(backtraceClient, context);
         backtraceAppExitInfoSender.send();
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);

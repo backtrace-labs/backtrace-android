@@ -40,7 +40,7 @@ public class BacktraceAnrTest {
     public void checkIfANRIsDetectedCorrectly() {
         // GIVEN
         final Waiter waiter = new Waiter();
-        BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 500);
+        BacktraceANRHandlerWatchdog watchdog = new BacktraceANRHandlerWatchdog(this.backtraceClient, 500);
         watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
             @Override
             public void onEvent(BacktraceWatchdogTimeoutException exception) {
@@ -96,7 +96,7 @@ public class BacktraceAnrTest {
         // GIVEN
         final int numberOfIterations = 5;
         final Waiter waiter = new Waiter();
-        BacktraceANRWatchdog watchdog = new BacktraceANRWatchdog(this.backtraceClient, 5000);
+        BacktraceANRHandlerWatchdog watchdog = new BacktraceANRHandlerWatchdog(this.backtraceClient, 5000);
         watchdog.setOnApplicationNotRespondingEvent(new OnApplicationNotRespondingEvent() {
             @Override
             public void onEvent(BacktraceWatchdogTimeoutException exception) {

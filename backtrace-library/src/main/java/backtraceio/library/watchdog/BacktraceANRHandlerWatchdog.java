@@ -7,6 +7,7 @@ import android.os.Looper;
 import java.util.Calendar;
 
 import backtraceio.library.BacktraceClient;
+import backtraceio.library.anr.BacktraceANRHandler;
 import backtraceio.library.logger.BacktraceLogger;
 
 
@@ -14,9 +15,9 @@ import backtraceio.library.logger.BacktraceLogger;
  * This is the class that is responsible for monitoring the
  * user interface thread and sending an error if it is blocked
  */
-public class BacktraceANRWatchdog extends Thread {
+public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRHandler {
 
-    private final static transient String LOG_TAG = BacktraceANRWatchdog.class.getSimpleName();
+    private final static transient String LOG_TAG = BacktraceANRHandlerWatchdog.class.getSimpleName();
 
     /**
      * Default timeout value in milliseconds
@@ -58,7 +59,7 @@ public class BacktraceANRWatchdog extends Thread {
      *
      * @param client current Backtrace client instance which will be used to send information about exception
      */
-    public BacktraceANRWatchdog(BacktraceClient client) {
+    public BacktraceANRHandlerWatchdog(BacktraceClient client) {
         this(client, DEFAULT_ANR_TIMEOUT);
     }
 
@@ -68,7 +69,7 @@ public class BacktraceANRWatchdog extends Thread {
      * @param client  current Backtrace client instance which will be used to send information about exception
      * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
      */
-    public BacktraceANRWatchdog(BacktraceClient client, int timeout) {
+    public BacktraceANRHandlerWatchdog(BacktraceClient client, int timeout) {
         this(client, timeout, false);
     }
 
@@ -79,7 +80,7 @@ public class BacktraceANRWatchdog extends Thread {
      * @param timeout maximum time in milliseconds after which should check if the main thread is not hanged
      * @param debug   enable debug mode - errors will not be sent if the debugger is connected
      */
-    public BacktraceANRWatchdog(BacktraceClient client, int timeout, boolean debug) {
+    public BacktraceANRHandlerWatchdog(BacktraceClient client, int timeout, boolean debug) {
         BacktraceLogger.d(LOG_TAG, "Start monitoring ANR");
         this.backtraceClient = client;
         this.timeout = timeout;
@@ -138,6 +139,10 @@ public class BacktraceANRWatchdog extends Thread {
     }
 
     public void stopMonitoringAnr() {
+        if (this.isInterrupted()) {
+            BacktraceLogger.d(LOG_TAG, "ANR thread is already interrupted"); // todo: improve lang
+            return;
+        }
         BacktraceLogger.d(LOG_TAG, "Stop monitoring ANR");
         shouldStop = true;
     }

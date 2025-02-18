@@ -14,9 +14,10 @@ import java.util.List;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
-public class BacktraceAppExitInfoSender {
-    private final static String LOG_TAG = BacktraceAppExitInfoSender.class.getSimpleName();
+public class BacktraceAppExitInfoSenderHandler extends Thread implements BacktraceANRHandler {
+    private final static String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
 
     private final BacktraceClient backtraceClient;
     private final String packageName;
@@ -25,31 +26,17 @@ public class BacktraceAppExitInfoSender {
 
     private final AnrAppExitInfoState anrAppExitInfoState;
 
-
-
-    public BacktraceAppExitInfoSender(BacktraceClient client, Context context) {
+    public BacktraceAppExitInfoSenderHandler(BacktraceClient client, Context context) {
         this.backtraceClient = client;
         this.packageName = ApplicationMetadataCache.getInstance(context).getPackageName();
         this.activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         this.anrAppExitInfoState = new AnrAppExitInfoState(context);
+        this.start();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
-    private boolean isSupportedTypeOfApplicationExit(int reason) {
-        final List<Integer> supportedTypes = Collections.singletonList(ApplicationExitInfo.REASON_ANR);
-        return supportedTypes.contains(reason);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.R)
-    private boolean shouldProcessAppExitInfo(ApplicationExitInfo appExitInfo) {
-        long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
-        long anrTimestamp = appExitInfo.getTimestamp();
-
-        if (lastAnrTimestamp >= anrTimestamp) {
-            return false;
-        }
-
-        return isSupportedTypeOfApplicationExit(appExitInfo.getReason());
+    @Override
+    public void run() {
+        send();
     }
 
     public void send() {
@@ -70,9 +57,36 @@ public class BacktraceAppExitInfoSender {
             BacktraceANRApplicationExitException exception = new BacktraceANRApplicationExitException(appExitInfo);
             backtraceClient.send(exception, backtraceResult -> {
                 if (backtraceResult.status == BacktraceResultStatus.Ok) {
+                    // TODO: race condition
                     this.anrAppExitInfoState.saveTimestamp(appExitInfo.getTimestamp());
                 }
             });
         }
     }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private boolean isSupportedTypeOfApplicationExit(int reason) {
+        final List<Integer> supportedTypes = Collections.singletonList(ApplicationExitInfo.REASON_ANR);
+        return supportedTypes.contains(reason);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private boolean shouldProcessAppExitInfo(ApplicationExitInfo appExitInfo) {
+        long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
+        long anrTimestamp = appExitInfo.getTimestamp();
+
+        if (lastAnrTimestamp >= anrTimestamp) {
+            return false;
+        }
+
+        return isSupportedTypeOfApplicationExit(appExitInfo.getReason());
+    }
+
+    @Override
+    public void setOnApplicationNotRespondingEvent(
+            OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {}
+
+    @Override
+    public void stopMonitoringAnr() {}
 }
