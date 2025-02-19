@@ -1,7 +1,5 @@
 package backtraceio.library;
 
-import android.app.ActivityManager;
-import android.app.ApplicationExitInfo;
 import android.content.Context;
 
 import java.util.HashMap;
@@ -10,9 +8,9 @@ import java.util.Map;
 
 import backtraceio.library.anr.AnrType;
 import backtraceio.library.anr.BacktraceANRHandler;
+import backtraceio.library.anr.BacktraceANRSettings;
 import backtraceio.library.anr.BacktraceAppExitInfoSenderHandler;
 import backtraceio.library.base.BacktraceBase;
-import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
@@ -28,7 +26,7 @@ public class BacktraceClient extends BacktraceBase {
     /**
      * Backtrace ANR watchdog instance
      */
-    private BacktraceANRHandler anrWatchdog;
+    private BacktraceANRHandler anrHandler;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -254,26 +252,14 @@ public class BacktraceClient extends BacktraceBase {
         super.send(report, serverResponseEventListener);
     }
 
-    public void enableAnr(AnrType type) {
-        if (type == AnrType.Event) {
-            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            String packageName = ApplicationMetadataCache.getInstance(context).getPackageName();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                List<ApplicationExitInfo> applicationExitInfoList = activityManager.getHistoricalProcessExitReasons(packageName, 0, 0);
-
-
-            }
-        } else if (type == AnrType.Threshold){
-            this.enableAnr();
-        }
-        // TODO: to verify what's here
-    }
-
     /**
      * Start monitoring if the main thread has been blocked
      */
     public void enableAnr() {
-        this.anrWatchdog = new BacktraceANRHandlerWatchdog(this);
+        this.enableAnr(AnrType.Threshold);
+    }
+    public void enableAnr(AnrType anrType) {
+        this.enableAnr(anrType, new BacktraceANRSettings());
     }
 
     /**
@@ -313,25 +299,41 @@ public class BacktraceClient extends BacktraceBase {
      * @param debug                           enable debug mode - errors will not be sent if the debugger is connected
      */
     public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
-        this.anrWatchdog = new BacktraceANRHandlerWatchdog(this, timeout, debug);
-        this.anrWatchdog.setOnApplicationNotRespondingEvent(onApplicationNotRespondingEvent);
+        enableAnr(new BacktraceANRSettings(timeout, onApplicationNotRespondingEvent, debug));
+    }
+
+    public void enableAnr(BacktraceANRSettings anrSettings) {
+        enableAnr(AnrType.Threshold, anrSettings);
+    }
+
+    public void enableAnr(AnrType anrType, BacktraceANRSettings anrSettings) {
+        this.anrHandler = initAnrHandler(anrType, anrSettings);
     }
 
     /**
      * Stop monitoring if the main thread has been blocked
      */
     public void disableAnr() {
-        if (this.anrWatchdog != null) {
-            this.anrWatchdog.stopMonitoringAnr();
+        if (this.anrHandler != null) {
+            this.anrHandler.stopMonitoringAnr();
         }
     }
 
-    public BacktraceANRHandler createBacktraceAnrHandler(AnrType type) {
-        if (type == AnrType.Event) {
-            return new BacktraceAppExitInfoSenderHandler(this, context);
-        } else if (type == AnrType.Threshold){
-            this.enableAnr();
+    public BacktraceANRHandler initAnrHandler(AnrType anrType, BacktraceANRSettings backtraceANRSettings) {
+        BacktraceANRHandler handler = createBacktraceAnrHandler(anrType, backtraceANRSettings);
+        if (backtraceANRSettings.onApplicationNotRespondingEvent != null) {
+            handler.setOnApplicationNotRespondingEvent(backtraceANRSettings.onApplicationNotRespondingEvent);
         }
-        return null;
+        return handler;
     }
+
+    public BacktraceANRHandler createBacktraceAnrHandler(AnrType anrType, BacktraceANRSettings settings) {
+        if (anrType == AnrType.Event) {
+            return new BacktraceAppExitInfoSenderHandler(this, context);
+        } else if (anrType == AnrType.Threshold){
+            return new BacktraceANRHandlerWatchdog(this, settings.timeout, settings.debug);
+        }
+        throw new IllegalArgumentException("Unsupported type of ANR: " + anrType.name());
+    }
+
 }
