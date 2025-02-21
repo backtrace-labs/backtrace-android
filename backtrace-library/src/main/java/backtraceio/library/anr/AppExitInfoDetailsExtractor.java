@@ -10,45 +10,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
 
 
 public class AppExitInfoDetailsExtractor {
+    public static HashMap<String, Object> getANRAttributes(ApplicationExitInfo appExitInfo) {
+        if (appExitInfo == null || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
+            return new HashMap<>();
+        }
+
+        final HashMap<String, Object> attributes = new HashMap<>();
+        attributes.put("description", appExitInfo.getDescription());
+        attributes.put("timestamp", getANRTimestamp(appExitInfo));
+        attributes.put("stackTrace", AppExitInfoDetailsExtractor.getStackTraceInfo(appExitInfo));
+        attributes.put("reason-code", appExitInfo.getReason());
+        attributes.put("reason", reasonCodeToDescription(appExitInfo.getReason()));
+        attributes.put("PID", appExitInfo.getPid());
+        attributes.put("Importance", appExitInfo.getImportance());
+        attributes.put("PSS", appExitInfo.getPss());
+        attributes.put("RSS", appExitInfo.getRss());
+        return attributes;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.R)
-    public static String getANRMessage(ApplicationExitInfo exitInfo) {
-        if (exitInfo == null) {
-            return "No ApplicationExitInfo available.";
-        }
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
-            // TODO: log
-            return null;
-        }
-
+    private static String getANRTimestamp(ApplicationExitInfo appExitInfo) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String timestamp = dateFormat.format(new Date(exitInfo.getTimestamp()));
-        String stackTrace = AppExitInfoDetailsExtractor.getStackTraceInfo(exitInfo);
-        return String.format(Locale.getDefault(),
-                "App exit info: %s\n" +
-                        "Timestamp: %s\n" +
-                        "Reason: (code %s) %s\n" +
-                        "PID: %d\n" +
-                        "Importance: %d\n" +
-                        "PSS (KB): %d\n" +
-                        "RSS (KB): %d\n" +
-                        "Stack trace: %s \n" +
-                        "%s",
-                exitInfo.getDescription(),
-                timestamp,
-                exitInfo.getReason(),
-                AppExitInfoDetailsExtractor.reasonCodeToDescription(exitInfo.getReason()),
-                exitInfo.getPid(),
-                exitInfo.getImportance(),
-                exitInfo.getPss(),
-                exitInfo.getRss(),
-                stackTrace != null ? "Available" : "Not Available",
-                stackTrace
-        );
+        return dateFormat.format(new Date(appExitInfo.getTimestamp()));
     }
 
     private static String getStackTraceInfo(ApplicationExitInfo exitInfo) {
@@ -84,35 +72,8 @@ public class AppExitInfoDetailsExtractor {
     }
 
     private static String reasonCodeToDescription(int reasonCode) {
-        switch(reasonCode) {
-            case ApplicationExitInfo.REASON_ANR:
-                return "anr";
-            case ApplicationExitInfo.REASON_EXIT_SELF:
-                return "exit itself";
-            case ApplicationExitInfo.REASON_CRASH:
-                return "crash";
-            case ApplicationExitInfo.REASON_CRASH_NATIVE:
-                return "crash native";
-            case ApplicationExitInfo.REASON_LOW_MEMORY:
-                return "low memory";
-            case ApplicationExitInfo.REASON_DEPENDENCY_DIED:
-                return "dependency died";
-            case ApplicationExitInfo.REASON_FREEZER:
-                return "freezer";
-            case ApplicationExitInfo.REASON_USER_STOPPED:
-                return "user stopped";
-            case ApplicationExitInfo.REASON_USER_REQUESTED:
-                return "user requested";
-            case ApplicationExitInfo.REASON_UNKNOWN:
-                return "unknown";
-            case ApplicationExitInfo.REASON_INITIALIZATION_FAILURE:
-                return "initialization failure";
-            case ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE:
-                return "excessive resource usage";
-            case ApplicationExitInfo.REASON_SIGNALED:
-                return "signaled";
-            case ApplicationExitInfo.REASON_OTHER:
-                return "other";
+        if (reasonCode == ApplicationExitInfo.REASON_ANR) {
+            return "anr";
         }
         return "unsupported code";
     }

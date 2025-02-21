@@ -1,5 +1,7 @@
 package backtraceio.library.anr;
 
+import static backtraceio.library.anr.AppExitInfoDetailsExtractor.getANRAttributes;
+
 import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.Context;
@@ -9,15 +11,19 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationMetadataCache;
+import backtraceio.library.models.BacktraceAttributeConsts;
+import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
 public class BacktraceAppExitInfoSenderHandler extends Thread implements BacktraceANRHandler {
     private final static String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
+    private final static String ANR_COMPLEX_ATTR_KEY = "ANR_ANNOTATIONS";
 
     private final BacktraceClient backtraceClient;
     private final String packageName;
@@ -54,14 +60,27 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
                 continue;
             }
 
-            BacktraceANRApplicationExitException exception = new BacktraceANRApplicationExitException(appExitInfo);
-            backtraceClient.send(exception, backtraceResult -> {
+
+            final BacktraceReport report = generateBacktraceReport(appExitInfo);
+            backtraceClient.send(report, backtraceResult -> {
                 if (backtraceResult.status == BacktraceResultStatus.Ok) {
                     // TODO: race condition
                     this.anrAppExitInfoState.saveTimestamp(appExitInfo.getTimestamp());
                 }
             });
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private BacktraceReport generateBacktraceReport(ApplicationExitInfo appExitInfo) {
+        BacktraceANRApplicationExitException exception = new BacktraceANRApplicationExitException(appExitInfo);
+
+        HashMap<String, Object> attributes = new HashMap<>();
+
+        attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
+        attributes.put(ANR_COMPLEX_ATTR_KEY, getANRAttributes(appExitInfo));
+
+        return new BacktraceReport(exception, attributes);
     }
 
 

@@ -299,11 +299,11 @@ public class BacktraceClient extends BacktraceBase {
      * @param debug                           enable debug mode - errors will not be sent if the debugger is connected
      */
     public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
-        enableAnr(new BacktraceANRSettings(timeout, onApplicationNotRespondingEvent, debug));
+        this.enableAnr(new BacktraceANRSettings(timeout, onApplicationNotRespondingEvent, debug));
     }
 
     public void enableAnr(BacktraceANRSettings anrSettings) {
-        enableAnr(AnrType.Threshold, anrSettings);
+        this.enableAnr(AnrType.Threshold, anrSettings);
     }
 
     public void enableAnr(AnrType anrType, BacktraceANRSettings anrSettings) {
