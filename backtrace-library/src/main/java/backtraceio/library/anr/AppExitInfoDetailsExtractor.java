@@ -15,6 +15,7 @@ import java.util.Locale;
 
 
 public class AppExitInfoDetailsExtractor {
+
     public static HashMap<String, Object> getANRAttributes(ApplicationExitInfo appExitInfo) {
         if (appExitInfo == null || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
             return new HashMap<>();
@@ -31,6 +32,13 @@ public class AppExitInfoDetailsExtractor {
         attributes.put("PSS", appExitInfo.getPss());
         attributes.put("RSS", appExitInfo.getRss());
         return attributes;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    public static String getANRMessage(ApplicationExitInfo appExitInfo) {
+        return "ApplicationExitInfo ANR Exception\n" +
+                "Description: " + appExitInfo.getDescription() + "\n" +
+                "Timestamp: " + getANRTimestamp(appExitInfo);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
