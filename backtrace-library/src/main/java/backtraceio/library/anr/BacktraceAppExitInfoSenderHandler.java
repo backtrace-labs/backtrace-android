@@ -6,7 +6,6 @@ import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -16,6 +15,7 @@ import java.util.List;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationMetadataCache;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
@@ -47,7 +47,7 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
 
     public void send() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
-            Log.w(LOG_TAG, ""); // TODO:
+            BacktraceLogger.d(LOG_TAG, "Unsupported Android version " + android.os.Build.VERSION.SDK_INT + " to send ANR based on applicationExitInfoList");
             return;
         }
 

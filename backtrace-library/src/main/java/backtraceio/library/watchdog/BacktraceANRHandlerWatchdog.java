@@ -103,7 +103,7 @@ public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRH
             return;
         }
 
-        Boolean reported = false;
+        boolean reported = false;
         while (!shouldStop && !isInterrupted()) {
             String dateTimeNow = Calendar.getInstance().getTime().toString();
             BacktraceLogger.d(LOG_TAG, "ANR WATCHDOG - " + dateTimeNow);
@@ -140,7 +140,7 @@ public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRH
 
     public void stopMonitoringAnr() {
         if (this.isInterrupted()) {
-            BacktraceLogger.d(LOG_TAG, "ANR thread is already interrupted"); // todo: improve lang
+            BacktraceLogger.d(LOG_TAG, "ANR monitoring thread has already been interrupted.");
             return;
         }
         BacktraceLogger.d(LOG_TAG, "Stop monitoring ANR");

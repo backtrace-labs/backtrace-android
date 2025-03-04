@@ -4,17 +4,21 @@ import android.app.ApplicationExitInfo;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
-import java.util.Date;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import backtraceio.library.logger.BacktraceLogger;
+
 
 public class AppExitInfoDetailsExtractor {
+    private final static String LOG_TAG = AppExitInfoDetailsExtractor.class.getSimpleName();
 
     public static HashMap<String, Object> getANRAttributes(ApplicationExitInfo appExitInfo) {
         if (appExitInfo == null || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
@@ -50,7 +54,7 @@ public class AppExitInfoDetailsExtractor {
     private static String getStackTraceInfo(ApplicationExitInfo exitInfo) {
         InputStream traceStream = getStreamOrNull(exitInfo);
         if (traceStream == null) {
-            // TODO: log
+            BacktraceLogger.w(LOG_TAG, "Unexpected null trace stream");
             return null;
         }
         StringBuilder builder = new StringBuilder();
@@ -60,7 +64,7 @@ public class AppExitInfoDetailsExtractor {
                 builder.append(line).append("\n");
             }
         } catch (Exception exception) {
-            // TODO: log
+            BacktraceLogger.e(LOG_TAG, "Unexpected exception on getting stacktrace from exitInfo", exception);
             return "";
         }
 
