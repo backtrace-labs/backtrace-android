@@ -2,6 +2,8 @@ package backtraceio.library.anr;
 
 import android.content.Context;
 
+import backtraceio.library.common.SharedPreferencesManager;
+
 public class AnrAppExitInfoState {
 
     private final SharedPreferencesManager sharedPreferencesManager;

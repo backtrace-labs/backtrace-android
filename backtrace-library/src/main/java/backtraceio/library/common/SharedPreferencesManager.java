@@ -1,4 +1,4 @@
-package backtraceio.library.anr;
+package backtraceio.library.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,7 +13,7 @@ public class SharedPreferencesManager {
         SharedPreferences sharedPreferences = this.context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(key, value);
-        editor.apply(); // or editor.commit();
+        editor.apply();
         editor.commit();
     }
 
