@@ -20,8 +20,9 @@ import backtraceio.library.logger.BacktraceLogger;
 public class AppExitInfoDetailsExtractor {
     private final static String LOG_TAG = AppExitInfoDetailsExtractor.class.getSimpleName();
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public static HashMap<String, Object> getANRAttributes(ApplicationExitInfo appExitInfo) {
-        if (appExitInfo == null || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
+        if (appExitInfo == null) {
             return new HashMap<>();
         }
 
@@ -51,6 +52,7 @@ public class AppExitInfoDetailsExtractor {
         return dateFormat.format(new Date(appExitInfo.getTimestamp()));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     private static String getStackTraceInfo(ApplicationExitInfo exitInfo) {
         InputStream traceStream = getStreamOrNull(exitInfo);
         if (traceStream == null) {
@@ -71,11 +73,8 @@ public class AppExitInfoDetailsExtractor {
         return builder.toString();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     private static InputStream getStreamOrNull(ApplicationExitInfo exitInfo) {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
-            return null;
-        }
-
         try {
             return exitInfo.getTraceInputStream();
         } catch (IOException e) {
