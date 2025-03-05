@@ -41,8 +41,8 @@ public class AppExitInfoDetailsExtractor {
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     public static String getANRMessage(ApplicationExitInfo appExitInfo) {
-        return "ApplicationExitInfo ANR Exception\n" +
-                "Description: " + appExitInfo.getDescription() + "\n" +
+        return "ApplicationExitInfo ANR Exception" + " | " +
+                "Description: " + appExitInfo.getDescription() + " | " +
                 "Timestamp: " + getANRTimestamp(appExitInfo);
     }
 

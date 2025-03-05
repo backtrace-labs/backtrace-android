@@ -17,12 +17,12 @@ import backtraceio.library.logger.BacktraceLogger;
  */
 public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRHandler {
 
-    private final static transient String LOG_TAG = BacktraceANRHandlerWatchdog.class.getSimpleName();
+    private final static String LOG_TAG = BacktraceANRHandlerWatchdog.class.getSimpleName();
 
     /**
      * Default timeout value in milliseconds
      */
-    private final static transient int DEFAULT_ANR_TIMEOUT = 5000;
+    private final static int DEFAULT_ANR_TIMEOUT = 5000;
 
     /**
      * Current Backtrace client instance which will be used to send information about exception

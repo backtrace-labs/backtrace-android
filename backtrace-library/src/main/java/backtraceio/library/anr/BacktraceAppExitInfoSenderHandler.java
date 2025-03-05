@@ -45,7 +45,7 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
         send();
     }
 
-    public void send() {
+    private void send() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
             BacktraceLogger.d(LOG_TAG, "Unsupported Android version " + android.os.Build.VERSION.SDK_INT + " to send ANR based on applicationExitInfoList");
             return;
@@ -56,19 +56,27 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
         Collections.reverse(applicationExitInfoList);
         for (ApplicationExitInfo appExitInfo : applicationExitInfoList) {
 
-            if (!this.shouldProcessAppExitInfo(appExitInfo)) {
-                continue;
+            synchronized (this.anrAppExitInfoState) {
+                if (!this.shouldProcessAppExitInfo(appExitInfo)) {
+                    continue;
+                }
+
+                sendApplicationExitInfoReport(appExitInfo);
             }
+        }
+    }
 
-
-            final BacktraceReport report = generateBacktraceReport(appExitInfo);
-            backtraceClient.send(report, backtraceResult -> {
-                if (backtraceResult.status == BacktraceResultStatus.Ok) {
-                    // TODO: race condition
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private void sendApplicationExitInfoReport(ApplicationExitInfo appExitInfo) {
+        final BacktraceReport report = generateBacktraceReport(appExitInfo);
+        BacktraceLogger.d(LOG_TAG, "Sending ApplicationExitInfo ANR: " + report.message);
+        backtraceClient.send(report, backtraceResult -> {
+            synchronized (this.anrAppExitInfoState) {
+                if (backtraceResult.status == BacktraceResultStatus.Ok && shouldUpdateLastTimestamp(appExitInfo)) {
                     this.anrAppExitInfoState.saveTimestamp(appExitInfo.getTimestamp());
                 }
-            });
-        }
+            }
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -100,6 +108,13 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
         }
 
         return isSupportedTypeOfApplicationExit(appExitInfo.getReason());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private boolean shouldUpdateLastTimestamp(ApplicationExitInfo appExitInfo) {
+        long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
+
+        return lastAnrTimestamp < appExitInfo.getTimestamp();
     }
 
     @Override

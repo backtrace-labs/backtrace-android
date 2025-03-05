@@ -7,9 +7,7 @@ public class BacktraceANRSettings {
     public boolean debug = false;
     public OnApplicationNotRespondingEvent onApplicationNotRespondingEvent = null;
 
-    public BacktraceANRSettings() {
-
-    }
+    public BacktraceANRSettings() { }
 
     public BacktraceANRSettings(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
         this.debug = debug;
