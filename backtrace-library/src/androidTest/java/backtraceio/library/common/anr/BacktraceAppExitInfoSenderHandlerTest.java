@@ -10,7 +10,10 @@ import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.Context;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.google.gson.Gson;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -19,7 +22,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +38,16 @@ import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
+//@RunWith(AndroidJUnit4.class)
+//@RunWith(MockitoJUnitRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class BacktraceAppExitInfoSenderHandlerTest {
     @Mock
     private Context mockContext;
 
+//    @Mock
+//    private ApplicationExitInfo mockAppExitInfo2;
     @Mock
     private ActivityManager mockActivityManager;
 
@@ -48,8 +55,18 @@ public class BacktraceAppExitInfoSenderHandlerTest {
     private final BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     private BacktraceClient backtraceClient;
 
+
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+                ApplicationExitInfo x = ApplicationExitInfoFactory.createApplicationExitInfo(0, "", 0,0L);
+//        ApplicationExitInfo x = mockApplicationExitInfo("random-text", System.currentTimeMillis(), ApplicationExitInfo.REASON_CRASH_NATIVE);
+
+//        Gson gson = new Gson();
+
+//        ApplicationExitInfo obj = gson.fromJson("{\"mReason\": 5 }", ApplicationExitInfo.class);
+
+        MockitoAnnotations.openMocks(this);
         BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         MockitoAnnotations.initMocks(this);
         this.backtraceClient = new BacktraceClient(this.mockContext, credentials);
@@ -66,7 +83,10 @@ public class BacktraceAppExitInfoSenderHandlerTest {
     }
 
     private ApplicationExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason, int pid, int importance, long pss, long rss) {
-        ApplicationExitInfo mockAppExitInfo = mock(ApplicationExitInfo.class);
+        Gson gson = new Gson();
+        ApplicationExitInfo gsonMockAppExitInfo = gson.fromJson("{}", ApplicationExitInfo.class);
+        ApplicationExitInfo mockAppExitInfo = mock(gsonMockAppExitInfo);
+//        ApplicationExitInfo mockAppExitInfo = mock(ApplicationExitInfo.class);
         when(mockAppExitInfo.getDescription()).thenReturn(description);
         when(mockAppExitInfo.getTimestamp()).thenReturn(timestamp);
         when(mockAppExitInfo.getReason()).thenReturn(reason);

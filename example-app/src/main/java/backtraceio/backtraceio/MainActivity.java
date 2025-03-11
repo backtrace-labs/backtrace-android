@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 //        backtraceClient.metrics.enable();
 //        backtraceClient.enableAnr(AnrType.Event);
         BacktraceAppExitInfoSenderHandler backtraceAppExitInfoSender = new BacktraceAppExitInfoSenderHandler(backtraceClient, context);
-        backtraceAppExitInfoSender.send();
+//        backtraceAppExitInfoSender.send();
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
 
