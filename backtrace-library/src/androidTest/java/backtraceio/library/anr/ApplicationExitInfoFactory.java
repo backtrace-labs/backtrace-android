@@ -1,4 +1,4 @@
-package backtraceio.library.common.anr;
+package backtraceio.library.anr;
 
 import android.app.ApplicationExitInfo;
 

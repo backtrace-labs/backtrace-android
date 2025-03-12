@@ -21,7 +21,7 @@ public class AppExitInfoDetailsExtractor {
     private final static String LOG_TAG = AppExitInfoDetailsExtractor.class.getSimpleName();
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    public static HashMap<String, Object> getANRAttributes(ApplicationExitInfo appExitInfo) {
+    public static HashMap<String, Object> getANRAttributes(ExitInfo appExitInfo) {
         if (appExitInfo == null) {
             return new HashMap<>();
         }
@@ -40,20 +40,20 @@ public class AppExitInfoDetailsExtractor {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    public static String getANRMessage(ApplicationExitInfo appExitInfo) {
+    public static String getANRMessage(ExitInfo appExitInfo) {
         return "ApplicationExitInfo ANR Exception" + " | " +
                 "Description: " + appExitInfo.getDescription() + " | " +
                 "Timestamp: " + getANRTimestamp(appExitInfo);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private static String getANRTimestamp(ApplicationExitInfo appExitInfo) {
+    private static String getANRTimestamp(ExitInfo appExitInfo) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return dateFormat.format(new Date(appExitInfo.getTimestamp()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private static String getStackTraceInfo(ApplicationExitInfo exitInfo) {
+    private static String getStackTraceInfo(ExitInfo exitInfo) {
         InputStream traceStream = getStreamOrNull(exitInfo);
         if (traceStream == null) {
             BacktraceLogger.w(LOG_TAG, "Unexpected null trace stream");
@@ -74,7 +74,7 @@ public class AppExitInfoDetailsExtractor {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private static InputStream getStreamOrNull(ApplicationExitInfo exitInfo) {
+    private static InputStream getStreamOrNull(ExitInfo exitInfo) {
         try {
             return exitInfo.getTraceInputStream();
         } catch (IOException e) {

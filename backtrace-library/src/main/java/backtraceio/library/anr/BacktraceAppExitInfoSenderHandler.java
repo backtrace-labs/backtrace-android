@@ -2,8 +2,6 @@ package backtraceio.library.anr;
 
 import static backtraceio.library.anr.AppExitInfoDetailsExtractor.getANRAttributes;
 
-import android.app.ActivityManager;
-import android.app.ApplicationExitInfo;
 import android.content.Context;
 import android.os.Build;
 
@@ -28,15 +26,24 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     private final BacktraceClient backtraceClient;
     private final String packageName;
 
-    private final ActivityManager activityManager;
+    private final ProcessExitInfoProvider activityManager;
 
-    private final AnrAppExitInfoState anrAppExitInfoState;
+    private final AnrExitInfoState anrAppExitInfoState;
 
     public BacktraceAppExitInfoSenderHandler(BacktraceClient client, Context context) {
+        this(client,
+                ApplicationMetadataCache.getInstance(context).getPackageName(),
+                new AnrExitInfoState(context),
+                new ActivityManagerExitInfoProvider(context)
+                );
+    }
+
+    protected BacktraceAppExitInfoSenderHandler(BacktraceClient client, String packageName, AnrExitInfoState anrAppExitInfoState, ProcessExitInfoProvider activityManager) {
         this.backtraceClient = client;
-        this.packageName = ApplicationMetadataCache.getInstance(context).getPackageName();
-        this.activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        this.anrAppExitInfoState = new AnrAppExitInfoState(context);
+        this.packageName = packageName;
+        this.anrAppExitInfoState = anrAppExitInfoState;
+        this.activityManager = activityManager;
+
         this.start();
     }
 
@@ -51,11 +58,10 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
             return;
         }
 
-        final List<ApplicationExitInfo> applicationExitInfoList = this.activityManager.getHistoricalProcessExitReasons(this.packageName, 0, 0);
+        final List<ExitInfo> applicationExitInfoList = this.activityManager.getHistoricalExitInfo(this.packageName, 0, 0);
 
         Collections.reverse(applicationExitInfoList);
-        for (ApplicationExitInfo appExitInfo : applicationExitInfoList) {
-
+        for (ExitInfo appExitInfo : applicationExitInfoList) {
             synchronized (this.anrAppExitInfoState) {
                 if (!this.shouldProcessAppExitInfo(appExitInfo)) {
                     continue;
@@ -67,7 +73,7 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private void sendApplicationExitInfoReport(ApplicationExitInfo appExitInfo) {
+    private void sendApplicationExitInfoReport(ExitInfo appExitInfo) {
         final BacktraceReport report = generateBacktraceReport(appExitInfo);
         BacktraceLogger.d(LOG_TAG, "Sending ApplicationExitInfo ANR: " + report.message);
         backtraceClient.send(report, backtraceResult -> {
@@ -80,8 +86,8 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private BacktraceReport generateBacktraceReport(ApplicationExitInfo appExitInfo) {
-        BacktraceANRApplicationExitException exception = new BacktraceANRApplicationExitException(appExitInfo);
+    private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {
+        BacktraceANRExitInfoException exception = new BacktraceANRExitInfoException(appExitInfo);
 
         HashMap<String, Object> attributes = new HashMap<>();
 
@@ -93,13 +99,13 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
 
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private boolean isSupportedTypeOfApplicationExit(int reason) {
-        final List<Integer> supportedTypes = Collections.singletonList(ApplicationExitInfo.REASON_ANR);
-        return supportedTypes.contains(reason);
+    private boolean isSupportedTypeOfApplicationExit(ExitInfo appExitInfo) {
+        final List<Integer> supportedTypes = this.activityManager.getSupportedTypesOfExitInfo();
+        return supportedTypes.contains(appExitInfo.getReason());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private boolean shouldProcessAppExitInfo(ApplicationExitInfo appExitInfo) {
+    private boolean shouldProcessAppExitInfo(ExitInfo appExitInfo) {
         long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
         long anrTimestamp = appExitInfo.getTimestamp();
 
@@ -107,11 +113,11 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
             return false;
         }
 
-        return isSupportedTypeOfApplicationExit(appExitInfo.getReason());
+        return isSupportedTypeOfApplicationExit(appExitInfo);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private boolean shouldUpdateLastTimestamp(ApplicationExitInfo appExitInfo) {
+    private boolean shouldUpdateLastTimestamp(ExitInfo appExitInfo) {
         long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
 
         return lastAnrTimestamp < appExitInfo.getTimestamp();

@@ -1,14 +1,13 @@
 package backtraceio.library.anr;
 
-import android.app.ApplicationExitInfo;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-public class BacktraceANRApplicationExitException extends Exception {
+public class BacktraceANRExitInfoException extends Exception {
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    public BacktraceANRApplicationExitException(ApplicationExitInfo exitInfo) {
+    public BacktraceANRExitInfoException(ExitInfo exitInfo) {
         super(AppExitInfoDetailsExtractor.getANRMessage(exitInfo));
     }
 }

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import backtraceio.library.common.SharedPreferencesManager;
 
-public class AnrAppExitInfoState {
+public class AnrExitInfoState {
 
     private final SharedPreferencesManager sharedPreferencesManager;
 
@@ -13,7 +13,7 @@ public class AnrAppExitInfoState {
     private static final String TIMESTAMP_PREF_KEY = "LAST_ANR_TIMESTAMP";
     private static final long TIMESTAMP_DEFAULT = 0;
 
-    public AnrAppExitInfoState(Context context) {
+    public AnrExitInfoState(Context context) {
         this.sharedPreferencesManager = new SharedPreferencesManager(context);
     }
 

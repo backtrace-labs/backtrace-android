@@ -1,4 +1,4 @@
-package backtraceio.library.common.anr;
+package backtraceio.library.anr;
 
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.anr.BacktraceAppExitInfoSenderHandler;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
