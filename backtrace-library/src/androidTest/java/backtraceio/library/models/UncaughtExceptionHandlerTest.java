@@ -91,7 +91,7 @@ public class UncaughtExceptionHandlerTest {
         assertNull(testedReportData.getReport().message);
         assertTrue(testedReportData.getReport().diagnosticStack.size() > 0);
         assertEquals("java.lang.IllegalArgumentException", testedReportData.getReport().classifier);
-        assertEquals("Unhandled Exception", testedReportData.getReport().attributes.get("error.type"));
+        assertEquals("Unhandled exception", testedReportData.getReport().attributes.get("error.type"));
         assertTrue(testedReportData.getReport().exceptionTypeReport);
     }
 
@@ -128,7 +128,7 @@ public class UncaughtExceptionHandlerTest {
         assertNull(testedReportData.getReport().message);
         assertTrue(testedReportData.getReport().diagnosticStack.size() > 0);
         assertEquals("java.lang.OutOfMemoryError", testedReportData.getReport().classifier);
-        assertEquals("Unhandled Exception", testedReportData.getReport().attributes.get("error.type"));
+        assertEquals("Unhandled exception", testedReportData.getReport().attributes.get("error.type"));
         assertTrue(testedReportData.getReport().exceptionTypeReport);
     }
 }
