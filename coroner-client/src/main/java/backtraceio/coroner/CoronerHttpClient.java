@@ -39,6 +39,10 @@ class CoronerHttpClient implements HttpClient {
 
         final String resultJson = getResponseMessage(urlConnection);
 
+        System.out.println("Coroner request");
+        System.out.println("Coroner request json: " + requestJson);
+        System.out.println("Coroner response json: " + resultJson);
+
         return GsonWrapper.fromJson(
                 resultJson,
                 CoronerApiResponse.class);
