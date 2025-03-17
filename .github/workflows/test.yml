@@ -102,7 +102,6 @@ jobs:
         run: |
           saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
           # recent real device
-#          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=14" --region us-west-1
           # newest Android version
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=15.0" --region us-west-1
           # oldest Android version
