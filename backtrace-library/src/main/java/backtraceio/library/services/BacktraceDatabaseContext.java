@@ -30,10 +30,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final int _retryNumber;
 
-    /**
-     * Application context
-     */
-    private final Context _applicationContext;
 
     /**
      * Database cache
@@ -56,12 +52,27 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private final RetryOrder retryOrder;
 
     /**
+     * @deprecated This constructor will be removed in future versions.
+     * The {@code context} parameter is no longer used.
+     * Please use the constructor without the {@code context} parameter.
+     *
+     * <p>Use {@link #BacktraceDatabaseContext(BacktraceDatabaseSettings)} instead.</p>
+     *
+     * @param context The unused Android context parameter.
+     * @param settings The database settings.
+     */
+    @Deprecated
+    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
+        this(settings);
+    }
+
+    /**
      * Initialize new instance of Backtrace Database Context
      *
      * @param settings database settings
      */
-    public BacktraceDatabaseContext(Context context, BacktraceDatabaseSettings settings) {
-        this(context, settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
+    public BacktraceDatabaseContext(BacktraceDatabaseSettings settings) {
+        this(settings.getDatabasePath(), settings.getRetryLimit(), settings.getRetryOrder());
     }
 
     /**
@@ -71,8 +82,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @param retryNumber total number of retries
      * @param retryOrder  record order
      */
-    private BacktraceDatabaseContext(Context context, String path, int retryNumber, RetryOrder retryOrder) {
-        this._applicationContext = context;
+    private BacktraceDatabaseContext(String path, int retryNumber, RetryOrder retryOrder) {
         this._path = path;
         this._retryNumber = retryNumber;
         this.retryOrder = retryOrder;
@@ -83,12 +93,12 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Setup cache
      */
     private void setupBatch() {
-        if (this._retryNumber == 0) {
+        if (this._retryNumber <= 0) {
             throw new IllegalArgumentException("Retry number must be greater than 0!");
         }
 
         for (int i = 0; i < _retryNumber; i++) {
-            this.batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            this.batchRetry.put(i, new ArrayList<>());
         }
     }
 
@@ -126,7 +136,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
         backtraceDatabaseRecord.locked = true;
         this.totalSize += backtraceDatabaseRecord.getSize();
-        this.batchRetry.get(0).add(backtraceDatabaseRecord); // TODO: null
+        this.addToFirstBatch(backtraceDatabaseRecord);
         this.totalRecords++;
         return backtraceDatabaseRecord;
     }
@@ -304,7 +314,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     private void incrementBatches() {
         for (int i = this._retryNumber - 2; i >= 0; i--) {
             List<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
-            batchRetry.put(i, new ArrayList<BacktraceDatabaseRecord>());
+            batchRetry.put(i, new ArrayList<>());
             batchRetry.put(i + 1, currentBatch);
         }
     }
@@ -344,7 +354,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         return getRecordFromCache(true);
     }
 
-
     /**
      * Get record in in-cache BacktraceDatabase
      *
@@ -371,5 +380,22 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             }
         }
         return null;
+    }
+
+    private void addToFirstBatch(BacktraceDatabaseRecord backtraceDatabaseRecord) {
+        final int firstBatch = 0;
+
+        if (this.batchRetry.isEmpty()) {
+            this.batchRetry.put(firstBatch, new ArrayList<>());
+        }
+
+        List<BacktraceDatabaseRecord> batch = this.batchRetry.get(firstBatch);
+
+        if (batch == null) {
+            batch = new ArrayList<>();
+            this.batchRetry.put(firstBatch, batch);
+        }
+
+        batch.add(backtraceDatabaseRecord);
     }
 }

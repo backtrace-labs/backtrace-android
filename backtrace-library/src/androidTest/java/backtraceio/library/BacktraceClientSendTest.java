@@ -20,8 +20,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
@@ -34,12 +37,12 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientSendTest {
-    private Context context;
-    private BacktraceCredentials credentials;
     private final String resultMessage = "From request handler";
     private final Map<String, Object> attributes = new HashMap<String, Object>() {{
         put("test", "value");
     }};
+    private Context context;
+    private BacktraceCredentials credentials;
 
     @Before
     public void setUp() {
@@ -91,7 +94,13 @@ public class BacktraceClientSendTest {
 
         final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
-        final String mainExceptionExpectedMessage = "java.io.IOException: java.lang.IllegalArgumentException: New Exception";
+
+        final Stack<String> expectedExceptionMessages = new Stack<String>() {{
+            add("New Exception");
+            add("java.lang.IllegalArgumentException: New Exception");
+            add("java.io.IOException: java.lang.IllegalArgumentException: New Exception");
+        }};
+
         RequestHandler rh = data -> {
             String jsonString = BacktraceSerializeHelper.toJson(data);
 
@@ -100,7 +109,7 @@ public class BacktraceClientSendTest {
                 final JSONObject jsonObject = new JSONObject(jsonString);
                 final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
                 final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
-
+                final String mainExceptionExpectedMessage = expectedExceptionMessages.pop();
                 assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
                 assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
                 assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
@@ -110,7 +119,7 @@ public class BacktraceClientSendTest {
                 fail(e.getMessage());
             }
 
-            return new BacktraceResult(data.getReport(), data.report.message,
+            return new BacktraceResult(data.getReport(), data.getReport().message,
                     BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -275,6 +284,46 @@ public class BacktraceClientSendTest {
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
+    }
+
+    @Test
+    public void sendExceptionWithInnerException() {
+        // GIVEN
+        final int expectedNumberOfReports = 2;
+        final String innerExceptionMessage = "inner exception";
+        final String outerExceptionMessage = "outer exception";
+        final Exception innerException = new Exception(innerExceptionMessage);
+        final Exception outerException = new Exception(outerExceptionMessage, innerException);
+        final List<BacktraceData> reportData = new ArrayList<>();
+        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
+        backtraceClient.sendInnerExceptions(true);
+        backtraceClient.sendSuppressedExceptions(true);
+        final Waiter waiter = new Waiter();
+
+
+        backtraceClient.setOnRequestHandler(new RequestHandler() {
+            @Override
+            public BacktraceResult onRequest(BacktraceData data) {
+                reportData.add(data);
+                if (reportData.size() == expectedNumberOfReports) {
+                    waiter.resume();
+                }
+                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
+                        BacktraceResultStatus.Ok);
+            }
+        });
+        backtraceClient.send(outerException);
+
+        try {
+            waiter.await(5, TimeUnit.SECONDS, 1);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+        assertEquals(expectedNumberOfReports, reportData.size());
+        BacktraceData outerExceptionData = reportData.get(0);
+        assertEquals(outerExceptionMessage, outerExceptionData.attributes.get("error.message"));
+        BacktraceData innerExceptionData = reportData.get(reportData.size() - 1);
+        assertEquals(innerExceptionMessage, innerExceptionData.attributes.get("error.message"));
     }
 
     @Test

@@ -29,13 +29,18 @@ import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 import backtraceio.library.services.BacktraceMetrics;
+import backtraceio.library.services.ReportExceptionTransformer;
 
 /**
  * Base Backtrace Android client
  */
 public class BacktraceBase implements Client {
 
-    private static final transient String LOG_TAG = BacktraceBase.class.getSimpleName();
+    private static final String LOG_TAG = BacktraceBase.class.getSimpleName();
+    /**
+     * Backtrace client version
+     */
+    public static String version = backtraceio.library.BuildConfig.VERSION_NAME;
 
     static {
         System.loadLibrary("backtrace-native");
@@ -45,12 +50,6 @@ public class BacktraceBase implements Client {
      * Backtrace database instance
      */
     public final Database database;
-
-    /**
-     * Backtrace client version
-     */
-    public static String version = backtraceio.library.BuildConfig.VERSION_NAME;
-
     /**
      * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
      */
@@ -61,27 +60,23 @@ public class BacktraceBase implements Client {
      */
     public final List<String> attachments;
     private final BacktraceCredentials credentials;
-
+    private final ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
     /**
      * Backtrace metrics instance
      */
     public Metrics metrics = null;
-
     /**
      * Application context
      */
     protected Context context;
-
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
     private Api backtraceApi;
-
     /**
      * Event which will be executed before sending data to Backtrace API
      */
     private OnBeforeSendEventListener beforeSendEventListener = null;
-
     /**
      * Is Proguard symbolication enabled? We have to inform the Backtrace API
      */
@@ -235,7 +230,7 @@ public class BacktraceBase implements Client {
         this.attributes = CollectionUtils.copyMap(attributes);
         this.attachments = CollectionUtils.copyList(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
-        this.setBacktraceApi(new BacktraceApi(credentials));
+        this.setBacktraceApi(new BacktraceApi(this.context, credentials));
         this.database.start();
         this.metrics = new BacktraceMetrics(context, this.attributes, backtraceApi, credentials);
     }
@@ -574,25 +569,28 @@ public class BacktraceBase implements Client {
     /**
      * Sending an exception to Backtrace API
      *
-     * @param report current BacktraceReport
+     * @param sourceReport current BacktraceReport
      */
-    public void send(BacktraceReport report, final OnServerResponseEventListener callback) {
+    public void send(BacktraceReport sourceReport, final OnServerResponseEventListener callback) {
         Breadcrumbs breadcrumbs = this.database.getBreadcrumbs();
-        if (breadcrumbs != null) {
-            breadcrumbs.processReportBreadcrumbs(report);
+        for (BacktraceReport report :
+                this.reportExceptionTransformer.transformReportWithInnerExceptions(sourceReport)) {
+            if (breadcrumbs != null) {
+                breadcrumbs.processReportBreadcrumbs(report);
+            }
+            addReportAttachments(report);
+
+            BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
+            backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
+
+            final BacktraceDatabaseRecord record = this.database.add(report, this.attributes, this.isProguardEnabled);
+
+            if (this.beforeSendEventListener != null) {
+                backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
+            }
+
+            this.backtraceApi.send(backtraceData, this.getDatabaseCallback(record, callback));
         }
-        addReportAttachments(report);
-
-        BacktraceData backtraceData = new BacktraceData(this.context, report, this.attributes);
-        backtraceData.symbolication = this.isProguardEnabled ? "proguard" : null;
-
-        final BacktraceDatabaseRecord record = this.database.add(report, this.attributes, this.isProguardEnabled);
-
-        if (this.beforeSendEventListener != null) {
-            backtraceData = this.beforeSendEventListener.onEvent(backtraceData);
-        }
-
-        this.backtraceApi.send(backtraceData, this.getDatabaseCallback(record, callback));
     }
 
     private OnServerResponseEventListener getDatabaseCallback(final BacktraceDatabaseRecord record, final OnServerResponseEventListener customCallback) {
@@ -624,4 +622,22 @@ public class BacktraceBase implements Client {
         return database != null && database.getBreadcrumbs() != null;
     }
 
+
+    /**
+     * Determine if Reports should be generated for inner exceptions. By default the value is set to false.
+     *
+     * @param sendInnerExceptions boolean flag that enabled/disable sending inner exceptions
+     */
+    public void sendInnerExceptions(boolean sendInnerExceptions) {
+        this.reportExceptionTransformer.sendInnerExceptions(sendInnerExceptions);
+    }
+
+    /**
+     * Determine if Reports should be generated for suppressed exceptions. By default the value is set to false.
+     *
+     * @param sendSuppressedExceptions boolean flag that enabled/disable sending suppressed exceptions
+     */
+    public void sendSuppressedExceptions(boolean sendSuppressedExceptions) {
+        this.reportExceptionTransformer.sendSuppressedExceptions(sendSuppressedExceptions);
+    }
 }
