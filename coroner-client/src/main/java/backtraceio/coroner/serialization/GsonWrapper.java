@@ -18,7 +18,16 @@ public class GsonWrapper {
                 .create();
         backtraceio.coroner.common.Logger.d("CoronerHttpClient GsonWrapper", gson.toString());
 
-        return gson.fromJson(json, type);
+
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient GsonWrapper fromJson", "json");
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient GsonWrapper fromJson", json);
+
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient GsonWrapper fromJson", "started");
+        T result = gson.fromJson(json, type);
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient GsonWrapper fromJson", "result");
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient GsonWrapper fromJson", result.toString());
+
+        return result;
     }
 
 }
