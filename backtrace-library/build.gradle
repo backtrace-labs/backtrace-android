@@ -71,14 +71,10 @@ android {
         lintOptions {
             abortOnError false
         }
-        testOptions {
-            unitTests.returnDefaultValues = true
-        }
     }
 }
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.12.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.squareup:tape:1.2.3'
