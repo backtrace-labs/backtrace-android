@@ -17,8 +17,6 @@ import backtraceio.coroner.response.CoronerHttpException;
 import backtraceio.coroner.serialization.CoronerResponseGroupDeserializer;
 import backtraceio.coroner.serialization.GsonWrapper;
 
-import backtraceio.coroner.common.AndroidLogDelegate;
-
 class CoronerHttpClient implements HttpClient {
     private static final Logger LOGGER = Logger.getLogger(CoronerResponseGroupDeserializer.class.getName());
     private final String apiUrl;
@@ -32,6 +30,8 @@ class CoronerHttpClient implements HttpClient {
         final HttpURLConnection urlConnection = prepareHttpRequest(requestJson);
         final int statusCode = urlConnection.getResponseCode();
         backtraceio.coroner.common.Logger.d("CoronerHttpClient", "invoked");
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient api url", apiUrl);
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient request json", requestJson);
         backtraceio.coroner.common.Logger.d("CoronerHttpClient statusCode", String.valueOf(statusCode));
         if (statusCode != HttpURLConnection.HTTP_OK) {
             String message = getResponseMessage(urlConnection);
