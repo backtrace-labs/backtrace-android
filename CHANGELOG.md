@@ -77,7 +77,7 @@
 - Replaced deprecated BluetoothAdapter with BluetoothManager
 - Added missing ACCESS_WIFI_STATE and BLUETOOTH permissions to example app and Tests
 - Replaced androidx NonNull with jetbrains NotNull annotation
-- Use "Unhandled Exception" error type in the unhnadled exception handler callback
+- Use "Unhandled Exception" error type in the unhandled exception handler callback
 
 ## Version 3.7.6
 
