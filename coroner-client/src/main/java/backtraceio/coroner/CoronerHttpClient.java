@@ -29,15 +29,24 @@ class CoronerHttpClient implements HttpClient {
     public CoronerApiResponse get(final String requestJson) throws CoronerHttpException, IOException {
         final HttpURLConnection urlConnection = prepareHttpRequest(requestJson);
         final int statusCode = urlConnection.getResponseCode();
-
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient", "invoked");
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient api url", apiUrl);
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient request json", requestJson);
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient statusCode", String.valueOf(statusCode));
         if (statusCode != HttpURLConnection.HTTP_OK) {
             String message = getResponseMessage(urlConnection);
+
+            backtraceio.coroner.common.Logger.d("CoronerHttpClient getResponseMessage message", message);
+
             message = (Common.isNullOrEmpty(message)) ?
                     urlConnection.getResponseMessage() : message;
             throw new CoronerHttpException(statusCode, String.format("%s: %s", statusCode, message));
         }
 
         final String resultJson = getResponseMessage(urlConnection);
+
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient resultJson", resultJson);
+
 
         return GsonWrapper.fromJson(
                 resultJson,

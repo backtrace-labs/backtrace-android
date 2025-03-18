@@ -48,7 +48,11 @@ public class CoronerClient {
     public CoronerResponse errorTypeTimestampFilter(final String errorType, final String timestampLeast, final String timestampMost, final List<String> customAttributes) throws CoronerResponseException, IOException, CoronerHttpException {
         final List<String> attributes = concatAttributes(customAttributes);
 
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient errorTypeTimestampFilter started attributes", String.valueOf(attributes));
+
+
         final JsonObject coronerQuery = this.coronerQueries.filterByErrorTypeAndTimestamp(errorType, timestampLeast, timestampMost, attributes);
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient errorTypeTimestampFilter coronerQuery JsonObject", String.valueOf(coronerQuery));
 
         return makeRequest(coronerQuery);
     }
@@ -60,8 +64,12 @@ public class CoronerClient {
     }
 
     private CoronerResponse makeRequest(final JsonObject coronerQuery) throws CoronerResponseException, IOException, CoronerHttpException {
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient makeRequest started", "started");
+
+
         final CoronerApiResponse response = this.coronerHttpClient.get(coronerQuery.toString());
-        
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient CoronerResponse makeRequest", response.toString());
+
         if (response.error != null) {
             throw new CoronerResponseException(response.getError());
         }
