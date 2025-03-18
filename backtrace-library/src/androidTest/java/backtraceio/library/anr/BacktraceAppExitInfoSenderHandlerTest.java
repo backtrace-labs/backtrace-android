@@ -1,19 +1,16 @@
 package backtraceio.library.anr;
 
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.Context;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import com.google.gson.Gson;
 
 import net.jodah.concurrentunit.Waiter;
 
@@ -21,108 +18,103 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.RequestHandler;
-import backtraceio.library.logger.BacktraceInternalLogger;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 
-//@RunWith(MockitoJUnitRunner.class)
-//@RunWith(AndroidJUnit4.class)
-//@RunWith(MockitoJUnitRunner.class)
 @RunWith(AndroidJUnit4.class)
-public class BacktraceAppExitInfoSenderHandlerTest {
+public class BacktraceAppExitInfoSenderHandlerTest { // TODO: fix name
     @Mock
     private Context mockContext;
 
-//    @Mock
-//    private ApplicationExitInfo mockAppExitInfo2;
-    @Mock
-    private ActivityManager mockActivityManager;
+    private final String PACKAGE_NAME = "backtrace.io.tests";
 
-    private String PACKAGE_NAME = "backtrace.io";
     private final BacktraceCredentials credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
     private BacktraceClient backtraceClient;
 
-
-
     @Before
     public void setUp() throws Exception {
-                ApplicationExitInfo x = ApplicationExitInfoFactory.createApplicationExitInfo(0, "", 0,0L);
-//        ApplicationExitInfo x = mockApplicationExitInfo("random-text", System.currentTimeMillis(), ApplicationExitInfo.REASON_CRASH_NATIVE);
-
-//        Gson gson = new Gson();
-
-//        ApplicationExitInfo obj = gson.fromJson("{\"mReason\": 5 }", ApplicationExitInfo.class);
-
-        MockitoAnnotations.openMocks(this);
-        BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
-        MockitoAnnotations.initMocks(this);
-        this.backtraceClient = new BacktraceClient(this.mockContext, credentials);
-
-        when(mockContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockActivityManager);
-//        when(mockContext.getApplicationContext().getPackageName()).thenReturn(PACKAGE_NAME);
-//        context.getApplicationContext().getPackageName()
         this.mockContext = InstrumentationRegistry.getInstrumentation().getContext();
+        this.backtraceClient = new BacktraceClient(this.mockContext, credentials);
     }
 
-    private void mockHistoricalProcessExitReasons(List<ApplicationExitInfo> exitInfoList) {
-        when(mockActivityManager.getHistoricalProcessExitReasons(anyString(), eq(0), eq(0)))
-                .thenReturn(exitInfoList);
+    private ExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason,
+                                             int pid, int importance, long pss, long rss) {
+        ExitInfo mockExitInfo = mock(ExitInfo.class);
+        when(mockExitInfo.getDescription()).thenReturn(description);
+        when(mockExitInfo.getTimestamp()).thenReturn(timestamp);
+        when(mockExitInfo.getReason()).thenReturn(reason);
+        when(mockExitInfo.getPid()).thenReturn(pid);
+        when(mockExitInfo.getImportance()).thenReturn(importance);
+        when(mockExitInfo.getPss()).thenReturn(pss);
+        when(mockExitInfo.getRss()).thenReturn(rss);
+        return mockExitInfo;
     }
 
-    private ApplicationExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason, int pid, int importance, long pss, long rss) {
-        Gson gson = new Gson();
-        ApplicationExitInfo gsonMockAppExitInfo = gson.fromJson("{}", ApplicationExitInfo.class);
-        ApplicationExitInfo mockAppExitInfo = mock(gsonMockAppExitInfo);
-//        ApplicationExitInfo mockAppExitInfo = mock(ApplicationExitInfo.class);
-        when(mockAppExitInfo.getDescription()).thenReturn(description);
-        when(mockAppExitInfo.getTimestamp()).thenReturn(timestamp);
-        when(mockAppExitInfo.getReason()).thenReturn(reason);
-        when(mockAppExitInfo.getPid()).thenReturn(pid);
-        when(mockAppExitInfo.getImportance()).thenReturn(importance);
-        when(mockAppExitInfo.getPss()).thenReturn(pss);
-        when(mockAppExitInfo.getRss()).thenReturn(rss);
-        return mockAppExitInfo;
+    private ExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason) {
+        return mockApplicationExitInfo(description, timestamp, reason, 0, 0, 0L, 0L);
     }
 
-    private ApplicationExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason) {
-        return mockApplicationExitInfo(description, timestamp, reason, 0,0 , 0L, 0L);
+    private ProcessExitInfoProvider mockActivityManagerExitInfoProvider() {
+        ActivityManagerExitInfoProvider mock = mock(ActivityManagerExitInfoProvider.class);
+        final List<ExitInfo> exitInfoList = new ArrayList<>();
+        exitInfoList.add(mockApplicationExitInfo("random-text", System.currentTimeMillis(), ApplicationExitInfo.REASON_CRASH_NATIVE));
+        exitInfoList.add(mockApplicationExitInfo("anr", System.currentTimeMillis(), ApplicationExitInfo.REASON_ANR));
+        exitInfoList.add(mockApplicationExitInfo("random-description", System.currentTimeMillis(), ApplicationExitInfo.REASON_LOW_MEMORY));
+
+        when(mock.getHistoricalExitInfo(PACKAGE_NAME, 0, 0)).thenReturn(exitInfoList);
+        when(mock.getSupportedTypesOfExitInfo()).thenReturn(Collections.singletonList(ApplicationExitInfo.REASON_ANR));
+        return mock;
+    }
+
+    private AnrExitInfoState mockAnrExitInfoState() {
+        AnrExitInfoState mock = mock(AnrExitInfoState.class);
+        doNothing().when(mock).saveTimestamp(anyLong());
+        when(mock.getLastTimestamp()).thenReturn(0L);
+        return mock;
     }
 
     @Test
     public void checkIfANRIsSentFromAppExitInfo() {
         // GIVEN
-        final List<ApplicationExitInfo> exitInfoList = new ArrayList<>();
-        exitInfoList.add(mockApplicationExitInfo("random-text", System.currentTimeMillis(), ApplicationExitInfo.REASON_CRASH_NATIVE));
-        exitInfoList.add(mockApplicationExitInfo("anr", System.currentTimeMillis(), ApplicationExitInfo.REASON_ANR));
-        exitInfoList.add(mockApplicationExitInfo("random-description", System.currentTimeMillis(), ApplicationExitInfo.REASON_LOW_MEMORY));
-        this.mockHistoricalProcessExitReasons(exitInfoList);
-
+        final ProcessExitInfoProvider mockProcessExitInfoProvider = mockActivityManagerExitInfoProvider();
+        final AnrExitInfoState anrExitInfoState = mockAnrExitInfoState();
         final Waiter waiter = new Waiter();
         backtraceClient.setOnRequestHandler(new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
+                Map<String, Object> anrAnnotations = (HashMap<String, Object>) data.getAnnotations().get("ANR_ANNOTATIONS");
+                Map<String, String> attributes = data.getAttributes();
+
+                waiter.assertNotNull(anrAnnotations);
+                waiter.assertNotNull(attributes);
+                waiter.assertEquals("anr", anrAnnotations.get("description"));
+                waiter.assertEquals(ApplicationExitInfo.REASON_ANR, anrAnnotations.get("reason-code"));
+                waiter.assertEquals("anr", anrAnnotations.get("reason"));
+                waiter.assertEquals("backtraceio.library.anr.BacktraceANRExitInfoException", attributes.get("classifier"));
+                waiter.assertEquals("Hang", attributes.get("error.type"));
                 waiter.resume();
+
                 return new BacktraceResult(new BacktraceApiResult("_", "ok"));
             }
         });
-        BacktraceAppExitInfoSenderHandler handler = new BacktraceAppExitInfoSenderHandler(this.backtraceClient, mockContext);
         // WHEN
+        new BacktraceAppExitInfoSenderHandler(this.backtraceClient, PACKAGE_NAME, anrExitInfoState, mockProcessExitInfoProvider);
 
         // THEN
         try {
-            waiter.await(1000, TimeUnit.SECONDS); // Check if anr is detected and event was emitted
+            waiter.await(10, TimeUnit.SECONDS); // Check if anr is detected and event was emitted
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
