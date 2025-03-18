@@ -20,9 +20,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import backtraceio.coroner.common.Logger;
 import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
 
@@ -42,6 +44,11 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     @Before
     public void enableMetricsAndBreadcrumbs() {
         onView(withId(R.id.enableBreadcrumbs)).perform(click());
+    }
+
+    @Before
+    public void setUp() {
+        Logger.setDelegate(new CoronerLogDelegate());
     }
 
     @Test
@@ -70,8 +77,13 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         // THEN
         CoronerResponse response = null;
 
+        // Test
+        backtraceio.coroner.common.Logger.d("CoronerHttpClient", "handledException");
+
         try {
             response = this.getCoronerClient().rxIdFilter(rxId[0], Arrays.asList("error.message"));
+            backtraceio.coroner.common.Logger.d("CoronerHttpClient handledException response", response.toString());
+
         } catch (Exception ex) {
             Assert.fail(ex.getMessage());
         }
@@ -96,13 +108,21 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
         Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
 
+        // Test
+        Logger.d("CoronerHttpClient", "Hello from pure Java code!");
+
         // THEN
         try {
             response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
                     Long.toString(timestampStart),
                     Long.toString(this.getSecondsTimestampNowGMT()),
-                    Arrays.asList("error.message"));
+                    Collections.singletonList("error.message"));
+
+            backtraceio.coroner.common.Logger.d("CoronerHttpClient dumpWithoutCrash response", response.toString());
+
         } catch (Exception ex) {
+            backtraceio.coroner.common.Logger.d("CoronerHttpClient dumpWithoutCrash Exception", ex.getMessage());
+
             Assert.fail(ex.getMessage());
         }
 
@@ -132,7 +152,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
             response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
                     Long.toString(timestampStart),
                     Long.toString(this.getSecondsTimestampNowGMT()),
-                    Arrays.asList("error.message"));
+                    Collections.singletonList("error.message"));
         } catch (Exception ex) {
             Assert.fail(ex.getMessage());
         }
