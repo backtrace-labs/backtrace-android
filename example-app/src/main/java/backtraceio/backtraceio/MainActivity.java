@@ -226,6 +226,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void dumpWithoutCrash(View view) {
+
+        
         backtraceClient.dumpWithoutCrash("DumpWithoutCrash");
     }
 
