@@ -57,22 +57,6 @@ public class MainActivity extends AppCompatActivity {
         return sharedPreferences.getString(KEY_NAME, "Default Value");
     }
 
-    private void saveToSharedPreferences(String value) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_NAME, value);
-        editor.apply(); // or editor.commit();
-        editor.commit();
-    }
-
-    public void sharedPreferencesExample() {
-        String val = readFromSharedPreferences();
-        String val2 = val + "1";
-        saveToSharedPreferences(val2);
-        String val3 = readFromSharedPreferences();
-        System.out.println(val3);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,9 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-        sharedPreferencesExample();
-        BacktraceCredentials credentials = new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
-                "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
+        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
@@ -127,10 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
         BacktraceExceptionHandler.enable(backtraceClient);
 
-//        backtraceClient.metrics.enable();
-//        backtraceClient.enableAnr(AnrType.Event);
         BacktraceAppExitInfoSenderHandler backtraceAppExitInfoSender = new BacktraceAppExitInfoSenderHandler(backtraceClient, context);
-//        backtraceAppExitInfoSender.send();
+
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);
 
