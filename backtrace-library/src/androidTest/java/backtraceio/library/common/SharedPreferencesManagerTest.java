@@ -50,7 +50,6 @@ public class SharedPreferencesManagerTest {
         verify(mockSharedPreferences).edit();
         verify(mockEditor).putLong(key, value);
         verify(mockEditor).apply();
-        verify(mockEditor).commit();
     }
 
     @Test

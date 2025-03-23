@@ -1,7 +1,6 @@
 package backtraceio.backtraceio;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.system.ErrnoException;
 import android.system.Os;

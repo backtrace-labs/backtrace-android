@@ -14,7 +14,6 @@ public class SharedPreferencesManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(key, value);
         editor.apply();
-        editor.commit();
     }
 
     public Long readLongFromSharedPreferences(String prefName, String key, Long defaultValue) {
