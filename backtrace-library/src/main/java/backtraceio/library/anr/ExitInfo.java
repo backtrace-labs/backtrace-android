@@ -5,9 +5,13 @@ import java.io.InputStream;
 
 public interface ExitInfo {
     int getReason();
+
     long getTimestamp();
+
     String getDescription();
+
     int getPid();
+
     int getUid();
 
     int getImportance();
