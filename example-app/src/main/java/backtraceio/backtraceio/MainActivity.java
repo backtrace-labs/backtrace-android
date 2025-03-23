@@ -52,11 +52,6 @@ public class MainActivity extends AppCompatActivity {
         this.listener = e;
     }
 
-    private String readFromSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getString(KEY_NAME, "Default Value");
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
