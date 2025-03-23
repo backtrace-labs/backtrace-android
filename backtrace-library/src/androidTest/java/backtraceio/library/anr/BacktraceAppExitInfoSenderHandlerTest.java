@@ -34,7 +34,7 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 
 @RunWith(AndroidJUnit4.class)
-public class BacktraceAppExitInfoSenderHandlerTest { // TODO: fix name
+public class BacktraceAppExitInfoSenderHandlerTest {
     @Mock
     private Context mockContext;
 
