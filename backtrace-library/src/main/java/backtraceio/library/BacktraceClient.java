@@ -321,8 +321,8 @@ public class BacktraceClient extends BacktraceBase {
 
     public BacktraceANRHandler initAnrHandler(AnrType anrType, BacktraceANRSettings backtraceANRSettings) {
         BacktraceANRHandler handler = createBacktraceAnrHandler(anrType, backtraceANRSettings);
-        if (backtraceANRSettings.onApplicationNotRespondingEvent != null) {
-            handler.setOnApplicationNotRespondingEvent(backtraceANRSettings.onApplicationNotRespondingEvent);
+        if (backtraceANRSettings.getOnApplicationNotRespondingEvent() != null) {
+            handler.setOnApplicationNotRespondingEvent(backtraceANRSettings.getOnApplicationNotRespondingEvent());
         }
         return handler;
     }
@@ -331,7 +331,7 @@ public class BacktraceClient extends BacktraceBase {
         if (anrType == AnrType.Event) {
             return new BacktraceAppExitInfoSenderHandler(this, context);
         } else if (anrType == AnrType.Threshold){
-            return new BacktraceANRHandlerWatchdog(this, settings.timeout, settings.debug);
+            return new BacktraceANRHandlerWatchdog(this, settings.getTimeout(), settings.isDebug());
         }
         throw new IllegalArgumentException("Unsupported type of ANR: " + anrType.name());
     }

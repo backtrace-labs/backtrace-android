@@ -21,15 +21,16 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import backtraceio.library.anr.AppExitInfoDetailsExtractor;
+import backtraceio.library.anr.ExitInfo;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AppExitInfoDetailsExtractorTest {
     @Mock
-    private ApplicationExitInfo mockAppExitInfo;
+    private ExitInfo mockAppExitInfo;
 
     @Before
     public void setUp() {
-        mockAppExitInfo = mock(ApplicationExitInfo.class);
+        mockAppExitInfo = mock(ExitInfo.class);
     }
 
     @Test
