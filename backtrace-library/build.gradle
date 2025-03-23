@@ -83,7 +83,6 @@ dependencies {
     testImplementation "org.mockito:mockito-core:5.12.0"
     testImplementation 'org.json:json:20240303'
     testImplementation "com.google.guava:guava:33.3.1-jre"
-    testImplementation 'net.jodah:concurrentunit:0.4.4'
     androidTestImplementation 'net.jodah:concurrentunit:0.4.4'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test:rules:1.6.1'
