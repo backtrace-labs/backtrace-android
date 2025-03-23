@@ -42,8 +42,6 @@ public class BacktraceBase implements Client {
      */
     public static String version = backtraceio.library.BuildConfig.VERSION_NAME;
 
-//    private static NativeLibraryLoader libraryLoader = new NativeLibraryLoader();
-
     static {
         NativeLibraryLoader.load();
     }
@@ -353,10 +351,6 @@ public class BacktraceBase implements Client {
     public void setOnRequestHandler(RequestHandler requestHandler) {
         this.backtraceApi.setRequestHandler(requestHandler);
     }
-
-//    public static void setLibraryLoader(NativeLibraryLoader loader) {
-//        libraryLoader = loader;
-//    }
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
