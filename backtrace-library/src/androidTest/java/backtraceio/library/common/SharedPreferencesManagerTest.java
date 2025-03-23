@@ -38,8 +38,6 @@ public class SharedPreferencesManagerTest {
         when(mockEditor.putLong(anyString(), anyLong())).thenReturn(mockEditor);
     }
 
-
-
     @Test
     public void testSaveLongToSharedPreferences() {
         String prefName = "test_prefs";
@@ -59,7 +57,7 @@ public class SharedPreferencesManagerTest {
     public void testReadLongFromSharedPreferences() {
         String prefName = "test_prefs";
         String key = "test_key";
-        Long defaultValue = 0L;
+        long defaultValue = 0L;
         Long expectedValue = 12345L;
 
         when(mockSharedPreferences.getLong(key, defaultValue)).thenReturn(expectedValue);
