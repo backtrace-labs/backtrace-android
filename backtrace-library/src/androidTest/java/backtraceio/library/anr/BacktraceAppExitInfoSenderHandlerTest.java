@@ -126,7 +126,7 @@ public class BacktraceAppExitInfoSenderHandlerTest {
 //    @SdkSuppress(maxSdkVersion = android.os.Build.VERSION_CODES.Q)
     public void checkIfANRIsNotSentOnOldSDK() {
         // GIVEN
-        final int THREAD_SLEEP_TIME_MS = 3000;
+        final int THREAD_SLEEP_TIME_MS = 15000;
         final ProcessExitInfoProvider mockProcessExitInfoProvider = mockActivityManagerExitInfoProvider();
         final AnrExitInfoState anrExitInfoState = mockAnrExitInfoState();
         final Waiter waiter = new Waiter();
