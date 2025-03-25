@@ -35,7 +35,7 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
                 ApplicationMetadataCache.getInstance(context).getPackageName(),
                 new AnrExitInfoState(context),
                 new ActivityManagerExitInfoProvider(context)
-                );
+        );
     }
 
     protected BacktraceAppExitInfoSenderHandler(BacktraceClient client, String packageName, AnrExitInfoState anrAppExitInfoState, ProcessExitInfoProvider activityManager) {
@@ -118,15 +118,15 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     private boolean shouldUpdateLastTimestamp(ExitInfo appExitInfo) {
-        long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
-
-        return lastAnrTimestamp < appExitInfo.getTimestamp();
+        return this.anrAppExitInfoState.getLastTimestamp() < appExitInfo.getTimestamp();
     }
 
     @Override
     public void setOnApplicationNotRespondingEvent(
-            OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {}
+            OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {
+    }
 
     @Override
-    public void stopMonitoringAnr() {}
+    public void stopMonitoringAnr() {
+    }
 }
