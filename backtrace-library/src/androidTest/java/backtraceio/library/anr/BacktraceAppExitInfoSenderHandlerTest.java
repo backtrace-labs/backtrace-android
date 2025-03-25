@@ -121,4 +121,30 @@ public class BacktraceAppExitInfoSenderHandlerTest {
             fail(ex.getMessage());
         }
     }
+
+    @Test
+//    @SdkSuppress(maxSdkVersion = android.os.Build.VERSION_CODES.Q)
+    public void checkIfANRIsNotSentOnOldSDK() {
+        // GIVEN
+        final int THREAD_SLEEP_TIME_MS = 3000;
+        final ProcessExitInfoProvider mockProcessExitInfoProvider = mockActivityManagerExitInfoProvider();
+        final AnrExitInfoState anrExitInfoState = mockAnrExitInfoState();
+        final Waiter waiter = new Waiter();
+        backtraceClient.setOnRequestHandler(new RequestHandler() {
+            @Override
+            public BacktraceResult onRequest(BacktraceData data) {
+                waiter.fail();
+                return new BacktraceResult(new BacktraceApiResult("_", "ok"));
+            }
+        });
+        // WHEN
+        new BacktraceAppExitInfoSenderHandler(this.backtraceClient, PACKAGE_NAME, anrExitInfoState, mockProcessExitInfoProvider);
+
+        // THEN
+        try {
+            Thread.sleep(THREAD_SLEEP_TIME_MS);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
 }
