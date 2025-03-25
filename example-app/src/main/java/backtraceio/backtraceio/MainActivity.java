@@ -24,7 +24,6 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.anr.BacktraceAppExitInfoSenderHandler;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -35,9 +34,6 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String PREFS_NAME = "MyPrefs";
-    private static final String KEY_NAME = "myKey";
-
     private BacktraceClient backtraceClient;
     private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
@@ -79,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
-
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 
@@ -103,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         BacktraceExceptionHandler.enable(backtraceClient);
 
-        BacktraceAppExitInfoSenderHandler backtraceAppExitInfoSender = new BacktraceAppExitInfoSenderHandler(backtraceClient, context);
+        backtraceClient.metrics.enable();
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);

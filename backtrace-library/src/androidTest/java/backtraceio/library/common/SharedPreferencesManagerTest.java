@@ -40,12 +40,15 @@ public class SharedPreferencesManagerTest {
 
     @Test
     public void testSaveLongToSharedPreferences() {
+        // GIVEN
         String prefName = "test_prefs";
         String key = "test_key";
-        Long value = 12345L;
+        long value = 12345L;
 
+        // WHEN
         sharedPreferencesManager.saveLongToSharedPreferences(prefName, key, value);
 
+        // THEN
         verify(mockContext).getSharedPreferences(prefName, Context.MODE_PRIVATE);
         verify(mockSharedPreferences).edit();
         verify(mockEditor).putLong(key, value);
@@ -54,13 +57,16 @@ public class SharedPreferencesManagerTest {
 
     @Test
     public void testReadLongFromSharedPreferences() {
+        // GIVEN
         String prefName = "test_prefs";
         String key = "test_key";
         long defaultValue = 0L;
         Long expectedValue = 12345L;
 
+        // WHEN
         when(mockSharedPreferences.getLong(key, defaultValue)).thenReturn(expectedValue);
 
+        // THEN
         Long result = sharedPreferencesManager.readLongFromSharedPreferences(prefName, key, defaultValue);
 
         verify(mockContext).getSharedPreferences(prefName, Context.MODE_PRIVATE);
