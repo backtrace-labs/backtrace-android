@@ -10,6 +10,7 @@ import android.app.ApplicationExitInfo;
 import android.content.Context;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SdkSuppress;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import net.jodah.concurrentunit.Waiter;
@@ -86,6 +87,7 @@ public class BacktraceAppExitInfoSenderHandlerTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.R)
     public void checkIfANRIsSentFromAppExitInfo() {
         // GIVEN
         final ProcessExitInfoProvider mockProcessExitInfoProvider = mockActivityManagerExitInfoProvider();
