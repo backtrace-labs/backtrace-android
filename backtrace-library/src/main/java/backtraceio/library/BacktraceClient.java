@@ -328,7 +328,7 @@ public class BacktraceClient extends BacktraceBase {
     }
 
     public BacktraceANRHandler createBacktraceAnrHandler(AnrType anrType, BacktraceANRSettings settings) {
-        if (anrType == AnrType.Event) {
+        if (anrType == AnrType.ApplicationExit) {
             return new BacktraceAppExitInfoSenderHandler(this, context);
         } else if (anrType == AnrType.Threshold){
             return new BacktraceANRHandlerWatchdog(this, settings.getTimeout(), settings.isDebug());
