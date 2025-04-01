@@ -20,7 +20,7 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
 public class BacktraceAppExitInfoSenderHandler extends Thread implements BacktraceANRHandler {
-    private final static String THREAD_NAME = "backtrace-app-exit-info-handler";
+    private final static String THREAD_NAME = "main-anr-appexit";
     private final static String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
     private final static String ANR_COMPLEX_ATTR_KEY = "ANR_ANNOTATIONS";
 
