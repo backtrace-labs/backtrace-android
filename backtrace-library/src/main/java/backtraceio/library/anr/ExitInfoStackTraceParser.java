@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 public class ExitInfoStackTraceParser {
 
     public static StackTraceElement[] parseMainThreadStackTrace(Map<String, Object> parsedData) {
-//        Map<String, Object> parsedData = parseStackTrace(stackTrace);
         Map<String, Object> mainThreadInfo = (Map<String, Object>) parsedData.get("main_thread");
 
         if (mainThreadInfo != null) {
@@ -42,6 +41,10 @@ public class ExitInfoStackTraceParser {
 
     public static Map<String, Object> parseStackTrace(String stackTrace) {
         Map<String, Object> parsedData = new HashMap<>();
+
+        if(stackTrace == null || stackTrace.isEmpty()) {
+            return parsedData;
+        }
 
         // Parse timestamp
         Pattern timestampPattern = Pattern.compile("----- pid \\d+ at (.*?) -----");

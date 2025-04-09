@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationMetadataCache;
@@ -22,7 +23,8 @@ import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 public class BacktraceAppExitInfoSenderHandler extends Thread implements BacktraceANRHandler {
     private final static String THREAD_NAME = "main-anr-appexit";
     private final static String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
-    private final static String ANR_COMPLEX_ATTR_KEY = "ANR_ANNOTATIONS";
+    private final static String ANR_COMPLEX_ATTR_KEY = "ANR annotations";
+    private final static String ANR_STACKTRACE_ATTR_KEY = "ANR parsed stacktrace";
 
     private final BacktraceClient backtraceClient;
     private final String packageName;
@@ -88,16 +90,19 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {
-        HashMap<String, Object> parsedStackTrace = ExitInfoStackTraceParser.parseStackTrace(appExitInfo.)
-        BacktraceANRExitInfoException exception = new BacktraceANRExitInfoException(appExitInfo);
+    private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {;
+        Map<String, Object> anrAttributes = getANRAttributes(appExitInfo);
 
-        HashMap<String, Object> attributes = new HashMap<>();
+        Map<String, Object> parsedStackTraceAttributes = ExitInfoStackTraceParser.parseStackTrace((String) anrAttributes.get("stackTrace"));
+        StackTraceElement[] anrStackTrace = ExitInfoStackTraceParser.parseMainThreadStackTrace(parsedStackTraceAttributes);
 
-        attributes.put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
-        attributes.put(ANR_COMPLEX_ATTR_KEY, getANRAttributes(appExitInfo));
+        HashMap<String, Object> attributes = new HashMap<String, Object>(){{
+            put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
+            put(ANR_COMPLEX_ATTR_KEY, anrAttributes);
+            put(ANR_STACKTRACE_ATTR_KEY, parsedStackTraceAttributes);
+        }};
 
-        return new BacktraceReport(exception, attributes);
+        return new BacktraceReport(new BacktraceANRExitInfoException(appExitInfo, anrStackTrace), attributes);
     }
 
 
