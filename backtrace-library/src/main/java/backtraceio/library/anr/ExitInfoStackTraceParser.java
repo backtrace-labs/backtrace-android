@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StackTraceParser {
+public class ExitInfoStackTraceParser {
 
-    public static StackTraceElement[] parseMainThreadStackTrace(String stackTrace) {
-        Map<String, Object> parsedData = parseStackTrace(stackTrace);
+    public static StackTraceElement[] parseMainThreadStackTrace(Map<String, Object> parsedData) {
+//        Map<String, Object> parsedData = parseStackTrace(stackTrace);
         Map<String, Object> mainThreadInfo = (Map<String, Object>) parsedData.get("main_thread");
 
         if (mainThreadInfo != null) {
@@ -159,6 +159,4 @@ public class StackTraceParser {
 
         return parsedData;
     }
-
-
 }

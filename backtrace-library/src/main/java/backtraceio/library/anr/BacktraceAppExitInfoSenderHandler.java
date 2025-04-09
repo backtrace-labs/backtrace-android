@@ -89,6 +89,7 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {
+        HashMap<String, Object> parsedStackTrace = ExitInfoStackTraceParser.parseStackTrace(appExitInfo.)
         BacktraceANRExitInfoException exception = new BacktraceANRExitInfoException(appExitInfo);
 
         HashMap<String, Object> attributes = new HashMap<>();

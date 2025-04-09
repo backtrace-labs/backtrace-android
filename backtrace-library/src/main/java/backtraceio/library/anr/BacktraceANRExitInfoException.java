@@ -35,7 +35,7 @@ public class BacktraceANRExitInfoException extends Exception {
     public void initAnrStackTrace(ExitInfo exitInfo) {
         try {
             String stackTrace = getStackTraceInfo(exitInfo);
-            this.anrStackTrace = StackTraceParser.parseMainThreadStackTrace(stackTrace);
+            this.anrStackTrace = ExitInfoStackTraceParser.parseMainThreadStackTrace(stackTrace);
         } catch (Exception e) {
             e.printStackTrace();
         }
