@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class ExitInfoStackTraceParser {
-    private static final transient String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
+    private static final String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
 
     static StackTraceElement parseFrame(Pattern javaFramePattern, String frame) {
         StackTraceElement javaFrame = parseJavaFrame(javaFramePattern, frame);
@@ -63,21 +63,25 @@ public class ExitInfoStackTraceParser {
     public static StackTraceElement[] parseMainThreadStackTrace(Map<String, Object> parsedData) {
         Map<String, Object> mainThreadInfo = (Map<String, Object>) parsedData.get("main_thread");
 
-        if (mainThreadInfo != null) {
-            List<String> stackFrames = (List<String>) mainThreadInfo.get("stack_trace");
-            if (stackFrames != null) {
-                List<StackTraceElement> elements = new ArrayList<>();
-                Pattern javaFramePattern = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
-                for (String frame : stackFrames) {
-                    StackTraceElement element = parseFrame(javaFramePattern, frame);
-                    if (element != null) {
-                        elements.add(element);
-                    }
-                }
-                return elements.toArray(new StackTraceElement[0]);
+        if (mainThreadInfo == null) {
+            return new StackTraceElement[0];
+        }
+
+        List<String> stackFrames = (List<String>) mainThreadInfo.get("stack_trace");
+        
+        if (stackFrames == null) {
+            return new StackTraceElement[0];
+        }
+
+        List<StackTraceElement> elements = new ArrayList<>();
+        Pattern javaFramePattern = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
+        for (String frame : stackFrames) {
+            StackTraceElement element = parseFrame(javaFramePattern, frame);
+            if (element != null) {
+                elements.add(element);
             }
         }
-        return new StackTraceElement[0];
+        return elements.toArray(new StackTraceElement[0]);
     }
 
     public static Map<String, Object> parseStackTrace(String stackTrace) {
