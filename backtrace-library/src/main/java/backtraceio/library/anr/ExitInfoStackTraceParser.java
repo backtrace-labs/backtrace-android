@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 public class ExitInfoStackTraceParser {
 
+    public static StackTraceElement parseNativeFrame(String frame) {
+        return null;
+    }
     public static StackTraceElement[] parseMainThreadStackTrace(Map<String, Object> parsedData) {
         Map<String, Object> mainThreadInfo = (Map<String, Object>) parsedData.get("main_thread");
 
@@ -31,6 +34,24 @@ public class ExitInfoStackTraceParser {
                         String methodName = (lastDot == -1) ? "" : fullClassNameMethod.substring(lastDot + 1);
 
                         elements.add(new StackTraceElement(className, methodName, fileName, lineNumber));
+                    }
+                    else {
+                        if (!frame.startsWith("native")) {
+                            continue;
+                        }
+                        String[] parts = frame.split("\\s+", 6);
+
+                        String address = parts[3]; // "0005ad68"
+                        String library = parts[4]; // "/apex/com.android.runtime/lib/bionic/libc.so"
+                        String funcName = parts[5].substring(1, parts[5].indexOf('+')); // strip "(" and extract up to "+"
+
+                        Map<String, String> result = new HashMap<>();
+                        result.put("funcName", funcName);
+                        result.put("library", library);
+                        result.put("address", address);;
+
+                        elements.add(new StackTraceElement("native: " + library, funcName, " address: " + address, -1));
+//                        elements.add(new StackTraceElement(library, funcName,  address, 0));
                     }
                 }
                 return elements.toArray(new StackTraceElement[0]);
