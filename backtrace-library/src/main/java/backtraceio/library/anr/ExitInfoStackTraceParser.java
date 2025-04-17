@@ -16,7 +16,7 @@ import backtraceio.library.logger.BacktraceLogger;
 
 public class ExitInfoStackTraceParser {
     private static final String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
-
+    private static final int NATIVE_STACK_ELEMENTS_NUMBER = 6;
     static StackTraceElement parseFrame(Pattern javaFramePattern, String frame) {
         StackTraceElement javaFrame = parseJavaFrame(javaFramePattern, frame);
         if (javaFrame != null) {
@@ -30,17 +30,19 @@ public class ExitInfoStackTraceParser {
         if (!frame.startsWith("native")) {
             return null;
         }
-        String[] parts = frame.split("\\s+", 6);
+        String[] parts = frame.split("\\s+", NATIVE_STACK_ELEMENTS_NUMBER);
 
-        if (parts.length < 6) {
+        if (parts.length < NATIVE_STACK_ELEMENTS_NUMBER) {
             return null;
         }
 
         String address = parts[3];
         String library = parts[4];
-        String funcName = parts[5].substring(1, parts[5].indexOf('+'));
+        String funcName = parts[5];
 
-        return new StackTraceElement("native: " + library, funcName, " address: " + address, -1);
+        return new StackTraceElement(library, funcName, " address: " + address, -1);
+
+//        return new StackTraceElement(funcName, library, "native address: " + address, 0);
     }
 
     static StackTraceElement parseJavaFrame(Pattern javaFramePattern, String frame) {
@@ -68,7 +70,7 @@ public class ExitInfoStackTraceParser {
         }
 
         List<String> stackFrames = (List<String>) mainThreadInfo.get("stack_trace");
-        
+
         if (stackFrames == null) {
             return new StackTraceElement[0];
         }
@@ -84,78 +86,73 @@ public class ExitInfoStackTraceParser {
         return elements.toArray(new StackTraceElement[0]);
     }
 
-    public static Map<String, Object> parseStackTrace(String stackTrace) {
+    public static Map<String, Object> parseANRStackTrace(String stackTrace) {
         Map<String, Object> parsedData = new HashMap<>();
 
         if (stackTrace == null || stackTrace.isEmpty()) {
             return parsedData;
         }
 
-        try {
             // Parse timestamp
-            parsedData.put("timestamp", parseTimestamp(stackTrace));
+        parsedData.put("timestamp", parseTimestamp(stackTrace));
 
-            // Parse PID
-            Pattern pidPattern = Pattern.compile("----- pid (\\d+) at");
-            Matcher pidMatcher = pidPattern.matcher(stackTrace);
-            if (pidMatcher.find()) {
-                parsedData.put("pid", Integer.parseInt(pidMatcher.group(1)));
-            }
-
-            // Parse command line
-            Pattern cmdLinePattern = Pattern.compile("Cmd line: (.*)");
-            Matcher cmdLineMatcher = cmdLinePattern.matcher(stackTrace);
-            if (cmdLineMatcher.find()) {
-                parsedData.put("command_line", cmdLineMatcher.group(1));
-            }
-
-            // Parse build fingerprint
-            Pattern fingerprintPattern = Pattern.compile("Build fingerprint: '(.*?)'");
-            Matcher fingerprintMatcher = fingerprintPattern.matcher(stackTrace);
-            if (fingerprintMatcher.find()) {
-                parsedData.put("build_fingerprint", fingerprintMatcher.group(1));
-            }
-
-            // Parse ABI
-            Pattern abiPattern = Pattern.compile("ABI: '(.*?)'");
-            Matcher abiMatcher = abiPattern.matcher(stackTrace);
-            if (abiMatcher.find()) {
-                parsedData.put("abi", abiMatcher.group(1));
-            }
-
-            // Parse build type
-            Pattern buildTypePattern = Pattern.compile("Build type: (.*)");
-            Matcher buildTypeMatcher = buildTypePattern.matcher(stackTrace);
-            if (buildTypeMatcher.find()) {
-                parsedData.put("build_type", buildTypeMatcher.group(1));
-            }
-
-            // Parse heap information
-            Pattern heapPattern = Pattern.compile("Heap: (.*)");
-            Matcher heapMatcher = heapPattern.matcher(stackTrace);
-            if (heapMatcher.find()) {
-                parsedData.put("heap_info", heapMatcher.group(1));
-            }
-
-            // Parse Dalvik Threads
-            List<Map<String, Object>> threads = new ArrayList<>();
-            Pattern threadStartPattern = Pattern.compile(
-                    "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?)/.*? handle=(.*?)");
-            Matcher threadStartMatcher = threadStartPattern.matcher(stackTrace);
-
-            while (threadStartMatcher.find()) {
-                Map<String, Object> threadInfo = parseThreadInformation(stackTrace, threadStartMatcher);
-                threads.add(threadInfo);
-            }
-            parsedData.put("threads", threads);
-
-            // Find the main thread
-            Map<String, Object> mainThreadInfo = getMainThreadInfo(threads);
-            parsedData.put("main_thread", mainThreadInfo);
-
-        } catch (Exception ex) {
-            BacktraceLogger.e(LOG_TAG, "Error during parsing ExitInfoStackTrace", ex);
+        // Parse PID
+        Pattern pidPattern = Pattern.compile("----- pid (\\d+) at");
+        Matcher pidMatcher = pidPattern.matcher(stackTrace);
+        if (pidMatcher.find()) {
+            parsedData.put("pid", Integer.parseInt(pidMatcher.group(1)));
         }
+
+        // Parse command line
+        Pattern cmdLinePattern = Pattern.compile("Cmd line: (.*)");
+        Matcher cmdLineMatcher = cmdLinePattern.matcher(stackTrace);
+        if (cmdLineMatcher.find()) {
+            parsedData.put("command_line", cmdLineMatcher.group(1));
+        }
+
+        // Parse build fingerprint
+        Pattern fingerprintPattern = Pattern.compile("Build fingerprint: '(.*?)'");
+        Matcher fingerprintMatcher = fingerprintPattern.matcher(stackTrace);
+        if (fingerprintMatcher.find()) {
+            parsedData.put("build_fingerprint", fingerprintMatcher.group(1));
+        }
+
+        // Parse ABI
+        Pattern abiPattern = Pattern.compile("ABI: '(.*?)'");
+        Matcher abiMatcher = abiPattern.matcher(stackTrace);
+        if (abiMatcher.find()) {
+            parsedData.put("abi", abiMatcher.group(1));
+        }
+
+        // Parse build type
+        Pattern buildTypePattern = Pattern.compile("Build type: (.*)");
+        Matcher buildTypeMatcher = buildTypePattern.matcher(stackTrace);
+        if (buildTypeMatcher.find()) {
+            parsedData.put("build_type", buildTypeMatcher.group(1));
+        }
+
+        // Parse heap information
+        Pattern heapPattern = Pattern.compile("Heap: (.*)");
+        Matcher heapMatcher = heapPattern.matcher(stackTrace);
+        if (heapMatcher.find()) {
+            parsedData.put("heap_info", heapMatcher.group(1));
+        }
+
+        // Parse Dalvik Threads
+        List<Map<String, Object>> threads = new ArrayList<>();
+        Pattern threadStartPattern = Pattern.compile(
+                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?)/.*? handle=(.*?)");
+        Matcher threadStartMatcher = threadStartPattern.matcher(stackTrace);
+
+        while (threadStartMatcher.find()) {
+            Map<String, Object> threadInfo = parseThreadInformation(stackTrace, threadStartMatcher);
+            threads.add(threadInfo);
+        }
+        parsedData.put("threads", threads);
+
+        // Find the main thread
+        Map<String, Object> mainThreadInfo = getMainThreadInfo(threads);
+        parsedData.put("main_thread", mainThreadInfo);
 
         return parsedData;
     }

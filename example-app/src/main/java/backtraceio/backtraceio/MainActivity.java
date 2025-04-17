@@ -141,7 +141,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void handledException(View view) {
+
         try {
+            while(true)
+            {
+                System.out.println(System.nanoTime());
+                if ( 5 > 100) {
+                    break;
+                }
+            }
             try {
                 List<String> myWarriorArmor = getWarriorArmor();
                 int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");

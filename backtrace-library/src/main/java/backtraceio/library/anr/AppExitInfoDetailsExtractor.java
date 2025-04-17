@@ -29,7 +29,6 @@ public class AppExitInfoDetailsExtractor {
         final HashMap<String, Object> attributes = new HashMap<>();
         attributes.put("description", appExitInfo.getDescription());
         attributes.put("timestamp", getANRTimestamp(appExitInfo));
-        attributes.put("stackTrace", AppExitInfoDetailsExtractor.getStackTraceInfo(appExitInfo));
         attributes.put("reason-code", appExitInfo.getReason());
         attributes.put("reason", reasonCodeToDescription(appExitInfo.getReason()));
         attributes.put("PID", appExitInfo.getPid());
@@ -41,7 +40,7 @@ public class AppExitInfoDetailsExtractor {
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     public static String getANRMessage(ExitInfo appExitInfo) {
-        return "ApplicationExitInfo ANR Exception" + " | " +
+        return "Application Not Responding" + " | " +
                 "Description: " + appExitInfo.getDescription() + " | " +
                 "Timestamp: " + getANRTimestamp(appExitInfo);
     }
@@ -53,7 +52,7 @@ public class AppExitInfoDetailsExtractor {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private static String getStackTraceInfo(ExitInfo exitInfo) {
+    public static String getStackTraceInfo(ExitInfo exitInfo) {
         InputStream traceStream = getStreamOrNull(exitInfo);
         if (traceStream == null) {
             BacktraceLogger.w(LOG_TAG, "Unexpected null trace stream");

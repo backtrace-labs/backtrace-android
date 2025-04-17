@@ -24,7 +24,8 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     private final static String THREAD_NAME = "main-anr-appexit";
     private final static String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
     private final static String ANR_COMPLEX_ATTR_KEY = "ANR annotations";
-    private final static String ANR_STACKTRACE_ATTR_KEY = "ANR parsed stacktrace";
+    private final static String ANR_STACKTRACE_PARSED_ATTR_KEY = "ANR parsed stacktrace";
+    private final static String ANR_STACKTRACE_ATTR_KEY = "ANR stacktrace";
 
     private final BacktraceClient backtraceClient;
     private final String packageName;
@@ -79,6 +80,14 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     @RequiresApi(api = Build.VERSION_CODES.R)
     private void sendApplicationExitInfoReport(ExitInfo appExitInfo) {
         final BacktraceReport report = generateBacktraceReport(appExitInfo);
+
+        if (report == null) {
+            synchronized (this.anrAppExitInfoState) {
+                this.anrAppExitInfoState.saveTimestamp(appExitInfo.getTimestamp());
+            }
+            return;
+        }
+
         BacktraceLogger.d(LOG_TAG, "Sending ApplicationExitInfo ANR: " + report.message);
         backtraceClient.send(report, backtraceResult -> {
             synchronized (this.anrAppExitInfoState) {
@@ -91,20 +100,35 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {;
-        Map<String, Object> anrAttributes = getANRAttributes(appExitInfo);
+        final Map<String, Object> anrAttributes = getANRAttributes(appExitInfo);
+        final String stackTrace = AppExitInfoDetailsExtractor.getStackTraceInfo(appExitInfo);
 
-        Map<String, Object> parsedStackTraceAttributes = ExitInfoStackTraceParser.parseStackTrace((String) anrAttributes.get("stackTrace"));
-        StackTraceElement[] anrStackTrace = ExitInfoStackTraceParser.parseMainThreadStackTrace(parsedStackTraceAttributes);
+        if (stackTrace == null || stackTrace.isEmpty()) {
+            BacktraceLogger.w(LOG_TAG, "Empty stacktrace for ApplicationExitInfo");
+            return null;
+        }
 
-        HashMap<String, Object> attributes = new HashMap<String, Object>(){{
+        final Map<String, Object> parsedStackTraceAttributes = this.getAttributesFromStacktrace(stackTrace);
+        final StackTraceElement[] anrStackTrace = ExitInfoStackTraceParser.parseMainThreadStackTrace(parsedStackTraceAttributes);
+
+        final HashMap<String, Object> attributes = new HashMap<String, Object>(){{
             put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
             put(ANR_COMPLEX_ATTR_KEY, anrAttributes);
-            put(ANR_STACKTRACE_ATTR_KEY, parsedStackTraceAttributes);
+            put(ANR_STACKTRACE_ATTR_KEY, stackTrace);
+            put(ANR_STACKTRACE_PARSED_ATTR_KEY, parsedStackTraceAttributes);
         }};
 
         return new BacktraceReport(new BacktraceANRExitInfoException(appExitInfo, anrStackTrace), attributes);
     }
 
+    private Map<String, Object> getAttributesFromStacktrace(String stacktrace) {
+        try {
+            return ExitInfoStackTraceParser.parseANRStackTrace(stacktrace);
+        } catch (Exception ex) {
+            BacktraceLogger.e(LOG_TAG, "Error during parsing ExitInfoStackTrace", ex);
+            return new HashMap<>();
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     private boolean isSupportedTypeOfApplicationExit(ExitInfo appExitInfo) {
@@ -116,8 +140,8 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     private boolean shouldProcessAppExitInfo(ExitInfo appExitInfo) {
         long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
         long anrTimestamp = appExitInfo.getTimestamp();
-//        return true;
-//
+
+//        TODO: uncomment
 //        if (lastAnrTimestamp >= anrTimestamp) {
 //            return false;
 //        }
@@ -136,6 +160,5 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @Override
-    public void stopMonitoringAnr() {
-    }
+    public void stopMonitoringAnr() { }
 }
