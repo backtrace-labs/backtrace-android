@@ -128,7 +128,7 @@ public class BacktraceAppExitInfoSenderHandlerTest {
 
         // THEN
         try {
-            waiter.await(500, TimeUnit.SECONDS); // Check if anr is detected and event was emitted
+            waiter.await(5, TimeUnit.SECONDS); // Check if anr is detected and event was emitted
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
