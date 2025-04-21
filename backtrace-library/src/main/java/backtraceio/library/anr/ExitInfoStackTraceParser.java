@@ -16,9 +16,10 @@ import backtraceio.library.logger.BacktraceLogger;
 
 public class ExitInfoStackTraceParser {
     private static final String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
+    private static final Pattern JAVA_FRAME_PATTERN = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
     private static final int NATIVE_STACK_ELEMENTS_NUMBER = 6;
-    static StackTraceElement parseFrame(Pattern javaFramePattern, String frame) {
-        StackTraceElement javaFrame = parseJavaFrame(javaFramePattern, frame);
+    static StackTraceElement parseFrame(String frame) {
+        StackTraceElement javaFrame = parseJavaFrame(frame);
         if (javaFrame != null) {
             return javaFrame;
         }
@@ -43,8 +44,8 @@ public class ExitInfoStackTraceParser {
         return new StackTraceElement(library, funcName, " address: " + address, 0);
     }
 
-    static StackTraceElement parseJavaFrame(Pattern javaFramePattern, String frame) {
-        Matcher matcher = javaFramePattern.matcher(frame);
+    static StackTraceElement parseJavaFrame(String frame) {
+        Matcher matcher = JAVA_FRAME_PATTERN.matcher(frame);
         if (!matcher.find()) {
             return null;
         }
@@ -74,9 +75,8 @@ public class ExitInfoStackTraceParser {
         }
 
         List<StackTraceElement> elements = new ArrayList<>();
-        Pattern javaFramePattern = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
         for (String frame : stackFrames) {
-            StackTraceElement element = parseFrame(javaFramePattern, frame);
+            StackTraceElement element = parseFrame(frame);
             if (element != null) {
                 elements.add(element);
             }
