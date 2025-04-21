@@ -40,9 +40,7 @@ public class ExitInfoStackTraceParser {
         String library = parts[4];
         String funcName = parts[5];
 
-        return new StackTraceElement(library, funcName, " address: " + address, -1);
-
-//        return new StackTraceElement(funcName, library, "native address: " + address, 0);
+        return new StackTraceElement(library, funcName, " address: " + address, 0);
     }
 
     static StackTraceElement parseJavaFrame(Pattern javaFramePattern, String frame) {
