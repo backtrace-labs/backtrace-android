@@ -41,7 +41,7 @@ public class ExitInfoStackTraceParser {
         String library = parts[4];
         String funcName = parts[5];
 
-        return new StackTraceElement(library, funcName, " address: " + address, 0);
+        return new StackTraceElement(library, funcName, "address: " + address, 0);
     }
 
     static StackTraceElement parseJavaFrame(String frame) {
@@ -138,8 +138,16 @@ public class ExitInfoStackTraceParser {
 
         // Parse Dalvik Threads
         List<Map<String, Object>> threads = new ArrayList<>();
-        Pattern threadStartPattern = Pattern.compile(
-                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?)/.*? handle=(.*?)");
+        String regex = "\"(?<name>.*?)\"\\s*prio=(?<prio>\\d+)?\\s*tid=(?<tid>\\d+)?\\s*(?<native>Native)?\\s*\\n" +
+                "\\s*\\|\\s*group=\"(?<group>.*?)\"\\s*sCount=(?<sCount>\\d+)?\\s*dsCount=(?<dsCount>\\d+)?\\s*flags=(?<flags>\\d+)?\\s*obj=(?<obj>0x[0-9a-fA-F]+)?\\s*self=(?<self>0x[0-9a-fA-F]+)?\\s*\\n" +
+                "\\s*\\|\\s*sysTid=(?<sysTid>\\d+)?\\s*nice=(?<nice>-?\\d+)?\\s*cgrp=(?<cgrp>.*?)?\\s*sched=(?<sched>[^\\s]+)?\\s*handle=(?<handle>0x[0-9a-fA-F]+)?\\s*\\n" +
+                "\\s*\\|\\s*state=(?<state>\\w+)?\\s*schedstat=\\(\\s*(?<schedstat1>\\d+)?\\s+(?<schedstat2>\\d+)?\\s+(?<schedstat3>\\d+)?\\s*\\)\\s*utm=(?<utm>\\d+)?\\s*stm=(?<stm>\\d+)?\\s*core=(?<core>\\d+)?\\s*HZ=(?<hz>\\d+)?\\s*\\n" +
+                "\\s*\\|\\s*stack=(?<stackStart>0x[0-9a-fA-F]+)?-(?<stackEnd>0x[0-9a-fA-F]+)?\\s*stackSize=(?<stackSize>\\d+)?KB\\s*\\n" +
+                "\\s*\\|\\s*held mutexes=?(?<mutexes>.*)?";
+        Pattern threadStartPattern = Pattern.compile(regex);
+
+//                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?).*? handle=(.*?)", Pattern.DOTALL);
+
         Matcher threadStartMatcher = threadStartPattern.matcher(stackTrace);
 
         while (threadStartMatcher.find()) {

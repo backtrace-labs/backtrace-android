@@ -28,7 +28,7 @@ public class TestUtils {
                 StringBuilder jsonStringBuilder = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    jsonStringBuilder.append(line);
+                    jsonStringBuilder.append(line + "\n");
                 }
                 return jsonStringBuilder.toString();
 

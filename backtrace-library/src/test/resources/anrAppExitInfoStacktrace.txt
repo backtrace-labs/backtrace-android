@@ -1,4 +1,3 @@
-
 ----- pid 9207 at 2025-03-27 21:02:38 -----
 Cmd line: backtraceio.backtraceio
 Build fingerprint: 'google/sdk_gphone_x86/generic_x86_arm:11/RSR1.201013.001/6903271:user/release-keys'
@@ -520,4 +519,3 @@ sysTid=9237      futex_wait_queue_me
 sysTid=9239      futex_wait_queue_me
 
 ----- end 9207 -----
-
