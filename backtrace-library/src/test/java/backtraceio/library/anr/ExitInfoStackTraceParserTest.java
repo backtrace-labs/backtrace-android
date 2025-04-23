@@ -2,10 +2,10 @@ package backtraceio.library.anr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,10 +52,14 @@ public class ExitInfoStackTraceParserTest {
         assertNotNull(anrStacktrace);
         assertNotNull(anrStacktrace.get("main_thread"));
         assertEquals("x86", anrStacktrace.get("abi"));
-
+        assertEquals("74% free, 6892KB/25MB; 138095 objects", anrStacktrace.get("heap_info"));
+        assertEquals("google/sdk_gphone_x86/generic_x86_arm:11/RSR1.201013.001/6903271:user/release-keys", anrStacktrace.get("build_fingerprint"));
+        assertEquals("optimized", anrStacktrace.get("build_type"));
+        assertEquals("backtraceio.backtraceio", anrStacktrace.get("command_line"));
+        assertEquals("2025-03-27 21:02:38", anrStacktrace.get("timestamp"));
         assertEquals(9207, anrStacktrace.get("pid"));
-        assertNull(anrStacktrace.get("timestamp")); // TODO?
 
+        // THEN THREADS
         List<Map<String, Object>> threads = (List<Map<String, Object>>) anrStacktrace.get("threads");
         assertEquals(20, threads.size());
 
@@ -67,6 +71,32 @@ public class ExitInfoStackTraceParserTest {
         assertEquals("at java.lang.Thread.sleep(Thread.java:442)", thread4StackTrace.get(1));
         assertEquals("at java.lang.Thread.sleep(Thread.java:358)", thread4StackTrace.get(2));
         assertEquals("at backtraceio.library.watchdog.BacktraceANRHandlerWatchdog.run(BacktraceANRHandlerWatchdog.java:118)", thread4StackTrace.get(3));
+
+        // THEN MAIN THREAD
+        Map<String, Object> mainThread = (Map<String, Object>) anrStacktrace.get("main_thread");
+        assertEquals(1, mainThread.get("flags"));
+        assertEquals("", mainThread.get("handle"));
+        assertEquals(5, mainThread.get("priority"));
+        assertEquals("top-app", mainThread.get("cgrp"));
+        assertEquals(1, mainThread.get("tid"));
+        assertEquals(-10, mainThread.get("nice"));
+        assertEquals(false, mainThread.get("daemon"));
+        assertEquals(0, mainThread.get("dscount"));
+        assertEquals("0/0", mainThread.get("sched"));
+        assertEquals("0x72287300", mainThread.get("obj"));
+        assertEquals("main", mainThread.get("name"));
+        assertEquals(1, mainThread.get("scount"));
+        assertEquals("0xe7380e10", mainThread.get("self"));
+        assertEquals("Native", mainThread.get("state"));
+
+        ArrayList<?> stackTrace = (ArrayList<?>) mainThread.get("stack_trace");
+        assertEquals(36, stackTrace.size());
+
+        assertEquals(9207, mainThread.get("systid"));
+        assertEquals("main", mainThread.get("group"));
+
+        assertEquals("native: #20 pc 005886a0  /apex/com.android.art/lib/libart.so (art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*)+80)", stackTrace.get(20));
+        assertEquals("at androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener.onClick(AppCompatViewInflater.java:468)", stackTrace.get(24));
     }
     @Test
     public void parseAnrMainThreadStackTrace() {

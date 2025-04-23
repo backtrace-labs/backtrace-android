@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class ExitInfoStackTraceParser {
     private static final String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
     private static final Pattern JAVA_FRAME_PATTERN = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
+    private static final String MAIN_THREAD_NAME = "main";
     private static final int NATIVE_STACK_ELEMENTS_NUMBER = 6;
     static StackTraceElement parseFrame(String frame) {
         StackTraceElement javaFrame = parseJavaFrame(frame);
@@ -165,7 +166,7 @@ public class ExitInfoStackTraceParser {
     private static Map<String, Object> getMainThreadInfo(List<Map<String, Object>> threads) {
         Map<String, Object> mainThreadInfo = null;
         for (Map<String, Object> thread : threads) {
-            if (thread.get("name").equals("main")) {
+            if (thread.get("name").equals(MAIN_THREAD_NAME)) {
                 mainThreadInfo = thread;
                 break;
             }
@@ -192,9 +193,13 @@ public class ExitInfoStackTraceParser {
         threadInfo.put("cgrp", threadStartMatcher.group(14));
         threadInfo.put("sched", threadStartMatcher.group(15));
         threadInfo.put("handle", threadStartMatcher.group(16));
+        threadInfo.put("stack_trace", parseThreadStacktrace(stackTrace, threadStartMatcher));
+        return threadInfo;
+    }
 
-        // Parse the stack trace for this thread
-        Pattern stackFramePattern = Pattern.compile("\\s*(native: #\\d+ pc .*|at .*\\((.*?)\\))");
+    @NonNull
+    private static List<String> parseThreadStacktrace(String stackTrace, Matcher threadStartMatcher) {
+        Pattern stackFramePattern = Pattern.compile("\\s*(native: #\\d+ pc .*|at .*\\((.*?)\\))"); // native or java stack frame
         int startIndex = threadStartMatcher.end();
         int endIndex = stackTrace.indexOf("\n\"", startIndex); // Find the start of the next thread or end of input
         if (endIndex == -1) {
@@ -205,7 +210,6 @@ public class ExitInfoStackTraceParser {
         while (stackFrameMatcher.find()) {
             stackFrames.add(stackFrameMatcher.group().trim());
         }
-        threadInfo.put("stack_trace", stackFrames);
-        return threadInfo;
+        return stackFrames;
     }
 }
