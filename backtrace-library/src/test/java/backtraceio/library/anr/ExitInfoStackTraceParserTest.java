@@ -50,7 +50,7 @@ public class ExitInfoStackTraceParserTest {
 
         // THEN
         assertNotNull(anrStacktrace);
-        assertNull(anrStacktrace.get("main_thread"));
+        assertNotNull(anrStacktrace.get("main_thread"));
         assertEquals("x86", anrStacktrace.get("abi"));
 
         assertEquals(9207, anrStacktrace.get("pid"));
@@ -58,11 +58,15 @@ public class ExitInfoStackTraceParserTest {
 
         List<Map<String, Object>> threads = (List<Map<String, Object>>) anrStacktrace.get("threads");
         assertEquals(20, threads.size());
+
+        Map<String, Object> customThread4 = threads.get(18);
+        List<String> thread4StackTrace = (List<String>) customThread4.get("stack_trace");
+
         assertEquals("Thread-4", threads.get(18).get("name"));
-        assertEquals("at java.lang.Thread.sleep(Native method)", ((List<String>)threads.get(18).get("stack_trace")).get(0));
-        assertEquals("at java.lang.Thread.sleep(Thread.java:442)", ((List<String>)threads.get(18).get("stack_trace")).get(1));
-        assertEquals("at java.lang.Thread.sleep(Thread.java:358)", ((List<String>)threads.get(18).get("stack_trace")).get(2));
-        assertEquals("at backtraceio.library.watchdog.BacktraceANRHandlerWatchdog.run(BacktraceANRHandlerWatchdog.java:118)", ((List<String>)threads.get(18).get("stack_trace")).get(3));
+        assertEquals("at java.lang.Thread.sleep(Native method)", thread4StackTrace.get(0));
+        assertEquals("at java.lang.Thread.sleep(Thread.java:442)", thread4StackTrace.get(1));
+        assertEquals("at java.lang.Thread.sleep(Thread.java:358)", thread4StackTrace.get(2));
+        assertEquals("at backtraceio.library.watchdog.BacktraceANRHandlerWatchdog.run(BacktraceANRHandlerWatchdog.java:118)", thread4StackTrace.get(3));
     }
     @Test
     public void parseAnrMainThreadStackTrace() {

@@ -3,16 +3,12 @@ package backtraceio.library.anr;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import backtraceio.library.logger.BacktraceLogger;
 
 public class ExitInfoStackTraceParser {
     private static final String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
@@ -160,21 +156,7 @@ public class ExitInfoStackTraceParser {
         Pattern timestampPattern = Pattern.compile("----- pid \\d+ at (.*?) -----");
         Matcher timestampMatcher = timestampPattern.matcher(stackTrace);
         if (timestampMatcher.find()) {
-            String timestampStr = timestampMatcher.group(1);
-            try {
-                DateTimeFormatter formatter = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                }
-                LocalDateTime dateTime = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    dateTime = LocalDateTime.parse(timestampStr, formatter);
-                }
-                return dateTime;
-            } catch (Exception e) {
-                BacktraceLogger.e(LOG_TAG, "Error on parsing ExitInfoStackTrace timestamp: " + stackTrace, e);
-                return timestampStr;
-            }
+            return timestampMatcher.group(1);
         }
         return null;
     }
