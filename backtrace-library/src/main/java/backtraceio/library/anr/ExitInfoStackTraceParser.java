@@ -138,15 +138,8 @@ public class ExitInfoStackTraceParser {
 
         // Parse Dalvik Threads
         List<Map<String, Object>> threads = new ArrayList<>();
-        String regex = "\"(?<name>.*?)\"\\s*prio=(?<prio>\\d+)?\\s*tid=(?<tid>\\d+)?\\s*(?<native>Native)?\\s*\\n" +
-                "\\s*\\|\\s*group=\"(?<group>.*?)\"\\s*sCount=(?<sCount>\\d+)?\\s*dsCount=(?<dsCount>\\d+)?\\s*flags=(?<flags>\\d+)?\\s*obj=(?<obj>0x[0-9a-fA-F]+)?\\s*self=(?<self>0x[0-9a-fA-F]+)?\\s*\\n" +
-                "\\s*\\|\\s*sysTid=(?<sysTid>\\d+)?\\s*nice=(?<nice>-?\\d+)?\\s*cgrp=(?<cgrp>.*?)?\\s*sched=(?<sched>[^\\s]+)?\\s*handle=(?<handle>0x[0-9a-fA-F]+)?\\s*\\n" +
-                "\\s*\\|\\s*state=(?<state>\\w+)?\\s*schedstat=\\(\\s*(?<schedstat1>\\d+)?\\s+(?<schedstat2>\\d+)?\\s+(?<schedstat3>\\d+)?\\s*\\)\\s*utm=(?<utm>\\d+)?\\s*stm=(?<stm>\\d+)?\\s*core=(?<core>\\d+)?\\s*HZ=(?<hz>\\d+)?\\s*\\n" +
-                "\\s*\\|\\s*stack=(?<stackStart>0x[0-9a-fA-F]+)?-(?<stackEnd>0x[0-9a-fA-F]+)?\\s*stackSize=(?<stackSize>\\d+)?KB\\s*\\n" +
-                "\\s*\\|\\s*held mutexes=?(?<mutexes>.*)?";
-        Pattern threadStartPattern = Pattern.compile(regex);
-
-//                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?).*? handle=(.*?)", Pattern.DOTALL);
+        Pattern threadStartPattern = Pattern.compile(
+                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?) handle=(.*?)");
 
         Matcher threadStartMatcher = threadStartPattern.matcher(stackTrace);
 
@@ -219,7 +212,6 @@ public class ExitInfoStackTraceParser {
         threadInfo.put("handle", threadStartMatcher.group(16));
 
         // Parse the stack trace for this thread
-        StringBuilder stackTraceBuilder = new StringBuilder();
         Pattern stackFramePattern = Pattern.compile("\\s*(native: #\\d+ pc .*|at .*\\((.*?)\\))");
         int startIndex = threadStartMatcher.end();
         int endIndex = stackTrace.indexOf("\n\"", startIndex); // Find the start of the next thread or end of input
