@@ -24,7 +24,6 @@ import java.util.Map;
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.anr.AnrType;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
@@ -76,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
-        BacktraceCredentials credentials = new BacktraceCredentials("https://yolo.sp.backtrace.io:6098/",
-                "2dd86e8e779d1fc7e22e7b19a9489abeedec3b1426abe7e2209888e92362fba4");
+        BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         database.setupNativeIntegration(backtraceClient, credentials, true);
 
         // Enable ANR detection
-        backtraceClient.enableAnr(AnrType.ApplicationExit);
+        backtraceClient.enableAnr(anrTimeout);
         return backtraceClient;
     }
 
@@ -141,15 +139,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void handledException(View view) {
-
         try {
-            while(true)
-            {
-                System.out.println(System.nanoTime());
-                if ( 5 > 100) {
-                    break;
-                }
-            }
             try {
                 List<String> myWarriorArmor = getWarriorArmor();
                 int magicWandIndex = findEquipmentIndex(myWarriorArmor, "Magic Wand");
