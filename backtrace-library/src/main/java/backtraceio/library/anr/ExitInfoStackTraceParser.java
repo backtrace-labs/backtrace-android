@@ -133,16 +133,17 @@ public class ExitInfoStackTraceParser {
         }
 
         // Parse Dalvik Threads
-        List<Map<String, Object>> threads = new ArrayList<>();
-        Pattern threadStartPattern = Pattern.compile(
-                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?) handle=(.*?)");
 
-        Matcher threadStartMatcher = threadStartPattern.matcher(stackTrace);
-
-        while (threadStartMatcher.find()) {
-            Map<String, Object> threadInfo = parseThreadInformation(stackTrace, threadStartMatcher);
-            threads.add(threadInfo);
-        }
+//        Pattern threadStartPattern = Pattern.compile(
+//                "\"(.*?)\" (daemon )?prio=(\\d+) tid=(\\d+) (.*?)\n\\s*\\| group=\"(.*?)\" sCount=(\\d+) dsCount=(\\d+) flags=(\\d+) obj=(.*?) self=(.*?)\n\\s*\\| sysTid=(\\d+) nice=(-?\\d+) cgrp=(.*?) sched=(.*?) handle=(.*?)");
+//
+//        Matcher threadStartMatcher = threadStartPattern.matcher(stackTrace);
+//
+//        while (threadStartMatcher.find()) {
+//            Map<String, Object> threadInfo = ;
+//            threads.add(threadInfo);
+//        }
+        List<Map<String, Object>> threads = parseThreadDumps(stackTrace);
         parsedData.put("threads", threads);
 
         // Find the main thread
@@ -172,29 +173,129 @@ public class ExitInfoStackTraceParser {
         }
         return mainThreadInfo;
     }
+    private static Map<String, Object> parseThreadInformation(String threadDump) {
+        Map<String, Object> result = new HashMap<>();
 
-    @NonNull
-    private static Map<String, Object> parseThreadInformation(String stackTrace, Matcher threadStartMatcher) {
-        Map<String, Object> threadInfo = new HashMap<>();
-        threadInfo.put("name", threadStartMatcher.group(1));
-        threadInfo.put("daemon", threadStartMatcher.group(2) != null);
-        threadInfo.put("priority", Integer.parseInt(threadStartMatcher.group(3)));
-        threadInfo.put("tid", Integer.parseInt(threadStartMatcher.group(4)));
-        threadInfo.put("state", threadStartMatcher.group(5).trim());
-        threadInfo.put("group", threadStartMatcher.group(6));
-        threadInfo.put("scount", Integer.parseInt(threadStartMatcher.group(7)));
-        threadInfo.put("dscount", Integer.parseInt(threadStartMatcher.group(8)));
-        threadInfo.put("flags", Integer.parseInt(threadStartMatcher.group(9)));
-        threadInfo.put("obj", threadStartMatcher.group(10));
-        threadInfo.put("self", threadStartMatcher.group(11));
-        threadInfo.put("systid", Integer.parseInt(threadStartMatcher.group(12)));
-        threadInfo.put("nice", Integer.parseInt(threadStartMatcher.group(13)));
-        threadInfo.put("cgrp", threadStartMatcher.group(14));
-        threadInfo.put("sched", threadStartMatcher.group(15));
-        threadInfo.put("handle", threadStartMatcher.group(16));
-        threadInfo.put("stack_trace", parseThreadStacktrace(stackTrace, threadStartMatcher));
-        return threadInfo;
+        // Parse header line
+        Pattern headerPattern = Pattern.compile("\"([^\"]+)\"\\s*(daemon)?\\s*prio=(\\d+)\\s*tid=(\\d+)\\s*([^\\n]+)");
+        Matcher headerMatcher = headerPattern.matcher(threadDump);
+
+        if (headerMatcher.find()) {
+            result.put("name", headerMatcher.group(1));
+            result.put("isDaemon", headerMatcher.group(2) != null);
+            result.put("priority", Integer.parseInt(headerMatcher.group(3)));
+            result.put("tid", Integer.parseInt(headerMatcher.group(4)));
+            result.put("status", headerMatcher.group(5).trim());
+        }
+
+        // Parse info lines
+        List<String> stackTrace = new ArrayList<>();
+        String[] lines = threadDump.split("\n");
+        boolean isStackTrace = false;
+
+        for (String line : lines) {
+            line = line.trim();
+
+            if (isStackTrace && (line.isEmpty() || line.startsWith("\""))) {
+                break;
+            }
+
+            // Skip empty lines and first line (already parsed)
+            if (line.isEmpty() || line.startsWith("\"")) {
+                continue;
+            }
+
+            // Check if we've reached stack trace
+            if (line.startsWith("at ") || line.startsWith("native:")) {
+                isStackTrace = true;
+                stackTrace.add(line);
+                continue;
+            }
+
+            if (isStackTrace) {
+                continue;
+            }
+
+            // Parse info lines (starting with |)
+            if (line.startsWith("|")) {
+                line = line.substring(1).trim(); // Remove the | character
+                String[] pairs = line.split("\\s+");
+
+                for (String pair : pairs) {
+                    if (pair.contains("=")) {
+                        String[] keyValue = pair.split("=", 2);
+                        String key = keyValue[0].trim();
+                        String value = keyValue[1].trim();
+
+                        // Remove quotes if present
+                        if (value.startsWith("\"") && value.endsWith("\"")) {
+                            value = value.substring(1, value.length() - 1);
+                        }
+
+                        // Try to parse numbers
+                        try {
+                            if (value.matches("-?\\d+")) {
+                                result.put(key, Integer.parseInt(value));
+                            } else {
+                                result.put(key, value);
+                            }
+                        } catch (NumberFormatException e) {
+                            result.put(key, value);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add stack trace if we found any
+        if (!stackTrace.isEmpty()) {
+            result.put("stack_trace", stackTrace);
+        }
+
+        return result;
     }
+
+    public static List<Map<String, Object>> parseThreadDumps(String input) {
+        List<Map<String, Object>> threads = new ArrayList<>();
+
+        // Split input into individual thread dumps
+        // Pattern matches the start of each thread dump (looking for quoted thread name)
+//        String regex = "\\\"(.*?)\\\" prio=(\\\\d+) tid=(\\\\d+) (\\\\w+)\\\\n(?s)(.*?)(?=(?:\\\\n\\\\n)|$)";
+        String regex = "\\\"(.*?)\\\" (daemon )?prio=(\\d+) tid=(\\d+) (\\w+)(.*)\\n(?s)((.*?\\n))(?=(?:\\n\\n)|$)";
+
+        Pattern threadStartPattern = Pattern.compile(regex, Pattern.MULTILINE);
+        Matcher threadMatcher = threadStartPattern.matcher(input);
+
+        while (threadMatcher.find()) {
+            String threadDump = threadMatcher.group();
+            Map<String, Object> threadInfo = parseThreadInformation(threadDump);
+            threads.add(threadInfo);
+        }
+
+        return threads;
+    }
+//    @NonNull
+//    private static Map<String, Object> parseThreadInformation(String stackTrace, Matcher threadStartMatcher) {
+//        Map<String, Object> threadInfo = new HashMap<>();
+//        threadInfo.put("name", threadStartMatcher.group(1));
+//        threadInfo.put("daemon", threadStartMatcher.group(2) != null);
+//        threadInfo.put("priority", Integer.parseInt(threadStartMatcher.group(3)));
+//        threadInfo.put("tid", Integer.parseInt(threadStartMatcher.group(4)));
+//        threadInfo.put("state", threadStartMatcher.group(5).trim());
+//        threadInfo.put("group", threadStartMatcher.group(6));
+//        threadInfo.put("scount", Integer.parseInt(threadStartMatcher.group(7)));
+//        threadInfo.put("dscount", Integer.parseInt(threadStartMatcher.group(8)));
+//        threadInfo.put("flags", Integer.parseInt(threadStartMatcher.group(9)));
+//        threadInfo.put("obj", threadStartMatcher.group(10));
+//        threadInfo.put("self", threadStartMatcher.group(11));
+//        threadInfo.put("systid", Integer.parseInt(threadStartMatcher.group(12)));
+//        threadInfo.put("nice", Integer.parseInt(threadStartMatcher.group(13)));
+//        threadInfo.put("cgrp", threadStartMatcher.group(14));
+//        threadInfo.put("sched", threadStartMatcher.group(15));
+//        threadInfo.put("handle", threadStartMatcher.group(16));
+//        threadInfo.put("stack_trace", parseThreadStacktrace(stackTrace, threadStartMatcher));
+//        return threadInfo;
+//    }
 
     @NonNull
     private static List<String> parseThreadStacktrace(String stackTrace, Matcher threadStartMatcher) {
