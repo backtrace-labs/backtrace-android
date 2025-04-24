@@ -71,14 +71,13 @@ public class AppExitInfoDetailsExtractorTest {
     public void testGetANRMessage() {
         // GIVEN
         when(mockAppExitInfo.getDescription()).thenReturn("Test ANR");
-        when(mockAppExitInfo.getTimestamp()).thenReturn(System.currentTimeMillis());
+        when(mockAppExitInfo.getTimestamp()).thenReturn(1745473156000L);
 
         // WHEN
         String result = AppExitInfoDetailsExtractor.getANRMessage(mockAppExitInfo);
 
         // THEN
-        assertTrue(result.contains("ApplicationExitInfo ANR Exception"));
-        assertTrue(result.contains("Test ANR"));
+        assertEquals("Application Not Responding | Description: Test ANR | Timestamp: 2025-04-24 07:39:16", result);
     }
 
     @Test
@@ -89,7 +88,7 @@ public class AppExitInfoDetailsExtractorTest {
         when(mockAppExitInfo.getTraceInputStream()).thenReturn(inputStream);
 
         // WHEN
-        String stackTrace = AppExitInfoDetailsExtractor.getANRAttributes(mockAppExitInfo).get("stackTrace").toString();
+        String stackTrace = AppExitInfoDetailsExtractor.getStackTraceInfo(mockAppExitInfo);
 
         // THEN
         assertNotNull(stackTrace);
@@ -97,10 +96,7 @@ public class AppExitInfoDetailsExtractorTest {
     }
 
     @Test
-    public void testGetStackTraceInfoNullStream() throws IOException {
-        // GIVEN
-        when(mockAppExitInfo.getTraceInputStream()).thenReturn(null);
-
+    public void testGetStackTraceInfoNullStream() {
         // WHEN
         Object stackTrace = AppExitInfoDetailsExtractor.getANRAttributes(mockAppExitInfo).get("stackTrace");
 

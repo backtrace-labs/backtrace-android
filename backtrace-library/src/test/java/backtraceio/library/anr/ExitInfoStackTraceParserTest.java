@@ -108,6 +108,26 @@ public class ExitInfoStackTraceParserTest {
         StackTraceElement[] anrMainThreadStacktrace = ExitInfoStackTraceParser.parseMainThreadStackTrace(anrStacktrace);
 
         // THEN
+        assertEquals(33, anrMainThreadStacktrace.length);
 
+        assertEquals("(__kernel_vsyscall+7)", anrMainThreadStacktrace[0].getMethodName());
+        assertEquals(0, anrMainThreadStacktrace[0].getLineNumber());
+        assertEquals("address: 00000b97", anrMainThreadStacktrace[0].getFileName());
+        assertEquals("[vdso]", anrMainThreadStacktrace[0].getClassName());
+
+        assertEquals("(art::interpreter::EnterInterpreterFromEntryPoint(art::Thread*, art::CodeItemDataAccessor const&, art::ShadowFrame*)+176)", anrMainThreadStacktrace[14].getMethodName());
+        assertEquals(0, anrMainThreadStacktrace[14].getLineNumber());
+        assertEquals("address: 00379b00", anrMainThreadStacktrace[14].getFileName());
+        assertEquals("/apex/com.android.art/lib/libart.so", anrMainThreadStacktrace[14].getClassName());
+
+        assertEquals("onClick", anrMainThreadStacktrace[22].getMethodName());
+        assertEquals(468, anrMainThreadStacktrace[22].getLineNumber());
+        assertEquals("AppCompatViewInflater.java", anrMainThreadStacktrace[22].getFileName());
+        assertEquals("androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener", anrMainThreadStacktrace[22].getClassName());
+
+        assertEquals("main", anrMainThreadStacktrace[32].getMethodName());
+        assertEquals(947, anrMainThreadStacktrace[32].getLineNumber());
+        assertEquals("ZygoteInit.java", anrMainThreadStacktrace[32].getFileName());
+        assertEquals("com.android.internal.os.ZygoteInit", anrMainThreadStacktrace[32].getClassName());
     }
 }

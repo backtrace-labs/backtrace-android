@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExitInfoStackTraceParser {
-    private static final String LOG_TAG = ExitInfoStackTraceParser.class.getSimpleName();
     private static final Pattern JAVA_FRAME_PATTERN = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
     private static final String MAIN_THREAD_NAME = "main";
     private static final int NATIVE_STACK_ELEMENTS_NUMBER = 6;
