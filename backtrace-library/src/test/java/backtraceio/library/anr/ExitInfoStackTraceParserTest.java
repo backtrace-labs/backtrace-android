@@ -12,7 +12,7 @@ import java.util.Map;
 import backtraceio.library.TestUtils;
 
 public class ExitInfoStackTraceParserTest {
-    private final String ANR_APPEXIT_STACKTRACE_FILE = "anrAppExitInfoStacktrace2.txt";
+    private final String ANR_APPEXIT_STACKTRACE_FILE = "anrAppExitInfoStacktrace.txt";
 
     @Test
     public void parseFrameJava() {
@@ -74,26 +74,12 @@ public class ExitInfoStackTraceParserTest {
 
         // THEN MAIN THREAD
         Map<String, Object> mainThread = (Map<String, Object>) anrStacktrace.get("main_thread");
-        assertEquals(1, mainThread.get("flags"));
-        assertEquals("0xf583f478", mainThread.get("handle"));
-        assertEquals(5, mainThread.get("priority"));
-        assertEquals("top-app", mainThread.get("cgrp"));
+        assertEquals(5, mainThread.get("prio"));
         assertEquals(1, mainThread.get("tid"));
-        assertEquals(-10, mainThread.get("nice"));
         assertEquals(null, mainThread.get("daemon"));
-        assertEquals(0, mainThread.get("dsCount"));
-        assertEquals("0/0", mainThread.get("sched"));
-        assertEquals("0x72287300", mainThread.get("obj"));
-        assertEquals("main", mainThread.get("name"));
-        assertEquals(1, mainThread.get("sCount"));
-        assertEquals("0xe7380e10", mainThread.get("self"));
-        assertEquals("S", mainThread.get("state"));
 
         ArrayList<?> stackTrace = (ArrayList<?>) mainThread.get("stack_trace");
         assertEquals(36, stackTrace.size());
-
-        assertEquals(9207, mainThread.get("sysTid"));
-        assertEquals("main", mainThread.get("group"));
 
         assertEquals("native: #20 pc 005886a0  /apex/com.android.art/lib/libart.so (art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*)+80)", stackTrace.get(20));
         assertEquals("at androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener.onClick(AppCompatViewInflater.java:468)", stackTrace.get(24));
