@@ -2,6 +2,7 @@ package backtraceio.library.anr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -76,7 +77,7 @@ public class ExitInfoStackTraceParserTest {
         Map<String, Object> mainThread = (Map<String, Object>) anrStacktrace.get("main_thread");
         assertEquals(5, mainThread.get("prio"));
         assertEquals(1, mainThread.get("tid"));
-        assertEquals(null, mainThread.get("daemon"));
+        assertNull(mainThread.get("daemon"));
 
         ArrayList<?> stackTrace = (ArrayList<?>) mainThread.get("stack_trace");
         assertEquals(36, stackTrace.size());
