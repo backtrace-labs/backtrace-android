@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.interfaces.DatabaseContext;
@@ -30,7 +32,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final int _retryNumber;
 
-
     /**
      * Database cache
      */
@@ -39,12 +40,12 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     /**
      * Total database size on hard drive
      */
-    private long totalSize = 0;
+    private final AtomicLong totalSize = new AtomicLong(0);
 
     /**
      * Total records in BacktraceDatabase
      */
-    private int totalRecords = 0;
+    private final AtomicInteger totalRecords = new AtomicInteger(0);
 
     /**
      * Record order
@@ -135,9 +136,9 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             throw new NullPointerException("BacktraceDatabaseRecord");
         }
         backtraceDatabaseRecord.locked = true;
-        this.totalSize += backtraceDatabaseRecord.getSize();
+        this.totalSize.addAndGet(backtraceDatabaseRecord.getSize());
         this.addToFirstBatch(backtraceDatabaseRecord);
-        this.totalRecords++;
+        this.totalRecords.incrementAndGet();
         return backtraceDatabaseRecord;
     }
 
@@ -202,8 +203,8 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                 databaseRecord.delete();
                 try {
                     iterator.remove();
-                    this.totalRecords--;
-                    this.totalSize -= databaseRecord.getSize();
+                    this.totalRecords.decrementAndGet();
+                    this.totalSize.addAndGet(-databaseRecord.getSize());
                     return true;
                 } catch (Exception e) {
                     BacktraceLogger.d(LOG_TAG, "Exception on removing record "
@@ -242,7 +243,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @return is database empty
      */
     public boolean isEmpty() {
-        return totalRecords == 0;
+        return totalRecords.get() == 0;
     }
 
     /**
@@ -251,7 +252,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @return number of records in database
      */
     public int count() {
-        return totalRecords;
+        return totalRecords.get();
     }
 
     /**
@@ -267,32 +268,15 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             }
         }
 
-        this.totalRecords = 0;
-        this.totalSize = 0;
+        this.totalRecords.set(0);
+        this.totalSize.set(0);
 
         for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
             entry.getValue().clear();
         }
     }
 
-    /**
-     * Increment retry time for current record
-     */
-    public void incrementBatchRetry() {
-        removeMaxRetries();
-        incrementBatches();
-    }
-
-    /**
-     * Get database size
-     *
-     * @return database size
-     */
-    public long getDatabaseSize() {
-        return this.totalSize;
-    }
-
-    /**
+        /**
      * Delete the oldest file
      *
      * @return is deletion was successful
@@ -330,11 +314,18 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                 continue;
             }
             record.delete();
-            this.totalRecords--;
-            totalSize -= record.getSize();
+            this.totalRecords.decrementAndGet();
+            totalSize.addAndGet(-record.getSize());
         }
     }
 
+    /**
+     * Increment retry time for current record
+     */
+    public void incrementBatchRetry() {
+        removeMaxRetries();
+        incrementBatches();
+    }
 
     /**
      * Get first record in in-cache BacktraceDatabase
