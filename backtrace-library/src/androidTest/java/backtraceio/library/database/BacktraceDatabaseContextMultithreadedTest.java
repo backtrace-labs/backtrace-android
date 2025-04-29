@@ -1,6 +1,6 @@
 package backtraceio.library.database;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
 
@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +49,16 @@ public class BacktraceDatabaseContextMultithreadedTest {
         List<Exception> caughtExceptions = new ArrayList<>();
 
         List<Integer> deleted = new ArrayList<>();
+
         // Thread 1: Continuously deleting records
+        int recordsToDelete = 750;
         Thread deleteThread = new Thread(() -> {
             try {
                 latch.await(); // Wait for signal
-                for (int i = 0; i < recordCount; i++) {
+                for (int i = 0; i < recordsToDelete; i++) {
                     databaseContext.delete(records.get(i));
                     deleted.add(1);
+//                    Thread.sleep(20);
                 }
 //                for (BacktraceDatabaseRecord record : databaseContext.get()) {
 //                    databaseContext.delete(record);
@@ -68,15 +70,17 @@ public class BacktraceDatabaseContextMultithreadedTest {
             }
         });
 
+        int recordsToAdd = 500;
         List<Integer> added = new ArrayList<>();
         // Thread 2: Continuously adding new records
         Thread addThread = new Thread(() -> {
             try {
                 latch.await(); // Wait for signal
-                for (int i = 0; i < recordCount; i++) {
+                for (int i = 0; i < recordsToAdd; i++) {
                     BacktraceData data = createMockBacktraceData();
                     databaseContext.add(data);
                     added.add(1);
+//                    Thread.sleep(5);
                 }
             } catch (Exception e) {
                 synchronized (caughtExceptions) {
@@ -89,10 +93,10 @@ public class BacktraceDatabaseContextMultithreadedTest {
         Thread getThread = new Thread(() -> {
             try {
                 latch.await(); // Wait for signal
-                for (int i = 0; i < recordCount; i++) {
+                String result;
+                while(true) {
                     for (BacktraceDatabaseRecord record : databaseContext.get()) {
-                        // Force iteration
-                        record.toString();
+                        result = record.toString();
                     }
                 }
             } catch (Exception e) {
@@ -120,11 +124,13 @@ public class BacktraceDatabaseContextMultithreadedTest {
             e.printStackTrace();
         }
 
+        assertEquals(0, caughtExceptions.size());
+        assertEquals(750, recordCount + added.size() - deleted.size());
         // Assert that we caught a ConcurrentModificationException
-        assertTrue("Expected ConcurrentModificationException",
-                caughtExceptions.stream()
-                        .anyMatch(e -> e instanceof ConcurrentModificationException ||
-                                (e.getCause() != null && e.getCause() instanceof ConcurrentModificationException)));
+//        assertTrue("Expected ConcurrentModificationException",
+//                caughtExceptions.stream()
+//                        .anyMatch(e -> e instanceof ConcurrentModificationException ||
+//                                (e.getCause() != null && e.getCause() instanceof ConcurrentModificationException)));
     }
 
     private BacktraceData createMockBacktraceData() {
