@@ -2,9 +2,7 @@ package backtraceio.library.database;
 
 import static org.junit.Assert.assertEquals;
 
-import android.content.Context;
-
-import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.annotation.NonNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +22,6 @@ import backtraceio.library.services.BacktraceDatabaseContext;
 public class BacktraceDatabaseContextMultithreadedTest {
     private BacktraceDatabaseContext databaseContext;
 
-    Context context = InstrumentationRegistry.getInstrumentation().getContext();
     @Before
     public void setUp() {
         BacktraceDatabaseSettings settings = new BacktraceDatabaseSettings("test-path");
@@ -34,35 +31,27 @@ public class BacktraceDatabaseContextMultithreadedTest {
 
     @Test
     public void testConcurrentModification() throws InterruptedException {
-        // First populate the database with some records
-        int recordCount = 1000;
-        List<BacktraceDatabaseRecord> records = new ArrayList<>();
+        // GIVEN
+        final int recordsState = 1000;
+        final int recordsToAdd = 500;
+        final int recordsToDelete = 750;
+        final int threadWaitTimeMs = 5000;
+        final List<BacktraceDatabaseRecord> records = generateMockRecords(recordsState);
 
-        for (int i = 0; i < recordCount; i++) {
-            BacktraceData data = createMockBacktraceData();
-            BacktraceDatabaseRecord record = databaseContext.add(data);
-            records.add(record);
-        }
+        final CountDownLatch latch = new CountDownLatch(1);
 
-        // Create a latch to synchronize threads
-        CountDownLatch latch = new CountDownLatch(1);
-        List<Exception> caughtExceptions = new ArrayList<>();
+        final List<Exception> caughtExceptions = new ArrayList<>();
+        final List<Integer> deletedRecords = new ArrayList<>();
+        final List<Integer> addedRecords = new ArrayList<>();
 
-        List<Integer> deleted = new ArrayList<>();
-
-        // Thread 1: Continuously deleting records
-        int recordsToDelete = 750;
-        Thread deleteThread = new Thread(() -> {
+        // GIVEN threads
+        final Thread deleteThread = new Thread(() -> {
             try {
-                latch.await(); // Wait for signal
+                latch.await();
                 for (int i = 0; i < recordsToDelete; i++) {
                     databaseContext.delete(records.get(i));
-                    deleted.add(1);
-//                    Thread.sleep(20);
+                    deletedRecords.add(1);
                 }
-//                for (BacktraceDatabaseRecord record : databaseContext.get()) {
-//                    databaseContext.delete(record);
-//                }
             } catch (Exception e) {
                 synchronized (caughtExceptions) {
                     caughtExceptions.add(e);
@@ -70,17 +59,13 @@ public class BacktraceDatabaseContextMultithreadedTest {
             }
         });
 
-        int recordsToAdd = 500;
-        List<Integer> added = new ArrayList<>();
-        // Thread 2: Continuously adding new records
-        Thread addThread = new Thread(() -> {
+        final Thread addThread = new Thread(() -> {
             try {
-                latch.await(); // Wait for signal
+                latch.await();
                 for (int i = 0; i < recordsToAdd; i++) {
                     BacktraceData data = createMockBacktraceData();
                     databaseContext.add(data);
-                    added.add(1);
-//                    Thread.sleep(5);
+                    addedRecords.add(1);
                 }
             } catch (Exception e) {
                 synchronized (caughtExceptions) {
@@ -89,12 +74,11 @@ public class BacktraceDatabaseContextMultithreadedTest {
             }
         });
 
-        // Thread 3: Continuously getting records
-        Thread getThread = new Thread(() -> {
+        final Thread readThread = new Thread(() -> {
             try {
-                latch.await(); // Wait for signal
+                latch.await();
                 String result;
-                while(true) {
+                while (true) {
                     for (BacktraceDatabaseRecord record : databaseContext.get()) {
                         result = record.toString();
                     }
@@ -106,46 +90,48 @@ public class BacktraceDatabaseContextMultithreadedTest {
             }
         });
 
+        // WHEN
         // Start all threads
         deleteThread.start();
         addThread.start();
-        getThread.start();
+        readThread.start();
 
         // Release all threads simultaneously
         latch.countDown();
 
         // Wait for threads to complete
-        deleteThread.join(5000);
-        addThread.join(5000);
-        getThread.join(5000);
+        deleteThread.join(threadWaitTimeMs);
+        addThread.join(threadWaitTimeMs);
+        readThread.join(threadWaitTimeMs);
 
         // Print all caught exceptions
         for (Exception e : caughtExceptions) {
             e.printStackTrace();
         }
 
+        // THEN
         assertEquals(0, caughtExceptions.size());
-        assertEquals(750, recordCount + added.size() - deleted.size());
-        // Assert that we caught a ConcurrentModificationException
-//        assertTrue("Expected ConcurrentModificationException",
-//                caughtExceptions.stream()
-//                        .anyMatch(e -> e instanceof ConcurrentModificationException ||
-//                                (e.getCause() != null && e.getCause() instanceof ConcurrentModificationException)));
+        assertEquals(recordsState + recordsToAdd - recordsToDelete, recordsState + addedRecords.size() - deletedRecords.size());
+    }
+
+    @NonNull
+    private List<BacktraceDatabaseRecord> generateMockRecords(int recordCount) {
+        final List<BacktraceDatabaseRecord> records = new ArrayList<>();
+        for (int i = 0; i < recordCount; i++) {
+            BacktraceData data = createMockBacktraceData();
+            BacktraceDatabaseRecord record = databaseContext.add(data);
+            records.add(record);
+        }
+        return records;
     }
 
     private BacktraceData createMockBacktraceData() {
-        // Create a mock exception for the test
-        Exception testException = new Exception("Test exception");
+        final Exception testException = new Exception("Test exception");
 
-        // Create attributes map if needed
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("test_attribute", "test_value");
+        final Map<String, Object> attributes = new HashMap<String, Object>() {{
+            put("test_attribute", "test_value");
+        }};
 
-        // Create BacktraceData with the exception
-        return new BacktraceData(
-                context,
-                new BacktraceReport(testException),
-                attributes
-        );
+        return new BacktraceData.Builder(new BacktraceReport(testException, attributes)).build();
     }
 }
