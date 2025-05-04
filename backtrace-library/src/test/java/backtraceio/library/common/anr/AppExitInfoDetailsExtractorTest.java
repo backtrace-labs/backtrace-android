@@ -18,7 +18,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 
 import backtraceio.library.anr.AppExitInfoDetailsExtractor;
 import backtraceio.library.anr.ExitInfo;
@@ -70,14 +72,19 @@ public class AppExitInfoDetailsExtractorTest {
     @Test
     public void testGetANRMessage() {
         // GIVEN
+        Long timestamp = 1745473156000L;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String timestampString = dateFormat.format(timestamp);
+
+        // GIVEN
         when(mockAppExitInfo.getDescription()).thenReturn("Test ANR");
-        when(mockAppExitInfo.getTimestamp()).thenReturn(1745473156000L);
+        when(mockAppExitInfo.getTimestamp()).thenReturn(timestamp);
 
         // WHEN
         String result = AppExitInfoDetailsExtractor.getANRMessage(mockAppExitInfo);
 
         // THEN
-        assertEquals("Application Not Responding | Description: Test ANR | Timestamp: 2025-04-24 07:39:16", result);
+        assertEquals("Application Not Responding | Description: Test ANR | Timestamp: " + timestampString, result);
     }
 
     @Test
