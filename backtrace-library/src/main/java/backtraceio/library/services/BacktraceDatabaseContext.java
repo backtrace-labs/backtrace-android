@@ -370,13 +370,15 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             if (batchRecords == null) {
                 continue;
             }
-            
-            List<BacktraceDatabaseRecord> recordsList = new ArrayList<>(batchRecords);
+
+            Iterable<BacktraceDatabaseRecord> records = batchRecords;
             if (reverse) {
+                List<BacktraceDatabaseRecord> recordsList = new ArrayList<>(batchRecords);
                 Collections.reverse(recordsList);
+                records = recordsList;
             }
 
-            for (BacktraceDatabaseRecord record : recordsList) {
+            for (BacktraceDatabaseRecord record : records) {
                 if (record != null && !record.locked) {
                     record.locked = true;
                     return record;
