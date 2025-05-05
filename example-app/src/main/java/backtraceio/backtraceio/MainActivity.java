@@ -34,6 +34,7 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 
 public class MainActivity extends AppCompatActivity {
+
     private BacktraceClient backtraceClient;
     private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BacktraceClient initializeBacktrace(final String submissionUrl) {
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
+
         Context context = getApplicationContext();
         String dbPath = context.getFilesDir().getAbsolutePath();
 
