@@ -20,6 +20,35 @@ import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceDatabaseContext;
 
 public class BacktraceDatabaseContextMultithreadedTest {
+    private static class TestConfig {
+        final int recordsState;
+        final int recordsToAdd;
+        final int recordsToDelete;
+        final int threadWaitTimeMs;
+
+        TestConfig(int recordsState, int recordsToAdd, int recordsToDelete, int threadWaitTimeMs) {
+            this.recordsState = recordsState;
+            this.recordsToAdd = recordsToAdd;
+            this.recordsToDelete = recordsToDelete;
+            this.threadWaitTimeMs = threadWaitTimeMs;
+        }
+    }
+
+    private static class ConcurrentTestState {
+        final List<Exception> caughtExceptions = new ArrayList<>();
+        final List<Integer> deletedRecords = new ArrayList<>();
+        final List<Integer> addedRecords = new ArrayList<>();
+
+        synchronized void handleException(Exception e) {
+            caughtExceptions.add(e);
+        }
+
+        void printExceptions() {
+            for (Exception e : caughtExceptions) {
+                e.printStackTrace();
+            }
+        }
+    }
     private BacktraceDatabaseContext databaseContext;
 
     @Before
@@ -32,49 +61,61 @@ public class BacktraceDatabaseContextMultithreadedTest {
     @Test
     public void testConcurrentModification() throws InterruptedException {
         // GIVEN
-        final int recordsState = 1000;
-        final int recordsToAdd = 500;
-        final int recordsToDelete = 750;
-        final int threadWaitTimeMs = 5000;
-        final List<BacktraceDatabaseRecord> records = generateMockRecords(recordsState);
+        final TestConfig config = new TestConfig(1000, 500, 750, 5000);
+        final List<BacktraceDatabaseRecord> initialRecords = generateMockRecords(config.recordsState);
+        
+        final CountDownLatch startLatch = new CountDownLatch(1);
+        final ConcurrentTestState testState = new ConcurrentTestState();
 
-        final CountDownLatch latch = new CountDownLatch(1);
+        // Create and start test threads
+        Thread deleteThread = createDeleteThread(startLatch, initialRecords, config.recordsToDelete, testState);
+        Thread addThread = createAddThread(startLatch, config.recordsToAdd, testState);
+        Thread readThread = createReadThread(startLatch, testState);
 
-        final List<Exception> caughtExceptions = new ArrayList<>();
-        final List<Integer> deletedRecords = new ArrayList<>();
-        final List<Integer> addedRecords = new ArrayList<>();
+        // WHEN
+        startThreads(deleteThread, addThread, readThread);
+        startLatch.countDown();
+        waitForThreads(deleteThread, addThread, readThread, config.threadWaitTimeMs);
 
-        // GIVEN threads
-        final Thread deleteThread = new Thread(() -> {
+        // Print any exceptions that occurred
+        testState.printExceptions();
+
+        // THEN
+        assertTestResults(config, testState);
+    }
+
+    private Thread createDeleteThread(CountDownLatch latch, List<BacktraceDatabaseRecord> records, 
+            int recordsToDelete, ConcurrentTestState state) {
+        return new Thread(() -> {
             try {
                 latch.await();
                 for (int i = 0; i < recordsToDelete; i++) {
                     databaseContext.delete(records.get(i));
-                    deletedRecords.add(1);
+                    state.deletedRecords.add(1);
                 }
             } catch (Exception e) {
-                synchronized (caughtExceptions) {
-                    caughtExceptions.add(e);
-                }
+                state.handleException(e);
             }
         });
+    }
 
-        final Thread addThread = new Thread(() -> {
+    private Thread createAddThread(CountDownLatch latch, int recordsToAdd, ConcurrentTestState state) {
+        return new Thread(() -> {
             try {
                 latch.await();
                 for (int i = 0; i < recordsToAdd; i++) {
                     BacktraceData data = createMockBacktraceData();
                     databaseContext.add(data);
-                    addedRecords.add(1);
+                    state.addedRecords.add(1);
                 }
             } catch (Exception e) {
-                synchronized (caughtExceptions) {
-                    caughtExceptions.add(e);
-                }
+                state.handleException(e);
             }
         });
+    }
 
-        final Thread readThread = new Thread(() -> {
+    private Thread createReadThread(CountDownLatch latch, ConcurrentTestState state) {
+        return new Thread(() -> {
             try {
                 latch.await();
                 String result;
@@ -84,34 +125,30 @@ public class BacktraceDatabaseContextMultithreadedTest {
                     }
                 }
             } catch (Exception e) {
-                synchronized (caughtExceptions) {
-                    caughtExceptions.add(e);
-                }
+                state.handleException(e);
             }
         });
+    }
 
-        // WHEN
-        // Start all threads
-        deleteThread.start();
-        addThread.start();
-        readThread.start();
-
-        // Release all threads simultaneously
-        latch.countDown();
-
-        // Wait for threads to complete
-        deleteThread.join(threadWaitTimeMs);
-        addThread.join(threadWaitTimeMs);
-        readThread.join(threadWaitTimeMs);
-
-        // Print all caught exceptions
-        for (Exception e : caughtExceptions) {
-            e.printStackTrace();
+    private void startThreads(Thread... threads) {
+        for (Thread thread : threads) {
+            thread.start();
         }
+    }
 
-        // THEN
-        assertEquals(0, caughtExceptions.size());
-        assertEquals(recordsState + recordsToAdd - recordsToDelete, recordsState + addedRecords.size() - deletedRecords.size());
+    private void waitForThreads(Thread deleteThread, Thread addThread, Thread readThread, int waitTimeMs) 
+            throws InterruptedException {
+        deleteThread.join(waitTimeMs);
+        addThread.join(waitTimeMs);
+        readThread.join(waitTimeMs);
+    }
+
+    private void assertTestResults(TestConfig config, ConcurrentTestState state) {
+        assertEquals(0, state.caughtExceptions.size());
+        assertEquals(
+            config.recordsState + config.recordsToAdd - config.recordsToDelete,
+            config.recordsState + state.addedRecords.size() - state.deletedRecords.size()
+        );
     }
 
     @NonNull
