@@ -365,18 +365,18 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private BacktraceDatabaseRecord getRecordFromCache(boolean reverse) {
         for (int i = _retryNumber - 1; i >= 0; i--) {
-            Queue<BacktraceDatabaseRecord> reverseRecords = batchRetry.get(i);
+            Queue<BacktraceDatabaseRecord> batchRecords = batchRetry.get(i);
 
-            if (reverseRecords == null) {
+            if (batchRecords == null) {
                 continue;
             }
-
-            List<BacktraceDatabaseRecord> tempList = new ArrayList<>(reverseRecords);
+            
+            List<BacktraceDatabaseRecord> recordsList = new ArrayList<>(batchRecords);
             if (reverse) {
-                Collections.reverse(tempList);
+                Collections.reverse(recordsList);
             }
 
-            for (BacktraceDatabaseRecord record : tempList) {
+            for (BacktraceDatabaseRecord record : recordsList) {
                 if (record != null && !record.locked) {
                     record.locked = true;
                     return record;
