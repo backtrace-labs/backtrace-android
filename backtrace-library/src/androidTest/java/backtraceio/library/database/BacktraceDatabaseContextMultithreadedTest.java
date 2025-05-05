@@ -61,15 +61,15 @@ public class BacktraceDatabaseContextMultithreadedTest {
     @Test
     public void testConcurrentModification() throws InterruptedException {
         // GIVEN
-        final TestConfig config = new TestConfig(1000, 500, 750, 5000);
+        final TestConfig config = new TestConfig(1000, 500, 750, 10000);
         final List<BacktraceDatabaseRecord> initialRecords = generateMockRecords(config.recordsState);
         
         final CountDownLatch startLatch = new CountDownLatch(1);
         final ConcurrentTestState testState = new ConcurrentTestState();
 
         // Create and start test threads
-        Thread deleteThread = createDeleteThread(startLatch, initialRecords, config.recordsToDelete, testState);
         Thread addThread = createAddThread(startLatch, config.recordsToAdd, testState);
+        Thread deleteThread = createDeleteThread(startLatch, initialRecords, config.recordsToDelete, testState);
         Thread readThread = createReadThread(startLatch, testState);
 
         // WHEN
