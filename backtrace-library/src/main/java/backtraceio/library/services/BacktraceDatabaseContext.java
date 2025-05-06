@@ -220,7 +220,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                     return true;
                 } catch (Exception e) {
                     BacktraceLogger.d(LOG_TAG, "Exception on removing record "
-                            + databaseRecord.id.toString() + "from db context: " + e.getMessage());
+                            + databaseRecord.id + " from db context: " + e.getMessage());
                 }
             }
         }

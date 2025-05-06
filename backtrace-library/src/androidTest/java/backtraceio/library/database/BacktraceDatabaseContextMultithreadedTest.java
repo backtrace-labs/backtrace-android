@@ -61,7 +61,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
     @Test
     public void testConcurrentModification() throws InterruptedException {
         // GIVEN
-        final TestConfig config = new TestConfig(100, 50, 75, 2000);
+        final TestConfig config = new TestConfig(500, 250, 150, 2000);
         final List<BacktraceDatabaseRecord> initialRecords = generateMockRecords(config.recordsState);
         
         final CountDownLatch startLatch = new CountDownLatch(1);
