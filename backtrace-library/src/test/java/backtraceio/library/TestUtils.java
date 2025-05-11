@@ -2,10 +2,10 @@ package backtraceio.library;
 
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
+import backtraceio.gson.Gson;
+import backtraceio.gson.JsonElement;
+import backtraceio.gson.JsonParser;
+import backtraceio.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
