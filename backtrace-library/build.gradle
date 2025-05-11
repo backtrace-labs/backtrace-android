@@ -1,5 +1,6 @@
 plugins {
     id 'com.gladed.androidgitversion' version '0.4.14'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 apply plugin: 'com.android.library'
 
@@ -89,6 +90,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation 'org.mockito:mockito-core:5.16.0'
     androidTestImplementation "org.mockito:mockito-android:5.16.0"
+}
+
+tasks.register('shadowJarTask', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    relocate 'com.google.gson', 'backtraceio.library.shaded.com.google.gson'
 }
 
 apply from: 'publish.gradle'
