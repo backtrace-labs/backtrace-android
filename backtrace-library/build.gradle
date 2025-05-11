@@ -76,6 +76,7 @@ android {
 
 dependencies {
     implementation 'com.squareup:tape:1.2.3'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation files('../gson/build/libs/gson-backtrace.jar')
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:5.16.0"

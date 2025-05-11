@@ -12,7 +12,7 @@ dependencies {
 }
 
 shadowJar {
-    relocate 'backtraceio.gson', 'backtraceio.gson'
+    relocate 'com.google.gson', 'backtraceio.gson'
     archiveClassifier.set('backtrace')
 }
 
