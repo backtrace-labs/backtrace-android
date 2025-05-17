@@ -159,5 +159,10 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @Override
-    public void stopMonitoringAnr() { }
+    public void stopMonitoringAnr() {
+        if (!this.isInterrupted()) {
+            BacktraceLogger.d(LOG_TAG, "ANR thread will be interrupted.");
+            this.interrupt();
+        }
+    }
 }
