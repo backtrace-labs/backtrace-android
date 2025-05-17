@@ -6,12 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import backtraceio.library.anr.AnrType;
+import backtraceio.library.anr.BacktraceANRHandler;
+import backtraceio.library.anr.BacktraceANRSettings;
+import backtraceio.library.anr.BacktraceAppExitInfoSenderHandler;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.watchdog.BacktraceANRWatchdog;
+import backtraceio.library.watchdog.BacktraceANRHandlerWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
 /**
@@ -22,7 +26,7 @@ public class BacktraceClient extends BacktraceBase {
     /**
      * Backtrace ANR watchdog instance
      */
-    private BacktraceANRWatchdog anrWatchdog;
+    private BacktraceANRHandler anrHandler;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -252,7 +256,10 @@ public class BacktraceClient extends BacktraceBase {
      * Start monitoring if the main thread has been blocked
      */
     public void enableAnr() {
-        this.anrWatchdog = new BacktraceANRWatchdog(this);
+        this.enableAnr(AnrType.Threshold);
+    }
+    public void enableAnr(AnrType anrType) {
+        this.enableAnr(anrType, new BacktraceANRSettings());
     }
 
     /**
@@ -292,16 +299,41 @@ public class BacktraceClient extends BacktraceBase {
      * @param debug                           enable debug mode - errors will not be sent if the debugger is connected
      */
     public void enableAnr(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
-        this.anrWatchdog = new BacktraceANRWatchdog(this, timeout, debug);
-        this.anrWatchdog.setOnApplicationNotRespondingEvent(onApplicationNotRespondingEvent);
+        this.enableAnr(new BacktraceANRSettings(timeout, onApplicationNotRespondingEvent, debug));
+    }
+
+    public void enableAnr(BacktraceANRSettings anrSettings) {
+        this.enableAnr(AnrType.Threshold, anrSettings);
+    }
+
+    public void enableAnr(AnrType anrType, BacktraceANRSettings anrSettings) {
+        this.anrHandler = initAnrHandler(anrType, anrSettings);
     }
 
     /**
      * Stop monitoring if the main thread has been blocked
      */
     public void disableAnr() {
-        if (this.anrWatchdog != null && !this.anrWatchdog.isInterrupted()) {
-            this.anrWatchdog.stopMonitoringAnr();
+        if (this.anrHandler != null) {
+            this.anrHandler.stopMonitoringAnr();
         }
     }
+
+    public BacktraceANRHandler initAnrHandler(AnrType anrType, BacktraceANRSettings backtraceANRSettings) {
+        BacktraceANRHandler handler = createBacktraceAnrHandler(anrType, backtraceANRSettings);
+        if (backtraceANRSettings.getOnApplicationNotRespondingEvent() != null) {
+            handler.setOnApplicationNotRespondingEvent(backtraceANRSettings.getOnApplicationNotRespondingEvent());
+        }
+        return handler;
+    }
+
+    public BacktraceANRHandler createBacktraceAnrHandler(AnrType anrType, BacktraceANRSettings settings) {
+        if (anrType == AnrType.ApplicationExit) {
+            return new BacktraceAppExitInfoSenderHandler(this, context);
+        } else if (anrType == AnrType.Threshold){
+            return new BacktraceANRHandlerWatchdog(this, settings.getTimeout(), settings.isDebug());
+        }
+        throw new IllegalArgumentException("Unsupported type of ANR: " + anrType.name());
+    }
+
 }
