@@ -13,7 +13,7 @@ public class SharedPreferencesManager {
         SharedPreferences sharedPreferences = this.context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(key, value);
-        editor.apply();
+        editor.commit();
     }
 
     public Long readLongFromSharedPreferences(String prefName, String key, Long defaultValue) {

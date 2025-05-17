@@ -52,7 +52,7 @@ public class SharedPreferencesManagerTest {
         verify(mockContext).getSharedPreferences(prefName, Context.MODE_PRIVATE);
         verify(mockSharedPreferences).edit();
         verify(mockEditor).putLong(key, value);
-        verify(mockEditor).apply();
+        verify(mockEditor).commit();
     }
 
     @Test
