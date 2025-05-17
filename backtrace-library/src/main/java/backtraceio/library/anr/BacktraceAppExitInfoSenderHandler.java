@@ -140,11 +140,10 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     private boolean shouldProcessAppExitInfo(ExitInfo appExitInfo) {
         long lastAnrTimestamp = this.anrAppExitInfoState.getLastTimestamp();
         long anrTimestamp = appExitInfo.getTimestamp();
-
-//        TODO: uncomment
-//        if (lastAnrTimestamp >= anrTimestamp) {
-//            return false;
-//        }
+        
+        if (lastAnrTimestamp >= anrTimestamp) {
+            return false;
+        }
 
         return isSupportedTypeOfApplicationExit(appExitInfo);
     }
