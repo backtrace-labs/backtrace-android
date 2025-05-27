@@ -47,8 +47,6 @@ android {
             useLegacyPackaging false
        }
     }
-
-
 }
 
 String getProperty(String name, String defaultValue) {

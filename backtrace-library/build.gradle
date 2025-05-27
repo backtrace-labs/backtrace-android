@@ -1,14 +1,15 @@
 plugins {
+    id "maven-publish"
     id 'com.gladed.androidgitversion' version '0.4.14'
 }
 apply plugin: 'com.android.library'
+
 
 androidGitVersion {
     // this is the format for generating the versionName
     // default is %tag%%-count%%-commit%%-branch%%-dirty% - removed %-dirty% because submodules tend to get dirty
     format '%tag%%-count%%-commit%%-branch%'
 }
-
 android {
     namespace "backtraceio.library"
     defaultConfig {
@@ -34,12 +35,7 @@ android {
         buildFeatures {
             buildConfig = true
         }
-        publishing {
-            singleVariant("release") {
-                withSourcesJar()
-                withJavadocJar()
-            }
-        }
+
     }
 
     buildTypes {
@@ -70,6 +66,52 @@ android {
     android {
         lintOptions {
             abortOnError false
+        }
+    }
+}
+version = android.defaultConfig.versionName
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.findByName('release')
+                groupId = GROUP
+                artifactId = POM_ARTIFACT_ID
+                version = version
+
+                pom {
+                    name = POM_NAME
+                    packaging = POM_PACKAGING
+                    description = POM_DESCRIPTION
+                    url = POM_URL
+
+                    scm {
+                        url = POM_SCM_URL
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
+                    }
+
+                    licenses {
+                        license {
+                            name = POM_LICENSE_NAME
+                            url = POM_LICENSE_URL
+                            distribution = POM_LICENSE_DIST
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = POM_DEVELOPER_ID
+                            name = POM_DEVELOPER_NAME
+                        }
+                        developer {
+                            id = POM_DEVELOPER_ID2
+                            name = POM_DEVELOPER_NAME2
+                        }
+                    }
+                }
+            }
         }
     }
 }
