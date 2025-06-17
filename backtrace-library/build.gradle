@@ -12,8 +12,6 @@ androidGitVersion {
     format '%tag%%-count%%-commit%%-branch%'
 }
 
-version = "3.11.1"
-
 android {
     namespace "backtraceio.library"
     defaultConfig {
@@ -76,10 +74,10 @@ android {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
-    coordinates("com.github.backtrace-labs", "backtrace-android", "3.11.1")
+    coordinates(GROUP, POM_NAME, android.defaultConfig.versionName)
 
     pom {
-        packaging = 'aar'
+        name = POM_NAME
         description = POM_DESCRIPTION
         url = POM_URL
 
