@@ -42,7 +42,7 @@ jobs:
    - name: LS
      run: ls
    - name: Prepare signing secret key ring file
-     run: echo "${{ secrets.SIGNING_KEY }}" > secret_key.gpg
+     run: echo "${{ secrets.SIGNING_KEY }}" > backtrace-library/secret_key.gpg
 
    - name: Grant execute permission for gradlew
      run: chmod +x gradlew
