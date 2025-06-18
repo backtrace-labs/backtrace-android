@@ -53,7 +53,9 @@ jobs:
        OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
        ORG_GRADLE_PROJECT_signing.keyId: ${{ secrets.SIGNING_KEY_ID }}
        ORG_GRADLE_PROJECT_signing.key: ${{ secrets.SIGNING_KEY }}
+       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
        ORG_GRADLE_PROJECT_signing.password: ${{ secrets.SIGNING_PASSWORD }}
+       ORG_GRADLE_PROJECT_signingPassword:  ${{ secrets.SIGNING_PASSWORD }}
 
    - uses: xresloader/upload-to-github-release@v1
      env:
