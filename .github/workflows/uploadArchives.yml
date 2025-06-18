@@ -31,17 +31,26 @@ jobs:
        java-version: 17.0.10
        distribution: "adopt"
        cache: gradle
-   
+
+   - name: PWD
+     run: pwd
+
    - name: Add Maven credentials to gradle.properties
 ##     run: echo "NEXUS_USERNAME=${{ secrets.NEXUS_USERNAME }}" >> gradle.properties && echo "NEXUS_PASSWORD=${{ secrets.NEXUS_PASSWORD }}" >> gradle.properties
-     run: echo "signing.keyId=${{ secrets.SIGNING_KEY_ID }}" >> gradle.properties && echo "signing.password=${{ secrets.SIGNING_PASSWORD }}" >> gradle.properties  && echo "signing.secretKeyRingFile=~/secret_key.gpg" >> gradle.properties
+     run: echo "signing.keyId=${{ secrets.SIGNING_KEY_ID }}" >> gradle.properties && echo "signing.password=${{ secrets.SIGNING_PASSWORD }}" >> gradle.properties  && echo "signing.secretKeyRingFile=secret_key.gpg" >> gradle.properties
 
+   - name: LS
+     run: ls
    - name: Prepare signing secret key ring file
-     run: echo "${{ secrets.SIGNING_KEY }}" > ~/secret_key.gpg
+     run: echo "${{ secrets.SIGNING_KEY }}" > secret_key.gpg
 
    - name: Grant execute permission for gradlew
      run: chmod +x gradlew
-       
+
+   - name: PWD
+     run: pwd
+   - name: LS
+     run: ls
    - name: Upload archives
      run: ./gradlew signMavenPublication
 #     env:
