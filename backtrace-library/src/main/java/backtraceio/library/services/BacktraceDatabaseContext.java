@@ -4,10 +4,14 @@ import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.interfaces.DatabaseContext;
@@ -30,21 +34,20 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private final int _retryNumber;
 
-
     /**
      * Database cache
      */
-    private final Map<Integer, List<BacktraceDatabaseRecord>> batchRetry = new HashMap<>();
+    private final Map<Integer, Queue<BacktraceDatabaseRecord>> batchRetry = new ConcurrentHashMap<>();
 
     /**
      * Total database size on hard drive
      */
-    private long totalSize = 0;
+    private final AtomicLong totalSize = new AtomicLong(0);
 
     /**
      * Total records in BacktraceDatabase
      */
-    private int totalRecords = 0;
+    private final AtomicInteger totalRecords = new AtomicInteger(0);
 
     /**
      * Record order
@@ -98,7 +101,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
 
         for (int i = 0; i < _retryNumber; i++) {
-            this.batchRetry.put(i, new ArrayList<>());
+            this.batchRetry.put(i, new ConcurrentLinkedQueue<>());
         }
     }
 
@@ -135,9 +138,9 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             throw new NullPointerException("BacktraceDatabaseRecord");
         }
         backtraceDatabaseRecord.locked = true;
-        this.totalSize += backtraceDatabaseRecord.getSize();
+        this.totalSize.addAndGet(backtraceDatabaseRecord.getSize());
         this.addToFirstBatch(backtraceDatabaseRecord);
-        this.totalRecords++;
+        this.totalRecords.incrementAndGet();
         return backtraceDatabaseRecord;
     }
 
@@ -169,11 +172,21 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     public Iterable<BacktraceDatabaseRecord> get() {
         List<BacktraceDatabaseRecord> allRecords = new ArrayList<>();
-        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : batchRetry.entrySet()) {
+        for (Map.Entry<Integer, Queue<BacktraceDatabaseRecord>> entry : batchRetry.entrySet()) {
             allRecords.addAll(entry.getValue());
         }
         return allRecords;
     }
+
+    /**
+     * Get database size
+     *
+     * @return database size
+     */
+    public long getDatabaseSize() {
+        return this.totalSize.get();
+    }
+
 
     /**
      * Delete existing record from database
@@ -186,7 +199,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
 
         for (int key : batchRetry.keySet()) {
-            List<BacktraceDatabaseRecord> records = batchRetry.get(key);
+            Queue<BacktraceDatabaseRecord> records = batchRetry.get(key);
 
             if (records == null) {
                 continue;
@@ -202,12 +215,12 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                 databaseRecord.delete();
                 try {
                     iterator.remove();
-                    this.totalRecords--;
-                    this.totalSize -= databaseRecord.getSize();
+                    this.totalRecords.decrementAndGet();
+                    this.totalSize.addAndGet(-databaseRecord.getSize());
                     return true;
                 } catch (Exception e) {
                     BacktraceLogger.d(LOG_TAG, "Exception on removing record "
-                            + databaseRecord.id.toString() + "from db context: " + e.getMessage());
+                            + databaseRecord.id + " from db context: " + e.getMessage());
                 }
             }
         }
@@ -224,8 +237,8 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         if (record == null) {
             throw new NullPointerException("BacktraceDatabaseRecord");
         }
-        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
-            List<BacktraceDatabaseRecord> records = entry.getValue();
+        for (Map.Entry<Integer, Queue<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
+            Queue<BacktraceDatabaseRecord> records = entry.getValue();
 
             for (BacktraceDatabaseRecord databaseRecord : records) {
                 if (databaseRecord != null && databaseRecord.id == record.id) {
@@ -242,7 +255,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @return is database empty
      */
     public boolean isEmpty() {
-        return totalRecords == 0;
+        return totalRecords.get() == 0;
     }
 
     /**
@@ -251,7 +264,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @return number of records in database
      */
     public int count() {
-        return totalRecords;
+        return totalRecords.get();
     }
 
     /**
@@ -259,40 +272,23 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     public void clear() {
         BacktraceLogger.d(LOG_TAG, "Deleting all records from database context");
-        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
-            List<BacktraceDatabaseRecord> records = entry.getValue();
+        for (Map.Entry<Integer, Queue<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
+            Queue<BacktraceDatabaseRecord> records = entry.getValue();
 
             for (BacktraceDatabaseRecord databaseRecord : records) {
                 databaseRecord.delete();
             }
         }
 
-        this.totalRecords = 0;
-        this.totalSize = 0;
+        this.totalRecords.set(0);
+        this.totalSize.set(0);
 
-        for (Map.Entry<Integer, List<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
+        for (Map.Entry<Integer, Queue<BacktraceDatabaseRecord>> entry : this.batchRetry.entrySet()) {
             entry.getValue().clear();
         }
     }
 
-    /**
-     * Increment retry time for current record
-     */
-    public void incrementBatchRetry() {
-        removeMaxRetries();
-        incrementBatches();
-    }
-
-    /**
-     * Get database size
-     *
-     * @return database size
-     */
-    public long getDatabaseSize() {
-        return this.totalSize;
-    }
-
-    /**
+        /**
      * Delete the oldest file
      *
      * @return is deletion was successful
@@ -313,8 +309,8 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private void incrementBatches() {
         for (int i = this._retryNumber - 2; i >= 0; i--) {
-            List<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
-            batchRetry.put(i, new ArrayList<>());
+            Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
+            batchRetry.put(i, new ConcurrentLinkedQueue<>());
             batchRetry.put(i + 1, currentBatch);
         }
     }
@@ -323,18 +319,25 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Remove last batch
      */
     private void removeMaxRetries() {
-        List<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(_retryNumber - 1);
+        Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(_retryNumber - 1);
 
         for (BacktraceDatabaseRecord record : currentBatch) {
             if (!record.valid()) {
                 continue;
             }
             record.delete();
-            this.totalRecords--;
-            totalSize -= record.getSize();
+            this.totalRecords.decrementAndGet();
+            totalSize.addAndGet(-record.getSize());
         }
     }
 
+    /**
+     * Increment retry time for current record
+     */
+    public void incrementBatchRetry() {
+        removeMaxRetries();
+        incrementBatches();
+    }
 
     /**
      * Get first record in in-cache BacktraceDatabase
@@ -362,17 +365,20 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      */
     private BacktraceDatabaseRecord getRecordFromCache(boolean reverse) {
         for (int i = _retryNumber - 1; i >= 0; i--) {
-            List<BacktraceDatabaseRecord> reverseRecords = batchRetry.get(i);
+            Queue<BacktraceDatabaseRecord> batchRecords = batchRetry.get(i);
 
-            if (reverseRecords == null) {
+            if (batchRecords == null) {
                 continue;
             }
 
+            Iterable<BacktraceDatabaseRecord> records = batchRecords;
             if (reverse) {
-                Collections.reverse(reverseRecords);
+                List<BacktraceDatabaseRecord> recordsList = new ArrayList<>(batchRecords);
+                Collections.reverse(recordsList);
+                records = recordsList;
             }
 
-            for (BacktraceDatabaseRecord record : reverseRecords) {
+            for (BacktraceDatabaseRecord record : records) {
                 if (record != null && !record.locked) {
                     record.locked = true;
                     return record;
@@ -386,13 +392,13 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         final int firstBatch = 0;
 
         if (this.batchRetry.isEmpty()) {
-            this.batchRetry.put(firstBatch, new ArrayList<>());
+            this.batchRetry.put(firstBatch, new ConcurrentLinkedQueue<>());
         }
 
-        List<BacktraceDatabaseRecord> batch = this.batchRetry.get(firstBatch);
+        Queue<BacktraceDatabaseRecord> batch = this.batchRetry.get(firstBatch);
 
         if (batch == null) {
-            batch = new ArrayList<>();
+            batch = new ConcurrentLinkedQueue<>();
             this.batchRetry.put(firstBatch, batch);
         }
 

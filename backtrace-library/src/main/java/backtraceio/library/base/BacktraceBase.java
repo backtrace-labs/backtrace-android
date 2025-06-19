@@ -43,7 +43,7 @@ public class BacktraceBase implements Client {
     public static String version = backtraceio.library.BuildConfig.VERSION_NAME;
 
     static {
-        System.loadLibrary("backtrace-native");
+        NativeLibraryLoader.load();
     }
 
     /**
