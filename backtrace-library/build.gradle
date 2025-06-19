@@ -1,7 +1,10 @@
 plugins {
     id 'com.gladed.androidgitversion' version '0.4.14'
+    id "com.vanniktech.maven.publish" version "0.29.0" apply true
 }
 apply plugin: 'com.android.library'
+
+import com.vanniktech.maven.publish.SonatypeHost
 
 androidGitVersion {
     // this is the format for generating the versionName
@@ -33,12 +36,6 @@ android {
         }
         buildFeatures {
             buildConfig = true
-        }
-        publishing {
-            singleVariant("release") {
-                withSourcesJar()
-                withJavadocJar()
-            }
         }
     }
 
@@ -74,6 +71,43 @@ android {
     }
 }
 
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    coordinates(GROUP, POM_NAME, android.defaultConfig.versionName)
+
+    pom {
+        name = POM_NAME
+        description = POM_DESCRIPTION
+        url = POM_URL
+
+        licenses {
+            license {
+                name = POM_LICENSE_NAME
+                url = POM_LICENSE_URL
+                distribution = POM_LICENSE_DIST
+            }
+        }
+
+        developers {
+            developer {
+                id = POM_DEVELOPER_ID
+                name = POM_DEVELOPER_NAME
+            }
+            developer {
+                id = POM_DEVELOPER_ID2
+                name = POM_DEVELOPER_NAME2
+            }
+        }
+
+        scm {
+            url = POM_SCM_URL
+            connection = POM_SCM_CONNECTION
+            developerConnection = POM_SCM_DEV_CONNECTION
+        }
+    }
+}
+
 dependencies {
     implementation 'com.google.code.gson:gson:2.12.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -90,5 +124,3 @@ dependencies {
     androidTestImplementation 'org.mockito:mockito-core:5.16.0'
     androidTestImplementation "org.mockito:mockito-android:5.16.0"
 }
-
-apply from: 'publish.gradle'
