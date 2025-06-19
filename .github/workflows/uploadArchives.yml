@@ -58,12 +58,12 @@ jobs:
      run: ls
    - name: Upload archives
      run: ./gradlew build
-     env:
+#     env:
 #       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ASCII_ARMORED_GPG_KEY }} # ASCII-armored GPG key
 #       ORG_GRADLE_PROJECT_signingPassword: "" # Using empty password for GPG key
    - name: Upload archives
      run: ./gradlew publishAllPublicationsToMavenCentralRepository
-     env:
+#     env:
 #       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ASCII_ARMORED_GPG_KEY }} # ASCII-armored GPG key
 #       ORG_GRADLE_PROJECT_signingPassword: "" # Using empty password for GPG key
      #     env:
