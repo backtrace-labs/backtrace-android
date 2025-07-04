@@ -13,8 +13,8 @@ android {
     namespace "backtraceio.library"
     defaultConfig {
         minSdkVersion 21
-        compileSdk 34
-        targetSdkVersion 34
+        compileSdk 36
+        targetSdkVersion 36
         versionName androidGitVersion.name()
         versionCode androidGitVersion.code()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
