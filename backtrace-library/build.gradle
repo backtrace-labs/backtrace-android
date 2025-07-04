@@ -13,8 +13,8 @@ android {
     namespace "backtraceio.library"
     defaultConfig {
         minSdkVersion 21
-        compileSdk 34
-        targetSdkVersion 34
+        compileSdk 36
+        targetSdkVersion 36
         versionName androidGitVersion.name()
         versionCode androidGitVersion.code()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
@@ -72,10 +72,11 @@ android {
             abortOnError false
         }
     }
+    ndkVersion "28.1.13356709"
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.12.1'
+    implementation 'com.google.code.gson:gson:2.13.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.squareup:tape:1.2.3'
     testImplementation 'junit:junit:4.13.2'
