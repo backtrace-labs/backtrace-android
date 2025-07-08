@@ -54,6 +54,14 @@ add_library(# Sets the name of the library.
 
 target_compile_features(backtrace-native PRIVATE cxx_std_17)
 
+# Android 15 & later: make every LOAD segment 16 KB-aligned so the .so files
+# can work on kernels that use 16 KB pages. Has zero impact on 4 KB devices.
+if (ANDROID_ABI STREQUAL "arm64-v8a" OR ANDROID_ABI STREQUAL "x86_64")
+    target_link_options(backtrace-native PRIVATE
+        -Wl,-z,max-page-size=16384
+        -Wl,-z,common-page-size=16384)
+endif()
+
 if (BACKEND STREQUAL "CRASHPAD_BACKEND")
     target_compile_definitions(backtrace-native PRIVATE -DCRASHPAD_BACKEND)
 
@@ -107,6 +115,10 @@ list(APPEND LIBS backtrace-native)
 list(APPEND LIBS ${log-lib})
 
 if (BACKEND STREQUAL "CRASHPAD_BACKEND")
+    # Pass 16 KB linker flags to Crashpad’s handler so libcrashpad_handler.so loads on 16 KB kernels.
+    set(CRASHPAD_GN_ARGS_FILE
+        "${CMAKE_CURRENT_SOURCE_DIR}/crashpad/args_android.gn")
+
     set(CRASHPAD_HANDLER_GENERATE_STATIC_LIB true)
     add_subdirectory(crashpad)
     target_link_libraries(backtrace-native client)

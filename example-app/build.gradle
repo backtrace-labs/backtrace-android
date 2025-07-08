@@ -3,9 +3,10 @@ apply plugin: 'com.android.application'
 android {
     namespace "backtraceio.backtraceio"
     defaultConfig {
-        compileSdk 34
+        compileSdk 35
         applicationId "backtraceio.backtraceio"
         minSdkVersion 21
+        // TODO: BT-5924 Android 35 update -> noinspection OldTargetApi,EditedTargetSdkVersion
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
