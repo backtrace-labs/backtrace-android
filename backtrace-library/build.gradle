@@ -13,10 +13,9 @@ android {
     namespace "backtraceio.library"
     defaultConfig {
         minSdkVersion 21
-        compileSdk 34
-        targetSdkVersion 34
-        versionName androidGitVersion.name()
-        versionCode androidGitVersion.code()
+        compileSdk 35
+        targetSdkVersion 35
+        ndkVersion "27.0.11718014-beta1"
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -26,6 +25,7 @@ android {
                 cppFlags ""
                 arguments "-DCMAKE_BUILD_TYPE=Release"
                 arguments "-DCRASHPAD_HTTPS_TRANSPORT=OPENSSL"
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
             }
         }
         ndk {
@@ -57,7 +57,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version "3.22.1"
+            version "3.31.6"
         }
     }
     sourceSets {
