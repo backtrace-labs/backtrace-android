@@ -8,6 +8,9 @@ public class BacktraceGsonBuilder implements CustomGsonBuilder {
 
     @Override
     public Gson buildGson() {
-        return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
+        return new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+                .registerTypeHierarchyAdapter(Throwable.class, new ThrowableAdapter())
+                .create();
     }
 }
