@@ -41,7 +41,7 @@ public class GsonThrowableSerializationTest {
 
         // THEN
         String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedThrowable.json")
+                TestUtils.readFileAsString(this, "serializedThrowableWithCause.json")
         );
 
         assertTrue(TestUtils.compareJson(json, expectedJson));

@@ -1,15 +1,17 @@
 {
+  "detail-message" : "Something went wrong",
   "stack-trace" : [ {
     "declaring-class" : "sample-class-1",
-    "line-number" : 100,
     "method-name" : "method-1",
-    "file-name" : "file-name1"
+    "file-name" : "file-name1",
+    "line-number" : 100,
+    "format" : 0
   }, {
     "declaring-class" : "sample-class-2",
-    "line-number" : 200,
     "method-name" : "method-2",
-    "file-name" : "file-name2"
+    "file-name" : "file-name2",
+    "line-number" : 200,
+    "format" : 0
   } ],
-  "message" : "Something went wrong",
-  "class" : "java.lang.Throwable"
+  "suppressed-exceptions" : [ ]
 }

@@ -1,18 +1,17 @@
 {
-  "stack-trace": [
-    {
-      "declaring-class": "sample-class-1",
-      "line-number": 100,
-      "method-name": "method-1",
-      "file-name": "file-name1"
-    },
-    {
-      "declaring-class": "sample-class-2",
-      "line-number": 200,
-      "method-name": "method-2",
-      "file-name": "file-name2"
-    }
-  ],
-  "message": "test-msg",
-  "class": "java.lang.Exception"
+  "detail-message" : "test-msg",
+  "stack-trace" : [ {
+    "declaring-class" : "sample-class-1",
+    "method-name" : "method-1",
+    "file-name" : "file-name1",
+    "line-number" : 100,
+    "format" : 0
+  }, {
+    "declaring-class" : "sample-class-2",
+    "method-name" : "method-2",
+    "file-name" : "file-name2",
+    "line-number" : 200,
+    "format" : 0
+  } ],
+  "suppressed-exceptions" : [ ]
 }
