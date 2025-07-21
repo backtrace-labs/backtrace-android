@@ -12,7 +12,7 @@ import java.util.List;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
 
-public class GsonThrowableSerialization {
+public class GsonThrowableSerializationTest {
     @Test
     public void testSerializeException() throws JSONException {
         // GIVEN
@@ -51,7 +51,7 @@ public class GsonThrowableSerialization {
     public void testSerializeThrowable() throws JSONException {
         // GIVEN
         Throwable throwable = new Throwable("Something went wrong");
-        throwable.setStackTrace(GsonThrowableSerialization.generateStackTraceElements());
+        throwable.setStackTrace(GsonThrowableSerializationTest.generateStackTraceElements());
 
         // WHEN
         String json = BacktraceSerializeHelper.toJson(throwable);
@@ -76,6 +76,28 @@ public class GsonThrowableSerialization {
         // THEN
         String expectedJson = TestUtils.minifyJsonString(
                 TestUtils.readFileAsString(this, "serializedError.json")
+        );
+
+        assertTrue(TestUtils.compareJson(json, expectedJson));
+    }
+
+    @Test
+    public void serializeExceptionWithException() throws JSONException {
+        // GIVEN
+        Exception e = generateException();
+        Exception e2;
+        try {
+            throw e;
+        } catch (Exception ex) {
+            e2 = new JSONException(ex);
+        }
+
+        // WHEN
+        String json = BacktraceSerializeHelper.toJson(e2);
+
+        // THEN
+        String expectedJson = TestUtils.minifyJsonString(
+                TestUtils.readFileAsString(this, "serializedExceptionWithCause.json")
         );
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
