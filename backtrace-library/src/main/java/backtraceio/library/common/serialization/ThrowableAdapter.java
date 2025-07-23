@@ -1,5 +1,9 @@
 package backtraceio.library.common.serialization;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -13,14 +17,15 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-class ThrowableAdapter extends TypeAdapter<Throwable> {
+class ThrowableAdapter<T extends Throwable> extends TypeAdapter<T> {
     @Override
-    public void write(JsonWriter out, Throwable value) throws IOException {
-        JSONObject json = new JSONObject();
+    public void write(JsonWriter out, T value) throws IOException {
+        JsonObject json = new JsonObject();
+
         try {
-            json.put("message", value.getMessage());
-            json.put("class", value.getClass().getName());
-            json.put("stack-trace", parseStacktraceElements(value.getStackTrace()));
+            json.addProperty("message", value.getMessage());
+            json.addProperty("class", value.getClass().getName());
+            json.add("stack-trace", parseStacktraceElements(value.getStackTrace()));
 
         } catch (JSONException e) {
             // TODO: improve
@@ -30,22 +35,52 @@ class ThrowableAdapter extends TypeAdapter<Throwable> {
         out.jsonValue(json.toString());
     }
 
-    public JSONArray parseStacktraceElements(StackTraceElement[] stackTraceElements) throws JSONException {
-        JSONArray stackTraceArray = new JSONArray();
+    public JsonArray parseStacktraceElements(StackTraceElement[] stackTraceElements) throws JSONException {
+        JsonArray stackTraceArray = new JsonArray();
         for (StackTraceElement element : stackTraceElements) {
-            JSONObject elementJson = new JSONObject();
-            elementJson.put("declaring-class", element.getClassName());
-            elementJson.put("method-name", element.getMethodName());
-            elementJson.put("file-name", element.getFileName());
-            elementJson.put("line-number", element.getLineNumber());
-            stackTraceArray.put(elementJson);
+            JsonObject elementJson = new JsonObject();
+            elementJson.addProperty("declaring-class", element.getClassName());
+            elementJson.addProperty("method-name", element.getMethodName());
+            elementJson.addProperty("file-name", element.getFileName());
+            elementJson.addProperty("line-number", element.getLineNumber());
+            stackTraceArray.add(elementJson);
         }
         return stackTraceArray;
     }
 
+    public String getExceptionMessage(JsonObject json) {
+        if (json.has("detail-message")) {
+            return json.get("detail-message").getAsString();
+        }
+
+        if (json.has("message")) {
+            return json.get("message").getAsString();
+        }
+        return null;
+    }
+
     @Override
-    public Throwable read(JsonReader in) throws IOException {
-        return this.fromJson(in.toString());
+    public T read(JsonReader in) throws IOException {
+        JsonObject json = JsonParser.parseReader(in).getAsJsonObject();
+        JsonArray stackTraceArray = json.getAsJsonArray("stack-trace");
+        String message = getExceptionMessage(json);
+        List<StackTraceElement> stackTraceElementList = new ArrayList<>();
+        for (JsonElement element : stackTraceArray) {
+            JsonObject elementJson = element.getAsJsonObject();
+            String lineNumber = elementJson.get("line-number").getAsString();
+            String fileName = elementJson.get("file-name").getAsString();
+            String methodName = elementJson.get("method-name").getAsString();
+            String declaringClass = elementJson.get("declaring-class").getAsString();
+            stackTraceElementList.add(new StackTraceElement(declaringClass, methodName, fileName, Integer.parseInt(lineNumber)));
+        }
+
+        Throwable throwable = new Throwable(message);
+
+        throwable.setStackTrace(stackTraceElementList.toArray(new StackTraceElement[0]));
+        return (T) throwable;
+
+//        t.setStackTrace(elements.toArray(new StackTraceElement[0]));
+//        return this.fromJson(in.toString());
 //        in.
 //        String message = null;
 //        String className = null;

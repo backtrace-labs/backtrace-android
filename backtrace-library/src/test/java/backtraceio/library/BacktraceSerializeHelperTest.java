@@ -54,8 +54,8 @@ public class BacktraceSerializeHelperTest {
     @Test
     public void testSerialization() {
         Throwable x = new Throwable("test");
-        x.
-        x.setStackTrace( );
+//        x.
+//        x.setStackTrace( );
         // GIVEN
         BacktraceResult backtraceResult = new BacktraceResult(null, "result-message", BacktraceResultStatus.Ok);
         // WHEN

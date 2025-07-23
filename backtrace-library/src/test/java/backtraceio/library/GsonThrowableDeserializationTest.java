@@ -24,7 +24,7 @@ public class GsonThrowableDeserializationTest {
         String json = TestUtils.readFileAsString(this, "serializedException.json");
 
         // WHEN
-        Exception deserializedException = BacktraceSerializeHelper.fromJson(json, Exception.class);
+        IllegalArgumentException deserializedException = BacktraceSerializeHelper.fromJson(json, IllegalArgumentException.class);
 
         // THEN
         assertNotNull(deserializedException);
