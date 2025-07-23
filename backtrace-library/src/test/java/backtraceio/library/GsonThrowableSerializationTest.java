@@ -82,6 +82,15 @@ public class GsonThrowableSerializationTest {
     }
 
     @Test
+    public void serializeMultiCauseException() {
+        AssertionError e = new AssertionError("4", new RuntimeException("3", new JSONException("2", new IllegalArgumentException("1"))));
+
+        String json = BacktraceSerializeHelper.toJson(e);
+
+        System.out.println(json);
+    }
+
+    @Test
     public void serializeExceptionWithException() throws JSONException {
         // GIVEN
         Exception e = generateException();
@@ -90,6 +99,7 @@ public class GsonThrowableSerializationTest {
             throw e;
         } catch (Exception ex) {
             e2 = new JSONException(ex);
+            e2.setStackTrace(generateStackTraceElements());
         }
 
         // WHEN

@@ -110,8 +110,8 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
 
                 String actualClassName = null;
-                if (jsonObject.has("actualClass")) {
-                    actualClassName = jsonObject.get("actualClass").getAsString();
+                if (jsonObject.has("class")) {
+                    actualClassName = jsonObject.get("class").getAsString();
                 }
 
                 String message = null;
@@ -120,8 +120,8 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
                 }
 
                 List<StackTraceElement> stackTraceList = new ArrayList<>();
-                if (jsonObject.has("stackTrace") && jsonObject.get("stackTrace").isJsonArray()) {
-                    for (JsonElement elementJson : jsonObject.getAsJsonArray("stackTrace")) {
+                if (jsonObject.has("stack-trace") && jsonObject.get("stack-trace").isJsonArray()) {
+                    for (JsonElement elementJson : jsonObject.getAsJsonArray("stack-trace")) {
 //                        stackTraceList.add(stackTraceElementAdapter.fromJsonTree(elementJson));
                     }
                 }
