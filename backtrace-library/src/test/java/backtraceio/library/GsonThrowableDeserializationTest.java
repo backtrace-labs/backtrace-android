@@ -28,7 +28,7 @@ public class GsonThrowableDeserializationTest {
 
         // THEN
         assertNotNull(deserializedException);
-//        assertEquals("test-msg", deserializedException.getMessage());
+        assertEquals("test-msg", deserializedException.getMessage());
         assertNull(deserializedException.getCause()); // No cause in this specific JSON
         assertEquals(2, deserializedException.getStackTrace().length);
         assertEquals("sample-class-1", deserializedException.getStackTrace()[0].getClassName());
@@ -42,7 +42,7 @@ public class GsonThrowableDeserializationTest {
     }
 
     @Test
-    public void testDeserializeThrowableWithCause() {
+    public void testDeserializeThrowableWithoutCause() {
         // GIVEN
         String json = TestUtils.readFileAsString(this, "serializedThrowable.json");
 
@@ -51,9 +51,26 @@ public class GsonThrowableDeserializationTest {
 
         // THEN
         assertNotNull(deserializedThrowable);
-//        assertEquals("Something went wrong", deserializedThrowable.getMessage());
-//        assertNotNull(deserializedThrowable.getCause()); // TODO: to verify
-//        assertEquals("test-msg", deserializedThrowable.getCause().getMessage());
+        assertEquals("Something went wrong", deserializedThrowable.getMessage());
+        assertNull(deserializedThrowable.getCause());
+        assertEquals(2, deserializedThrowable.getStackTrace().length);
+        assertEquals("sample-class-1", deserializedThrowable.getStackTrace()[0].getClassName());
+        assertEquals("method-1", deserializedThrowable.getStackTrace()[0].getMethodName());
+    }
+
+    @Test
+    public void testDeserializeThrowableWithCause() {
+        // GIVEN
+        String json = TestUtils.readFileAsString(this, "serializedThrowableWithCause.json");
+
+        // WHEN
+        Throwable deserializedThrowable = BacktraceSerializeHelper.fromJson(json, Throwable.class);
+
+        // THEN
+        assertNotNull(deserializedThrowable);
+        assertEquals("Something went wrong", deserializedThrowable.getMessage());
+        assertNotNull(deserializedThrowable.getCause());
+        assertEquals("test-msg", deserializedThrowable.getCause().getMessage());
         assertEquals(2, deserializedThrowable.getStackTrace().length);
         assertEquals("sample-class-1", deserializedThrowable.getStackTrace()[0].getClassName());
         assertEquals("method-1", deserializedThrowable.getStackTrace()[0].getMethodName());
@@ -103,7 +120,7 @@ public class GsonThrowableDeserializationTest {
 
         // THEN
         assertNotNull(deserializedError);
-//        assertEquals("Critical system error", deserializedError.getMessage());
+        assertEquals("Critical system error", deserializedError.getMessage());
         assertNull(deserializedError.getCause());
         assertEquals(2, deserializedError.getStackTrace().length);
         assertEquals("sample-class-1", deserializedError.getStackTrace()[0].getClassName());
@@ -121,7 +138,7 @@ public class GsonThrowableDeserializationTest {
         assertNotNull(deserializedException);
         assertEquals("test-msg", deserializedException.getMessage()); // Gson might serialize the cause's message into the main message
         assertNotNull(deserializedException.getCause());
-//        assertEquals("test-msg", deserializedException.getCause().getMessage());
+        assertEquals("test-msg", deserializedException.getCause().getMessage());
         assertEquals(2, Objects.requireNonNull(deserializedException.getCause()).getStackTrace().length);
         assertEquals("sample-class-1", deserializedException.getCause().getStackTrace()[0].getClassName());
     }
@@ -163,7 +180,7 @@ public class GsonThrowableDeserializationTest {
 
         // THEN
         assertNotNull(deserializedException);
-//        assertEquals("Error occurred", deserializedException.getMessage());
+        assertEquals("Error occurred", deserializedException.getMessage());
         assertNull(deserializedException.getCause());
         assertNotNull(deserializedException.getStackTrace());
     }

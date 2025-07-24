@@ -43,7 +43,6 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
         for (StackTraceElement element : stackTraceElements) {
             out.beginObject();
             out.name("declaring-class").value(element.getClassName());
-            out.name("declaring-class").value(element.getClassName());
             out.name("method-name").value(element.getMethodName());
             out.name("file-name").value(element.getFileName());
             out.name("line-number").value(element.getLineNumber());
@@ -61,7 +60,7 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
         }
 
         final TypeAdapter<JsonElement> jsonElementAdapter = gson.getAdapter(JsonElement.class);
-//        final TypeAdapter<StackTraceElement> stackTraceElementAdapter = gson.getAdapter(StackTraceElement.class);
+        final TypeAdapter<StackTraceElement> stackTraceElementAdapter = gson.getAdapter(StackTraceElement.class);
         // Adapter for handling the 'cause' field recursively.
         // We request a TypeAdapter for Throwable itself for the cause.
         final TypeAdapter<Throwable> causeAdapter = gson.getAdapter(Throwable.class);
@@ -75,19 +74,19 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
                 }
                 Throwable throwable = (Throwable) value; // Safe cast due to the factory's check
                 out.beginObject();
-                try {
-                    out.name("message").value(throwable.getMessage());
-                    out.name("class").value(throwable.getClass().getName());
-                    addStacktraceElements(out, throwable.getStackTrace());
+                out.name("message").value(throwable.getMessage());
+                out.name("class").value(throwable.getClass().getName());
 
-                    if (throwable.getCause() != null) {
-                        out.name("cause");
-                        causeAdapter.write(out, throwable.getCause()); // Use the causeAdapter
-                    }
+                out.name("stack-trace");
+                out.beginArray();
+                for (StackTraceElement element : throwable.getStackTrace()){
+                    stackTraceElementAdapter.write(out, element);
+                }
+                out.endArray();
 
-                } catch (JSONException e) {
-                    // TODO: improve
-                    e.printStackTrace();
+                if (throwable.getCause() != null) {
+                    out.name("cause");
+                    causeAdapter.write(out, throwable.getCause()); // Use the causeAdapter
                 }
                 out.endObject();
             }
@@ -119,7 +118,7 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
                 List<StackTraceElement> stackTraceList = new ArrayList<>();
                 if (jsonObject.has("stack-trace") && jsonObject.get("stack-trace").isJsonArray()) {
                     for (JsonElement elementJson : jsonObject.getAsJsonArray("stack-trace")) {
-//                        stackTraceList.add(stackTraceElementAdapter.fromJsonTree(elementJson));
+                        stackTraceList.add(stackTraceElementAdapter.fromJsonTree(elementJson));
                     }
                 }
 
