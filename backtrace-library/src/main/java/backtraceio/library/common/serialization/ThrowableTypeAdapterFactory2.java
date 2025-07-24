@@ -15,6 +15,7 @@ import com.google.gson.stream.JsonWriter;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -65,7 +66,6 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
         // We request a TypeAdapter for Throwable itself for the cause.
         final TypeAdapter<Throwable> causeAdapter = gson.getAdapter(Throwable.class);
 
-
         return new TypeAdapter<T>() {
             @Override
             public void write(JsonWriter out, T value) throws IOException {
@@ -74,9 +74,6 @@ public class ThrowableTypeAdapterFactory2 implements TypeAdapterFactory {
                     return;
                 }
                 Throwable throwable = (Throwable) value; // Safe cast due to the factory's check
-
-
-//                JsonObject json = new JsonObject();
                 out.beginObject();
                 try {
                     out.name("message").value(throwable.getMessage());

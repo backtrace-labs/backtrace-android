@@ -1,6 +1,6 @@
 {
   "message" : "Something went wrong",
-  "class": "java.lang.Exception",
+  "class": "java.lang.Throwable",
   "cause" : {
     "message" : "test-msg",
     "class": "java.lang.Exception",

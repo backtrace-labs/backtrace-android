@@ -82,6 +82,7 @@ public class GsonThrowableSerializationTest {
     }
 
     @Test
+    // TODO: improve
     public void serializeMultiCauseException() {
         AssertionError e = new AssertionError("4", new RuntimeException("3", new JSONException("2", new IllegalArgumentException("1"))));
 

@@ -2,7 +2,7 @@
   "message" : "test-msg",
   "class": "org.json.JSONException",
   "cause" : {
-    "class":" java.lang.Exception",
+    "class": "java.lang.Exception",
     "message" : "test-msg",
     "stack-trace" : [ {
       "declaring-class" : "sample-class-1",
