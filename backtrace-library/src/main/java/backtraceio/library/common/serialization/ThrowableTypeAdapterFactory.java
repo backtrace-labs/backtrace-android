@@ -21,19 +21,16 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        // We are interested in creating adapters for Throwable and its subtypes.
         final Class<? super T> rawType = typeToken.getRawType();
         if (!Throwable.class.isAssignableFrom(rawType)) {
             return null; // This factory doesn't handle this type.
         }
 
-        // This adapter will handle T, where T is Throwable or a subclass.
         final TypeAdapter<JsonElement> jsonElementAdapter = gson.getAdapter(JsonElement.class);
-//        final TypeAdapter<StackTraceElement> stackTraceElementAdapter = gson.getAdapter(StackTraceElement.class);
+        final TypeAdapter<StackTraceElement> stackTraceElementAdapter = gson.getAdapter(StackTraceElement.class);
         // Adapter for handling the 'cause' field recursively.
         // We request a TypeAdapter for Throwable itself for the cause.
         final TypeAdapter<Throwable> causeAdapter = gson.getAdapter(Throwable.class);
-
 
         return new TypeAdapter<T>() {
             @Override
@@ -43,17 +40,15 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                     return;
                 }
                 Throwable throwable = (Throwable) value; // Safe cast due to the factory's check
-
                 out.beginObject();
-                // Store the actual class name for more accurate deserialization
-                out.name("actualClass").value(throwable.getClass().getName());
                 out.name("message").value(throwable.getMessage());
+                out.name("class").value(throwable.getClass().getName());
 
-                out.name("stackTrace");
+                out.name("stack-trace");
                 out.beginArray();
-//                for (StackTraceElement element : throwable.getStackTrace()) {
-//                    stackTraceElementAdapter.write(out, element);
-//                }
+                for (StackTraceElement element : throwable.getStackTrace()){
+                    stackTraceElementAdapter.write(out, element);
+                }
                 out.endArray();
 
                 if (throwable.getCause() != null) {
@@ -78,8 +73,8 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
 
                 String actualClassName = null;
-                if (jsonObject.has("actualClass")) {
-                    actualClassName = jsonObject.get("actualClass").getAsString();
+                if (jsonObject.has("class")) {
+                    actualClassName = jsonObject.get("class").getAsString();
                 }
 
                 String message = null;
@@ -88,9 +83,9 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 }
 
                 List<StackTraceElement> stackTraceList = new ArrayList<>();
-                if (jsonObject.has("stackTrace") && jsonObject.get("stackTrace").isJsonArray()) {
-                    for (JsonElement elementJson : jsonObject.getAsJsonArray("stackTrace")) {
-//                        stackTraceList.add(stackTraceElementAdapter.fromJsonTree(elementJson));
+                if (jsonObject.has("stack-trace") && jsonObject.get("stack-trace").isJsonArray()) {
+                    for (JsonElement elementJson : jsonObject.getAsJsonArray("stack-trace")) {
+                        stackTraceList.add(stackTraceElementAdapter.fromJsonTree(elementJson));
                     }
                 }
 
@@ -100,72 +95,16 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 }
 
                 // Determine the class to instantiate
-                Class<? extends Throwable> throwableClassToInstantiate = (Class<? extends Throwable>) rawType;
-                if (actualClassName != null) {
-                    try {
-                        Class<?> loadedClass = Class.forName(actualClassName);
-                        if (Throwable.class.isAssignableFrom(loadedClass)) {
-                            // Only use if it's compatible with the requested type T (rawType)
-                            if (rawType.isAssignableFrom(loadedClass)) {
-                                throwableClassToInstantiate = (Class<? extends Throwable>) loadedClass;
-                            }
-                            // If actualClassName is more specific but not assignable to rawType,
-                            // we stick to rawType to avoid ClassCastException later.
-                            // e.g. if deserializing into `Exception.class` but `actualClass` was `Error`.
-                        }
-                    } catch (ClassNotFoundException ignored) {
-                        // Class not found, will fall back to using rawType (the type requested from Gson)
-                    }
+                Class<? extends Throwable> throwableClassToInstantiate = determineClassToInstantiate(actualClassName);
+
+                Throwable instance = tryInstantiateThrowable(throwableClassToInstantiate, message, cause);
+
+                if (instance == null) {
+                    // TODO:
+                    return null;
                 }
 
-                Throwable instance = null;
-                try {
-                    // Try constructor with (String message, Throwable cause)
-                    Constructor<? extends Throwable> constructor = throwableClassToInstantiate.getDeclaredConstructor(String.class, Throwable.class);
-                    constructor.setAccessible(true);
-                    instance = constructor.newInstance(message, cause);
-                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e1) {
-                    try {
-                        // Try constructor with (String message)
-                        Constructor<? extends Throwable> constructor = throwableClassToInstantiate.getDeclaredConstructor(String.class);
-                        constructor.setAccessible(true);
-                        instance = constructor.newInstance(message);
-                        if (cause != null && instance != null) {
-                            try {
-                                instance.initCause(cause);
-                            } catch (IllegalStateException ignored) {
-                                // Cause might have already been set by a chained constructor, or not allowed
-                            }
-                        }
-                    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e2) {
-                        try {
-                            // Try default constructor
-                            Constructor<? extends Throwable> constructor = throwableClassToInstantiate.getDeclaredConstructor();
-                            constructor.setAccessible(true);
-                            instance = constructor.newInstance();
-                            // Manually initialize if possible (though Throwable doesn't have public setters for message/cause after construction)
-                            // This part is tricky. For custom exceptions, you might need more specific logic.
-                            // For standard exceptions, (String) and (String, Throwable) constructors are common.
-                            if (cause != null && instance != null) {
-                                try {
-                                    instance.initCause(cause);
-                                } catch (IllegalStateException ignored) {}
-                            }
-                        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e3) {
-                            // Fallback: create a generic RuntimeException if specific instantiation fails
-                            // This is a last resort to avoid losing the exception data entirely.
-                            String fallbackMessage = String.format(
-                                    "Failed to instantiate %s. Original message: %s. Cause: %s",
-                                    throwableClassToInstantiate.getName(), message, (cause != null ? cause.getMessage() : "null")
-                            );
-                            instance = new RuntimeException(fallbackMessage, cause);
-                        }
-                    }
-                }
-
-                if (instance != null) {
-                    instance.setStackTrace(stackTraceList.toArray(new StackTraceElement[0]));
-                }
+                instance.setStackTrace(stackTraceList.toArray(new StackTraceElement[0]));
 
                 // Ensure the created instance is assignable to T.
                 // This should be true if logic for 'throwableClassToInstantiate' is correct.
@@ -194,6 +133,89 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                         throw new JsonParseException("Could not create fallback instance of " + rawType.getName() + ": " + fallbackEx.getMessage(), fallbackEx);
                     }
                 }
+            }
+
+            private Class<? extends Throwable> determineClassToInstantiate(String actualClassName) {
+                Class<? extends Throwable> throwableClassToInstantiate = (Class<? extends Throwable>) rawType;
+                if (actualClassName != null) {
+                    try {
+                        Class<?> loadedClass = Class.forName(actualClassName);
+                        if (Throwable.class.isAssignableFrom(loadedClass)) {
+                            // Only use if it's compatible with the requested type T (rawType)
+                            if (rawType.isAssignableFrom(loadedClass)) {
+                                throwableClassToInstantiate = (Class<? extends Throwable>) loadedClass;
+                            }
+                            // If actualClassName is more specific but not assignable to rawType,
+                            // we stick to rawType to avoid ClassCastException later.
+                            // e.g. if deserializing into `Exception.class` but `actualClass` was `Error`.
+                        }
+                    } catch (ClassNotFoundException ignored) {
+                        // Class not found, will fall back to using rawType (the type requested from Gson)
+                    }
+                }
+                return throwableClassToInstantiate;
+            }
+
+
+            private <T extends Throwable> T tryInstantiateThrowable(
+                    Class<T> exceptionClass,
+                    String message,
+                    Throwable cause
+            ) {
+
+                // Attempt 1: Constructor (String message, Throwable cause)
+                try {
+                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor(String.class, Throwable.class);
+                    constructor.setAccessible(true);
+                    return constructor.newInstance(message, cause);
+                } catch (NoSuchMethodException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks (String, Throwable) constructor.");
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String, Throwable)", e);
+                }
+
+                // Attempt 2: Constructor (String message)
+                try {
+                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor(String.class);
+                    constructor.setAccessible(true);
+                    T instance = constructor.newInstance(message);
+                    if (cause != null) {
+                        try {
+                            instance.initCause(cause);
+                        } catch (IllegalStateException ignored) {
+                            // Cause might have already been set by a chained constructor, or not allowed
+//                            if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", "Could not initCause for " + exceptionClass.getName() + " after (String) constructor.");
+                        }
+                    }
+                    return instance;
+                } catch (NoSuchMethodException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks (String) constructor.");
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String)", e);
+                }
+
+                // Attempt 3: Default constructor
+                try {
+                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor();
+                    constructor.setAccessible(true);
+                    T instance = constructor.newInstance();
+                    // Message cannot be set via public API for standard Throwables after default construction.
+                    // It will rely on the default message of the exception or be null.
+                    if (cause != null) {
+                        try {
+                            instance.initCause(cause);
+                        } catch (IllegalStateException ignored) {
+//                            if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", "Could not initCause for " + exceptionClass.getName() + " after default constructor.");
+                        }
+                    }
+                    return instance;
+                } catch (NoSuchMethodException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks default constructor.");
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with default constructor", e);
+                }
+
+                return null; // All attempts failed
             }
         };
     }
