@@ -10,7 +10,6 @@ public class BacktraceGsonBuilder implements CustomGsonBuilder {
     public Gson buildGson() {
         return new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
-//                .registerTypeHierarchyAdapter(Throwable.class, new ThrowableAdapter())
                 .registerTypeAdapter(StackTraceElement.class, new StackTraceElementTypeAdapter())
                 .registerTypeAdapterFactory(new ThrowableTypeAdapterFactory())
                 .create();

@@ -15,31 +15,49 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
+
+import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.logger.BacktraceLogger;
 
 public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 
+    private static class ConstructorSpec<T extends Throwable> {
+        final Class<?>[] paramTypes;
+        final Object[] args;
+
+        ConstructorSpec(Class<?>[] paramTypes, Object[] args) {
+            this.paramTypes = paramTypes;
+            this.args = args;
+        }
+    }
+
+    private transient final String LOG_TAG = ThrowableTypeAdapterFactory.class.getSimpleName();
+
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+
         final Class<? super T> rawType = typeToken.getRawType();
         if (!Throwable.class.isAssignableFrom(rawType)) {
-            return null; // This factory doesn't handle this type.
+            BacktraceLogger.d(LOG_TAG, "ThrowableTypeAdapterFactory doesn't handle " + rawType.getName() + " type");
+            return null;
         }
 
         final TypeAdapter<JsonElement> jsonElementAdapter = gson.getAdapter(JsonElement.class);
         final TypeAdapter<StackTraceElement> stackTraceElementAdapter = gson.getAdapter(StackTraceElement.class);
-        // Adapter for handling the 'cause' field recursively.
-        // We request a TypeAdapter for Throwable itself for the cause.
         final TypeAdapter<Throwable> causeAdapter = gson.getAdapter(Throwable.class);
 
         return new TypeAdapter<T>() {
+
             @Override
             public void write(JsonWriter out, T value) throws IOException {
                 if (value == null) {
                     out.nullValue();
                     return;
                 }
-                Throwable throwable = (Throwable) value; // Safe cast due to the factory's check
+                Throwable throwable = (Throwable) value;
                 out.beginObject();
                 out.name("message").value(throwable.getMessage());
                 out.name("class").value(throwable.getClass().getName());
@@ -53,7 +71,7 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 
                 if (throwable.getCause() != null) {
                     out.name("cause");
-                    causeAdapter.write(out, throwable.getCause()); // Use the causeAdapter
+                    causeAdapter.write(out, throwable.getCause());
                 }
                 out.endObject();
             }
@@ -110,29 +128,11 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 // This should be true if logic for 'throwableClassToInstantiate' is correct.
                 if (rawType.isInstance(instance)) {
                     return (T) instance;
-                } else {
-                    // This case should ideally not be hit if actualClassName logic is sound
-                    // or if only rawType was used.
-                    // If it is, it means 'actualClass' was incompatible with the requested type 'T'.
-                    // We might return a generic instance of T or throw an error.
-                    // For now, let's wrap the incompatible instance if possible, or throw.
-                    String errorMessage = String.format(
-                            "Deserialized to %s but expected assignable to %s. Message: %s",
-                            (instance != null ? instance.getClass().getName() : "null"),
-                            rawType.getName(),
-                            message
-                    );
-                    // Create a new instance of the originally requested type (T or rawType) with the info
-                    try {
-                        Constructor<? extends Throwable> tConstructor = ((Class<? extends Throwable>)rawType).getDeclaredConstructor(String.class, Throwable.class);
-                        tConstructor.setAccessible(true);
-                        T fallbackT = (T) tConstructor.newInstance(errorMessage, instance); // 'instance' becomes the cause
-                        ((Throwable)fallbackT).setStackTrace(stackTraceList.toArray(new StackTraceElement[0]));
-                        return fallbackT;
-                    } catch (Exception fallbackEx) {
-                        throw new JsonParseException("Could not create fallback instance of " + rawType.getName() + ": " + fallbackEx.getMessage(), fallbackEx);
-                    }
                 }
+                // This case should ideally not be hit if actualClassName logic is sound
+                // or if only rawType was used.
+                // If it is, it means 'actualClass' was incompatible with the requested type 'T'.
+                return createFallbackInstanceOrThrow(instance, message, stackTraceList);
             }
 
             private Class<? extends Throwable> determineClassToInstantiate(String actualClassName) {
@@ -150,84 +150,70 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                             // e.g. if deserializing into `Exception.class` but `actualClass` was `Error`.
                         }
                     } catch (ClassNotFoundException ignored) {
-                        // Class not found, will fall back to using rawType (the type requested from Gson)
+                        BacktraceLogger.d(LOG_TAG, "Class "+ actualClassName +" not found, will fall back to using rawType (the type requested from Gson): " + rawType.getSimpleName());
                     }
                 }
                 return throwableClassToInstantiate;
             }
 
-
+            @SuppressWarnings("unchecked")
             private <T extends Throwable> T tryInstantiateThrowable(
                     Class<T> exceptionClass,
                     String message,
                     Throwable cause
             ) {
 
-                // Attempt 1: Constructor (String message, Throwable cause)
-                try {
-                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor(String.class, Throwable.class);
-                    constructor.setAccessible(true);
-                    return constructor.newInstance(message, cause);
-                } catch (NoSuchMethodException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks (String, Throwable) constructor.");
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String, Throwable)", e);
-                }
+                ConstructorSpec<T>[] specs = new ConstructorSpec[]{
+                        new ConstructorSpec<T>(new Class<?>[]{String.class, Throwable.class}, new Object[]{message, cause}),
+                        new ConstructorSpec<T>(new Class<?>[]{Throwable.class}, new Object[]{cause}),
+                        new ConstructorSpec<T>(new Class<?>[]{String.class}, new Object[]{message}),
+                        new ConstructorSpec<T>(new Class<?>[]{}, new Object[]{})
+                };
 
-                // Attempt 2: Constructor (Throwable cause)
-                try {
-                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor(Throwable.class);
-                    constructor.setAccessible(true);
-                    return constructor.newInstance(cause);
-                } catch (NoSuchMethodException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks (String, Throwable) constructor.");
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String, Throwable)", e);
-                }
-
-                // Attempt 3: Constructor (String message)
-                try {
-                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor(String.class);
-                    constructor.setAccessible(true);
-                    T instance = constructor.newInstance(message);
-                    if (cause != null) {
-                        try {
-                            instance.initCause(cause);
-                        } catch (IllegalStateException ignored) {
-                            // Cause might have already been set by a chained constructor, or not allowed
-//                            if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", "Could not initCause for " + exceptionClass.getName() + " after (String) constructor.");
+                for (ConstructorSpec<T> spec : specs) {
+                    try {
+                        Constructor<T> constructor = exceptionClass.getDeclaredConstructor(spec.paramTypes);
+                        constructor.setAccessible(true);
+                        T instance = constructor.newInstance(spec.args);
+                        if (cause != null) {
+                            try {
+                                instance.initCause(cause);
+                            } catch (Exception e) {
+                                BacktraceLogger.d(LOG_TAG, "Could not initCause for " + exceptionClass.getName() + " after constructor with args: " + Arrays.toString(spec.paramTypes));
+                            }
                         }
+                        return instance;
                     }
-                    return instance;
-                } catch (NoSuchMethodException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks (String) constructor.");
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String)", e);
+                    catch (Exception e) {
+                        BacktraceLogger.d(LOG_TAG, "Failed to instantiate " + exceptionClass.getName() + " with constructor with args: " + Arrays.toString(spec.paramTypes) + ", error message: " + e);
+                    }
                 }
 
-                // Attempt 4: Default constructor
-                try {
-                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor();
-                    constructor.setAccessible(true);
-                    T instance = constructor.newInstance();
-                    // Message cannot be set via public API for standard Throwables after default construction.
-                    // It will rely on the default message of the exception or be null.
-                    if (cause != null) {
-                        try {
-                            instance.initCause(cause);
-                        } catch (IllegalStateException ignored) {
-//                            if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", "Could not initCause for " + exceptionClass.getName() + " after default constructor.");
-                        }
-                    }
-                    return instance;
-                } catch (NoSuchMethodException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks default constructor.");
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with default constructor", e);
-                }
-
-                return null; // All attempts failed
+                return null;
             }
+
+            @SuppressWarnings("unchecked")
+            private T createFallbackInstanceOrThrow(Throwable instance, String message, List<StackTraceElement> stackTraceList) throws JsonParseException {
+                String errorMessage = String.format(
+                        "Deserialized to %s but expected assignable to %s. Message: %s",
+                        (instance != null ? instance.getClass().getName() : "null"),
+                        rawType.getName(),
+                        message
+                );
+                // Create a new instance of the originally requested type (T or rawType) with the info
+                try {
+                    Constructor<? extends Throwable> tConstructor = ((Class<? extends Throwable>) rawType).getDeclaredConstructor(String.class, Throwable.class);
+                    tConstructor.setAccessible(true);
+                    // 'instance' becomes the cause
+                    T fallbackT = (T) tConstructor.newInstance(errorMessage, instance);
+                    ((Throwable) fallbackT).setStackTrace(stackTraceList.toArray(new StackTraceElement[0]));
+                    return fallbackT;
+                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+                         InvocationTargetException e) {
+                    throw new JsonParseException("Could not create fallback instance of " + rawType.getName() + ": " + e.getMessage(), e);
+                }
+            }
+
         };
     }
 }
