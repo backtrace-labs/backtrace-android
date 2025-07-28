@@ -174,7 +174,18 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 //                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String, Throwable)", e);
                 }
 
-                // Attempt 2: Constructor (String message)
+                // Attempt 2: Constructor (Throwable cause)
+                try {
+                    Constructor<T> constructor = exceptionClass.getDeclaredConstructor(Throwable.class);
+                    constructor.setAccessible(true);
+                    return constructor.newInstance(cause);
+                } catch (NoSuchMethodException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.d("ThrowableFactory", exceptionClass.getName() + " lacks (String, Throwable) constructor.");
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String, Throwable)", e);
+                }
+
+                // Attempt 3: Constructor (String message)
                 try {
                     Constructor<T> constructor = exceptionClass.getDeclaredConstructor(String.class);
                     constructor.setAccessible(true);
@@ -194,7 +205,7 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 //                    if (logFailures) androidx.media3.common.util.Log.w("ThrowableFactory", "Failed to instantiate " + exceptionClass.getName() + " with (String)", e);
                 }
 
-                // Attempt 3: Default constructor
+                // Attempt 4: Default constructor
                 try {
                     Constructor<T> constructor = exceptionClass.getDeclaredConstructor();
                     constructor.setAccessible(true);
