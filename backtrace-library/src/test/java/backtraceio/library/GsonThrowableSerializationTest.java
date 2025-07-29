@@ -82,13 +82,28 @@ public class GsonThrowableSerializationTest {
     }
 
     @Test
-    // TODO: improve
-    public void serializeMultiCauseException() {
-        AssertionError e = new AssertionError("4", new RuntimeException("3", new JSONException("2", new IllegalArgumentException("1"))));
+    public void serializeMultiCauseException() throws JSONException {
+        // GIVEN
+        IllegalArgumentException e1 =  new IllegalArgumentException("1");
+        JSONException e2 = new JSONException("2", e1);
+        RuntimeException e3 = new RuntimeException("3", e2);
+        AssertionError e4 = new AssertionError("4", e3);
 
-        String json = BacktraceSerializeHelper.toJson(e);
+        Throwable[] throwableArray = {e1, e2, e3, e4};
 
-        System.out.println(json);
+        for (Throwable t : throwableArray){
+            t.setStackTrace(generateStackTraceElements());
+        }
+
+        // WHEN
+        String json = BacktraceSerializeHelper.toJson(e4);
+
+        // THEN
+        String expectedJson = TestUtils.minifyJsonString(
+                TestUtils.readFileAsString(this, "serializedMultiCauseException.json")
+        );
+
+        assertTrue(TestUtils.compareJson(json, expectedJson));
     }
 
     @Test
