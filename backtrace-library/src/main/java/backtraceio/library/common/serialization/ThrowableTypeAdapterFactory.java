@@ -118,7 +118,7 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 Throwable instance = tryInstantiateThrowable(throwableClassToInstantiate, message, cause);
 
                 if (instance == null) {
-                    // TODO:
+                    BacktraceLogger.w(LOG_TAG, String.format("Could not instantiate specific Throwable type '%s'. Falling back by returning null.", throwableClassToInstantiate.getName()));
                     return null;
                 }
 
