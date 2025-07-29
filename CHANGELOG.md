@@ -1,5 +1,13 @@
 # Backtrace Android Release Notes
 
+## Version 3.10.0
+- Bump version of all dependencies (gson, mockito, concurrentunit)
+- ANR based on ApplicationInfo
+- Update UnhandledExceptionAttributeType classifier
+- DatabaseContext batch null bugfix
+- Fixes a potential ConcurrentModificationException in BacktraceDatabaseContext during record deletion  
+- Use Maven Central repository
+
 ## Version 3.9.0
 
 - Added a support for nested and suppressed exceptions (#158)
