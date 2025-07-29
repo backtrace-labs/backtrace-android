@@ -1,6 +1,6 @@
 # Backtrace Integration with Android
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.backtrace-labs.backtrace-android/backtrace-library/badge.svg)](https://search.maven.org/artifact/com.github.backtrace-labs.backtrace-android/backtrace-library)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.backtrace-labs.backtrace-android/backtrace-library.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.github.backtrace-labs.backtrace-android/backtrace-library)
 ![Build Status](https://github.com/backtrace-labs/backtrace-android/actions/workflows/test.yml/badge.svg)
 [![javadoc](https://javadoc.io/badge2/com.github.backtrace-labs.backtrace-android/backtrace-library/javadoc.svg)](https://javadoc.io/doc/com.github.backtrace-labs.backtrace-android/backtrace-library)
 <img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="License: MIT">
