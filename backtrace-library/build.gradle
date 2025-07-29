@@ -72,6 +72,12 @@ android {
     ndkVersion "28.1.13356709"
 }
 
+tasks.withType(Test).configureEach {
+    jacoco {
+        excludes = ['net/bytebuddy/**', 'org/objenesis/**']
+    }
+}
+
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
@@ -114,6 +120,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.squareup:tape:1.2.3'
     testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.mockito:mockito-core:5.18.0"
     testImplementation 'org.json:json:20250517'
     testImplementation "com.google.guava:guava:33.4.8-jre"
     androidTestImplementation 'net.jodah:concurrentunit:0.4.6'
