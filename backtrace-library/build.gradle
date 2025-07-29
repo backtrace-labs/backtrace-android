@@ -72,12 +72,6 @@ android {
     ndkVersion "28.1.13356709"
 }
 
-tasks.withType(Test).configureEach {
-    jacoco {
-        excludes = ['net/bytebuddy/**', 'org/objenesis/**']
-    }
-}
-
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
