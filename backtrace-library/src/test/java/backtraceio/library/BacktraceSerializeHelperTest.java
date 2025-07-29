@@ -5,8 +5,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 
-import com.google.gson.internal.TroubleshootingGuide;
-
 import org.junit.Test;
 
 import backtraceio.library.common.BacktraceSerializeHelper;
