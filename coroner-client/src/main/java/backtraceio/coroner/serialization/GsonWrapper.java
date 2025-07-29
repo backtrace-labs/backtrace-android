@@ -12,6 +12,7 @@ public class GsonWrapper {
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
                 .registerTypeAdapter(CoronerResponseGroup.class, new CoronerResponseGroupDeserializer())
+                .registerTypeAdapter(Throwable.class, new ThrowableAdapter())
                 .create();
 
         return gson.fromJson(json, type);
