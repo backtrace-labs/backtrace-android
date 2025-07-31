@@ -112,7 +112,7 @@ public class BacktraceClientSendTest {
                 final String mainExceptionExpectedMessage = expectedExceptionMessages.pop();
                 assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
                 assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
-                assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("detail-message"));
+                assertEquals(mainExceptionExpectedMessage, exceptionProperties.get("message"));
 
             } catch (JSONException e) {
                 e.printStackTrace();

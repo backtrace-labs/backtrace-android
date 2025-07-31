@@ -33,6 +33,9 @@ jobs:
           echo BACKTRACE_CORONER_URL=\"${{ secrets.BACKTRACE_CORONER_URL }}\" >> ./local.properties
           echo BACKTRACE_CORONER_TOKEN=\"${{ secrets.BACKTRACE_CORONER_TOKEN }}\" >> ./local.properties
 
+      - name: Accept Android SDK licences
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses    
+
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
 
