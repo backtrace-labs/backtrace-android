@@ -18,16 +18,15 @@
     }
   ],
   "exception": {
+    "class": "java.lang.IllegalAccessException",
     "stack-trace": [
       {
         "declaring-class": "backtraceio.library.SettingAttributesTest",
         "file-name": "SettingAttributesTest.java",
         "line-number": 75,
-        "method-name": "tmpGsonTest",
-        "format": 0
+        "method-name": "tmpGsonTest"
       }
-    ],
-    "suppressed-exceptions": []
+    ]
   },
   "exception-type-report": true,
   "timestamp": 1709680251,
