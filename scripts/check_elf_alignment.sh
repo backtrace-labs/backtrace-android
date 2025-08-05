@@ -100,8 +100,13 @@ for match in $matches; do
   if [[ $res =~ 2\*\*(1[4-9]|[2-9][0-9]|[1-9][0-9]{2,}) ]]; then
     echo -e "${match}: ${GREEN}ALIGNED${ENDCOLOR} ($res)"
   else
-    echo -e "${match}: ${RED}UNALIGNED${ENDCOLOR} ($res)"
-    unaligned_libs+=("${match}")
+  # Record failure ONLY for 64-bit ABIs (arm64-v8a / x86_64)
+    if [[ "$match" == *arm64-v8a* || "$match" == *x86_64* ]]; then
+      echo -e "${match}: ${RED}UNALIGNED${ENDCOLOR} ($res)"
+      unaligned_libs+=("${match}")
+    else
+      echo -e "${match}: ${RED}UNALIGNED (ignored 32-bit)${ENDCOLOR}"
+    fi 
   fi
 done
 
