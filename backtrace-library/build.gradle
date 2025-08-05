@@ -1,8 +1,8 @@
 plugins {
+    id 'com.android.library'
     id 'com.gladed.androidgitversion' version '0.4.14'
     id "com.vanniktech.maven.publish" version "0.29.0" apply true
 }
-apply plugin: 'com.android.library'
 
 import com.vanniktech.maven.publish.SonatypeHost
 
@@ -17,6 +17,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         compileSdk 35
+        // TODO: BT-5924 Android 35 update -> noinspection OldTargetApi,EditedTargetSdkVersion
         targetSdkVersion 35
         ndkVersion "27.0.11718014-beta1"
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
