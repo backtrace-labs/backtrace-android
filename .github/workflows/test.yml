@@ -39,10 +39,6 @@ jobs:
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
 
-      - name: Install Build-Tools 35
-        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" \
-                "build-tools;35.0.0-rc3"
-
       - name: Alignment script executable
         run: chmod +x scripts/check_elf_alignment.sh
 
