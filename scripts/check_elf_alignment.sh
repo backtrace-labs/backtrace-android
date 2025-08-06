@@ -100,13 +100,20 @@ for match in $matches; do
   if [[ $res =~ 2\*\*(1[4-9]|[2-9][0-9]|[1-9][0-9]{2,}) ]]; then
     echo -e "${match}: ${GREEN}ALIGNED${ENDCOLOR} ($res)"
   else
-    echo -e "${match}: ${RED}UNALIGNED${ENDCOLOR} ($res)"
-    unaligned_libs+=("${match}")
+  # Record failure ONLY for 64-bit ABIs (arm64-v8a / x86_64)
+    if [[ "$match" == *arm64-v8a* || "$match" == *x86_64* ]]; then
+      echo -e "${match}: ${RED}UNALIGNED${ENDCOLOR} ($res)"
+      unaligned_libs+=("${match}")
+    else
+      echo -e "${match}: ${RED}UNALIGNED (ignored 32-bit)${ENDCOLOR}"
+    fi 
   fi
 done
 
 if [ ${#unaligned_libs[@]} -gt 0 ]; then
   echo -e "${RED}Found ${#unaligned_libs[@]} unaligned libs (only arm64-v8a/x86_64 libs need to be aligned).${ENDCOLOR}"
+  # Fail/Exit if any arm64-v8a and x86_64 shared objects are still 4KB-aligned.
+  exit 1
 elif [ -n "${dir_filename}" ]; then
   echo -e "ELF Verification Successful"
 fi

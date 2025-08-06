@@ -117,7 +117,7 @@ list(APPEND LIBS ${log-lib})
 if (BACKEND STREQUAL "CRASHPAD_BACKEND")
     # Pass 16 KB linker flags to Crashpad’s handler so libcrashpad_handler.so loads on 16 KB kernels.
     set(CRASHPAD_GN_ARGS_FILE
-        "${CMAKE_CURRENT_SOURCE_DIR}/crashpad/args_android.gn")
+        "${CMAKE_CURRENT_SOURCE_DIR}/build_args/args_android.gn")
 
     set(CRASHPAD_HANDLER_GENERATE_STATIC_LIB true)
     add_subdirectory(crashpad)
