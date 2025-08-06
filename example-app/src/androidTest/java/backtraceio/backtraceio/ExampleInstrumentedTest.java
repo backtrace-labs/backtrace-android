@@ -25,6 +25,8 @@ import java.util.concurrent.TimeoutException;
 
 import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -41,6 +43,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
     @Before
     public void enableMetricsAndBreadcrumbs() {
+        BacktraceLogger.setLevel(LogLevel.DEBUG);
         onView(withId(R.id.enableBreadcrumbs)).perform(click());
     }
 

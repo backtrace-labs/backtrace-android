@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 // Where was that magic wand again?
                 equipItem(myWarriorArmor, magicWandIndex);
             } catch (IndexOutOfBoundsException e) {
-                throw new IndexOutOfBoundsException("Invalid index of selected element!");
+                throw new IndexOutOfBoundsException("Github - Invalid index of selected element!");
             }
         } catch (IndexOutOfBoundsException e) {
             backtraceClient.send(new BacktraceReport(e), this.listener);
@@ -158,9 +158,10 @@ public class MainActivity extends AppCompatActivity {
     public void getSaveData() throws IOException {
         // I know for sure this file is there (spoiler alert, it's not)
         File mySaveData = new File("mySave.sav");
-        FileReader mySaveDataReader = new FileReader(mySaveData);
-        char[] saveDataBuffer = new char[255];
-        mySaveDataReader.read(saveDataBuffer);
+        try (FileReader mySaveDataReader = new FileReader(mySaveData)) {
+            char[] saveDataBuffer = new char[255];
+            mySaveDataReader.read(saveDataBuffer);
+        }
     }
 
     public void unhandledException(View view) throws IOException {
