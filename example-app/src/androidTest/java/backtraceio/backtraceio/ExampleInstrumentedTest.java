@@ -54,6 +54,8 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         assertEquals("backtraceio.backtraceio", appContext.getPackageName());
     }
 
+    
+
     @Test
     public void handledException() throws TimeoutException, CoronerResponseProcessingException, InterruptedException {
         // GIVEN
