@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -146,23 +147,25 @@ public class DeviceAttributesHelper {
     /**
      * Get device CPU temperature
      *
-     * @return measured temperature value in degrees Celsius
+     * @return measured temperature value in degrees Celsius, or 0.0f if unavailable.
      */
     private float getCpuTemperature() {
-        Process p;
+        // Reading from /sys/ is restricted on newer Android versions (API 35+)
+        // and may not be available on all devices/emulators.
         try {
-
             BufferedReader reader = new BufferedReader(new FileReader("/sys/class/thermal/thermal_zone0/temp"));
             String line = reader.readLine();
-            if (line == null) {
-                return 0.0f;
-            }
             reader.close();
 
-            return Float.parseFloat(line) / 1000.0f;
+            if (line != null) {
+                return Float.parseFloat(line) / 1000.0f;
+            }
         } catch (Exception e) {
-            return 0.0f;
+            // Log the exception so it's clear why this failed, but continue gracefully.
+            // This is expected on API 35+ due to security restrictions.
+            Log.w("DeviceAttributesHelper", "Could not read CPU temperature. " + e.getMessage());
         }
+        return 0.0f;
     }
 
     /**
