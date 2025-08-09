@@ -1,0 +1,30 @@
+{
+  "message" : "test-msg",
+  "class": "org.json.JSONException",
+  "cause" : {
+    "class": "java.lang.Exception",
+    "message" : "test-msg",
+    "stack-trace" : [ {
+      "declaring-class" : "sample-class-1",
+      "method-name" : "method-1",
+      "file-name" : "file-name1",
+      "line-number" : 100
+    }, {
+      "declaring-class" : "sample-class-2",
+      "method-name" : "method-2",
+      "file-name" : "file-name2",
+      "line-number" : 200
+    } ]
+  },
+  "stack-trace" : [ {
+    "declaring-class" : "sample-class-1",
+    "method-name" : "method-1",
+    "file-name" : "file-name1",
+    "line-number" : 100
+  }, {
+    "declaring-class" : "sample-class-2",
+    "method-name" : "method-2",
+    "file-name" : "file-name2",
+    "line-number" : 200
+  } ]
+}

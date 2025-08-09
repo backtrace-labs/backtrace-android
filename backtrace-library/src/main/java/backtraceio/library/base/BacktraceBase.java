@@ -1,6 +1,7 @@
 package backtraceio.library.base;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -233,6 +234,7 @@ public class BacktraceBase implements Client {
         this.setBacktraceApi(new BacktraceApi(this.context, credentials));
         this.database.start();
         this.metrics = new BacktraceMetrics(context, this.attributes, backtraceApi, credentials);
+        this.sendInnerExceptions(true);
     }
 
     public native void crash();
@@ -563,6 +565,8 @@ public class BacktraceBase implements Client {
      * @param report current BacktraceReport
      */
     public void send(BacktraceReport report) {
+        // TEMPORARY DEBUG LINE: This will print who is calling the send method
+        Log.d("BacktraceDebugger", "BacktraceBase.send() called", new Exception());
         send(report, null);
     }
 
@@ -572,6 +576,8 @@ public class BacktraceBase implements Client {
      * @param sourceReport current BacktraceReport
      */
     public void send(BacktraceReport sourceReport, final OnServerResponseEventListener callback) {
+        // TEMPORARY DEBUG LINE: This will print who is calling the send method
+        Log.d("BacktraceDebugger", "BacktraceBase.send() called", new Exception());
         Breadcrumbs breadcrumbs = this.database.getBreadcrumbs();
         for (BacktraceReport report :
                 this.reportExceptionTransformer.transformReportWithInnerExceptions(sourceReport)) {
