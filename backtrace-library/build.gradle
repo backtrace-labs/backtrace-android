@@ -17,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         compileSdk 35
-        // TODO: BT-5924 Android 35 update -> noinspection OldTargetApi,EditedTargetSdkVersion
+        // TODO: BT-5924 Android 35+ update -> noinspection OldTargetApi,EditedTargetSdkVersion
         targetSdkVersion 35
         ndkVersion "27.0.11718014-beta1"
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
@@ -98,6 +98,10 @@ mavenPublishing {
             developer {
                 id = POM_DEVELOPER_ID2
                 name = POM_DEVELOPER_NAME2
+            }
+            developer {
+                id = POM_DEVELOPER_ID3
+                name = POM_DEVELOPER_NAME3
             }
         }
 
