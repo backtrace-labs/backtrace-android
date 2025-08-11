@@ -74,12 +74,16 @@ class BacktraceReportSender {
 
             int statusCode = urlConnection.getResponseCode();
             BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
+            BacktraceLogger.d(LOG_TAG, "JSON MSG: " + json);
+            BacktraceLogger.d(LOG_TAG, "JSON RX_ID: " + report.uuid);
+            BacktraceLogger.d(LOG_TAG, "JSON RX_ID: " + report.timestamp);
             System.out.println("TEMP-LOG STATUS: " + Integer.toString(statusCode));
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 final String responseJson = HttpHelper.getResponseMessage(urlConnection);
                 final BacktraceApiResult apiResult = BacktraceSerializeHelper.fromJson(responseJson, BacktraceApiResult.class);
-                
+
+                System.out.println(apiResult.rxId);
                 result = new BacktraceResult(apiResult);
                 result.setBacktraceReport(report);
             } else {

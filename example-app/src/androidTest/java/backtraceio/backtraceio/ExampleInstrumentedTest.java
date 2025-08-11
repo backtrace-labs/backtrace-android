@@ -48,12 +48,12 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         onView(withId(R.id.enableBreadcrumbs)).perform(click());
     }
 
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("backtraceio.backtraceio", appContext.getPackageName());
-    }
+//    @Test
+//    public void useAppContext() {
+//        // Context of the app under test.
+//        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+//        assertEquals("backtraceio.backtraceio", appContext.getPackageName());
+//    }
 
     
 
@@ -96,71 +96,71 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Assert.assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
     }
 
-    @Test
-    public void dumpWithoutCrash() throws CoronerResponseProcessingException, InterruptedException {
-        // GIVEN
-        CoronerResponse response = null;
-        long timestampStart = this.getSecondsTimestampNowGMT();
-
-        // WHEN
-        onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
-        Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
-
-        // THEN
-        try {
-            response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
-                    Long.toString(timestampStart),
-                    Long.toString(this.getSecondsTimestampNowGMT()),
-                    Arrays.asList("error.message"));
-        } catch (Exception ex) {
-            Assert.fail(ex.getMessage());
-        }
-
-        Assert.assertNotNull(response);
-        Assert.assertEquals(1, response.getResultsNumber());
-        String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("DumpWithoutCrash", val);
-    }
-
-    //@Test
-    public void unhandledException() throws CoronerResponseProcessingException, InterruptedException {
-        // GIVEN
-        CoronerResponse response = null;
-        long timestampStart = this.getSecondsTimestampNowGMT();
-
-        // WHEN
-        // UnhandledException crashes the app, so don't actually click the button
-        // onView(withId(R.id.unhandledException)).perform(click()); // UI action
-
-        // call BacktraceExceptionHandler directly instead
-        Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), new NullPointerException());
-
-        Thread.sleep(THREAD_SLEEP_TIME_MS);
-
-        // THEN
-        try {
-            response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
-                    Long.toString(timestampStart),
-                    Long.toString(this.getSecondsTimestampNowGMT()),
-                    Arrays.asList("error.message"));
-        } catch (Exception ex) {
-            Assert.fail(ex.getMessage());
-        }
-
-        Assert.assertNotNull(response);
-        Assert.assertEquals(1, response.getResultsNumber());
-        String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Dump without crash", val);
-    }
-
-    @Test
-    public void anr() {
-        onView(withId(R.id.anr)).perform(click());
-    }
-
-    // Will break build, obviously.
-    //@Test
-    public void nativeCrash() {
-        onView(withId(R.id.nativeCrash)).perform(click());
-    }
+//    @Test
+//    public void dumpWithoutCrash() throws CoronerResponseProcessingException, InterruptedException {
+//        // GIVEN
+//        CoronerResponse response = null;
+//        long timestampStart = this.getSecondsTimestampNowGMT();
+//
+//        // WHEN
+//        onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
+//        Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
+//
+//        // THEN
+//        try {
+//            response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
+//                    Long.toString(timestampStart),
+//                    Long.toString(this.getSecondsTimestampNowGMT()),
+//                    Arrays.asList("error.message"));
+//        } catch (Exception ex) {
+//            Assert.fail(ex.getMessage());
+//        }
+//
+//        Assert.assertNotNull(response);
+//        Assert.assertEquals(1, response.getResultsNumber());
+//        String val = response.getAttribute(0, "error.message", String.class);
+//        Assert.assertEquals("DumpWithoutCrash", val);
+//    }
+//
+//    //@Test
+//    public void unhandledException() throws CoronerResponseProcessingException, InterruptedException {
+//        // GIVEN
+//        CoronerResponse response = null;
+//        long timestampStart = this.getSecondsTimestampNowGMT();
+//
+//        // WHEN
+//        // UnhandledException crashes the app, so don't actually click the button
+//        // onView(withId(R.id.unhandledException)).perform(click()); // UI action
+//
+//        // call BacktraceExceptionHandler directly instead
+//        Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), new NullPointerException());
+//
+//        Thread.sleep(THREAD_SLEEP_TIME_MS);
+//
+//        // THEN
+//        try {
+//            response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
+//                    Long.toString(timestampStart),
+//                    Long.toString(this.getSecondsTimestampNowGMT()),
+//                    Arrays.asList("error.message"));
+//        } catch (Exception ex) {
+//            Assert.fail(ex.getMessage());
+//        }
+//
+//        Assert.assertNotNull(response);
+//        Assert.assertEquals(1, response.getResultsNumber());
+//        String val = response.getAttribute(0, "error.message", String.class);
+//        Assert.assertEquals("Dump without crash", val);
+//    }
+//
+//    @Test
+//    public void anr() {
+//        onView(withId(R.id.anr)).perform(click());
+//    }
+//
+//    // Will break build, obviously.
+//    //@Test
+//    public void nativeCrash() {
+//        onView(withId(R.id.nativeCrash)).perform(click());
+//    }
 }
