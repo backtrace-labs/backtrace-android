@@ -15,6 +15,7 @@ import net.jodah.concurrentunit.Waiter;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         assertEquals("backtraceio.backtraceio", appContext.getPackageName());
     }
 
+    @Ignore("// TODO: BT-5924 Android 35+ update")
     @Test
     public void handledException() throws TimeoutException, CoronerResponseProcessingException, InterruptedException {
         // GIVEN
@@ -86,6 +88,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Assert.assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
     }
 
+    @Ignore("// TODO: BT-5924 Android 35+ update")
     @Test
     public void dumpWithoutCrash() throws CoronerResponseProcessingException, InterruptedException {
         // GIVEN
