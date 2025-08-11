@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 throw new IndexOutOfBoundsException("Invalid index of selected element!");
             }
         } catch (IndexOutOfBoundsException e) {
+            Log.d("TestDebug", "Sending report to: " + BuildConfig.BACKTRACE_SUBMISSION_URL);
             backtraceClient.send(new BacktraceReport(e), this.listener);
         }
     }

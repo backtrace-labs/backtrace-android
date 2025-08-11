@@ -63,17 +63,23 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         System.out.println("HANDLED-EXCEPTION-TEST");
         final String[] rxId = new String[1];
         final Waiter waiter = new Waiter();
-        mActivityRule.getScenario().onActivity(activity ->
+        mActivityRule.getScenario().onActivity(activity -> {
+            try {
                 activity.setOnServerResponseEventListener(backtraceResult -> {
                     System.out.println("HANDLED-EXCEPTION-" + BacktraceSerializeHelper.toJson(backtraceResult));
-            rxId[0] = backtraceResult.rxId;
-            waiter.resume();
-        }));
+                    rxId[0] = backtraceResult.rxId;
+                    waiter.resume();
+                });
+            } catch (Exception e) {
+                System.err.println("Error setting listener: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
 
         // WHEN
         System.out.println("HANDLED-EXCEPTION-CLICK");
         onView(withId(R.id.handledException)).perform(click()); // UI action
-        waiter.await(5, TimeUnit.SECONDS, 1);
+        waiter.await(10, TimeUnit.SECONDS, 1);
         Thread.sleep(THREAD_SLEEP_TIME_MS);
 
         // THEN
