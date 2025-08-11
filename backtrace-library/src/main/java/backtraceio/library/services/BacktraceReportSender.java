@@ -1,5 +1,7 @@
 package backtraceio.library.services;
 
+import android.view.inputmethod.InsertGesture;
+
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -72,6 +74,7 @@ class BacktraceReportSender {
 
             int statusCode = urlConnection.getResponseCode();
             BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
+            System.out.println("TEMP-LOG STATUS: " + Integer.toString(statusCode));
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 final String responseJson = HttpHelper.getResponseMessage(urlConnection);
@@ -81,6 +84,7 @@ class BacktraceReportSender {
                 result.setBacktraceReport(report);
             } else {
                 String message = HttpHelper.getResponseMessage(urlConnection);
+                System.out.println("TEMP-LOG MSG: " + message);
                 message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
                         urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));

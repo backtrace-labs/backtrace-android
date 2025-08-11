@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
+import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
 
@@ -59,15 +60,18 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     @Test
     public void handledException() throws TimeoutException, CoronerResponseProcessingException, InterruptedException {
         // GIVEN
+        System.out.println("HANDLED-EXCEPTION-TEST");
         final String[] rxId = new String[1];
         final Waiter waiter = new Waiter();
         mActivityRule.getScenario().onActivity(activity ->
                 activity.setOnServerResponseEventListener(backtraceResult -> {
+                    System.out.println("HANDLED-EXCEPTION-" + BacktraceSerializeHelper.toJson(backtraceResult));
             rxId[0] = backtraceResult.rxId;
             waiter.resume();
         }));
 
         // WHEN
+        System.out.println("HANDLED-EXCEPTION-CLICK");
         onView(withId(R.id.handledException)).perform(click()); // UI action
         waiter.await(5, TimeUnit.SECONDS, 1);
         Thread.sleep(THREAD_SLEEP_TIME_MS);
@@ -77,6 +81,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
         try {
             response = this.getCoronerClient().rxIdFilter(rxId[0], Arrays.asList("error.message"));
+            System.out.println(BacktraceSerializeHelper.toJson(response));
         } catch (Exception ex) {
             Assert.fail(ex.getMessage());
         }
