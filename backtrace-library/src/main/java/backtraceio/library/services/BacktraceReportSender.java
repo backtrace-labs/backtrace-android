@@ -45,6 +45,9 @@ class BacktraceReportSender {
         HttpURLConnection urlConnection = null;
         BacktraceResult result;
         System.out.println("TEMP-LOG JSON: " + json);
+
+        System.out.println("TEMP-LOG JSON-part1: " + json.substring(0, 4000));
+        System.out.println("TEMP-LOG JSON-part2: " + json.substring(4001));
         try {
             URL url = new URL(serverUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
