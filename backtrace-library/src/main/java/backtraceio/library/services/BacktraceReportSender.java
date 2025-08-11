@@ -44,7 +44,7 @@ class BacktraceReportSender {
     static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report, OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
         BacktraceResult result;
-
+        System.out.println("TEMP-LOG JSON: " + json);
         try {
             URL url = new URL(serverUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
