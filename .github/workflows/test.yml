@@ -111,7 +111,9 @@ jobs:
 
       - name: Run Saucectl
         run: |
+          saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=16.0" --region us-west-1
+
 
       - name: Run morgue
         run: |
