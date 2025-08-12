@@ -75,7 +75,7 @@ android {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
-    coordinates(GROUP, POM_NAME, "\"3.10.1\"")
+    coordinates(GROUP, POM_NAME, "3.10.1")
 
     pom {
         name = POM_NAME
