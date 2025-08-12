@@ -6,129 +6,103 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/handledException"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="handledException"
-        android:text="Handled Exception"
-        app:layout_constraintBottom_toTopOf="@+id/unhandledException"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <Button
-        android:id="@+id/unhandledException"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Unhandled Exception"
-        android:onClick="unhandledException"
-        app:layout_constraintBottom_toTopOf="@+id/nativeCrash"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/handledException" />
+        <Button
+            android:id="@+id/handledException"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="handledException"
+            android:text="Handled Exception"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/nativeCrash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Native Crash"
-        android:onClick="nativeCrash"
-        app:layout_constraintBottom_toTopOf="@+id/dumpWithoutCrash"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/unhandledException" />
+        <Button
+            android:id="@+id/unhandledException"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="unhandledException"
+            android:text="Unhandled Exception"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/dumpWithoutCrash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Generate sample crash report"
-        android:onClick="dumpWithoutCrash"
-        app:layout_constraintBottom_toTopOf="@+id/anr"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nativeCrash" />
+        <Button
+            android:id="@+id/nativeCrash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="nativeCrash"
+            android:text="Native Crash"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/anr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ANR"
-        android:onClick="anr"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dumpWithoutCrash" />
+        <Button
+            android:id="@+id/dumpWithoutCrash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="dumpWithoutCrash"
+            android:text="Generate sample crash report"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/enableBreadcrumbs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable Breadcrumbs (All)"
-        android:onClick="enableBreadcrumbs"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/anr" />
+        <Button
+            android:id="@+id/anr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="anr"
+            android:text="ANR"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/enableBreadcrumbsUserOnly"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable Breadcrumbs (User Only)"
-        android:onClick="enableBreadcrumbsUserOnly"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbs" />
+        <Button
+            android:id="@+id/enableBreadcrumbs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="enableBreadcrumbs"
+            android:text="Enable Breadcrumbs (All)"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/sendReport"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send Report"
-        android:onClick="sendReport"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enableBreadcrumbsUserOnly" />
+        <Button
+            android:id="@+id/enableBreadcrumbsUserOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="enableBreadcrumbsUserOnly"
+            android:text="Enable Breadcrumbs (User Only)"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/disableNativeIntegration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Disable Native Integration"
-        android:onClick="disableNativeIntegration"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendReport" />
+        <Button
+            android:id="@+id/sendReport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="sendReport"
+            android:text="Send Report"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/enableNativeIntegration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Re-Enable Native Integration"
-        android:onClick="enableNativeIntegration"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/disableNativeIntegration" />
+        <Button
+            android:id="@+id/disableNativeIntegration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="disableNativeIntegration"
+            android:text="Disable Native Integration"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/exit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exit"
-        android:onClick="exit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enableNativeIntegration" />
+        <Button
+            android:id="@+id/enableNativeIntegration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="enableNativeIntegration"
+            android:text="Re-Enable Native Integration"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="exit"
+            android:text="Exit" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
