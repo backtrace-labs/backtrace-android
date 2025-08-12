@@ -42,6 +42,9 @@ jobs:
 
    - name: Prepare signing secret key ring file
      run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > backtrace-library/secret_key.gpg
+     
+   - name: Accept Android SDK licences
+     run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
    - name: Grant execute permission for gradlew
      run: chmod +x gradlew
