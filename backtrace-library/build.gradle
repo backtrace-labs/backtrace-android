@@ -4,7 +4,6 @@ plugins {
     id "com.vanniktech.maven.publish" version "0.34.0" apply true
 }
 
-import com.vanniktech.maven.publish.SonatypeHost
 
 androidGitVersion {
     // this is the format for generating the versionName
@@ -73,7 +72,7 @@ android {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     signAllPublications()
     coordinates(GROUP, POM_NAME, versionName)
 
