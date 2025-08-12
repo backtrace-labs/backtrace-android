@@ -72,43 +72,45 @@ android {
     }
 }
 
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
-    coordinates(GROUP, POM_NAME, versionName)
+afterEvaluate {
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        signAllPublications()
+        coordinates(GROUP, POM_NAME, android.defaultConfig.versionName)
 
-    pom {
-        name = POM_NAME
-        description = POM_DESCRIPTION
-        url = POM_URL
+        pom {
+            name = POM_NAME
+            description = POM_DESCRIPTION
+            url = POM_URL
 
-        licenses {
-            license {
-                name = POM_LICENSE_NAME
-                url = POM_LICENSE_URL
-                distribution = POM_LICENSE_DIST
+            licenses {
+                license {
+                    name = POM_LICENSE_NAME
+                    url = POM_LICENSE_URL
+                    distribution = POM_LICENSE_DIST
+                }
             }
-        }
 
-        developers {
-            developer {
-                id = POM_DEVELOPER_ID
-                name = POM_DEVELOPER_NAME
+            developers {
+                developer {
+                    id = POM_DEVELOPER_ID
+                    name = POM_DEVELOPER_NAME
+                }
+                developer {
+                    id = POM_DEVELOPER_ID2
+                    name = POM_DEVELOPER_NAME2
+                }
+                developer {
+                    id = POM_DEVELOPER_ID3
+                    name = POM_DEVELOPER_NAME3
+                }
             }
-            developer {
-                id = POM_DEVELOPER_ID2
-                name = POM_DEVELOPER_NAME2
-            }
-            developer {
-                id = POM_DEVELOPER_ID3
-                name = POM_DEVELOPER_NAME3
-            }
-        }
 
-        scm {
-            url = POM_SCM_URL
-            connection = POM_SCM_CONNECTION
-            developerConnection = POM_SCM_DEV_CONNECTION
+            scm {
+                url = POM_SCM_URL
+                connection = POM_SCM_CONNECTION
+                developerConnection = POM_SCM_DEV_CONNECTION
+            }
         }
     }
 }
