@@ -20,7 +20,7 @@ android {
         // TODO: BT-5924 Android 35+ update -> noinspection OldTargetApi,EditedTargetSdkVersion
         targetSdkVersion 35
         ndkVersion "27.0.11718014-beta1"
-        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
+        buildConfigField("String", "VERSION_NAME", "3.10.1")
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -75,7 +75,7 @@ android {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
-    coordinates(GROUP, POM_NAME, android.defaultConfig.versionName)
+    coordinates(GROUP, POM_NAME, "3.10.1")
 
     pom {
         name = POM_NAME
