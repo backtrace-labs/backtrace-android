@@ -74,7 +74,7 @@ android {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates(GROUP, POM_NAME, versionName)
+    coordinates(GROUP, POM_NAME, android.defaultConfig.versionName)
 
     pom {
         name = POM_NAME
