@@ -53,9 +53,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         assertEquals("backtraceio.backtraceio", appContext.getPackageName());
     }
-
     
-
     @Test
     public void handledException() throws TimeoutException, CoronerResponseProcessingException, InterruptedException {
         // GIVEN
