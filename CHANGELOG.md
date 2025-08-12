@@ -1,5 +1,10 @@
 # Backtrace Android Release Notes
 
+## Version 3.10.1-beta
+- Adds GSON fix - implement ThrowableTypeAdapterFactory because Throwable serialization is not supported. #178
+- Adds 16 KB page-size support, compileSdk 35, AGP 8.5 #176
+- Adds verification.properties
+
 ## Version 3.10.0
 - Bump version of all dependencies (gson, mockito, concurrentunit)
 - ANR based on ApplicationInfo
