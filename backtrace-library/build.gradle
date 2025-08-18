@@ -17,6 +17,7 @@ android {
         compileSdk 36
         targetSdkVersion 36
         ndkVersion "27.0.11718014-beta1"
+        versionName androidGitVersion.name()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
