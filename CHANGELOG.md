@@ -1,6 +1,11 @@
 # Backtrace Android Release Notes
 
-## Version 3.10.1-beta
+## Version 3.10.2
+- Updated Android SDK v36, Gradle v8.14
+- Upgraded gson, org.json, guava, mockito-core
+- Cleaned up layout/manifest, updated SDK, and re-enabled instrumentation tests in 'Example app'
+
+## Version 3.10.1
 - Adds GSON fix - implement ThrowableTypeAdapterFactory because Throwable serialization is not supported. #178
 - Adds 16 KB page-size support, compileSdk 35, AGP 8.5 #176
 - Adds verification.properties
