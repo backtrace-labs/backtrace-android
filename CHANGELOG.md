@@ -1,9 +1,9 @@
 # Backtrace Android Release Notes
 
 ## Version 3.10.2
-- Update Android SDK v36, Gradle v8.14
-- Upgrade gson, org.json, guava, mockito-core
-- Clean up layout/manifest, updated SDK, and re-enabled instrumentation tests in 'Example app'
+- Updated Android SDK v36, Gradle v8.14
+- Upgraded gson, org.json, guava, mockito-core
+- Cleaned up layout/manifest, updated SDK, and re-enabled instrumentation tests in 'Example app'
 
 ## Version 3.10.1
 - Adds GSON fix - implement ThrowableTypeAdapterFactory because Throwable serialization is not supported. #178
