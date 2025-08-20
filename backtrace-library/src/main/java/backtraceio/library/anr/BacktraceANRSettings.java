@@ -43,7 +43,6 @@ public class BacktraceANRSettings {
      * Constructs ANR settings with specified parameters.
      *
      * @param timeout                         The timeout in milliseconds for ANR detection.
-     *                                        A value of 0 might disable ANR detection or use a default.
      * @param onApplicationNotRespondingEvent The callback to be invoked when an ANR is detected.
      *                                        Can be null if no custom callback is needed.
      * @param debug                           True to enable debug logging for ANR detection, false otherwise.
@@ -57,8 +56,7 @@ public class BacktraceANRSettings {
     /**
      * Gets the configured ANR timeout in milliseconds.
      *
-     * @return The timeout in milliseconds. A value of 0 might indicate disabled ANR detection
-     * or reliance on a default.
+     * @return The timeout in milliseconds.
      */
     public int getTimeout() {
         return timeout;
