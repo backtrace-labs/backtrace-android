@@ -8,6 +8,7 @@ import java.util.Calendar;
 
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.anr.BacktraceANRHandler;
+import backtraceio.library.anr.BacktraceANRSettings;
 import backtraceio.library.logger.BacktraceLogger;
 
 
@@ -18,11 +19,6 @@ import backtraceio.library.logger.BacktraceLogger;
 public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRHandler {
 
     private final static String LOG_TAG = BacktraceANRHandlerWatchdog.class.getSimpleName();
-
-    /**
-     * Default timeout value in milliseconds
-     */
-    private final static int DEFAULT_ANR_TIMEOUT = 5000;
 
     /**
      * Current Backtrace client instance which will be used to send information about exception
@@ -60,7 +56,7 @@ public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRH
      * @param client current Backtrace client instance which will be used to send information about exception
      */
     public BacktraceANRHandlerWatchdog(BacktraceClient client) {
-        this(client, DEFAULT_ANR_TIMEOUT);
+        this(client, BacktraceANRSettings.DEFAULT_ANR_TIMEOUT);
     }
 
     /**
