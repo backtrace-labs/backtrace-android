@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 3.10.3
+- Fix default value of ANR timeout in BacktraceANRSettings
+
 ## Version 3.10.2
 - Updated Android SDK v36, Gradle v8.14
 - Upgraded gson, org.json, guava, mockito-core
