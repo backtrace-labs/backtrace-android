@@ -1,6 +1,6 @@
 package backtraceio.library.models;
 
-import com.google.gson.annotations.SerializedName;
+import backtraceio.gson.annotations.SerializedName;
 
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;

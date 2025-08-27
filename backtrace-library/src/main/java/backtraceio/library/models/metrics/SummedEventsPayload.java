@@ -1,6 +1,6 @@
 package backtraceio.library.models.metrics;
 
-import com.google.gson.annotations.SerializedName;
+import backtraceio.gson.annotations.SerializedName;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 

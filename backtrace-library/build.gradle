@@ -116,9 +116,9 @@ mavenPublishing {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.13.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.squareup:tape:1.2.3'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation files('../gson/build/libs/gson-backtrace.jar')
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:5.19.0"
     testImplementation 'org.json:json:20250517'
@@ -129,3 +129,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation "org.mockito:mockito-android:5.19.0"
 }
+
+tasks.preBuild.dependsOn(':gson:shadowJar')

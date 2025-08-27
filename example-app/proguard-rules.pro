@@ -21,5 +21,5 @@
 #-renamesourcefileattribute SourceFile
 
 #These are needed since Proguard breaks some Backtrace libraries
--keep class com.google.gson.**.* { *; }
+-keep class backtraceio.gson.**.* { *; }
 -keep class backtraceio.library.**.* { *; }
