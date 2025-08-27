@@ -131,4 +131,3 @@ dependencies {
 }
 
 tasks.preBuild.dependsOn(':gson:shadowJar')
-apply from: 'publish.gradle'
