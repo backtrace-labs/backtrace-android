@@ -116,9 +116,9 @@ mavenPublishing {
 }
 
 dependencies {
+    implementation project(':gson')
     implementation 'com.squareup:tape:1.2.3'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation files('../gson/build/libs/gson-backtrace.jar')
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:5.19.0"
     testImplementation 'org.json:json:20250517'

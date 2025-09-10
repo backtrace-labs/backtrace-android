@@ -62,6 +62,7 @@ String getProperty(String name, String defaultValue) {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':backtrace-library')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     testImplementation 'junit:junit:4.13.2'
@@ -69,7 +70,6 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.7.0'
     androidTestImplementation 'net.jodah:concurrentunit:0.4.6'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
-    implementation project(':backtrace-library')
     androidTestImplementation project(path: ':coroner-client')
 }
 
