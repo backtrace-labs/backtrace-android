@@ -9,4 +9,4 @@ pluginManagement {
         id 'com.android.library'    version '8.11.1' apply false
     }
 }
-include ':example-app', ':backtrace-library', ':coroner-client', ':gson'
+include ':gson', ':example-app', ':backtrace-library', ':coroner-client'

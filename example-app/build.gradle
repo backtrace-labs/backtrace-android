@@ -70,7 +70,7 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.7.0'
     androidTestImplementation 'net.jodah:concurrentunit:0.4.6'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
-    androidTestImplementation project(path: ':coroner-client')
+    androidTestImplementation project(':coroner-client')
 }
 
 tasks.preBuild.dependsOn(':gson:shadowJar')
