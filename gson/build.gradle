@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
@@ -17,18 +17,20 @@ shadowJar {
 
     archiveBaseName.set("gson")
     archiveClassifier.set("")   // remove "-all"
-    archiveVersion.set("")      // remove version → filename is gson.jar
+    archiveVersion.set("")      // remove version → gson.jar
 }
 
-jar.enabled = false
-
-artifacts {
-    archives shadowJar
-}
-
+// Replace default jar with shadow jar for other subprojects
 configurations {
+    apiElements.outgoing.artifacts.clear()
     apiElements.outgoing.artifact(shadowJar)
+
+    runtimeElements.outgoing.artifacts.clear()
     runtimeElements.outgoing.artifact(shadowJar)
 }
 
 tasks.build.dependsOn(shadowJar)
+
+afterEvaluate {
+    tasks.matching { it.name.contains("Jetify") }.configureEach { enabled = false }
+}
