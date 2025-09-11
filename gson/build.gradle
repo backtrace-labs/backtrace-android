@@ -23,18 +23,21 @@ shadowJar {
 jar.enabled = false
 
 // Publish shadow jar as default artifact for this project
-artifacts {
-    archives shadowJar
-}
+// artifacts {
+//     archives shadowJar
+// }
 
-// Ensure consumers (apiElements/runtimeElements) get the shadowed jar
-configurations {
-    apiElements {
-        outgoing.artifact(shadowJar)
-    }
-    runtimeElements {
-        outgoing.artifact(shadowJar)
-    }
-}
+// // Ensure consumers (apiElements/runtimeElements/default) get the shadowed jar
+// configurations {
+//     apiElements {
+//         outgoing.artifact(shadowJar)
+//     }
+//     runtimeElements {
+//         outgoing.artifact(shadowJar)
+//     }
+//     default {
+//         outgoing.artifact(shadowJar)
+//     }
+// }
 
 tasks.build.dependsOn(shadowJar)
