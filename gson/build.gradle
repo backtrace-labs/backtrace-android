@@ -15,9 +15,26 @@ shadowJar {
     relocate 'com.google.gson', 'backtraceio.gson'
     // Exclude everything from error_prone
     exclude 'com/google/errorprone/**'
+    archiveClassifier.set('')
+    archiveBaseName.set('gson')
 }
 
 // Disable the regular jar task since we want the shadowed jar to be the main artifact
 jar.enabled = false
+
+// Publish shadow jar as default artifact for this project
+artifacts {
+    archives shadowJar
+}
+
+// Ensure consumers (apiElements/runtimeElements) get the shadowed jar
+configurations {
+    apiElements {
+        outgoing.artifact(shadowJar)
+    }
+    runtimeElements {
+        outgoing.artifact(shadowJar)
+    }
+}
 
 tasks.build.dependsOn(shadowJar)
