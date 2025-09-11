@@ -13,8 +13,6 @@ dependencies {
 
 shadowJar {
     relocate 'com.google.gson', 'backtraceio.gson'
-    archiveClassifier.set('')
-
     // Exclude everything from error_prone
     exclude 'com/google/errorprone/**'
 }
