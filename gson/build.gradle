@@ -3,12 +3,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -17,18 +11,13 @@ dependencies {
     implementation "com.google.code.gson:gson:2.13.1"
 }
 
+// Shadow configuration: relocate Gson to avoid conflicts
 shadowJar {
-    archiveClassifier.set("") // replace default jar
+    archiveClassifier.set("") // override default jar
     relocate 'com.google.gson', 'backtraceio.gson'
 }
 
-// Disable the regular jar task since we want the shadowed jar to be the main artifact
-jar.enabled = false
-
-// Publish shadow jar as the main artifact
+// Make the shadow jar the default artifact
 artifacts {
-    apiElements shadowJar
-    runtimeElements shadowJar
+    archives shadowJar
 }
-
-tasks.build.dependsOn(shadowJar)

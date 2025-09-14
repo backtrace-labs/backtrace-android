@@ -10,6 +10,8 @@ androidGitVersion {
     format '%tag%%-count%%-commit%%-branch%'
 }
 
+def gsonJar = project(':gson').layout.buildDirectory.file("libs/gson.jar")
+
 android {
     namespace "backtraceio.library"
     defaultConfig {
@@ -116,7 +118,7 @@ mavenPublishing {
 }
 
 dependencies {
-    implementation project(":gson")
+    implementation files(gsonJar)
     implementation 'com.squareup:tape:1.2.3'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     testImplementation 'junit:junit:4.13.2'
@@ -129,3 +131,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation "org.mockito:mockito-android:5.19.0"
 }
+
+tasks.preBuild.dependsOn(':gson:shadowJar')
