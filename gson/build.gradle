@@ -3,34 +3,32 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.13.1'
+    implementation "com.google.code.gson:gson:2.13.1"
 }
 
 shadowJar {
+    archiveClassifier.set("") // replace default jar
     relocate 'com.google.gson', 'backtraceio.gson'
-    exclude 'com/google/errorprone/**'
-
-    archiveBaseName.set("gson")
-    archiveClassifier.set("")   // remove "-all"
-    archiveVersion.set("")      // remove version → gson.jar
 }
 
-// Replace default jar with shadow jar for other subprojects
-configurations {
-    apiElements.outgoing.artifacts.clear()
-    apiElements.outgoing.artifact(shadowJar)
+// Disable the regular jar task since we want the shadowed jar to be the main artifact
+jar.enabled = false
 
-    runtimeElements.outgoing.artifacts.clear()
-    runtimeElements.outgoing.artifact(shadowJar)
+// Publish shadow jar as the main artifact
+artifacts {
+    apiElements shadowJar
+    runtimeElements shadowJar
 }
 
 tasks.build.dependsOn(shadowJar)
-
-afterEvaluate {
-    tasks.matching { it.name.contains("Jetify") }.configureEach { enabled = false }
-}

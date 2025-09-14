@@ -116,12 +116,7 @@ mavenPublishing {
 }
 
 dependencies {
-    implementation(project(':gson')) {
-        attributes {
-            // Force Gradle to treat it as plain Java jar
-            attribute(org.gradle.api.attributes.LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named("jar"))
-        }
-    }
+    implementation project(":gson")
     implementation 'com.squareup:tape:1.2.3'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     testImplementation 'junit:junit:4.13.2'
