@@ -8,16 +8,20 @@ repositories {
 }
 
 dependencies {
-    implementation "com.google.code.gson:gson:2.13.1"
+    implementation 'com.google.code.gson:gson:2.13.1'
 }
 
-// Shadow configuration: relocate Gson to avoid conflicts
 shadowJar {
     archiveClassifier.set("") // override default jar
     relocate 'com.google.gson', 'backtraceio.gson'
+
+    // Exclude everything from error_prone
+    exclude 'com/google/errorprone/**'
 }
 
 // Make the shadow jar the default artifact
 artifacts {
     archives shadowJar
 }
+
+tasks.build.dependsOn(shadowJar)
