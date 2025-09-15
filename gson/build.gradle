@@ -19,9 +19,4 @@ shadowJar {
     exclude 'com/google/errorprone/**'
 }
 
-// Make the shadow jar the default artifact
-artifacts {
-    archives shadowJar
-}
-
 tasks.build.dependsOn(shadowJar)
