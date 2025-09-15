@@ -67,10 +67,8 @@ android {
     }
 
     // Needed until we migrate to AndroidX
-    android {
-        lintOptions {
-            abortOnError false
-        }
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -115,10 +113,13 @@ mavenPublishing {
     }
 }
 
+def gsonJar = project(':gson')
+        .layout.buildDirectory.file("libs/gson-backtrace.jar")
+
 dependencies {
     implementation 'com.squareup:tape:1.2.3'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation files('../gson/build/libs/gson-backtrace.jar')
+    implementation files(gsonJar)
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:5.19.0"
     testImplementation 'org.json:json:20250517'
