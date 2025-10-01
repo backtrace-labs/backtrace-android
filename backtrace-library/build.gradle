@@ -119,9 +119,11 @@ def gsonJar = project(':gson')
 dependencies {
     implementation 'com.squareup:tape:1.2.3'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation files(gsonJar)
+//    implementation project(':gson')
+    implementation project(path: ':gson', configuration: 'shadow')
+//    implementation files(gsonJar)
     testImplementation 'junit:junit:4.13.2'
-    testImplementation "org.mockito:mockito-core:5.19.0"
+    testImplementation "org.mockito:mockito-core:5.20.0"
     testImplementation 'org.json:json:20250517'
     testImplementation "com.google.guava:guava:33.4.8-jre"
     androidTestImplementation 'net.jodah:concurrentunit:0.4.6'
@@ -131,4 +133,4 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:5.19.0"
 }
 
-tasks.preBuild.dependsOn(':gson:shadowJar')
+//tasks.preBuild.dependsOn(':gson:shadowJar')

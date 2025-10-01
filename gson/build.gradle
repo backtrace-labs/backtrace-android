@@ -11,12 +11,39 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.13.1'
 }
 
-shadowJar {
-    relocate 'com.google.gson', 'backtraceio.gson'
-    archiveClassifier.set('backtrace')
+//shadowJar {
+//
+//    archiveClassifier.set('backtrace')
+//
+//    // Exclude everything from error_prone
+//
+//}
 
-    // Exclude everything from error_prone
+shadowJar {
+    archiveBaseName.set('backtrace-library')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+
+    // Relocate GSON to your package
+    relocate 'com.google.gson', 'backtraceio.gson'
+
+    // Merge service files if needed
+    mergeServiceFiles()
+
+    configurations = [project.configurations.runtimeClasspath]
     exclude 'com/google/errorprone/**'
 }
 
-tasks.build.dependsOn(shadowJar)
+// Replace the regular jar with the shadow jar
+jar {
+    enabled = false
+    dependsOn shadowJar
+}
+
+artifacts {
+    archives shadowJar
+    shadow shadowJar
+}
+
+// Make build depend on shadowJar
+build.dependsOn shadowJar
