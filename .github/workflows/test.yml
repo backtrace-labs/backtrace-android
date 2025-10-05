@@ -32,10 +32,23 @@ jobs:
           echo BACKTRACE_SUBMISSION_URL=\"${{ secrets.BACKTRACE_SUBMISSION_URL }}\" >> ./local.properties
           echo BACKTRACE_CORONER_URL=\"${{ secrets.BACKTRACE_CORONER_URL }}\" >> ./local.properties
           echo BACKTRACE_CORONER_TOKEN=\"${{ secrets.BACKTRACE_CORONER_TOKEN }}\" >> ./local.properties
+
+      - name: Accept Android SDK licences
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
       - name: Check Code Style
         run: ./gradlew spotlessCheck
+
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
+
+      - name: Alignment script executable
+        run: chmod +x scripts/check_elf_alignment.sh
+
+      - name: Verify 16-KB alignment (arm64-v8a & x86_64)
+        run: |
+          scripts/check_elf_alignment.sh \
+            example-app/build/outputs/apk/debug/example-app-debug.apk
 
       - name: Upload symbols.zip
         uses: actions/upload-artifact@v4

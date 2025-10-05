@@ -26,6 +26,13 @@ add_library( # Sets the name of the library.
 target_compile_features(native-lib PRIVATE cxx_std_11)
 target_compile_options(native-lib PRIVATE -fno-omit-frame-pointer)
 
+# 16 KB page-size alignment for Android 15+
+if (ANDROID_ABI STREQUAL "arm64-v8a" OR ANDROID_ABI STREQUAL "x86_64")
+    target_link_options(native-lib PRIVATE
+            -Wl,-z,max-page-size=16384
+            -Wl,-z,common-page-size=16384)
+endif()
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library

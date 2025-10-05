@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     namespace "backtraceio.backtraceio"
     defaultConfig {
-        compileSdk 34
+        compileSdk 36
         applicationId "backtraceio.backtraceio"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -24,7 +24,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.22.1"
+            version "3.31.6"
         }
     }
     
@@ -63,12 +63,12 @@ String getProperty(String name, String defaultValue) {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test:rules:1.6.1'
-    androidTestImplementation 'net.jodah:concurrentunit:0.4.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test:rules:1.7.0'
+    androidTestImplementation 'net.jodah:concurrentunit:0.4.6'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     implementation project(':backtrace-library')
     androidTestImplementation project(path: ':coroner-client')
 }

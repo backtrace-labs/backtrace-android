@@ -48,7 +48,7 @@ public interface Metrics {
      * user. This list is persistent, meaning that events will not be removed upon Send(), as they
      * are for summed events. For non-standard unique events, server side configuration needs to be
      * done.
-     * Please refer to the online documentation at https://support.backtrace.io
+     * Please refer to the online documentation at <a href="https://docs.saucelabs.com/error-reporting/platform-integrations/android/configuration/#error-free-metrics">Error-Free Metrics</a>
      *
      * @param name the name of the Unique event
      * @return true if added successfully, otherwise false.
@@ -60,7 +60,7 @@ public interface Metrics {
      * user. This list is persistent, meaning that events will not be removed upon Send(), as they
      * are for summed events. For non-standard unique events, server side configuration needs to be
      * done.
-     * Please refer to the online documentation at https://support.backtrace.io
+     * Please refer to the online documentation at <a href="https://docs.saucelabs.com/error-reporting/platform-integrations/android/configuration/#error-free-metrics">Error-Free Metrics</a>
      *
      * @param name       the name of the Unique event
      * @param attributes linked attributes which will update this unique event on update
@@ -80,7 +80,7 @@ public interface Metrics {
      *
      * @param metricGroupName name of the metric group to be incremented. This metric group must
      *                        be configured on the server side as well.
-     *                        Please refer to the online documentation at https://support.backtrace.io
+     *                        Please refer to the online documentation at <a href="https://docs.saucelabs.com/error-reporting/platform-integrations/android/configuration/#error-free-metrics">Error-Free Metrics</a>
      * @return true if added successfully, otherwise false.
      * @see BacktraceMetrics#send()
      */
@@ -91,7 +91,7 @@ public interface Metrics {
      *
      * @param metricGroupName name of the metric group to be incremented. This metric group must
      *                        be configured on the server side as well.
-     *                        Please refer to the online documentation at https://support.backtrace.io
+     *                        Please refer to the online documentation at <a href="https://docs.saucelabs.com/error-reporting/platform-integrations/android/configuration/#error-free-metrics">Error-Free Metrics</a>
      * @param attributes      Custom attributes to add. Will be merged with the default
      *                        attributes, with attribute values provided here overriding any defaults.
      * @return true if added successfully, otherwise false.
