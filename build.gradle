@@ -21,13 +21,35 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
-            googleJavaFormat('1.29.0') // Specify the version of Google Java Format
-            indentWithTabs(1)
-            indentWithSpaces(2)
+            googleJavaFormat('1.29.0').aosp() // Specify the version of Google Java Format
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            endWithNewline()
             target fileTree('.') {
                 include '**/*.java'
                 exclude '**/build/**', '**/build-*/**', '**/.cxx/**'
             }
+        }
+        format 'json', {
+            target '**/*.json'
+            leadingTabsToSpaces(2)
+            trimTrailingWhitespace()
+            endWithNewline()
+            targetExclude('**/build/**', '**/.cxx/**', '**/generated/**')
+        }
+
+        format 'gradle', {
+            target '**/*.gradle'
+            leadingTabsToSpaces(4)
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+
+
+        format 'misc', {
+            target '*.md', '.gitignore'
+            trimTrailingWhitespace()
+            endWithNewline()
         }
     }
 }
