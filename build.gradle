@@ -14,14 +14,14 @@ buildscript {
 }
 
 plugins {
-    id 'com.diffplug.spotless' version '7.2.1' apply false
+    id 'com.diffplug.spotless' version '8.0.0' apply false
 }
 
 subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
-            googleJavaFormat('1.29.0').aosp() // Specify the version of Google Java Format
+            palantirJavaFormat()
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
