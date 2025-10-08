@@ -1,9 +1,9 @@
 package backtraceio.coroner.query;
 
 public class Constants {
-    public final static String FOLD = "fold";
-    public final static String GROUP = "group";
-    public final static String OFFSET = "offset";
-    public final static String LIMIT = "limit";
-    public final static String FILTER = "filter";
+    public static final String FOLD = "fold";
+    public static final String GROUP = "group";
+    public static final String OFFSET = "offset";
+    public static final String LIMIT = "limit";
+    public static final String FILTER = "filter";
 }

@@ -4,14 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-
+import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.services.ReportExceptionTransformer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.services.ReportExceptionTransformer;
+import org.junit.Test;
 
 public class ReportExceptionTransformerTest {
 
@@ -19,21 +17,26 @@ public class ReportExceptionTransformerTest {
     final String outerExceptionMessage = "Outer exception message";
     final String suppressedExceptionMessage = "Outer exception message";
     final String attributeKey = "attribute-key";
-    final Map<String, Object> attributes = new HashMap<String, Object>() {{
-        put(attributeKey, "test");
-    }};
+    final Map<String, Object> attributes = new HashMap<String, Object>() {
+        {
+            put(attributeKey, "test");
+        }
+    };
 
     @Test
     public void generateReportOnlyForExceptionWithoutInnerExceptions() {
         final Exception exception = new Exception("Exception without inner or suppressed exceptions");
         ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(exception, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(exception, attributes));
 
         BacktraceReport exceptionReport = reports.get(0);
         assertEquals(exception.getMessage(), exceptionReport.exception.getMessage());
         assertNull(exceptionReport.attributes.get(ReportExceptionTransformer.errorParentIdAttribute));
-        assertEquals(exceptionReport.uuid.toString(), exceptionReport.attributes.get(ReportExceptionTransformer.errorIdAttribute));
+        assertEquals(
+                exceptionReport.uuid.toString(),
+                exceptionReport.attributes.get(ReportExceptionTransformer.errorIdAttribute));
         assertNotNull(exceptionReport.attributes.get(ReportExceptionTransformer.errorTraceAttribute));
     }
 
@@ -45,7 +48,8 @@ public class ReportExceptionTransformerTest {
         ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
         reportExceptionTransformer.sendInnerExceptions(true);
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(outerException, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -69,7 +73,8 @@ public class ReportExceptionTransformerTest {
         ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
         reportExceptionTransformer.sendInnerExceptions(false);
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(outerException, attributes));
 
         assertEquals(1, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -85,7 +90,8 @@ public class ReportExceptionTransformerTest {
         ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
         reportExceptionTransformer.sendSuppressedExceptions(true);
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(exception, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(exception, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -111,7 +117,8 @@ public class ReportExceptionTransformerTest {
         ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
 
         reportExceptionTransformer.sendSuppressedExceptions(false);
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(exception, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(exception, attributes));
 
         assertEquals(1, reports.size());
         BacktraceReport exceptionReport = reports.get(0);
@@ -129,7 +136,8 @@ public class ReportExceptionTransformerTest {
 
         reportExceptionTransformer.sendInnerExceptions(true);
         reportExceptionTransformer.sendSuppressedExceptions(true);
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(outerException, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);
@@ -151,7 +159,8 @@ public class ReportExceptionTransformerTest {
 
         reportExceptionTransformer.sendInnerExceptions(true);
         reportExceptionTransformer.sendSuppressedExceptions(true);
-        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(new BacktraceReport(outerException, attributes));
+        List<BacktraceReport> reports = reportExceptionTransformer.transformReportWithInnerExceptions(
+                new BacktraceReport(outerException, attributes));
 
         assertEquals(expectedNumberOfReports, reports.size());
         BacktraceReport outerExceptionReport = reports.get(0);

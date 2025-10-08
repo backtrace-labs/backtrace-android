@@ -6,24 +6,20 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceDatabaseContext;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseContextTest {
@@ -40,6 +36,7 @@ public class BacktraceDatabaseContextTest {
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
         this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
     }
+
     @After
     public void after() {
         this.databaseContext.clear();
@@ -139,13 +136,14 @@ public class BacktraceDatabaseContextTest {
         databaseContext.contains(null);
     }
 
-
     @Test
     public void notContainsInDatabaseContext() {
         // GIVEN
         fillDatabase();
         BacktraceReport report = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
+        BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -234,7 +232,9 @@ public class BacktraceDatabaseContextTest {
         // GIVEN
         fillDatabase();
         BacktraceReport report = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
+        BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.dbPath);
 
         // WHEN
@@ -259,9 +259,15 @@ public class BacktraceDatabaseContextTest {
         BacktraceReport report = new BacktraceReport(this.testMessage);
         BacktraceReport report2 = new BacktraceReport(this.testMessage);
         BacktraceReport report3 = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        BacktraceData data2 = new BacktraceData.Builder(report2).setAttributes(this.context, null).build();
-        BacktraceData data3 = new BacktraceData.Builder(report3).setAttributes(this.context, null).build();
+        BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        BacktraceData data2 = new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build();
+        BacktraceData data3 = new BacktraceData.Builder(report3)
+                .setAttributes(this.context, null)
+                .build();
         result.add(databaseContext.add(data));
         result.add(databaseContext.add(data2));
         result.add(databaseContext.add(data3));

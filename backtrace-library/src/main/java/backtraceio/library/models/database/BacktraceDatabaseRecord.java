@@ -1,13 +1,6 @@
 package backtraceio.library.models.database;
 
 import android.content.Context;
-
-import com.google.gson.annotations.SerializedName;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.FileHelper;
@@ -15,10 +8,14 @@ import backtraceio.library.interfaces.DatabaseRecordWriter;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.json.BacktraceReport;
+import com.google.gson.annotations.SerializedName;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class BacktraceDatabaseRecord {
 
-    private static transient final String LOG_TAG = BacktraceDatabaseRecord.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceDatabaseRecord.class.getSimpleName();
 
     /**
      * Path to database directory
@@ -40,7 +37,6 @@ public class BacktraceDatabaseRecord {
      * record writer
      */
     private final transient DatabaseRecordWriter recordWriter;
-
 
     /**
      * Path to json stored all information about current record
@@ -78,12 +74,8 @@ public class BacktraceDatabaseRecord {
         this.recordWriter = new BacktraceDatabaseRecordWriter(path);
     }
 
-    public BacktraceDatabaseRecord(String id,
-                                   String path,
-                                   String recordPath,
-                                   String diagnosticDataPath,
-                                   String reportPath,
-                                   long size) {
+    public BacktraceDatabaseRecord(
+            String id, String path, String recordPath, String diagnosticDataPath, String reportPath, long size) {
         this.id = UUID.fromString(id);
         this.recordPath = recordPath;
         this.diagnosticDataPath = diagnosticDataPath;
@@ -161,15 +153,13 @@ public class BacktraceDatabaseRecord {
         // deserialize data - if deserialize fails, we receive invalid entry
         try {
             BacktraceLogger.d(LOG_TAG, "Deserialization diagnostic data");
-            BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData,
-                    BacktraceData.class);
+            BacktraceData diagnosticData = BacktraceSerializeHelper.fromJson(jsonData, BacktraceData.class);
             // add report to diagnostic data
             // we don't store report with diagnostic data in the same json
             // because we have easier way to serialize and deserialize data
             // and no problem/condition with serialization when BacktraceApi want to send
             // diagnostic data to API
-            diagnosticData.report = BacktraceSerializeHelper.fromJson(jsonReport,
-                    BacktraceReport.class);
+            diagnosticData.report = BacktraceSerializeHelper.fromJson(jsonReport, BacktraceReport.class);
             return diagnosticData;
         } catch (Exception ex) {
             BacktraceLogger.e(LOG_TAG, "Exception occurs on deserialization of diagnostic data", ex);
@@ -188,8 +178,7 @@ public class BacktraceDatabaseRecord {
             this.diagnosticDataPath = save(record, String.format("%s-attachment", id));
             this.reportPath = save(record.getReport(), String.format("%s-report", id));
 
-            this.recordPath = new File(this.path,
-                    String.format("%s-record.json", this.id)).getAbsolutePath();
+            this.recordPath = new File(this.path, String.format("%s-record.json", this.id)).getAbsolutePath();
 
             String json = BacktraceSerializeHelper.toJson(this);
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
@@ -232,8 +221,7 @@ public class BacktraceDatabaseRecord {
      * @return is record valid
      */
     public boolean valid() {
-        return FileHelper.isFileExists(this.diagnosticDataPath) &&
-                FileHelper.isFileExists(this.reportPath);
+        return FileHelper.isFileExists(this.diagnosticDataPath) && FileHelper.isFileExists(this.reportPath);
     }
 
     /**

@@ -1,14 +1,13 @@
 package backtraceio.library.interfaces;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
 import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.services.BacktraceMetrics;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public interface Metrics {
 

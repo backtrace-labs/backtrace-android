@@ -1,12 +1,11 @@
 package backtraceio.library.models;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.logger.BacktraceLogger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Backtrace UncaughtExceptionHandler which will be invoked when a Thread abruptly terminates due
@@ -15,9 +14,11 @@ import backtraceio.library.logger.BacktraceLogger;
 public class BacktraceExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String LOG_TAG = BacktraceExceptionHandler.class.getSimpleName();
-    private static final Map<String, Object> customAttributes = new HashMap<String, Object>() {{
-        put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
-    }};
+    private static final Map<String, Object> customAttributes = new HashMap<String, Object>() {
+        {
+            put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.UnhandledExceptionAttributeType);
+        }
+    };
     private final Thread.UncaughtExceptionHandler rootHandler;
     private final CountDownLatch signal = new CountDownLatch(1);
     private final BacktraceClient client;

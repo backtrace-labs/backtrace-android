@@ -2,7 +2,6 @@ package backtraceio.library.anr;
 
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
-
 /**
  * Configuration settings for Application Not Responding (ANR) detection.
  * This class allows customization of ANR monitoring behavior, such as the timeout duration
@@ -12,7 +11,7 @@ public class BacktraceANRSettings {
     /**
      * Default timeout value in milliseconds
      */
-    public final static int DEFAULT_ANR_TIMEOUT = 5000;
+    public static final int DEFAULT_ANR_TIMEOUT = 5000;
 
     /**
      * The timeout in milliseconds after which an ANR is reported if the main thread is blocked.
@@ -47,7 +46,8 @@ public class BacktraceANRSettings {
      *                                        Can be null if no custom callback is needed.
      * @param debug                           True to enable debug logging for ANR detection, false otherwise.
      */
-    public BacktraceANRSettings(int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
+    public BacktraceANRSettings(
+            int timeout, OnApplicationNotRespondingEvent onApplicationNotRespondingEvent, boolean debug) {
         this.timeout = timeout;
         this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
         this.debug = debug;

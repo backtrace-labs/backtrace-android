@@ -1,16 +1,15 @@
 package backtraceio.library.services;
 
+import backtraceio.library.common.FileHelper;
+import backtraceio.library.interfaces.DatabaseFileContext;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import backtraceio.library.common.FileHelper;
-import backtraceio.library.interfaces.DatabaseFileContext;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.database.BacktraceDatabaseRecord;
 
 public class BacktraceDatabaseFileContext implements DatabaseFileContext {
 
@@ -51,7 +50,8 @@ public class BacktraceDatabaseFileContext implements DatabaseFileContext {
     public Iterable<File> getRecords() {
         BacktraceLogger.d(LOG_TAG, "Getting files from file context");
         final Pattern p = Pattern.compile(this.recordFilterRegex);
-        File[] pagesTemplates = this._databaseDirectory.listFiles(f -> p.matcher(f.getName()).matches());
+        File[] pagesTemplates =
+                this._databaseDirectory.listFiles(f -> p.matcher(f.getName()).matches());
         if (pagesTemplates == null) {
             return Collections.emptyList();
         }

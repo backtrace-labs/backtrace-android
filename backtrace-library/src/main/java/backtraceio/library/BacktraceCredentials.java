@@ -1,7 +1,6 @@
 package backtraceio.library;
 
 import android.net.Uri;
-
 import backtraceio.library.logger.BacktraceLogger;
 
 /**
@@ -9,7 +8,7 @@ import backtraceio.library.logger.BacktraceLogger;
  */
 public class BacktraceCredentials {
 
-    private final static transient String LOG_TAG = BacktraceCredentials.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceCredentials.class.getSimpleName();
 
     /**
      * Data format
@@ -56,8 +55,8 @@ public class BacktraceCredentials {
     private Uri getServerUrl() {
         String serverUrl = this.getEndpointUrl();
         String prefix = serverUrl.endsWith("/") ? "" : "/";
-        String url = String.format("%s%spost?format=%s&token=%s", serverUrl, prefix,
-                this.format, this.getSubmissionToken());
+        String url =
+                String.format("%s%spost?format=%s&token=%s", serverUrl, prefix, this.format, this.getSubmissionToken());
         return Uri.parse(url);
     }
 
@@ -119,8 +118,7 @@ public class BacktraceCredentials {
      * @return access token
      */
     public String getSubmissionToken() {
-        if (submissionToken != null)
-            return submissionToken;
+        if (submissionToken != null) return submissionToken;
 
         final int tokenLength = 64;
         final String tokenQueryParam = "token=";

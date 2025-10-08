@@ -21,7 +21,7 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
-            googleJavaFormat('1.29.0').aosp() // Specify the version of Google Java Format
+            palantirJavaFormat()
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()

@@ -6,16 +6,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class TestUtils {
 
@@ -56,7 +54,7 @@ public class TestUtils {
 
         if (!compareResult) {
             Gson g = new Gson();
-            Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+            Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> json1Map = g.fromJson(json1, mapType);
             Map<String, Object> json2Map = g.fromJson(json2, mapType);
             MapDifference<String, Object> x = Maps.difference(json1Map, json2Map);

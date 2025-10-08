@@ -1,5 +1,6 @@
 package backtraceio.library.common.serialization;
 
+import backtraceio.library.logger.BacktraceLogger;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,15 +11,12 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import backtraceio.library.logger.BacktraceLogger;
 
 public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 
@@ -32,7 +30,7 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
         }
     }
 
-    private transient final String LOG_TAG = ThrowableTypeAdapterFactory.class.getSimpleName();
+    private final transient String LOG_TAG = ThrowableTypeAdapterFactory.class.getSimpleName();
 
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
@@ -62,7 +60,7 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 
                 out.name("stack-trace");
                 out.beginArray();
-                for (StackTraceElement element : throwable.getStackTrace()){
+                for (StackTraceElement element : throwable.getStackTrace()) {
                     stackTraceElementAdapter.write(out, element);
                 }
                 out.endArray();
@@ -99,7 +97,8 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 }
 
                 List<StackTraceElement> stackTraceList = new ArrayList<>();
-                if (jsonObject.has("stack-trace") && jsonObject.get("stack-trace").isJsonArray()) {
+                if (jsonObject.has("stack-trace")
+                        && jsonObject.get("stack-trace").isJsonArray()) {
                     for (JsonElement elementJson : jsonObject.getAsJsonArray("stack-trace")) {
                         stackTraceList.add(stackTraceElementAdapter.fromJsonTree(elementJson));
                     }
@@ -116,7 +115,11 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                 Throwable instance = tryInstantiateThrowable(throwableClassToInstantiate, message, cause);
 
                 if (instance == null) {
-                    BacktraceLogger.w(LOG_TAG, String.format("Could not instantiate specific Throwable type '%s'. Falling back by returning null.", throwableClassToInstantiate.getName()));
+                    BacktraceLogger.w(
+                            LOG_TAG,
+                            String.format(
+                                    "Could not instantiate specific Throwable type '%s'. Falling back by returning null.",
+                                    throwableClassToInstantiate.getName()));
                     return null;
                 }
 
@@ -148,7 +151,11 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                             // e.g. if deserializing into `Exception.class` but `actualClass` was `Error`.
                         }
                     } catch (ClassNotFoundException ignored) {
-                        BacktraceLogger.d(LOG_TAG, "Class "+ actualClassName +" not found, will fall back to using rawType (the type requested from Gson): " + rawType.getSimpleName());
+                        BacktraceLogger.d(
+                                LOG_TAG,
+                                "Class " + actualClassName
+                                        + " not found, will fall back to using rawType (the type requested from Gson): "
+                                        + rawType.getSimpleName());
                     }
                 }
                 return throwableClassToInstantiate;
@@ -156,16 +163,14 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
 
             @SuppressWarnings("unchecked")
             private <T extends Throwable> T tryInstantiateThrowable(
-                    Class<T> exceptionClass,
-                    String message,
-                    Throwable cause
-            ) {
+                    Class<T> exceptionClass, String message, Throwable cause) {
 
-                ConstructorSpec<T>[] specs = new ConstructorSpec[]{
-                        new ConstructorSpec<T>(new Class<?>[]{String.class, Throwable.class}, new Object[]{message, cause}),
-                        new ConstructorSpec<T>(new Class<?>[]{Throwable.class}, new Object[]{cause}),
-                        new ConstructorSpec<T>(new Class<?>[]{String.class}, new Object[]{message}),
-                        new ConstructorSpec<T>(new Class<?>[]{}, new Object[]{})
+                ConstructorSpec<T>[] specs = new ConstructorSpec[] {
+                    new ConstructorSpec<T>(
+                            new Class<?>[] {String.class, Throwable.class}, new Object[] {message, cause}),
+                    new ConstructorSpec<T>(new Class<?>[] {Throwable.class}, new Object[] {cause}),
+                    new ConstructorSpec<T>(new Class<?>[] {String.class}, new Object[] {message}),
+                    new ConstructorSpec<T>(new Class<?>[] {}, new Object[] {})
                 };
 
                 for (ConstructorSpec<T> spec : specs) {
@@ -177,13 +182,18 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
                             try {
                                 instance.initCause(cause);
                             } catch (Exception e) {
-                                BacktraceLogger.d(LOG_TAG, "Could not initCause for " + exceptionClass.getName() + " after constructor with args: " + Arrays.toString(spec.paramTypes));
+                                BacktraceLogger.d(
+                                        LOG_TAG,
+                                        "Could not initCause for " + exceptionClass.getName()
+                                                + " after constructor with args: " + Arrays.toString(spec.paramTypes));
                             }
                         }
                         return instance;
-                    }
-                    catch (Exception e) {
-                        BacktraceLogger.d(LOG_TAG, "Failed to instantiate " + exceptionClass.getName() + " with constructor with args: " + Arrays.toString(spec.paramTypes) + ", error message: " + e);
+                    } catch (Exception e) {
+                        BacktraceLogger.d(
+                                LOG_TAG,
+                                "Failed to instantiate " + exceptionClass.getName() + " with constructor with args: "
+                                        + Arrays.toString(spec.paramTypes) + ", error message: " + e);
                     }
                 }
 
@@ -191,27 +201,29 @@ public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
             }
 
             @SuppressWarnings("unchecked")
-            private T createFallbackInstanceOrThrow(Throwable instance, String message, List<StackTraceElement> stackTraceList) throws JsonParseException {
+            private T createFallbackInstanceOrThrow(
+                    Throwable instance, String message, List<StackTraceElement> stackTraceList)
+                    throws JsonParseException {
                 String errorMessage = String.format(
                         "Deserialized to %s but expected assignable to %s. Message: %s",
-                        (instance != null ? instance.getClass().getName() : "null"),
-                        rawType.getName(),
-                        message
-                );
+                        (instance != null ? instance.getClass().getName() : "null"), rawType.getName(), message);
                 // Create a new instance of the originally requested type (T or rawType) with the info
                 try {
-                    Constructor<? extends Throwable> tConstructor = ((Class<? extends Throwable>) rawType).getDeclaredConstructor(String.class, Throwable.class);
+                    Constructor<? extends Throwable> tConstructor = ((Class<? extends Throwable>) rawType)
+                            .getDeclaredConstructor(String.class, Throwable.class);
                     tConstructor.setAccessible(true);
                     // 'instance' becomes the cause
                     T fallbackT = (T) tConstructor.newInstance(errorMessage, instance);
                     ((Throwable) fallbackT).setStackTrace(stackTraceList.toArray(new StackTraceElement[0]));
                     return fallbackT;
-                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
-                         InvocationTargetException e) {
-                    throw new JsonParseException("Could not create fallback instance of " + rawType.getName() + ": " + e.getMessage(), e);
+                } catch (NoSuchMethodException
+                        | IllegalAccessException
+                        | InstantiationException
+                        | InvocationTargetException e) {
+                    throw new JsonParseException(
+                            "Could not create fallback instance of " + rawType.getName() + ": " + e.getMessage(), e);
                 }
             }
-
         };
     }
 }

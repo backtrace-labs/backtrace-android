@@ -7,12 +7,6 @@ import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
@@ -20,6 +14,10 @@ import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.enums.ScreenOrientation;
 import backtraceio.library.models.attributes.ReportDataAttributes;
 import backtraceio.library.models.attributes.ReportDataBuilder;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Class instance to get a built-in attributes from current application
@@ -52,8 +50,7 @@ public class BacktraceAttributes {
      * @param report           received Backtrace report
      * @param clientAttributes client's attributes (report and client)
      */
-    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
-            clientAttributes) {
+    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object> clientAttributes) {
         this(context, report, clientAttributes, true);
     }
 
@@ -61,8 +58,11 @@ public class BacktraceAttributes {
         this(context, null, clientAttributes, false);
     }
 
-    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
-            clientAttributes, Boolean includeDynamicAttributes) {
+    public BacktraceAttributes(
+            Context context,
+            BacktraceReport report,
+            Map<String, Object> clientAttributes,
+            Boolean includeDynamicAttributes) {
         this.context = context;
         if (report != null) {
             this.convertReportAttributes(report);
@@ -142,7 +142,7 @@ public class BacktraceAttributes {
      * @param report received report
      */
     private void setExceptionAttributes(BacktraceReport report) {
-        //there is no information to analyse
+        // there is no information to analyse
         if (report == null) {
             return;
         }
@@ -175,10 +175,7 @@ public class BacktraceAttributes {
      * @return screen backlight brightness between 0 and 255
      */
     private int getScreenBrightness() {
-        return Settings.System.getInt(
-                this.context.getContentResolver(),
-                Settings.System.SCREEN_BRIGHTNESS,
-                0);
+        return Settings.System.getInt(this.context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 0);
     }
 
     /**
@@ -203,7 +200,6 @@ public class BacktraceAttributes {
         this.attributes.putAll(data.getAttributes());
         this.complexAttributes.putAll(data.getAnnotations());
     }
-
 
     public Map<String, Object> getAllAttributes() {
         Map<String, Object> attributes = new HashMap<String, Object>();

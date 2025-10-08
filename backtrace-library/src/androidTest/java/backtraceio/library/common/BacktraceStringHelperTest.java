@@ -4,7 +4,6 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -28,7 +27,6 @@ public class BacktraceStringHelperTest {
         String someString = "foo";
         assertFalse(BacktraceStringHelper.isNullOrEmpty(someString));
     }
-
 
     @Test
     public void testObjectIsNull() {

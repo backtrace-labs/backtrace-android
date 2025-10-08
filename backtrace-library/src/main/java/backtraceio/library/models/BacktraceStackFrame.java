@@ -1,11 +1,8 @@
 package backtraceio.library.models;
 
-
-import com.google.gson.annotations.SerializedName;
-
-import java.util.UUID;
-
 import backtraceio.library.logger.BacktraceLogger;
+import com.google.gson.annotations.SerializedName;
+import java.util.UUID;
 
 /**
  * Backtrace stack frame

@@ -1,19 +1,17 @@
 package backtraceio.library.models.json;
 
 import android.content.Context;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.common.CollectionUtils;
 import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceStackFrame;
 import backtraceio.library.models.BacktraceStackTrace;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Captured application error
@@ -67,9 +65,7 @@ public class BacktraceReport {
      *
      * @param message custom client message
      */
-    public BacktraceReport(
-            String message
-    ) {
+    public BacktraceReport(String message) {
         this((Exception) null, null, null);
         this.message = message;
     }
@@ -81,10 +77,7 @@ public class BacktraceReport {
      * @param message    custom client message
      * @param attributes additional information about application state
      */
-    public BacktraceReport(
-            String message,
-            Map<String, Object> attributes
-    ) {
+    public BacktraceReport(String message, Map<String, Object> attributes) {
         this((Exception) null, attributes, null);
         this.message = message;
     }
@@ -96,13 +89,9 @@ public class BacktraceReport {
      * @param message         custom client message
      * @param attachmentPaths path to all report attachments
      */
-    public BacktraceReport(
-            String message,
-            List<String> attachmentPaths
-    ) {
+    public BacktraceReport(String message, List<String> attachmentPaths) {
         this(message, null, attachmentPaths);
     }
-
 
     /**
      * Create new instance of Backtrace report to send a report
@@ -112,11 +101,7 @@ public class BacktraceReport {
      * @param attributes      additional information about application state
      * @param attachmentPaths path to all report attachments
      */
-    public BacktraceReport(
-            String message,
-            Map<String, Object> attributes,
-            List<String> attachmentPaths
-    ) {
+    public BacktraceReport(String message, Map<String, Object> attributes, List<String> attachmentPaths) {
         this((Exception) null, attributes, attachmentPaths);
         this.message = message;
     }
@@ -127,8 +112,7 @@ public class BacktraceReport {
      *
      * @param exception current exception
      */
-    public BacktraceReport(
-            Throwable exception) {
+    public BacktraceReport(Throwable exception) {
         this(exception, null, null);
     }
 
@@ -139,9 +123,7 @@ public class BacktraceReport {
      * @param exception  current exception
      * @param attributes additional information about application state
      */
-    public BacktraceReport(
-            Throwable exception,
-            Map<String, Object> attributes) {
+    public BacktraceReport(Throwable exception, Map<String, Object> attributes) {
         this(exception, attributes, null);
     }
 
@@ -152,9 +134,7 @@ public class BacktraceReport {
      * @param exception       current exception
      * @param attachmentPaths path to all report attachments
      */
-    public BacktraceReport(
-            Exception exception,
-            List<String> attachmentPaths) {
+    public BacktraceReport(Exception exception, List<String> attachmentPaths) {
         this(exception, null, attachmentPaths);
     }
 
@@ -181,12 +161,16 @@ public class BacktraceReport {
         this.setDefaultErrorTypeAttribute();
     }
 
-    public BacktraceReport(UUID uuid, long timestamp,
-                           boolean exceptionTypeReport, String classifier,
-                           Map<String, Object> attributes,
-                           String message, Exception exception,
-                           List<String> attachmentPaths,
-                           List<BacktraceStackFrame> diagnosticStack) {
+    public BacktraceReport(
+            UUID uuid,
+            long timestamp,
+            boolean exceptionTypeReport,
+            String classifier,
+            Map<String, Object> attributes,
+            String message,
+            Exception exception,
+            List<String> attachmentPaths,
+            List<BacktraceStackFrame> diagnosticStack) {
         this.uuid = uuid;
         this.timestamp = timestamp;
         this.exceptionTypeReport = exceptionTypeReport;
@@ -205,10 +189,8 @@ public class BacktraceReport {
      * @param attributes attributes to concatenate
      * @return concatenated map of attributes from report and from passed attributes
      */
-    public static Map<String, Object> concatAttributes(
-            BacktraceReport report, Map<String, Object> attributes) {
-        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes :
-                new HashMap<>();
+    public static Map<String, Object> concatAttributes(BacktraceReport report, Map<String, Object> attributes) {
+        Map<String, Object> reportAttributes = report.attributes != null ? report.attributes : new HashMap<>();
         if (attributes == null) {
             return reportAttributes;
         }
@@ -266,8 +248,12 @@ public class BacktraceReport {
         return toBacktraceData(context, clientAttributes, false);
     }
 
-    public BacktraceData toBacktraceData(Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
+    public BacktraceData toBacktraceData(
+            Context context, Map<String, Object> clientAttributes, boolean isProguardEnabled) {
         final String symbolication = isProguardEnabled ? "proguard" : null;
-        return new BacktraceData.Builder(this).setAttributes(context, clientAttributes).setSymbolication(symbolication).build();
+        return new BacktraceData.Builder(this)
+                .setAttributes(context, clientAttributes)
+                .setSymbolication(symbolication)
+                .build();
     }
 }

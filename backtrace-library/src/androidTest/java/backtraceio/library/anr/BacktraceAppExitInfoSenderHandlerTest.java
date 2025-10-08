@@ -8,26 +8,9 @@ import static org.mockito.Mockito.when;
 
 import android.app.ApplicationExitInfo;
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SdkSuppress;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.TestUtils;
@@ -35,6 +18,18 @@ import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceApiResult;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceAppExitInfoSenderHandlerTest {
@@ -54,8 +49,16 @@ public class BacktraceAppExitInfoSenderHandlerTest {
         this.backtraceClient = new BacktraceClient(this.mockContext, credentials);
     }
 
-    private ExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason,
-                                             int pid, int importance, long pss, long rss, InputStream stacktrace) throws IOException {
+    private ExitInfo mockApplicationExitInfo(
+            String description,
+            Long timestamp,
+            int reason,
+            int pid,
+            int importance,
+            long pss,
+            long rss,
+            InputStream stacktrace)
+            throws IOException {
         ExitInfo mockExitInfo = mock(ExitInfo.class);
         when(mockExitInfo.getDescription()).thenReturn(description);
         when(mockExitInfo.getTimestamp()).thenReturn(timestamp);
@@ -68,17 +71,25 @@ public class BacktraceAppExitInfoSenderHandlerTest {
         return mockExitInfo;
     }
 
-    private ExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason, InputStream stacktrace) throws IOException {
+    private ExitInfo mockApplicationExitInfo(String description, Long timestamp, int reason, InputStream stacktrace)
+            throws IOException {
         return mockApplicationExitInfo(description, timestamp, reason, 0, 0, 0L, 0L, stacktrace);
     }
 
     private ProcessExitInfoProvider mockActivityManagerExitInfoProvider() throws IOException {
         ActivityManagerExitInfoProvider mock = mock(ActivityManagerExitInfoProvider.class);
         final List<ExitInfo> exitInfoList = new ArrayList<>();
-        exitInfoList.add(mockApplicationExitInfo("random-text", System.currentTimeMillis(), ApplicationExitInfo.REASON_CRASH_NATIVE, null));
-        exitInfoList.add(mockApplicationExitInfo("anr", System.currentTimeMillis(), ApplicationExitInfo.REASON_ANR, TestUtils.readFileAsStream(this, ANR_APPEXIT_STACKTRACE_FILE)));
-        exitInfoList.add(mockApplicationExitInfo("anr without stacktrace", System.currentTimeMillis(), ApplicationExitInfo.REASON_ANR, null));
-        exitInfoList.add(mockApplicationExitInfo("random-description", System.currentTimeMillis(), ApplicationExitInfo.REASON_LOW_MEMORY, null));
+        exitInfoList.add(mockApplicationExitInfo(
+                "random-text", System.currentTimeMillis(), ApplicationExitInfo.REASON_CRASH_NATIVE, null));
+        exitInfoList.add(mockApplicationExitInfo(
+                "anr",
+                System.currentTimeMillis(),
+                ApplicationExitInfo.REASON_ANR,
+                TestUtils.readFileAsStream(this, ANR_APPEXIT_STACKTRACE_FILE)));
+        exitInfoList.add(mockApplicationExitInfo(
+                "anr without stacktrace", System.currentTimeMillis(), ApplicationExitInfo.REASON_ANR, null));
+        exitInfoList.add(mockApplicationExitInfo(
+                "random-description", System.currentTimeMillis(), ApplicationExitInfo.REASON_LOW_MEMORY, null));
 
         when(mock.getHistoricalExitInfo(PACKAGE_NAME, 0, 0)).thenReturn(exitInfoList);
         when(mock.getSupportedTypesOfExitInfo()).thenReturn(Collections.singletonList(ApplicationExitInfo.REASON_ANR));
@@ -114,8 +125,9 @@ public class BacktraceAppExitInfoSenderHandlerTest {
                 waiter.assertEquals("anr", anrAnnotations.get("description"));
                 waiter.assertEquals(ApplicationExitInfo.REASON_ANR, anrAnnotations.get("reason-code"));
                 waiter.assertEquals("anr", anrAnnotations.get("reason"));
-                waiter.assertTrue(((Map<String, Object>)annotations.get("ANR parsed stacktrace")).size() > 0);
-                waiter.assertEquals("backtraceio.library.anr.BacktraceANRExitInfoException", attributes.get("classifier"));
+                waiter.assertTrue(((Map<String, Object>) annotations.get("ANR parsed stacktrace")).size() > 0);
+                waiter.assertEquals(
+                        "backtraceio.library.anr.BacktraceANRExitInfoException", attributes.get("classifier"));
                 waiter.assertEquals("Hang", attributes.get("error.type"));
                 waiter.assertTrue(attributes.get("ANR stacktrace").length() > 0);
                 waiter.resume();
@@ -124,7 +136,8 @@ public class BacktraceAppExitInfoSenderHandlerTest {
             }
         });
         // WHEN
-        new BacktraceAppExitInfoSenderHandler(this.backtraceClient, PACKAGE_NAME, anrExitInfoState, mockProcessExitInfoProvider);
+        new BacktraceAppExitInfoSenderHandler(
+                this.backtraceClient, PACKAGE_NAME, anrExitInfoState, mockProcessExitInfoProvider);
 
         // THEN
         try {
@@ -150,7 +163,8 @@ public class BacktraceAppExitInfoSenderHandlerTest {
             }
         });
         // WHEN
-        new BacktraceAppExitInfoSenderHandler(this.backtraceClient, PACKAGE_NAME, anrExitInfoState, mockProcessExitInfoProvider);
+        new BacktraceAppExitInfoSenderHandler(
+                this.backtraceClient, PACKAGE_NAME, anrExitInfoState, mockProcessExitInfoProvider);
 
         // THEN
         try {

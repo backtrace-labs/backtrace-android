@@ -5,25 +5,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import backtraceio.library.events.RequestHandler;
+import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import backtraceio.library.events.RequestHandler;
-import backtraceio.library.models.BacktraceResult;
-import backtraceio.library.models.types.BacktraceResultStatus;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientAttributeTests {
@@ -142,15 +137,14 @@ public class BacktraceClientAttributeTests {
             Object value = data.getAttributes().get(attributeKey);
             assertNotNull(value);
             assertEquals(value, attributeValue);
-            return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                    BacktraceResultStatus.Ok);
+            return new BacktraceResult(
+                    data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);
         final Waiter waiter = new Waiter();
 
         // WHEN
-        backtraceClient.send(new Exception(errorMessage), backtraceResult -> waiter.resume()
-        );
+        backtraceClient.send(new Exception(errorMessage), backtraceResult -> waiter.resume());
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -158,5 +152,4 @@ public class BacktraceClientAttributeTests {
             fail(ex.getMessage());
         }
     }
-
 }

@@ -1,8 +1,7 @@
 package backtraceio.backtraceio;
 
-import org.junit.BeforeClass;
-
 import backtraceio.coroner.CoronerClient;
+import org.junit.BeforeClass;
 
 public class InstrumentedTest {
     private static CoronerClient coronerClient;

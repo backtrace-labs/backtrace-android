@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 
 public class StackTraceElementTypeAdapter extends TypeAdapter<StackTraceElement> {
@@ -56,7 +55,7 @@ public class StackTraceElementTypeAdapter extends TypeAdapter<StackTraceElement>
                 case "line-number":
                     lineNumber = in.nextInt();
                     break;
-                // Ignore any unknown fields (including classLoaderName)
+                    // Ignore any unknown fields (including classLoaderName)
                 default:
                     in.skipValue();
             }

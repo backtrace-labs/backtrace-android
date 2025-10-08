@@ -7,14 +7,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.content.Context;
-
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-
+import backtraceio.library.BacktraceClient;
+import backtraceio.library.BacktraceCredentials;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -23,17 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import backtraceio.library.BacktraceClient;
-import backtraceio.library.BacktraceCredentials;
-import backtraceio.library.models.types.BacktraceResultStatus;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
 
 public class UncaughtExceptionHandlerTest {
 
     private Context context;
     private BacktraceCredentials credentials;
 
-    private static void setRootHandler(Thread.UncaughtExceptionHandler customRootHandler, Thread.UncaughtExceptionHandler newRootHandler) {
+    private static void setRootHandler(
+            Thread.UncaughtExceptionHandler customRootHandler, Thread.UncaughtExceptionHandler newRootHandler) {
         try {
             Field field = BacktraceExceptionHandler.class.getDeclaredField("rootHandler");
             field.setAccessible(true);
@@ -43,8 +39,10 @@ public class UncaughtExceptionHandlerTest {
         }
     }
 
-    private static BacktraceExceptionHandler createBacktraceExceptionHandler(BacktraceClient client) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        Constructor<BacktraceExceptionHandler> constructor = BacktraceExceptionHandler.class.getDeclaredConstructor(BacktraceClient.class);
+    private static BacktraceExceptionHandler createBacktraceExceptionHandler(BacktraceClient client)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+        Constructor<BacktraceExceptionHandler> constructor =
+                BacktraceExceptionHandler.class.getDeclaredConstructor(BacktraceClient.class);
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         BacktraceExceptionHandler exceptionHandler = constructor.newInstance(client);
@@ -59,7 +57,8 @@ public class UncaughtExceptionHandlerTest {
     }
 
     @Test()
-    public void testUncaughtException() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public void testUncaughtException()
+            throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         // GIVEN
         final Waiter waiter = new Waiter();
         final Exception exception = new IllegalArgumentException("Test message");
@@ -69,8 +68,7 @@ public class UncaughtExceptionHandlerTest {
         client.setOnRequestHandler(data -> {
             testedAtomicReportData.set(data);
             waiter.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
+            return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
         });
 
         final BacktraceExceptionHandler handler = createBacktraceExceptionHandler(client);
@@ -92,12 +90,14 @@ public class UncaughtExceptionHandlerTest {
         assertNull(testedReportData.getReport().message);
         assertTrue(testedReportData.getReport().diagnosticStack.size() > 0);
         assertEquals("java.lang.IllegalArgumentException", testedReportData.getReport().classifier);
-        assertEquals("Unhandled exception", testedReportData.getReport().attributes.get("error.type"));
+        assertEquals(
+                "Unhandled exception", testedReportData.getReport().attributes.get("error.type"));
         assertTrue(testedReportData.getReport().exceptionTypeReport);
     }
 
     @Test
-    public void testUncaughtError() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public void testUncaughtError()
+            throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         // GIVEN
         final Waiter waiter = new Waiter();
         final Error error = new OutOfMemoryError();
@@ -107,8 +107,7 @@ public class UncaughtExceptionHandlerTest {
         client.setOnRequestHandler(data -> {
             testedAtomicReportData.set(data);
             waiter.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
+            return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
         });
 
         final BacktraceExceptionHandler handler = createBacktraceExceptionHandler(client);
@@ -129,12 +128,14 @@ public class UncaughtExceptionHandlerTest {
         assertNull(testedReportData.getReport().message);
         assertTrue(testedReportData.getReport().diagnosticStack.size() > 0);
         assertEquals("java.lang.OutOfMemoryError", testedReportData.getReport().classifier);
-        assertEquals("Unhandled exception", testedReportData.getReport().attributes.get("error.type"));
+        assertEquals(
+                "Unhandled exception", testedReportData.getReport().attributes.get("error.type"));
         assertTrue(testedReportData.getReport().exceptionTypeReport);
     }
 
     @Test()
-    public void testUncaughtInnerExceptionsGeneration() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public void testUncaughtInnerExceptionsGeneration()
+            throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         // GIVEN
         final int expectedNumberOfExceptions = 2;
         final Waiter waiter = new Waiter();
@@ -152,8 +153,7 @@ public class UncaughtExceptionHandlerTest {
             if (unhandledExceptionData.size() == expectedNumberOfExceptions) {
                 waiter.resume();
             }
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
+            return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
         });
 
         final BacktraceExceptionHandler handler = createBacktraceExceptionHandler(client);
@@ -178,7 +178,8 @@ public class UncaughtExceptionHandlerTest {
     }
 
     @Test()
-    public void testUncaughtInnerExceptionsErrorAttributes() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public void testUncaughtInnerExceptionsErrorAttributes()
+            throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         // GIVEN
         final int expectedNumberOfExceptions = 2;
         final Waiter waiter = new Waiter();
@@ -196,8 +197,7 @@ public class UncaughtExceptionHandlerTest {
             if (unhandledExceptionData.size() == expectedNumberOfExceptions) {
                 waiter.resume();
             }
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
+            return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
         });
 
         final BacktraceExceptionHandler handler = createBacktraceExceptionHandler(client);
@@ -218,7 +218,9 @@ public class UncaughtExceptionHandlerTest {
         assertEquals(outerException.attributes.get("error.trace"), innerException.attributes.get("error.trace"));
         assertEquals(outerException.uuid, innerException.attributes.get("error.parent"));
         assertNull(outerException.attributes.get("error.parent"));
-        assertEquals(BacktraceAttributeConsts.UnhandledExceptionAttributeType, outerException.attributes.get("error.type"));
-        assertEquals(BacktraceAttributeConsts.UnhandledExceptionAttributeType, innerException.attributes.get("error.type"));
+        assertEquals(
+                BacktraceAttributeConsts.UnhandledExceptionAttributeType, outerException.attributes.get("error.type"));
+        assertEquals(
+                BacktraceAttributeConsts.UnhandledExceptionAttributeType, innerException.attributes.get("error.type"));
     }
 }

@@ -1,8 +1,7 @@
 package backtraceio.library.common;
 
-import com.google.gson.Gson;
-
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
+import com.google.gson.Gson;
 
 /**
  * Helper class for serialize and deserialize objects
@@ -30,5 +29,4 @@ public class BacktraceSerializeHelper {
     public static <T> T fromJson(Gson gson, String json, Class<T> type) {
         return gson.fromJson(json, type);
     }
-
 }

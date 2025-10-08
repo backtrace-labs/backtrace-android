@@ -9,19 +9,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -33,6 +22,12 @@ import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceMetrics;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientMetricsTest {
@@ -41,7 +36,18 @@ public class BacktraceClientMetricsTest {
     public BacktraceCredentials credentials;
     private final String summedEventName = "activity-changed";
     // existing attribute name in Backtrace
-    private final String[] uniqueAttributeName = {"uname.version", "cpu.boottime", "screen.orientation", "battery.state", "device.airplane_mode", "device.sdk", "device.brand", "system.memory.total", "uname.sysname", "application.package"};
+    private final String[] uniqueAttributeName = {
+        "uname.version",
+        "cpu.boottime",
+        "screen.orientation",
+        "battery.state",
+        "device.airplane_mode",
+        "device.sdk",
+        "device.brand",
+        "system.memory.total",
+        "uname.sysname",
+        "application.package"
+    };
 
     private final String defaultBaseUrl = BacktraceMetrics.defaultBaseUrl;
     private final String token = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
@@ -50,13 +56,13 @@ public class BacktraceClientMetricsTest {
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
      * For best results run under low CPU load and low memory utilization conditions.
      */
-
     @Before
     public void setUp() {
         BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
-        BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        BacktraceDatabase database =
+                new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
     }
@@ -102,7 +108,8 @@ public class BacktraceClientMetricsTest {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 1;
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+        backtraceClient.metrics.enable(
+                new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -113,7 +120,9 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                assertEquals(mockUniqueRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
+                assertEquals(
+                        mockUniqueRequestHandler.numAttempts - 1,
+                        result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
@@ -123,7 +132,9 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
+                assertEquals(
+                        mockSummedRequestHandler.numAttempts - 1,
+                        result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
@@ -162,7 +173,9 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                assertEquals(mockUniqueRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
+                assertEquals(
+                        mockUniqueRequestHandler.numAttempts - 1,
+                        result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
@@ -173,7 +186,9 @@ public class BacktraceClientMetricsTest {
         backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
+                assertEquals(
+                        mockSummedRequestHandler.numAttempts - 1,
+                        result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
@@ -183,7 +198,8 @@ public class BacktraceClientMetricsTest {
 
         // Enabling metrics will automatically send startup events
         final int timeBetweenRetriesMillis = 1;
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+        backtraceClient.metrics.enable(
+                new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
         try {
             waiter.await(5, TimeUnit.SECONDS, 2);
@@ -235,7 +251,8 @@ public class BacktraceClientMetricsTest {
 
         assertEquals(1, mockRequestHandler.numAttempts);
         assertFalse(mockRequestHandler.lastEventPayloadJson.isEmpty());
-        assertEquals(maximumNumberOfEvents, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(
+                maximumNumberOfEvents, backtraceClient.metrics.getUniqueEvents().size());
     }
 
     @Test
@@ -266,7 +283,9 @@ public class BacktraceClientMetricsTest {
 
         assertEquals(0, mockRequestHandler.numAttempts);
         assertNull(mockRequestHandler.lastEventPayloadJson);
-        assertEquals(maximumNumberOfEvents - 1, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(
+                maximumNumberOfEvents - 1,
+                backtraceClient.metrics.getUniqueEvents().size());
     }
 
     @Test
@@ -338,7 +357,7 @@ public class BacktraceClientMetricsTest {
         assertEquals(0, mockRequestHandler.numAttempts);
         // We will always have startup unique event GUID
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
-        //assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
+        // assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
     }
 
     @Test
@@ -363,8 +382,11 @@ public class BacktraceClientMetricsTest {
                 JSONObject json;
                 try {
                     json = new JSONObject(eventsPayloadJsonString);
-                    JSONObject uniqueEventJson = json.getJSONArray("unique_events").getJSONObject(0);
-                    assertEquals(uniqueEventAttributeName, uniqueEventJson.getJSONArray("unique").get(0));
+                    JSONObject uniqueEventJson =
+                            json.getJSONArray("unique_events").getJSONObject(0);
+                    assertEquals(
+                            uniqueEventAttributeName,
+                            uniqueEventJson.getJSONArray("unique").get(0));
                     assertNotNull(uniqueEventJson.getJSONObject("attributes").getString("guid"));
                 } catch (Exception e) {
                     fail(e.toString());
@@ -381,7 +403,8 @@ public class BacktraceClientMetricsTest {
                 waiter.resume();
             }
         });
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0), uniqueEventAttributeName);
+        backtraceClient.metrics.enable(
+                new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0), uniqueEventAttributeName);
 
         try {
             waiter.await(5, TimeUnit.SECONDS, 2);
@@ -413,8 +436,16 @@ public class BacktraceClientMetricsTest {
                 JSONObject json;
                 try {
                     json = new JSONObject(eventsPayloadJsonString);
-                    assertEquals("guid", json.getJSONArray("unique_events").getJSONObject(0).getJSONArray("unique").get(0));
-                    assertNotNull(json.getJSONArray("unique_events").getJSONObject(0).getJSONObject("attributes").getString("guid"));
+                    assertEquals(
+                            "guid",
+                            json.getJSONArray("unique_events")
+                                    .getJSONObject(0)
+                                    .getJSONArray("unique")
+                                    .get(0));
+                    assertNotNull(json.getJSONArray("unique_events")
+                            .getJSONObject(0)
+                            .getJSONObject("attributes")
+                            .getString("guid"));
                 } catch (Exception e) {
                     fail(e.toString());
                 }
@@ -433,7 +464,9 @@ public class BacktraceClientMetricsTest {
                 JSONObject json;
                 try {
                     json = new JSONObject(eventsPayloadJsonString);
-                    assertEquals("Application Launches", json.getJSONArray("summed_events").getJSONObject(0).getString("metric_group"));
+                    assertEquals(
+                            "Application Launches",
+                            json.getJSONArray("summed_events").getJSONObject(0).getString("metric_group"));
                 } catch (Exception e) {
                     fail(e.toString());
                 }
@@ -444,7 +477,6 @@ public class BacktraceClientMetricsTest {
         });
 
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
-
 
         try {
             waiter.await(5, TimeUnit.SECONDS, 2);
@@ -460,7 +492,6 @@ public class BacktraceClientMetricsTest {
         assertEquals(1, backtraceClient.metrics.getUniqueEvents().size());
         assertEquals(0, backtraceClient.metrics.getSummedEvents().size());
     }
-
 
     @Test
     public void metricsAttributesShouldChangeIfClientAttributeChanges() {

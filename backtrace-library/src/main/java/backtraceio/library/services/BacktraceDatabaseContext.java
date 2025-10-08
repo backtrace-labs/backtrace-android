@@ -1,7 +1,12 @@
 package backtraceio.library.services;
 
 import android.content.Context;
-
+import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.interfaces.DatabaseContext;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,13 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import backtraceio.library.enums.database.RetryOrder;
-import backtraceio.library.interfaces.DatabaseContext;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.database.BacktraceDatabaseRecord;
-import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class BacktraceDatabaseContext implements DatabaseContext {
 
@@ -150,9 +148,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @return first Backtrace database record
      */
     public BacktraceDatabaseRecord first() {
-        return retryOrder == RetryOrder.Queue
-                ? getFirstRecord()
-                : getLastRecord();
+        return retryOrder == RetryOrder.Queue ? getFirstRecord() : getLastRecord();
     }
 
     /**
@@ -163,7 +159,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     public BacktraceDatabaseRecord last() {
         return this.retryOrder == RetryOrder.Queue ? getLastRecord() : getFirstRecord();
     }
-
 
     /**
      * Get all database records
@@ -186,7 +181,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     public long getDatabaseSize() {
         return this.totalSize.get();
     }
-
 
     /**
      * Delete existing record from database
@@ -219,8 +213,10 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                     this.totalSize.addAndGet(-databaseRecord.getSize());
                     return true;
                 } catch (Exception e) {
-                    BacktraceLogger.d(LOG_TAG, "Exception on removing record "
-                            + databaseRecord.id + " from db context: " + e.getMessage());
+                    BacktraceLogger.d(
+                            LOG_TAG,
+                            "Exception on removing record " + databaseRecord.id + " from db context: "
+                                    + e.getMessage());
                 }
             }
         }
@@ -288,7 +284,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
     }
 
-        /**
+    /**
      * Delete the oldest file
      *
      * @return is deletion was successful

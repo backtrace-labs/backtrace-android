@@ -5,9 +5,7 @@ public class CoronerError {
     public int code;
 
     @SuppressWarnings("unused")
-    public CoronerError() {
-
-    }
+    public CoronerError() {}
 
     @SuppressWarnings("unused")
     public CoronerError(final String message, final int code) {

@@ -1,10 +1,5 @@
 package backtraceio.library.services;
 
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.MultiFormRequestHelper;
@@ -19,6 +14,10 @@ import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.models.types.HttpException;
+import java.io.DataOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Class for sending and processing HTTP request
@@ -39,7 +38,12 @@ class BacktraceReportSender {
      * @param errorCallback event that will be executed after receiving an error from the server
      * @return information from the server about the result of processing the request
      */
-    static BacktraceResult sendReport(String serverUrl, String json, List<String> attachments, BacktraceReport report, OnServerErrorEventListener errorCallback) {
+    static BacktraceResult sendReport(
+            String serverUrl,
+            String json,
+            List<String> attachments,
+            BacktraceReport report,
+            OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
         BacktraceResult result;
 
@@ -57,8 +61,7 @@ class BacktraceReportSender {
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Cache-Control", "no-cache");
 
-            urlConnection.setRequestProperty("Content-Type",
-                    MultiFormRequestHelper.getContentType());
+            urlConnection.setRequestProperty("Content-Type", MultiFormRequestHelper.getContentType());
 
             BacktraceLogger.d(LOG_TAG, "HttpURLConnection successfully initialized");
             DataOutputStream request = new DataOutputStream(urlConnection.getOutputStream());
@@ -71,18 +74,19 @@ class BacktraceReportSender {
             request.close();
 
             int statusCode = urlConnection.getResponseCode();
-            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
+            BacktraceLogger.d(
+                    LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 final String responseJson = HttpHelper.getResponseMessage(urlConnection);
-                final BacktraceApiResult apiResult = BacktraceSerializeHelper.fromJson(responseJson, BacktraceApiResult.class);
+                final BacktraceApiResult apiResult =
+                        BacktraceSerializeHelper.fromJson(responseJson, BacktraceApiResult.class);
 
                 result = new BacktraceResult(apiResult);
                 result.setBacktraceReport(report);
             } else {
                 String message = HttpHelper.getResponseMessage(urlConnection);
-                message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
-                        urlConnection.getResponseMessage() : message;
+                message = (BacktraceStringHelper.isNullOrEmpty(message)) ? urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }
 
@@ -116,7 +120,8 @@ class BacktraceReportSender {
      * @param errorCallback event that will be executed after receiving an error from the server
      * @return information from the server about the result of processing the request
      */
-    public static EventsResult sendEvents(String serverUrl, String json, EventsPayload payload, OnServerErrorEventListener errorCallback) {
+    public static EventsResult sendEvents(
+            String serverUrl, String json, EventsPayload payload, OnServerErrorEventListener errorCallback) {
         HttpURLConnection urlConnection = null;
         EventsResult result;
         int statusCode = -1;
@@ -144,14 +149,15 @@ class BacktraceReportSender {
             request.close();
 
             statusCode = urlConnection.getResponseCode();
-            BacktraceLogger.d(LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
+            BacktraceLogger.d(
+                    LOG_TAG, "Received response status from Backtrace API for HTTP request is: " + statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                result = new EventsResult(payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);
+                result = new EventsResult(
+                        payload, urlConnection.getResponseMessage(), BacktraceResultStatus.Ok, statusCode);
             } else {
                 String message = HttpHelper.getResponseMessage(urlConnection);
-                message = (BacktraceStringHelper.isNullOrEmpty(message)) ?
-                        urlConnection.getResponseMessage() : message;
+                message = (BacktraceStringHelper.isNullOrEmpty(message)) ? urlConnection.getResponseMessage() : message;
                 throw new HttpException(statusCode, String.format("%s: %s", statusCode, message));
             }
         } catch (Exception e) {

@@ -1,12 +1,6 @@
 package backtraceio.library.services;
 
 import android.content.Context;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.common.BacktraceStringHelper;
@@ -18,42 +12,45 @@ import backtraceio.library.interfaces.Api;
 import backtraceio.library.interfaces.Metrics;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceMetricsSettings;
-import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.attributes.ReportDataBuilder;
+import backtraceio.library.models.json.BacktraceAttributes;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import org.jetbrains.annotations.NotNull;
 
 public final class BacktraceMetrics implements Metrics {
 
     /**
      * Default time interval in min
      */
-    public final static int defaultTimeIntervalInMin = 30;
+    public static final int defaultTimeIntervalInMin = 30;
 
     /**
      * Default time interval in milliseconds
      */
-    public final static long defaultTimeIntervalMs = defaultTimeIntervalInMin * 60 * 1000;
+    public static final long defaultTimeIntervalMs = defaultTimeIntervalInMin * 60 * 1000;
 
     /**
      * Maximum number of attempts
      */
-    public final static int maxNumberOfAttempts = 3;
+    public static final int maxNumberOfAttempts = 3;
 
     /**
      * Default time between retries in milliseconds
      */
-    public final static int defaultTimeBetweenRetriesMs = 10000;
+    public static final int defaultTimeBetweenRetriesMs = 10000;
 
     /**
      * Maximum time between requests in milliseconds
      */
-    public final static int maxTimeBetweenRetriesMs = 5 * 60 * 1000;
+    public static final int maxTimeBetweenRetriesMs = 5 * 60 * 1000;
 
     /**
      * Default submission url
      */
-    public final static String defaultBaseUrl = "https://events.backtrace.io/api";
+    public static final String defaultBaseUrl = "https://events.backtrace.io/api";
 
     private static final transient String LOG_TAG = BacktraceMetrics.class.getSimpleName();
 
@@ -135,7 +132,11 @@ public final class BacktraceMetrics implements Metrics {
      * @param customReportAttributes Backtrace client custom report attributes (must be nonnull)
      * @param backtraceApi           Backtrace API for metrics sending
      */
-    public BacktraceMetrics(Context context, @NotNull Map<String, Object> customReportAttributes, Api backtraceApi, BacktraceCredentials credentials) {
+    public BacktraceMetrics(
+            Context context,
+            @NotNull Map<String, Object> customReportAttributes,
+            Api backtraceApi,
+            BacktraceCredentials credentials) {
         this.context = context;
         this.customReportAttributes = customReportAttributes;
         this.backtraceApi = backtraceApi;
@@ -199,7 +200,8 @@ public final class BacktraceMetrics implements Metrics {
             BacktraceLogger.e(LOG_TAG, "Could not enable metrics, exception " + e.getMessage());
         }
         final long endMetricsSetup = DebugHelper.getCurrentTimeMillis();
-        BacktraceLogger.d(LOG_TAG, "Setup metrics integration took " + (endMetricsSetup - startMetricsSetup) + " milliseconds");
+        BacktraceLogger.d(
+                LOG_TAG, "Setup metrics integration took " + (endMetricsSetup - startMetricsSetup) + " milliseconds");
     }
 
     /**
@@ -209,9 +211,9 @@ public final class BacktraceMetrics implements Metrics {
      * Due to that, we need to have a getter that will always transform attributes to a simple format.
      */
     private Map<String, String> getClientMetricsAttributes() {
-        return ReportDataBuilder.getReportAttributes(customReportAttributes, true).getAttributes();
+        return ReportDataBuilder.getReportAttributes(customReportAttributes, true)
+                .getAttributes();
     }
-
 
     private void verifyIfMetricsAvailable() {
         if (!enabled) {
@@ -279,7 +281,8 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
+        Map<String, String> metricsAttributes =
+                ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
 
         Map<String, String> localAttributes = createLocalAttributes(metricsAttributes);
 
@@ -298,7 +301,8 @@ public final class BacktraceMetrics implements Metrics {
             }
         }
 
-        UniqueEvent uniqueEvent = new UniqueEvent(attributeName, BacktraceTimeHelper.getTimestampSeconds(), localAttributes);
+        UniqueEvent uniqueEvent =
+                new UniqueEvent(attributeName, BacktraceTimeHelper.getTimestampSeconds(), localAttributes);
         uniqueEventsHandler.events.addLast(uniqueEvent);
 
         if (count() == maximumNumberOfEvents) {
@@ -356,7 +360,8 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
 
-        Map<String, String> metricsAttributes = ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
+        Map<String, String> metricsAttributes =
+                ReportDataBuilder.getReportAttributes(attributes, true).getAttributes();
 
         SummedEvent summedEvent = new SummedEvent(metricGroupName);
         summedEvent.addAttributes(metricsAttributes);
@@ -407,7 +412,10 @@ public final class BacktraceMetrics implements Metrics {
             return false;
         }
         if (maximumNumberOfEvents > 0 && (count() + 1 > maximumNumberOfEvents)) {
-            BacktraceLogger.e(LOG_TAG, "Cannot process event, reached maximum number of events: " + maximumNumberOfEvents + " events count: " + count());
+            BacktraceLogger.e(
+                    LOG_TAG,
+                    "Cannot process event, reached maximum number of events: " + maximumNumberOfEvents
+                            + " events count: " + count());
             return false;
         }
 

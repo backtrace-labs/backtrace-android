@@ -6,11 +6,8 @@ public class CoronerApiResponse {
     public CoronerResponse response;
     public CoronerError error;
 
-
     @SuppressWarnings("unused")
-    public CoronerApiResponse() {
-
-    }
+    public CoronerApiResponse() {}
 
     @SuppressWarnings("unused")
     public CoronerApiResponse(final CoronerResponse response, final CoronerError error) {
@@ -35,6 +32,4 @@ public class CoronerApiResponse {
     public void setError(CoronerError error) {
         this.error = error;
     }
-
 }
-

@@ -4,12 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import org.junit.Test;
 
 public class BacktraceResultTest {
 

@@ -14,7 +14,7 @@ repos:
         language: system
         stages: [pre-commit]
         pass_filenames: false
-        
+
       - id: spotless-check
         name: Spotless Check
         entry: ./gradlew spotlessCheck

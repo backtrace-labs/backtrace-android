@@ -3,10 +3,9 @@ package backtraceio.library.models;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
-
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
+import org.junit.Test;
 
 public class BacktraceApiResultTest {
 
