@@ -189,7 +189,7 @@ public class UncaughtExceptionHandlerTest {
         final BacktraceClient client = new BacktraceClient(context, credentials);
         client.sendInnerExceptions(true);
         client.sendSuppressedExceptions(true);
-        
+
         final List<BacktraceData> unhandledExceptionData = new ArrayList<>();
         client.setOnRequestHandler(data -> {
             unhandledExceptionData.add(data);

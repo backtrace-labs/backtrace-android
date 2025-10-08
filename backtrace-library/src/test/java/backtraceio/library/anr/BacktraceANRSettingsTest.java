@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import backtraceio.library.watchdog.BacktraceWatchdogTimeoutException;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
 
 public class BacktraceANRSettingsTest {

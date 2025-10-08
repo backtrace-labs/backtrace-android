@@ -181,7 +181,7 @@ public interface Breadcrumbs {
      * @return true if breadcrumbs are enabled.
      */
     boolean isEnabled();
-    
+
     /**
      * Set event executed after adding a breadcrumb to the breadcrumb storage.
      *

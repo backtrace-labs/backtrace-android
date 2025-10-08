@@ -63,7 +63,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
         // GIVEN
         final TestConfig config = new TestConfig(500, 250, 150, 30000); // 30s
         final List<BacktraceDatabaseRecord> initialRecords = generateMockRecords(config.recordsState);
-        
+
         final CountDownLatch startLatch = new CountDownLatch(1);
         final ConcurrentTestState testState = new ConcurrentTestState();
 
@@ -84,7 +84,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
         assertTestResults(config, testState);
     }
 
-    private Thread createDeleteThread(CountDownLatch latch, List<BacktraceDatabaseRecord> records, 
+    private Thread createDeleteThread(CountDownLatch latch, List<BacktraceDatabaseRecord> records,
             int recordsToDelete, ConcurrentTestState state) {
         return new Thread(() -> {
             try {
@@ -136,7 +136,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
         }
     }
 
-    private void waitForThreads(Thread deleteThread, Thread addThread, Thread readThread, int waitTimeMs) 
+    private void waitForThreads(Thread deleteThread, Thread addThread, Thread readThread, int waitTimeMs)
             throws InterruptedException {
         deleteThread.join(waitTimeMs);
         addThread.join(waitTimeMs);

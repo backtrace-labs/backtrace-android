@@ -60,7 +60,7 @@ public class TestUtils {
             Map<String, Object> json1Map = g.fromJson(json1, mapType);
             Map<String, Object> json2Map = g.fromJson(json2, mapType);
             MapDifference<String, Object> x = Maps.difference(json1Map, json2Map);
-            
+
             System.out.println(Maps.difference(json1Map, json2Map));
             return false;
         }

@@ -76,7 +76,7 @@ class BacktraceReportSender {
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 final String responseJson = HttpHelper.getResponseMessage(urlConnection);
                 final BacktraceApiResult apiResult = BacktraceSerializeHelper.fromJson(responseJson, BacktraceApiResult.class);
-                
+
                 result = new BacktraceResult(apiResult);
                 result.setBacktraceReport(report);
             } else {

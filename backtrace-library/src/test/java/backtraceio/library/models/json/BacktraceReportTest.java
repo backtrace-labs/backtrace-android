@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.lang.StackTraceElement;
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.BacktraceStackFrame;

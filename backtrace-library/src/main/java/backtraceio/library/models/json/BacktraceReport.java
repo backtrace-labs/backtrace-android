@@ -271,4 +271,3 @@ public class BacktraceReport {
         return new BacktraceData.Builder(this).setAttributes(context, clientAttributes).setSymbolication(symbolication).build();
     }
 }
-

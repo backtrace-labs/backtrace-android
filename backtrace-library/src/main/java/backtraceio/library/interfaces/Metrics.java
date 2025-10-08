@@ -22,7 +22,7 @@ public interface Metrics {
      * @param defaultUniqueEventName custom session user identifier
      */
     void enable(String defaultUniqueEventName);
-    
+
     /**
      * Enable metrics
      *
@@ -37,7 +37,7 @@ public interface Metrics {
      * @param defaultUniqueEventName custom session user identifier
      */
     void enable(BacktraceMetricsSettings settings, String defaultUniqueEventName);
-    
+
     /**
      * Send all outgoing messages (unique and summed) currently queued
      */

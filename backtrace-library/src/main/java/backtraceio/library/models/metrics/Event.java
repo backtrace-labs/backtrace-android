@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.Map;
 
-import backtraceio.library.common.BacktraceStringHelper;
 
 public abstract class Event {
 

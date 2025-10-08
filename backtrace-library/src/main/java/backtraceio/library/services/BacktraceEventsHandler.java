@@ -79,7 +79,7 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         this.timeBetweenRetriesMillis = backtraceMetrics.settings.getTimeBetweenRetriesMillis();
 
         long timeIntervalMillis = backtraceMetrics.settings.getTimeIntervalMillis();
-        
+
         if (timeIntervalMillis != 0) {
             final BacktraceEventsHandler handler = this;
             handler.postDelayed(new Runnable() {

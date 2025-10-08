@@ -41,4 +41,3 @@ public interface DatabaseFileContext {
      */
     void clear();
 }
-

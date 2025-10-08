@@ -268,7 +268,7 @@ public class DeviceAttributesHelper {
         String androidId = Settings.Secure.getString(this.context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        // if the android id is not defined we want to cache at least guid 
+        // if the android id is not defined we want to cache at least guid
         // for the current session
         uuid = TextUtils.isEmpty(androidId)
                 ? UUID.randomUUID().toString()
