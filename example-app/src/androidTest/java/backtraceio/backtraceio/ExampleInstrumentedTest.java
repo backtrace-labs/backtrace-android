@@ -21,8 +21,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import backtraceio.library.logger.LogLevel;
+import org.junit.runner.RunWith;
+
 /**
  * Instrumented test, which will execute on an Android device.
  *
