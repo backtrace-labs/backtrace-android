@@ -12,7 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
 import backtraceio.library.logger.BacktraceLogger;
-
+import backtraceio.library.logger.LogLevel;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -21,7 +21,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import backtraceio.library.logger.LogLevel;
 import org.junit.runner.RunWith;
 
 /**
