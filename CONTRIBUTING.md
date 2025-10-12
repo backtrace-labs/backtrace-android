@@ -1,7 +1,7 @@
 # Contributing
-Thank you for considering contributing to Backtrace Android SDK library. Here are some guidelines to help you get started:
+Thank you for your interest in contributing to the Backtrace Android SDK. Please review the following guidelines to help you get started.
 
-### Getting Started
+## Getting Started
 
 1. **Clone the repository**
    ```bash
@@ -25,7 +25,7 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
    git submodule update --init --recursive
    ```
    
-### Coding Guidelines
+## Coding Guidelines
 
 1. **Code Formatting**
     - Make sure that your code is properly formatted using the default Android Studio formatter.
@@ -38,7 +38,7 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
 3. **Write Tests**
     - Ensure that you write tests for the new functionality or changes made. This helps maintain the integrity of the project.
 
-### Commit and Push
+## Commit and Push
 
 1. **Commit Your Changes**
     - Write clear and concise commit messages. Follow the convention of using the imperative mood in the subject line.
@@ -52,7 +52,7 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
       git push origin jira-ticket/your-feature-name
       ```
 
-### Create a Pull Request
+## Create a Pull Request
 
 1. **Submit a Pull Request**
     - Go to the repository on GitHub and click on the `New Pull Request` button.
@@ -61,8 +61,33 @@ Thank you for considering contributing to Backtrace Android SDK library. Here ar
 2. **Review Process**
     - One of the project maintainers will review your pull request. Please be responsive to any comments or suggestions made.
 
-### Additional Notes
+## Additional Notes
 
 - Ensure that your code follows the existing code style and structure.
 - Keep your branch up to date with the latest changes from the `master` branch to avoid merge conflicts.
 
+
+## Code Formatting
+
+This project uses **[Spotless](https://github.com/diffplug/spotless)** (a code formatting plugin) integrated with **[pre-commit](https://pre-commit.com/)** to ensure consistent code style and automatic formatting before each commit.
+
+### Setup Instructions
+   
+1. Run Spotless check
+This verifies that your code meets the project’s formatting standards.
+   ```bash
+   ./gradlew spotlessCheck
+   ```
+
+2. (Optional) Automatically reformat code
+If formatting issues are found, you can automatically fix them with:
+   ```bash
+   ./gradlew spotlessApply   
+   ```
+
+**Notes**
+- The pre-commit hook ensures code formatting is validated automatically before commits are created.
+- You can manually trigger all pre-commit checks at any time with:
+   ```bash
+   pre-commit run --all-files
+   ```
