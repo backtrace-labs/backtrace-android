@@ -12,20 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout submodules
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          submodules: recursive
-          token: ${{ secrets.ACCESS_TOKEN }}
-          persist-credentials: false
-
       - name: set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17.0.10
           distribution: "adopt"
           cache: gradle
+
+      - name: Check Code Style
+        run: ./gradlew spotlessCheck
 
       - name: Write to local.properties
         run: |
@@ -36,8 +31,13 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
-      - name: Check Code Style
-        run: ./gradlew spotlessCheck
+      - name: Checkout submodules
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+          persist-credentials: false
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
