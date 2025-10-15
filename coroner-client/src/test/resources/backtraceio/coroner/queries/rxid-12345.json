@@ -1,1 +1,14 @@
-{"fold":{"callstack":[["head"]],"guid":[["head"]],"classifiers":[["head"]]},"group":[["_rxid"]],"offset":0,"limit":1,"filter":[{"_rxid":[["equal","12345"]]}]}
+{
+    "filter": [{"_rxid": [[
+        "equal",
+        "12345"
+    ]]}],
+    "fold": {
+        "classifiers": [["head"]],
+        "guid": [["head"]],
+        "callstack": [["head"]]
+    },
+    "offset": 0,
+    "limit": 1,
+    "group": [["_rxid"]]
+}

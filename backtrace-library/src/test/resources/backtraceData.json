@@ -1,51 +1,43 @@
 {
-  "agent": "backtrace-android",
-  "agentVersion": "3.8.3",
-  "annotations": {
-    "Environment Variables": {
-      "SYSTEMSERVERCLASSPATH": "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar"
-    },
-    "Exception": {
-      "message": "Example test string"
-    }
-  },
-  "attributes": {
-    "application.session": "4b965773-539e-4dd3-be1b-f8ab017c2c9f"
-  },
-  "lang": "java",
-  "langVersion": "0",
-  "mainThread": "instr: androidx.test.runner.androidjunitrunner",
-  "sourceCode": {
-    "8751bea6-d6f6-48f4-9f96-1355c3408a9a": {
-      "path": "VMStack.java"
-    },
-    "27948842-7c2b-4898-a74a-ba3ca4afe814": {
-      "path": "InvokeMethod.java",
-      "startLine": 17
-    }
-  },
-  "threads": {
-    "profile saver": {
-      "fault": false,
-      "name": "profile saver",
-      "stack": []
-    },
-    "main": {
-      "fault": false,
-      "name": "main",
-      "stack": [
-        {
-          "funcName": "android.os.MessageQueue.nativePollOnce",
-          "sourceCode": "b1a3d84a-fcf3-4d10-90d5-994f1e397607"
-        },
-        {
-          "funcName": "android.os.MessageQueue.next",
-          "line": 335,
-          "sourceCode": "868c2d50-b00a-42a5-9aa0-e82cdea07bcd"
+    "mainThread": "instr: androidx.test.runner.androidjunitrunner",
+    "sourceCode": {
+        "8751bea6-d6f6-48f4-9f96-1355c3408a9a": {"path": "VMStack.java"},
+        "27948842-7c2b-4898-a74a-ba3ca4afe814": {
+            "path": "InvokeMethod.java",
+            "startLine": 17
         }
-      ]
-    }
-  },
-  "timestamp": 1720419610,
-  "uuid": "ecdf418b-3e22-4c7c-8011-c85dc2b4386f"
+    },
+    "agent": "backtrace-android",
+    "langVersion": "0",
+    "agentVersion": "3.8.3",
+    "annotations": {
+        "Environment Variables": {"SYSTEMSERVERCLASSPATH": "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar"},
+        "Exception": {"message": "Example test string"}
+    },
+    "threads": {
+        "profile saver": {
+            "stack": [],
+            "name": "profile saver",
+            "fault": false
+        },
+        "main": {
+            "stack": [
+                {
+                    "funcName": "android.os.MessageQueue.nativePollOnce",
+                    "sourceCode": "b1a3d84a-fcf3-4d10-90d5-994f1e397607"
+                },
+                {
+                    "funcName": "android.os.MessageQueue.next",
+                    "sourceCode": "868c2d50-b00a-42a5-9aa0-e82cdea07bcd",
+                    "line": 335
+                }
+            ],
+            "name": "main",
+            "fault": false
+        }
+    },
+    "attributes": {"application.session": "4b965773-539e-4dd3-be1b-f8ab017c2c9f"},
+    "lang": "java",
+    "uuid": "ecdf418b-3e22-4c7c-8011-c85dc2b4386f",
+    "timestamp": 1720419610
 }
