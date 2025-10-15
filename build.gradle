@@ -34,21 +34,17 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
+            target '**/*.java'
+            targetExclude spotlessExcludes
             palantirJavaFormat()
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
-//            target project.fileTree(project.rootDir) {
-//
-//
-//            }
-            target '**/*.java'
-            targetExclude spotlessExcludes
         }
         json {
             target '**/*.json'
-            simple()
             targetExclude spotlessExcludes
+            simple()
         }
 
         format 'gradle', {
