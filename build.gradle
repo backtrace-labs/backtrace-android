@@ -18,6 +18,10 @@ plugins {
 }
 
 def spotlessExcludes = [
+        '.github/**',
+        '.gradle/**',
+        '.idea/**',
+        'build/**',
         '**/cpp/**',
         '**/jniLibs/**',
         '**/build/**',
@@ -34,9 +38,11 @@ subprojects {
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
-            target fileTree('.') {
-                include '**/*.java'
-            }
+//            target project.fileTree(project.rootDir) {
+//
+//
+//            }
+            target '**/*.java'
             targetExclude spotlessExcludes
         }
         json {
