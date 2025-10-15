@@ -27,7 +27,13 @@ def spotlessExcludes = [
         '**/build/**',
         '**/build-*/**',
         '**/.cxx/**',
-        '**/generated/**'
+        '**/generated/**',
+        '**/libbun/**',
+        '**/breakpad-builds/**',
+        '**/crashpad/**',
+        '**/curl-builds/**',
+        '**/.clang-format',
+        '**/.clang-format/**'
 ]
 
 subprojects {
