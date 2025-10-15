@@ -22,18 +22,19 @@ def spotlessExcludes = [
         '.gradle/**',
         '.idea/**',
         'build/**',
-        '**/cpp/**',
-        '**/jniLibs/**',
         '**/build/**',
         '**/build-*/**',
         '**/.cxx/**',
         '**/generated/**',
+        '**/jniLibs/**',
         '**/libbun/**',
         '**/breakpad-builds/**',
         '**/crashpad/**',
         '**/curl-builds/**',
+        '**/cpp/**',                  // exclude all C++ source and third-party submodules
         '**/.clang-format',
-        '**/.clang-format/**'
+        '**/.clang-format/**',
+        '**/cpp/libbun/external/**',
 ]
 
 subprojects {
