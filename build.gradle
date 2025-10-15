@@ -30,11 +30,9 @@ subprojects {
                 exclude '**/build/**', '**/build-*/**', '**/.cxx/**'
             }
         }
-        format 'json', {
+        json {
             target '**/*.json'
-            leadingTabsToSpaces(2)
-            trimTrailingWhitespace()
-            endWithNewline()
+            simple()
             targetExclude('**/build/**', '**/.cxx/**', '**/generated/**')
         }
 
