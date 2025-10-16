@@ -18,6 +18,7 @@ plugins {
 }
 
 def spotlessExcludes = [
+        '**/libbun/**',
         '.github/**',
         '.gradle/**',
         '.idea/**',
