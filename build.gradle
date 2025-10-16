@@ -18,7 +18,6 @@ plugins {
 }
 
 def spotlessExcludes = [
-        '**/libbun/**',
         '.github/**',
         '.gradle/**',
         '.idea/**',
@@ -31,11 +30,7 @@ def spotlessExcludes = [
         '**/libbun/**',
         '**/breakpad-builds/**',
         '**/crashpad/**',
-        '**/curl-builds/**',
-        '**/cpp/**',                  // exclude all C++ source and third-party submodules
-        '**/.clang-format',
-        '**/.clang-format/**',
-        '**/cpp/libbun/external/**',
+        '**/cpp/**',
 ]
 
 subprojects {
