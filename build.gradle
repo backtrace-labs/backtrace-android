@@ -1,6 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-import com.diffplug.gradle.spotless.SpotlessTask
-
 buildscript {
 
     repositories {
@@ -74,10 +72,6 @@ allprojects {
         google()
         mavenCentral()
     }
-}
-
-tasks.withType(SpotlessTask).configureEach {
-    enabled = false
 }
 
 task clean(type: Delete) {
