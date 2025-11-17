@@ -117,6 +117,7 @@ jobs:
           # newest Android version
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=15.0" --region us-west-1
           # oldest Android version
+          
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=8.1" --region us-west-1
           # oldest real device (aiming for armv7 / 32bit)
           saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=9" --region us-west-1
