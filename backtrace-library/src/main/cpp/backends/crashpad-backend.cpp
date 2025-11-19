@@ -1,5 +1,6 @@
 #include "crashpad-backend.h"
 #include "handler/handler_main.h"
+#include "handler/crash_report_upload_thread.h"
 #include "backtrace-native.h"
 #include <jni.h>
 #include <libgen.h>
@@ -11,6 +12,51 @@ extern std::atomic_bool disabled;
 
 static crashpad::CrashpadClient *client;
 static std::unique_ptr<crashpad::CrashReportDatabase> database;
+
+// offline native uploads
+static std::unique_ptr<crashpad::CrashReportUploadThread> upload_thread;
+static std::string server_url;
+
+namespace {
+
+    void StartCrashpadUploadThreadIfNeeded() {
+        // Return if No DB or if the SDK is disabled
+        if (!database || disabled) {
+            return;
+        }
+
+        if (server_url.empty()) {
+            __android_log_print(
+                    ANDROID_LOG_WARN,
+                    "Backtrace-Android",
+                    "Crashpad upload thread not started: server URL is empty");
+            return;
+        }
+
+        if (upload_thread && upload_thread->is_running()) {
+            return;
+        }
+
+        crashpad::CrashReportUploadThread::Options options{};
+        // Scan the DB for pending reports
+        options.watch_pending_reports = true;
+
+        crashpad::CrashReportUploadThread::ProcessPendingReportsObservationCallback callback;
+        upload_thread = std::make_unique<crashpad::CrashReportUploadThread>(
+                database.get(),
+                server_url,
+                options,
+                callback);
+
+        upload_thread->Start();
+
+        __android_log_print(
+                ANDROID_LOG_INFO,
+                "Backtrace-Android",
+                "Started Crashpad upload thread for offline native reports");
+    }
+
+} // namespace
 
 std::vector<std::string>
 generateInitializationArguments(JNIEnv *env, jobjectArray attachmentPaths) {
@@ -141,6 +187,10 @@ bool InitializeCrashpad(jstring url,
     // Enable automated uploads.
     database->GetSettings()->SetUploadsEnabled(true);
 
+    // Process pending reports
+    server_url.assign(backtraceUrl);
+    StartCrashpadUploadThreadIfNeeded();
+
     // Start crash handler
     client = new crashpad::CrashpadClient();
 
@@ -209,6 +259,9 @@ bool InitializeCrashpadJavaCrashHandler(jstring url,
 
     // Enable automated uploads.
     database->GetSettings()->SetUploadsEnabled(true);
+
+    server_url.assign(backtraceUrl);
+    StartCrashpadUploadThreadIfNeeded();
 
     // Start crash handler
     client = new crashpad::CrashpadClient();
@@ -346,6 +399,12 @@ void DisableCrashpad() {
     // Disable automated uploads.
     database->GetSettings()->SetUploadsEnabled(false);
     disabled = true;
+
+    // Stop background upload thread
+    if (upload_thread && upload_thread->is_running()) {
+        upload_thread->Stop();
+        upload_thread.reset();
+    }
 }
 
 void ReEnableCrashpad() {
@@ -358,5 +417,10 @@ void ReEnableCrashpad() {
         }
         database->GetSettings()->SetUploadsEnabled(true);
         disabled = false;
+
+        // Restart upload thread
+        if (!server_url.empty()) {
+            StartCrashpadUploadThreadIfNeeded();
+        }
     }
 }
