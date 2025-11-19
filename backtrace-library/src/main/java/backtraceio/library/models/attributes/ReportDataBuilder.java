@@ -1,8 +1,7 @@
 package backtraceio.library.models.attributes;
 
-import java.util.Map;
-
 import backtraceio.library.common.TypeHelper;
+import java.util.Map;
 
 public class ReportDataBuilder {
 

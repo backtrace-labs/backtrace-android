@@ -7,9 +7,7 @@ public class ColumnDescElement {
     public String op;
 
     @SuppressWarnings("unused")
-    public ColumnDescElement() {
-
-    }
+    public ColumnDescElement() {}
 
     @SuppressWarnings("unused")
     public ColumnDescElement(String name, String format, String type, String op) {

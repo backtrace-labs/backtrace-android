@@ -1,7 +1,6 @@
 package backtraceio.library.models.metrics;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public final class UniqueEventsPayload extends EventsPayload<UniqueEvent> {

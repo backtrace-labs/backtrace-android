@@ -1,11 +1,6 @@
 package backtraceio.library;
 
 import android.content.Context;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import backtraceio.library.anr.AnrType;
 import backtraceio.library.anr.BacktraceANRHandler;
 import backtraceio.library.anr.BacktraceANRSettings;
@@ -17,6 +12,9 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.watchdog.BacktraceANRHandlerWatchdog;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Backtrace Java Android Client
@@ -70,7 +68,11 @@ public class BacktraceClient extends BacktraceBase {
      * @param attachments File attachment paths to consider for reports
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials, Map<String, Object> attributes, List<String> attachments) {
+    public BacktraceClient(
+            Context context,
+            BacktraceCredentials credentials,
+            Map<String, Object> attributes,
+            List<String> attachments) {
         this(context, credentials, (BacktraceDatabase) null, attributes, attachments);
     }
 
@@ -81,8 +83,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           BacktraceDatabaseSettings databaseSettings) {
+    public BacktraceClient(
+            Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings));
     }
 
@@ -94,8 +96,11 @@ public class BacktraceClient extends BacktraceBase {
      * @param databaseSettings Backtrace database settings
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           BacktraceDatabaseSettings databaseSettings, List<String> attachments) {
+    public BacktraceClient(
+            Context context,
+            BacktraceCredentials credentials,
+            BacktraceDatabaseSettings databaseSettings,
+            List<String> attachments) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attachments);
     }
 
@@ -107,8 +112,11 @@ public class BacktraceClient extends BacktraceBase {
      * @param databaseSettings Backtrace database settings
      * @param attributes       additional information about current application
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
+    public BacktraceClient(
+            Context context,
+            BacktraceCredentials credentials,
+            BacktraceDatabaseSettings databaseSettings,
+            Map<String, Object> attributes) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes);
     }
 
@@ -121,9 +129,12 @@ public class BacktraceClient extends BacktraceBase {
      * @param attributes       additional information about current application
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes,
-                           List<String> attachments) {
+    public BacktraceClient(
+            Context context,
+            BacktraceCredentials credentials,
+            BacktraceDatabaseSettings databaseSettings,
+            Map<String, Object> attributes,
+            List<String> attachments) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes, attachments);
     }
 
@@ -134,8 +145,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           Database database) {
+    public BacktraceClient(Context context, BacktraceCredentials credentials, Database database) {
         this(context, credentials, database, new HashMap<String, Object>());
     }
 
@@ -147,8 +157,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param database    Backtrace database
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           Database database, List<String> attachments) {
+    public BacktraceClient(
+            Context context, BacktraceCredentials credentials, Database database, List<String> attachments) {
         this(context, credentials, database, null, attachments);
     }
 
@@ -160,8 +170,8 @@ public class BacktraceClient extends BacktraceBase {
      * @param database    Backtrace database
      * @param attributes  additional information about current application
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           Database database, Map<String, Object> attributes) {
+    public BacktraceClient(
+            Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes) {
         this(context, credentials, database, attributes, null);
     }
 
@@ -175,9 +185,12 @@ public class BacktraceClient extends BacktraceBase {
      * @param attachments File attachment paths to consider for reports
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
-    public BacktraceClient(Context context, BacktraceCredentials credentials,
-                           Database database, Map<String, Object> attributes,
-                           List<String> attachments) {
+    public BacktraceClient(
+            Context context,
+            BacktraceCredentials credentials,
+            Database database,
+            Map<String, Object> attributes,
+            List<String> attachments) {
         super(context, credentials, database, attributes, attachments);
     }
 
@@ -215,8 +228,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param throwable                   current throwable
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
-    public void send(Throwable throwable, OnServerResponseEventListener
-            serverResponseEventListener) {
+    public void send(Throwable throwable, OnServerResponseEventListener serverResponseEventListener) {
         this.send(throwable, null, serverResponseEventListener);
     }
 
@@ -227,8 +239,10 @@ public class BacktraceClient extends BacktraceBase {
      * @param attributes                  throwable attributes
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
-    public void send(Throwable throwable, Map<String, Object> attributes, OnServerResponseEventListener
-            serverResponseEventListener) {
+    public void send(
+            Throwable throwable,
+            Map<String, Object> attributes,
+            OnServerResponseEventListener serverResponseEventListener) {
         super.send(new BacktraceReport(throwable, attributes), serverResponseEventListener);
     }
 
@@ -247,8 +261,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param report                      current BacktraceReport
      * @param serverResponseEventListener event callback that will be executed after receiving a response from the server
      */
-    public void send(BacktraceReport report, OnServerResponseEventListener
-            serverResponseEventListener) {
+    public void send(BacktraceReport report, OnServerResponseEventListener serverResponseEventListener) {
         super.send(report, serverResponseEventListener);
     }
 
@@ -258,6 +271,7 @@ public class BacktraceClient extends BacktraceBase {
     public void enableAnr() {
         this.enableAnr(AnrType.Threshold);
     }
+
     public void enableAnr(AnrType anrType) {
         this.enableAnr(anrType, new BacktraceANRSettings());
     }
@@ -330,10 +344,9 @@ public class BacktraceClient extends BacktraceBase {
     public BacktraceANRHandler createBacktraceAnrHandler(AnrType anrType, BacktraceANRSettings settings) {
         if (anrType == AnrType.ApplicationExit) {
             return new BacktraceAppExitInfoSenderHandler(this, context);
-        } else if (anrType == AnrType.Threshold){
+        } else if (anrType == AnrType.Threshold) {
             return new BacktraceANRHandlerWatchdog(this, settings.getTimeout(), settings.isDebug());
         }
         throw new IllegalArgumentException("Unsupported type of ANR: " + anrType.name());
     }
-
 }

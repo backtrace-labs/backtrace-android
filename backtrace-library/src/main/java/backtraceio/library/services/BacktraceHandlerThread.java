@@ -5,14 +5,12 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-
-import java.util.List;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.interfaces.Api;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceDataAttachmentsFileHelper;
 import backtraceio.library.models.BacktraceResult;
+import java.util.List;
 
 public class BacktraceHandlerThread extends HandlerThread {
 
@@ -57,7 +55,8 @@ public class BacktraceHandlerThread extends HandlerThread {
 
     void sendReport(BacktraceHandlerInputReport data) {
         // Sometimes, sendReport gets called before the Looper is ready.
-        // getLooper will wait for the Looper to be ready: https://stackoverflow.com/questions/30300555/android-what-happens-after-a-handlerthread-is-started
+        // getLooper will wait for the Looper to be ready:
+        // https://stackoverflow.com/questions/30300555/android-what-happens-after-a-handlerthread-is-started
         if (mHandler == null) {
             mHandler = new BacktraceHandler(this.context, this.getLooper(), this.url);
         }
@@ -94,9 +93,10 @@ public class BacktraceHandlerThread extends HandlerThread {
             } else {
                 BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
                 String json = BacktraceSerializeHelper.toJson(mInput.data);
-                List<String> attachments = BacktraceDataAttachmentsFileHelper.getValidAttachments(this.context, mInput.data);
-                result = BacktraceReportSender.sendReport(url, json, attachments, mInput.data.getReport(),
-                        mInput.serverErrorEventListener);
+                List<String> attachments =
+                        BacktraceDataAttachmentsFileHelper.getValidAttachments(this.context, mInput.data);
+                result = BacktraceReportSender.sendReport(
+                        url, json, attachments, mInput.data.getReport(), mInput.serverErrorEventListener);
             }
 
             if (mInput.serverResponseEventListener != null) {

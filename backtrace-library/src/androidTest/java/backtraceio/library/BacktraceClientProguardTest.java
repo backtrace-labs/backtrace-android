@@ -6,41 +6,40 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientProguardTest {
     private Context context;
     private BacktraceCredentials credentials;
     private final String resultMessage = "From request handler";
-    private final Map<String, Object> attributes = new HashMap<String, Object>() {{
-        put("test", "value");
-    }};
+    private final Map<String, Object> attributes = new HashMap<String, Object>() {
+        {
+            put("test", "value");
+        }
+    };
     // For Proguard
     private final UUID proguardMappingUUID = UUID.randomUUID();
-    private final Map<String, Object> proguardAttributes = new HashMap<String, Object>() {{
-        put("symbolication_id", proguardMappingUUID.toString());
-    }};
+    private final Map<String, Object> proguardAttributes = new HashMap<String, Object>() {
+        {
+            put("symbolication_id", proguardMappingUUID.toString());
+        }
+    };
 
     @Before
     public void setUp() {
@@ -59,22 +58,21 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().message,
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage, this.proguardAttributes),
-                new OnServerResponseEventListener() {
+        backtraceClient.send(
+                new BacktraceReport(this.resultMessage, this.proguardAttributes), new OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
                         // THEN
                         assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(proguardAttributes.get("symbolication_id"),
-                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id")
-                        );
+                        assertEquals(
+                                proguardAttributes.get("symbolication_id"),
+                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id"));
                         assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
                         assertNotNull(backtraceResult.getBacktraceReport());
                         assertNull(backtraceResult.getBacktraceReport().exception);
@@ -98,22 +96,21 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().message,
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage, this.attributes),
-                new OnServerResponseEventListener() {
+        backtraceClient.send(
+                new BacktraceReport(this.resultMessage, this.attributes), new OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
                         // THEN
                         assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(attributes.get("test"),
-                                backtraceResult.getBacktraceReport().attributes.get("test")
-                        );
+                        assertEquals(
+                                attributes.get("test"),
+                                backtraceResult.getBacktraceReport().attributes.get("test"));
                         assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
                         assertNotNull(backtraceResult.getBacktraceReport());
                         assertNull(backtraceResult.getBacktraceReport().exception);
@@ -139,31 +136,30 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(
-                new Exception(this.resultMessage), this.proguardAttributes), new
-                OnServerResponseEventListener() {
+        backtraceClient.send(
+                new BacktraceReport(new Exception(this.resultMessage), this.proguardAttributes),
+                new OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
 
                         // THEN
                         assertEquals(resultMessage, backtraceResult.message);
                         assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertEquals(proguardAttributes.get("symbolication_id"),
-                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id")
-                        );
+                        assertEquals(
+                                proguardAttributes.get("symbolication_id"),
+                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id"));
                         assertNotNull(backtraceResult.getBacktraceReport());
                         assertNotNull(backtraceResult.getBacktraceReport().exception);
                         waiter.resume();
                     }
-                }
-        );
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -181,31 +177,30 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(
-                new Exception(this.resultMessage), this.attributes), new
-                OnServerResponseEventListener() {
+        backtraceClient.send(
+                new BacktraceReport(new Exception(this.resultMessage), this.attributes),
+                new OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
 
                         // THEN
                         assertEquals(resultMessage, backtraceResult.message);
                         assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertEquals(attributes.get("test"),
-                                backtraceResult.getBacktraceReport().attributes.get("test")
-                        );
+                        assertEquals(
+                                attributes.get("test"),
+                                backtraceResult.getBacktraceReport().attributes.get("test"));
                         assertNotNull(backtraceResult.getBacktraceReport());
                         assertNotNull(backtraceResult.getBacktraceReport().exception);
                         waiter.resume();
                     }
-                }
-        );
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -225,30 +220,28 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
+        backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
 
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertEquals(proguardAttributes.get("symbolication_id"),
-                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id")
-                        );
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNotNull(backtraceResult.getBacktraceReport().exception);
-                        waiter.resume();
-                    }
-                }
-        );
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertEquals(
+                        proguardAttributes.get("symbolication_id"),
+                        backtraceResult.getBacktraceReport().attributes.get("symbolication_id"));
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -267,30 +260,28 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
+        backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
 
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertEquals(proguardAttributes.get("symbolication_id"),
-                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id")
-                        );
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNotNull(backtraceResult.getBacktraceReport().exception);
-                        waiter.resume();
-                    }
-                }
-        );
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertEquals(
+                        proguardAttributes.get("symbolication_id"),
+                        backtraceResult.getBacktraceReport().attributes.get("symbolication_id"));
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -310,30 +301,27 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertEquals("proguard", data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().message,
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(resultMessage, new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
+        backtraceClient.send(resultMessage, new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
 
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(proguardAttributes.get("symbolication_id"),
-                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id")
-                        );
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNull(backtraceResult.getBacktraceReport().exception);
-                        waiter.resume();
-                    }
-                }
-        );
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(
+                        proguardAttributes.get("symbolication_id"),
+                        backtraceResult.getBacktraceReport().attributes.get("symbolication_id"));
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNull(backtraceResult.getBacktraceReport().exception);
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -352,30 +340,27 @@ public class BacktraceClientProguardTest {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
                 assertNull(data.getSymbolication());
-                return new BacktraceResult(data.getReport(), data.getReport().message,
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(resultMessage, new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
+        backtraceClient.send(resultMessage, new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
 
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(proguardAttributes.get("symbolication_id"),
-                                backtraceResult.getBacktraceReport().attributes.get("symbolication_id")
-                        );
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNull(backtraceResult.getBacktraceReport().exception);
-                        waiter.resume();
-                    }
-                }
-        );
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(
+                        proguardAttributes.get("symbolication_id"),
+                        backtraceResult.getBacktraceReport().attributes.get("symbolication_id"));
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNull(backtraceResult.getBacktraceReport().exception);
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);

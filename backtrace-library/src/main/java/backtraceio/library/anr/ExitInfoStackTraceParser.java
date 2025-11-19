@@ -2,7 +2,6 @@ package backtraceio.library.anr;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +13,7 @@ public class ExitInfoStackTraceParser {
     private static final Pattern JAVA_FRAME_PATTERN = Pattern.compile("\\s*at (.*?)\\((.*?):(\\d+)\\)");
     private static final String MAIN_THREAD_NAME = "main";
     private static final int NATIVE_STACK_ELEMENTS_NUMBER = 6;
+
     static StackTraceElement parseFrame(String frame) {
         StackTraceElement javaFrame = parseJavaFrame(frame);
         if (javaFrame != null) {
@@ -87,7 +87,7 @@ public class ExitInfoStackTraceParser {
             return parsedData;
         }
 
-            // Parse timestamp
+        // Parse timestamp
         parsedData.put("timestamp", parseTimestamp(stackTrace));
 
         // Parse PID
@@ -162,6 +162,7 @@ public class ExitInfoStackTraceParser {
         }
         return mainThreadInfo;
     }
+
     private static Map<String, Object> parseThreadInformation(String threadDump) {
         Map<String, Object> result = new HashMap<>();
 

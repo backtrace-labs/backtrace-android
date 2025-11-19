@@ -36,9 +36,6 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
-      - name: Check Code Style
-        run: ./gradlew spotlessCheck
-
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
 

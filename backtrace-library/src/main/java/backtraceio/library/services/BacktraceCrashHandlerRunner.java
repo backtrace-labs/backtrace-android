@@ -1,12 +1,10 @@
 package backtraceio.library.services;
 
 import android.util.Log;
-
-import java.util.Map;
-
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import backtraceio.library.nativeCalls.BacktraceCrashHandlerWrapper;
 import backtraceio.library.nativeCalls.SystemLoader;
+import java.util.Map;
 
 public class BacktraceCrashHandlerRunner {
     private static final String LOG_TAG = BacktraceCrashHandlerRunner.class.getSimpleName();
@@ -35,16 +33,21 @@ public class BacktraceCrashHandlerRunner {
 
         String crashHandlerLibrary = environmentVariables.get(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
         if (crashHandlerLibrary == null) {
-            Log.e(LOG_TAG, String.format("Cannot capture crash dump. Cannot find %s environment variable", CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER));
+            Log.e(
+                    LOG_TAG,
+                    String.format(
+                            "Cannot capture crash dump. Cannot find %s environment variable",
+                            CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER));
             return false;
         }
-
 
         loader.loadLibrary(crashHandlerLibrary);
 
         boolean result = crashHandler.handleCrash(args);
         if (!result) {
-            Log.e(LOG_TAG, String.format("Cannot capture crash dump. Invocation parameters: %s", String.join(" ", args)));
+            Log.e(
+                    LOG_TAG,
+                    String.format("Cannot capture crash dump. Invocation parameters: %s", String.join(" ", args)));
             return false;
         }
 

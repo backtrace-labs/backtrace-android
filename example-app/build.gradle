@@ -27,7 +27,7 @@ android {
             version "3.31.6"
         }
     }
-    
+
     // Needed until we migrate to AndroidX
     android {
         lintOptions {

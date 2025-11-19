@@ -1,11 +1,7 @@
-{
-  "data": {
-    "8751bea6-d6f6-48f4-9f96-1355c3408a9a": {
-      "path": "VMStack.java"
-    },
+{"data": {
+    "8751bea6-d6f6-48f4-9f96-1355c3408a9a": {"path": "VMStack.java"},
     "27948842-7c2b-4898-a74a-ba3ca4afe814": {
-      "startLine": 17,
-      "path": "InvokeMethod.java"
+        "path": "InvokeMethod.java",
+        "startLine": 17
     }
-  }
-}
+}}

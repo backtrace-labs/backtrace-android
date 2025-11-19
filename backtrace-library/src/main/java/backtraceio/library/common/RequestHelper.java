@@ -1,9 +1,8 @@
 package backtraceio.library.common;
 
+import backtraceio.library.logger.BacktraceLogger;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import backtraceio.library.logger.BacktraceLogger;
 
 public class RequestHelper {
     private static final transient String LOG_TAG = RequestHelper.class.getSimpleName();

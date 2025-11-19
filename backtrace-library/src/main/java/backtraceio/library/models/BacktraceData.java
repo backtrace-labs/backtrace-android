@@ -1,12 +1,6 @@
 package backtraceio.library.models;
 
 import android.content.Context;
-
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-import java.util.Map;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.Annotations;
@@ -16,6 +10,9 @@ import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.SourceCodeData;
 import backtraceio.library.models.json.ThreadData;
 import backtraceio.library.models.json.ThreadInformation;
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Serializable Backtrace API data object
@@ -105,7 +102,6 @@ public class BacktraceData {
     @SerializedName("threads")
     Map<String, ThreadInformation> threadInformationMap;
 
-
     /**
      * Create new instance of BacktraceData
      * @deprecated
@@ -132,11 +128,19 @@ public class BacktraceData {
         this.threadInformationMap = obj.threadInformationMap;
     }
 
-    public BacktraceData(String uuid, String symbolication, long timestamp, String langVersion,
-                         String agentVersion, Map<String, String> attributes, String mainThread,
-                         String[] classifiers, BacktraceReport report, Map<String, Object> annotations,
-                         Map<String, SourceCode> sourceCode,
-                         Map<String, ThreadInformation> threadInformationMap) {
+    public BacktraceData(
+            String uuid,
+            String symbolication,
+            long timestamp,
+            String langVersion,
+            String agentVersion,
+            Map<String, String> attributes,
+            String mainThread,
+            String[] classifiers,
+            BacktraceReport report,
+            Map<String, Object> annotations,
+            Map<String, SourceCode> sourceCode,
+            Map<String, ThreadInformation> threadInformationMap) {
         this.uuid = uuid;
         this.symbolication = symbolication;
         this.timestamp = timestamp;
@@ -229,7 +233,6 @@ public class BacktraceData {
         return report;
     }
 
-
     public static class Builder {
         private final BacktraceReport report;
 
@@ -271,8 +274,7 @@ public class BacktraceData {
                     this.report,
                     this.annotations,
                     this.sourceCode,
-                    this.threadInformationMap
-            );
+                    this.threadInformationMap);
         }
 
         public Builder setSymbolication(String symbolication) {
@@ -286,15 +288,15 @@ public class BacktraceData {
         private Builder setDefaultReportInformation(BacktraceReport report) {
             this.uuid = report.uuid.toString();
             this.timestamp = report.timestamp;
-            this.classifiers = report.exceptionTypeReport ? new String[]{report.classifier} : null;
+            this.classifiers = report.exceptionTypeReport ? new String[] {report.classifier} : null;
             this.langVersion = System.getProperty("java.version");
             this.agentVersion = BacktraceClient.version;
             return this;
         }
 
         /**
-        * Set information about all threads
-        */
+         * Set information about all threads
+         */
         private Builder setDefaultThreadsInformation() {
             BacktraceLogger.d(LOG_TAG, "Setting threads information");
 
@@ -309,10 +311,7 @@ public class BacktraceData {
 
         public Builder setAttributes(Context context, Map<String, Object> clientAttributes) {
             BacktraceLogger.d(LOG_TAG, "Setting attributes");
-            BacktraceAttributes backtraceAttributes = new BacktraceAttributes(
-                    context,
-                    this.report,
-                    clientAttributes);
+            BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, this.report, clientAttributes);
             this.attributes = backtraceAttributes.attributes;
 
             setAnnotations(backtraceAttributes.getComplexAttributes());
@@ -323,8 +322,7 @@ public class BacktraceData {
             BacktraceLogger.d(LOG_TAG, "Setting annotations");
             Object exceptionMessage = null;
 
-            if (this.attributes != null &&
-                    this.attributes.containsKey("error.message")) {
+            if (this.attributes != null && this.attributes.containsKey("error.message")) {
                 exceptionMessage = this.attributes.get("error.message");
             }
             this.annotations = Annotations.getAnnotations(exceptionMessage, complexAttributes);

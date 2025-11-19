@@ -4,21 +4,18 @@ import static junit.framework.TestCase.assertEquals;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.common.FileHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecordWriter;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseRecordWriterTest {
@@ -29,7 +26,10 @@ public class BacktraceDatabaseRecordWriterTest {
 
     @Before
     public void setUp() {
-        this.dbPath = InstrumentationRegistry.getInstrumentation().getContext().getFilesDir().getAbsolutePath();
+        this.dbPath = InstrumentationRegistry.getInstrumentation()
+                .getContext()
+                .getFilesDir()
+                .getAbsolutePath();
         this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 0, 0);
         this.databaseFileContext.clear();
         this.databaseRecordWriter = new BacktraceDatabaseRecordWriter(this.dbPath);
@@ -61,7 +61,8 @@ public class BacktraceDatabaseRecordWriterTest {
     public void writeObject() throws Exception {
         // GIVEN
         Exception exception = new Exception("Example message");
-        StackTraceElement element = new StackTraceElement("Exception.class", "writeObject", "BacktraceDatabaseRecordWriterTest.java", 1);
+        StackTraceElement element =
+                new StackTraceElement("Exception.class", "writeObject", "BacktraceDatabaseRecordWriterTest.java", 1);
         StackTraceElement[] stackTraceElements = new StackTraceElement[1];
         stackTraceElements[0] = element;
         exception.setStackTrace(stackTraceElements);

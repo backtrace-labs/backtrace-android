@@ -32,10 +32,11 @@ public class BacktraceHandlerInputEvents extends BacktraceHandlerInput {
      * @param serverErrorEventListener            event callback that will be executed after receiving an error from the server
      * @param eventsRequestHandler                event callback which will be executed instead of default sending report to Backtrace server
      */
-    public BacktraceHandlerInputEvents(EventsPayload payload,
-                                       EventsOnServerResponseEventListener eventsOnServerResponseEventListener,
-                                       OnServerErrorEventListener serverErrorEventListener,
-                                       EventsRequestHandler eventsRequestHandler) {
+    public BacktraceHandlerInputEvents(
+            EventsPayload payload,
+            EventsOnServerResponseEventListener eventsOnServerResponseEventListener,
+            OnServerErrorEventListener serverErrorEventListener,
+            EventsRequestHandler eventsRequestHandler) {
         super(serverErrorEventListener);
         this.payload = payload;
         this.eventsOnServerResponseEventListener = eventsOnServerResponseEventListener;

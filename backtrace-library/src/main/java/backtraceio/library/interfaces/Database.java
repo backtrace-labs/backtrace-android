@@ -1,13 +1,12 @@
 package backtraceio.library.interfaces;
 
-import java.util.Map;
-
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import java.util.Map;
 
 public interface Database {
     /**
@@ -54,7 +53,8 @@ public interface Database {
      * @param isProguardEnabled
      * @return
      */
-    BacktraceDatabaseRecord add(BacktraceReport backtraceReport, Map<String, Object> attributes, boolean isProguardEnabled);
+    BacktraceDatabaseRecord add(
+            BacktraceReport backtraceReport, Map<String, Object> attributes, boolean isProguardEnabled);
 
     /**
      * @return
@@ -95,8 +95,8 @@ public interface Database {
      * @param credentials               Backtrace credentials
      * @param enableClientSideUnwinding Enable client side unwinding
      */
-    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
-                                   boolean enableClientSideUnwinding);
+    Boolean setupNativeIntegration(
+            BacktraceBase client, BacktraceCredentials credentials, boolean enableClientSideUnwinding);
 
     /**
      * Setup native crash handler
@@ -106,8 +106,11 @@ public interface Database {
      * @param enableClientSideUnwinding Enable client side unwinding
      * @param unwindingMode             Unwinding mode to use for client side unwinding
      */
-    Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
-                                   boolean enableClientSideUnwinding, UnwindingMode unwindingMode);
+    Boolean setupNativeIntegration(
+            BacktraceBase client,
+            BacktraceCredentials credentials,
+            boolean enableClientSideUnwinding,
+            UnwindingMode unwindingMode);
 
     /**
      * Disable native crash handler

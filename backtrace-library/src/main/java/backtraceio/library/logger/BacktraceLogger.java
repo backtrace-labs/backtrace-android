@@ -26,7 +26,7 @@ public class BacktraceLogger {
 
     public static void setLogger(@NotNull Logger logger) {
         if (logger == null) {
-           throw new IllegalArgumentException("Passed custom logger implementation can`t be null");
+            throw new IllegalArgumentException("Passed custom logger implementation can`t be null");
         }
         BacktraceLogger.logger = logger;
     }

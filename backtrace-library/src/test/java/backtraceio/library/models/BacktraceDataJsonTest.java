@@ -6,22 +6,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import androidx.annotation.NonNull;
-
-import com.google.common.collect.ImmutableMap;
-
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.json.SourceCode;
 import backtraceio.library.models.json.ThreadInformation;
+import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.Test;
 
 public class BacktraceDataJsonTest {
     private final String JSON_FILE = "backtraceData.json";
+
     @Test
     public void serialize() {
         // GIVEN
@@ -38,26 +35,32 @@ public class BacktraceDataJsonTest {
 
     @NonNull
     private static BacktraceData createTestBacktraceDataObject() {
-        final Map<String, String> attributes = ImmutableMap.of("application.session", "4b965773-539e-4dd3-be1b-f8ab017c2c9f");
+        final Map<String, String> attributes =
+                ImmutableMap.of("application.session", "4b965773-539e-4dd3-be1b-f8ab017c2c9f");
 
         // GIVEN annotations
         final Map<String, Object> annotations = ImmutableMap.of(
-                "Environment Variables", ImmutableMap.of("SYSTEMSERVERCLASSPATH", "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar"),
-                "Exception", ImmutableMap.of("message", "Example test string")
-        );
+                "Environment Variables",
+                        ImmutableMap.of(
+                                "SYSTEMSERVERCLASSPATH",
+                                "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar"),
+                "Exception", ImmutableMap.of("message", "Example test string"));
         // GIVEN other
         final Map<String, SourceCode> sourceCode = ImmutableMap.of(
-            "8751bea6-d6f6-48f4-9f96-1355c3408a9a", new SourceCode(null, "VMStack.java"),
-            "27948842-7c2b-4898-a74a-ba3ca4afe814", new SourceCode(17, "InvokeMethod.java")
-        );
+                "8751bea6-d6f6-48f4-9f96-1355c3408a9a", new SourceCode(null, "VMStack.java"),
+                "27948842-7c2b-4898-a74a-ba3ca4afe814", new SourceCode(17, "InvokeMethod.java"));
 
         final Map<String, ThreadInformation> threadInformationMap = new HashMap<>();
 
         threadInformationMap.put("profile saver", new ThreadInformation("profile saver", false, new ArrayList<>()));
-        threadInformationMap.put("main", new ThreadInformation("main", false, new ArrayList<BacktraceStackFrame>() {{
-            add(new BacktraceStackFrame("android.os.MessageQueue.nativePollOnce", null, null, "b1a3d84a-fcf3-4d10-90d5-994f1e397607" ));
-            add(new BacktraceStackFrame("android.os.MessageQueue.next",  null, 335, "868c2d50-b00a-42a5-9aa0-e82cdea07bcd"));
-        }}));
+        threadInformationMap.put("main", new ThreadInformation("main", false, new ArrayList<BacktraceStackFrame>() {
+            {
+                add(new BacktraceStackFrame(
+                        "android.os.MessageQueue.nativePollOnce", null, null, "b1a3d84a-fcf3-4d10-90d5-994f1e397607"));
+                add(new BacktraceStackFrame(
+                        "android.os.MessageQueue.next", null, 335, "868c2d50-b00a-42a5-9aa0-e82cdea07bcd"));
+            }
+        }));
 
         // GIVEN BacktraceData
         return new BacktraceData(
@@ -72,8 +75,7 @@ public class BacktraceDataJsonTest {
                 null,
                 annotations,
                 sourceCode,
-                threadInformationMap
-        );
+                threadInformationMap);
     }
 
     @Test
@@ -96,42 +98,59 @@ public class BacktraceDataJsonTest {
         assertEquals("instr: androidx.test.runner.androidjunitrunner", obj.getMainThread());
         assertNull(obj.classifiers);
         assertEquals(2, obj.getAnnotations().size());
-        assertEquals("/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar", ((Map<String, Object>)obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
-        assertEquals("Example test string", ((Map<String, Object>)obj.getAnnotations().get("Exception")).get("message"));
+        assertEquals(
+                "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar",
+                ((Map<String, Object>) obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
+        assertEquals(
+                "Example test string",
+                ((Map<String, Object>) obj.getAnnotations().get("Exception")).get("message"));
         assertEquals(1, obj.getAttributes().size());
         assertEquals("4b965773-539e-4dd3-be1b-f8ab017c2c9f", obj.getAttributes().get("application.session"));
         assertNull(obj.getReport());
 
         // THEN source-code
         assertEquals(2, obj.getSourceCode().size());
-        assertNull(obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
-        assertEquals("VMStack.java", obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
-        assertEquals(new Integer(17), obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
-        assertEquals("InvokeMethod.java", obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
+        assertNull(
+                obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
+        assertEquals(
+                "VMStack.java",
+                obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
+        assertEquals(
+                new Integer(17),
+                obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
+        assertEquals(
+                "InvokeMethod.java",
+                obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
         assertEquals(2, obj.getThreadInformationMap().size());
 
         // THEN 'profile saver' thread
-        ThreadInformation resultProfileSaverThread = obj.getThreadInformationMap().get("profile saver");
+        ThreadInformation resultProfileSaverThread =
+                obj.getThreadInformationMap().get("profile saver");
         assertEquals(false, resultProfileSaverThread.getFault());
         assertEquals("profile saver", resultProfileSaverThread.getName());
         assertEquals(0, resultProfileSaverThread.getStack().size());
 
         // THEN 'main' thread
         ThreadInformation resultMainThread = obj.getThreadInformationMap().get("main");
-        assertEquals(false,resultMainThread.getFault());
+        assertEquals(false, resultMainThread.getFault());
         assertEquals("main", resultMainThread.getName());
         assertEquals(2, resultMainThread.getStack().size());
         assertEquals(null, resultMainThread.getStack().get(0).sourceCodeFileName);
         assertEquals(null, resultMainThread.getStack().get(0).line);
-        assertEquals("b1a3d84a-fcf3-4d10-90d5-994f1e397607", resultMainThread.getStack().get(0).sourceCode);
-        assertEquals("android.os.MessageQueue.nativePollOnce", resultMainThread.getStack().get(0).functionName);
+        assertEquals(
+                "b1a3d84a-fcf3-4d10-90d5-994f1e397607",
+                resultMainThread.getStack().get(0).sourceCode);
+        assertEquals(
+                "android.os.MessageQueue.nativePollOnce",
+                resultMainThread.getStack().get(0).functionName);
 
         assertEquals(null, resultMainThread.getStack().get(1).sourceCodeFileName);
         assertEquals(new Integer(335), resultMainThread.getStack().get(1).line);
-        assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
+        assertEquals(
+                "868c2d50-b00a-42a5-9aa0-e82cdea07bcd",
+                resultMainThread.getStack().get(1).sourceCode);
         assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
-
 
     @Test
     public void serializeAndDeserialize() {
@@ -154,39 +173,57 @@ public class BacktraceDataJsonTest {
         assertEquals("instr: androidx.test.runner.androidjunitrunner", obj.getMainThread());
         assertNull(obj.classifiers);
         assertEquals(2, obj.getAnnotations().size());
-        assertEquals("/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar", ((Map<String, Object>)obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
-        assertEquals("Example test string", ((Map<String, Object>)obj.getAnnotations().get("Exception")).get("message"));
+        assertEquals(
+                "/system/framework/com.android.location.provider.jar:/system/framework/services.jar:/system/framework/ethernet-service.jar:/apex/com.android.permission/javalib/service-permission.jar:/apex/com.android.wifi/javalib/service-wifi.jar:/apex/com.android.ipsec/javalib/android.net.ipsec.ike.jar",
+                ((Map<String, Object>) obj.getAnnotations().get("Environment Variables")).get("SYSTEMSERVERCLASSPATH"));
+        assertEquals(
+                "Example test string",
+                ((Map<String, Object>) obj.getAnnotations().get("Exception")).get("message"));
         assertEquals(1, obj.getAttributes().size());
         assertEquals("4b965773-539e-4dd3-be1b-f8ab017c2c9f", obj.getAttributes().get("application.session"));
         assertNull(obj.getReport());
 
         // THEN source-code
         assertEquals(2, obj.getSourceCode().size());
-        assertNull(obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
-        assertEquals("VMStack.java", obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
-        assertEquals(new Integer(17), obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
-        assertEquals("InvokeMethod.java", obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
+        assertNull(
+                obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getStartLine());
+        assertEquals(
+                "VMStack.java",
+                obj.getSourceCode().get("8751bea6-d6f6-48f4-9f96-1355c3408a9a").getSourceCodeFileName());
+        assertEquals(
+                new Integer(17),
+                obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getStartLine());
+        assertEquals(
+                "InvokeMethod.java",
+                obj.getSourceCode().get("27948842-7c2b-4898-a74a-ba3ca4afe814").getSourceCodeFileName());
         assertEquals(2, obj.getThreadInformationMap().size());
 
         // THEN 'profile saver' thread
-        ThreadInformation resultProfileSaverThread = obj.getThreadInformationMap().get("profile saver");
+        ThreadInformation resultProfileSaverThread =
+                obj.getThreadInformationMap().get("profile saver");
         assertEquals(false, resultProfileSaverThread.getFault());
         assertEquals("profile saver", resultProfileSaverThread.getName());
         assertEquals(0, resultProfileSaverThread.getStack().size());
 
         // THEN 'main' thread
         ThreadInformation resultMainThread = obj.getThreadInformationMap().get("main");
-        assertEquals(false,resultMainThread.getFault());
+        assertEquals(false, resultMainThread.getFault());
         assertEquals("main", resultMainThread.getName());
         assertEquals(2, resultMainThread.getStack().size());
         assertEquals(null, resultMainThread.getStack().get(0).sourceCodeFileName);
         assertEquals(null, resultMainThread.getStack().get(0).line);
-        assertEquals("b1a3d84a-fcf3-4d10-90d5-994f1e397607", resultMainThread.getStack().get(0).sourceCode);
-        assertEquals("android.os.MessageQueue.nativePollOnce", resultMainThread.getStack().get(0).functionName);
+        assertEquals(
+                "b1a3d84a-fcf3-4d10-90d5-994f1e397607",
+                resultMainThread.getStack().get(0).sourceCode);
+        assertEquals(
+                "android.os.MessageQueue.nativePollOnce",
+                resultMainThread.getStack().get(0).functionName);
 
         assertEquals(null, resultMainThread.getStack().get(1).sourceCodeFileName);
         assertEquals(new Integer(335), resultMainThread.getStack().get(1).line);
-        assertEquals("868c2d50-b00a-42a5-9aa0-e82cdea07bcd", resultMainThread.getStack().get(1).sourceCode);
+        assertEquals(
+                "868c2d50-b00a-42a5-9aa0-e82cdea07bcd",
+                resultMainThread.getStack().get(1).sourceCode);
         assertEquals("android.os.MessageQueue.next", resultMainThread.getStack().get(1).functionName);
     }
 }

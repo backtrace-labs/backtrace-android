@@ -1,11 +1,10 @@
 package backtraceio.library.services;
 
+import backtraceio.library.models.json.BacktraceReport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import backtraceio.library.models.json.BacktraceReport;
 
 public class ReportExceptionTransformer {
 
@@ -97,22 +96,17 @@ public class ReportExceptionTransformer {
     }
 
     private List<BacktraceReport> getSuppressedReports(
-            Throwable throwable,
-            Map<String, Object> attributes,
-            String exceptionTrace,
-            String parentId) {
+            Throwable throwable, Map<String, Object> attributes, String exceptionTrace, String parentId) {
         List<BacktraceReport> reports = new ArrayList<>();
         if (!this.sendSuppressedExceptions) {
             return reports;
         }
 
-        for (Throwable suppressedException :
-                throwable.getSuppressed()) {
+        for (Throwable suppressedException : throwable.getSuppressed()) {
             BacktraceReport suppressedExceptionReport = new BacktraceReport(suppressedException, attributes);
             this.extendReportWithNestedExceptionAttributes(suppressedExceptionReport, exceptionTrace, parentId);
             reports.add(suppressedExceptionReport);
         }
-
 
         return reports;
     }
@@ -124,7 +118,8 @@ public class ReportExceptionTransformer {
      * @param exceptionTrace trace id
      * @param parentId       parent id
      */
-    private void extendReportWithNestedExceptionAttributes(BacktraceReport report, String exceptionTrace, String parentId) {
+    private void extendReportWithNestedExceptionAttributes(
+            BacktraceReport report, String exceptionTrace, String parentId) {
         report.attributes.put(errorTraceAttribute, exceptionTrace);
         report.attributes.put(errorIdAttribute, report.uuid.toString());
         report.attributes.put(errorParentIdAttribute, parentId);

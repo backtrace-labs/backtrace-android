@@ -1,18 +1,16 @@
 package backtraceio.library;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import backtraceio.library.models.attributes.ReportDataAttributes;
 import backtraceio.library.models.attributes.ReportDataBuilder;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ReportDataAttributeBuilderTest {
@@ -21,11 +19,8 @@ public class ReportDataAttributeBuilderTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {"String value"},
-                {123},
-                {45.67},
-                {true},
+        return Arrays.asList(new Object[][] {
+            {"String value"}, {123}, {45.67}, {true},
         });
     }
 
@@ -57,11 +52,13 @@ public class ReportDataAttributeBuilderTest {
 
     @Test
     public void shouldSkipNullableValue() {
-        ReportDataAttributes data = ReportDataBuilder.getReportAttributes(new HashMap<String, Object>() {
-            {
-                put(key, null);
-            }
-        }, true);
+        ReportDataAttributes data = ReportDataBuilder.getReportAttributes(
+                new HashMap<String, Object>() {
+                    {
+                        put(key, null);
+                    }
+                },
+                true);
         assertNull(data.getAttributes().get(key));
     }
 }

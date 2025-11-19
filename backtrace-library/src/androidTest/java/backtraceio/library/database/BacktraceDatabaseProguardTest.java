@@ -4,17 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
+import backtraceio.library.BacktraceDatabase;
+import backtraceio.library.models.json.BacktraceReport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import backtraceio.library.BacktraceDatabase;
-import backtraceio.library.models.json.BacktraceReport;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseProguardTest {
@@ -51,7 +48,8 @@ public class BacktraceDatabaseProguardTest {
         // THEN
         assertEquals(report, database.get().iterator().next().getBacktraceData().getReport());
         assertNull(database.get().iterator().next().getBacktraceData().symbolication);
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
+        assertEquals(
+                testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
         assertEquals(1, database.count());
     }
 
@@ -69,7 +67,8 @@ public class BacktraceDatabaseProguardTest {
         // THEN
         assertEquals(report, database.get().iterator().next().getBacktraceData().getReport());
         assertEquals("proguard", database.get().iterator().next().getBacktraceData().symbolication);
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
+        assertEquals(
+                testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
         assertEquals(1, database.count());
     }
 }

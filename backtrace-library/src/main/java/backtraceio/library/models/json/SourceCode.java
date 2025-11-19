@@ -1,8 +1,7 @@
 package backtraceio.library.models.json;
 
-import com.google.gson.annotations.SerializedName;
-
 import backtraceio.library.models.BacktraceStackFrame;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Single instance of source data frame
@@ -19,7 +18,6 @@ public class SourceCode {
      */
     @SerializedName("path")
     public String sourceCodeFileName;
-
 
     public SourceCode(BacktraceStackFrame stackFrame) {
         this(stackFrame.line, stackFrame.sourceCodeFileName);

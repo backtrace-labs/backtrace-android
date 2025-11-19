@@ -3,7 +3,6 @@ package backtraceio.coroner.query;
 import static org.junit.Assert.assertEquals;
 
 import com.google.gson.JsonElement;
-
 import org.junit.Test;
 
 public class CoronerValueFilterTest {

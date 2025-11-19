@@ -3,14 +3,11 @@ package backtraceio.library;
 import static org.junit.Assert.assertTrue;
 
 import androidx.annotation.NonNull;
-
-import org.json.JSONException;
-import org.junit.Test;
-
+import backtraceio.library.common.BacktraceSerializeHelper;
 import java.util.ArrayList;
 import java.util.List;
-
-import backtraceio.library.common.BacktraceSerializeHelper;
+import org.json.JSONException;
+import org.junit.Test;
 
 public class GsonThrowableSerializationTest {
     @Test
@@ -22,9 +19,7 @@ public class GsonThrowableSerializationTest {
         String json = BacktraceSerializeHelper.toJson(exception);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedException.json")
-        );
+        String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "serializedException.json"));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -40,9 +35,8 @@ public class GsonThrowableSerializationTest {
         String json = BacktraceSerializeHelper.toJson(throwable);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedThrowableWithCause.json")
-        );
+        String expectedJson =
+                TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "serializedThrowableWithCause.json"));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -57,9 +51,7 @@ public class GsonThrowableSerializationTest {
         String json = BacktraceSerializeHelper.toJson(throwable);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedThrowable.json")
-        );
+        String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "serializedThrowable.json"));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -74,9 +66,7 @@ public class GsonThrowableSerializationTest {
         String json = BacktraceSerializeHelper.toJson(error);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedError.json")
-        );
+        String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "serializedError.json"));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -84,14 +74,14 @@ public class GsonThrowableSerializationTest {
     @Test
     public void serializeMultiCauseException() throws JSONException {
         // GIVEN
-        IllegalArgumentException e1 =  new IllegalArgumentException("1");
+        IllegalArgumentException e1 = new IllegalArgumentException("1");
         JSONException e2 = new JSONException("2", e1);
         RuntimeException e3 = new RuntimeException("3", e2);
         AssertionError e4 = new AssertionError("4", e3);
 
         Throwable[] throwableArray = {e1, e2, e3, e4};
 
-        for (Throwable t : throwableArray){
+        for (Throwable t : throwableArray) {
             t.setStackTrace(generateStackTraceElements());
         }
 
@@ -99,9 +89,8 @@ public class GsonThrowableSerializationTest {
         String json = BacktraceSerializeHelper.toJson(e4);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedMultiCauseException.json")
-        );
+        String expectedJson =
+                TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "serializedMultiCauseException.json"));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -122,9 +111,8 @@ public class GsonThrowableSerializationTest {
         String json = BacktraceSerializeHelper.toJson(e2);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, "serializedExceptionWithCause.json")
-        );
+        String expectedJson =
+                TestUtils.minifyJsonString(TestUtils.readFileAsString(this, "serializedExceptionWithCause.json"));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -139,10 +127,12 @@ public class GsonThrowableSerializationTest {
 
     @NonNull
     private static StackTraceElement[] generateStackTraceElements() {
-        List<StackTraceElement> elements = new ArrayList<StackTraceElement>() {{
-            add(new StackTraceElement("sample-class-1", "method-1", "file-name1", 100));
-            add(new StackTraceElement("sample-class-2", "method-2", "file-name2", 200));
-        }};
+        List<StackTraceElement> elements = new ArrayList<StackTraceElement>() {
+            {
+                add(new StackTraceElement("sample-class-1", "method-1", "file-name1", 100));
+                add(new StackTraceElement("sample-class-2", "method-2", "file-name2", 200));
+            }
+        };
         return elements.toArray(new StackTraceElement[0]);
     }
 }

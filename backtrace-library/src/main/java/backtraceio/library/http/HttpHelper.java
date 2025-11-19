@@ -1,12 +1,11 @@
 package backtraceio.library.http;
 
+import backtraceio.library.logger.BacktraceLogger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-
-import backtraceio.library.logger.BacktraceLogger;
 
 public class HttpHelper {
     private static final String LOG_TAG = HttpHelper.class.getSimpleName();
@@ -28,8 +27,7 @@ public class HttpHelper {
             inputStream = urlConnection.getErrorStream();
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(
-                inputStream));
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
         StringBuilder responseStringBuilder = new StringBuilder();
         String line;

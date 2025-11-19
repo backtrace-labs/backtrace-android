@@ -5,11 +5,6 @@ import static android.content.Context.RECEIVER_EXPORTED;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 import backtraceio.library.common.serialization.DebugHelper;
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
@@ -17,6 +12,9 @@ import backtraceio.library.events.OnSuccessfulBreadcrumbAddEventListener;
 import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.json.BacktraceReport;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BacktraceBreadcrumbs implements Breadcrumbs {
 
@@ -58,7 +56,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     String breadcrumbLogDirectory;
 
-    final private static String breadcrumbLogFileName = "bt-breadcrumbs-0";
+    private static final String breadcrumbLogFileName = "bt-breadcrumbs-0";
 
     public BacktraceBreadcrumbs(String breadcrumbLogDirectory) {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
@@ -122,11 +120,10 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         backtraceBroadcastReceiver = new BacktraceBroadcastReceiver(this);
 
         if (Build.VERSION.SDK_INT >= 33) {
-            context.registerReceiver(backtraceBroadcastReceiver,
-                    backtraceBroadcastReceiver.getIntentFilter(), RECEIVER_EXPORTED);
+            context.registerReceiver(
+                    backtraceBroadcastReceiver, backtraceBroadcastReceiver.getIntentFilter(), RECEIVER_EXPORTED);
         } else {
-            context.registerReceiver(backtraceBroadcastReceiver,
-                    backtraceBroadcastReceiver.getIntentFilter());
+            context.registerReceiver(backtraceBroadcastReceiver, backtraceBroadcastReceiver.getIntentFilter());
         }
     }
 
@@ -146,7 +143,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     }
 
     @Override
-    public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
+    public boolean enableBreadcrumbs(
+            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
         this.context = context;
 
         final long startEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
@@ -155,17 +153,19 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
         final long endEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
 
-        BacktraceLogger.d(LOG_TAG, "Enabling breadcrumbs took " + (endEnablingReportsTime - startEnablingReportsTime) + " milliseconds");
+        BacktraceLogger.d(
+                LOG_TAG,
+                "Enabling breadcrumbs took " + (endEnablingReportsTime - startEnablingReportsTime) + " milliseconds");
 
         return enabled;
     }
 
-    private boolean enableBreadcrumbs(EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
+    private boolean enableBreadcrumbs(
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
         if (backtraceBreadcrumbsLogManager == null) {
             try {
                 backtraceBreadcrumbsLogManager = new BacktraceBreadcrumbsLogManager(
-                        breadcrumbLogDirectory + "/" + breadcrumbLogFileName,
-                        maxBreadcrumbLogSizeBytes);
+                        breadcrumbLogDirectory + "/" + breadcrumbLogFileName, maxBreadcrumbLogSizeBytes);
             } catch (Exception ex) {
                 BacktraceLogger.e(LOG_TAG, "Could not start the Breadcrumb logger due to: " + ex.getMessage());
                 return false;
@@ -312,7 +312,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
      * @return true if the breadcrumb was successfully added
      */
     @Override
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+    public boolean addBreadcrumb(
+            String message,
+            Map<String, Object> attributes,
+            BacktraceBreadcrumbType type,
+            BacktraceBreadcrumbLevel level) {
         if (!this.isEnabled() || backtraceBreadcrumbsLogManager == null) {
             return false;
         }
@@ -359,13 +363,15 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
                 attributes.put(enabledType.toString(), "enabled");
             }
 
-            String state = (enabledBreadcrumbTypes != null &&
-                    enabledBreadcrumbTypes.contains(enabledType)) ? "enabled" : "disabled";
+            String state = (enabledBreadcrumbTypes != null && enabledBreadcrumbTypes.contains(enabledType))
+                    ? "enabled"
+                    : "disabled";
 
             attributes.put(enabledType.toString(), state);
         }
 
-        return backtraceBreadcrumbsLogManager.addBreadcrumb("Breadcrumbs configuration",
+        return backtraceBreadcrumbsLogManager.addBreadcrumb(
+                "Breadcrumbs configuration",
                 attributes,
                 BacktraceBreadcrumbType.CONFIGURATION,
                 BacktraceBreadcrumbLevel.INFO);

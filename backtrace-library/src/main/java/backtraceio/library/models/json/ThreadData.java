@@ -1,11 +1,10 @@
 package backtraceio.library.models.json;
 
+import backtraceio.library.models.BacktraceStackFrame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import backtraceio.library.models.BacktraceStackFrame;
 
 /**
  * Generate information about application threads
@@ -50,9 +49,7 @@ public class ThreadData {
     private void generateCurrentThreadInformation(List<BacktraceStackFrame> exceptionStack) {
         Thread currThread = Thread.currentThread();
         mainThread = currThread.getName().toLowerCase();
-        this.threadInformation.put(mainThread,
-                new ThreadInformation(currThread, exceptionStack, true)
-        );
+        this.threadInformation.put(mainThread, new ThreadInformation(currThread, exceptionStack, true));
     }
 
     /**
@@ -77,8 +74,7 @@ public class ThreadData {
                     stackFrame.add(BacktraceStackFrame.fromStackTraceElement(stackTraceElement));
                 }
             }
-            this.threadInformation.put(threadName, new ThreadInformation(thread, stackFrame,
-                    false));
+            this.threadInformation.put(threadName, new ThreadInformation(thread, stackFrame, false));
         }
     }
 }
