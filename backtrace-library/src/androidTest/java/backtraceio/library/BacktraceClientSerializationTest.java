@@ -9,7 +9,7 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.google.gson.annotations.SerializedName;
+import backtraceio.gson.annotations.SerializedName;
 
 import net.jodah.concurrentunit.Waiter;
 
