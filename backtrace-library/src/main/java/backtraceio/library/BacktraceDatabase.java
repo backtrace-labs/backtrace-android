@@ -43,7 +43,6 @@ import backtraceio.library.services.BacktraceDatabaseFileContext;
  */
 public class BacktraceDatabase implements Database {
 
-    private static boolean _timerBackgroundWork = false;
     private static Timer _timer;
     private transient final String LOG_TAG = BacktraceDatabase.class.getSimpleName();
     private Api BacktraceApi;
@@ -96,21 +95,25 @@ public class BacktraceDatabase implements Database {
             throw new IllegalArgumentException("Database settings or application context is null");
         }
 
-        if (databaseSettings.getDatabasePath() == null || databaseSettings.getDatabasePath().isEmpty()) {
+        if (databaseSettings.getDatabasePath() == null || databaseSettings.getDatabasePath()
+                .isEmpty()) {
             throw new IllegalArgumentException("Database path is null or empty");
         }
 
         if (!FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
             boolean createDirs = new File(databaseSettings.getDatabasePath()).mkdirs();
             if (!createDirs || !FileHelper.isFileExists(databaseSettings.getDatabasePath())) {
-                throw new IllegalArgumentException("Incorrect database path or application " + "doesn't have permission to write to this path");
+                throw new IllegalArgumentException("Incorrect database path or application " +
+                        "doesn't have permission to write to this path");
             }
         }
 
         this._applicationContext = context;
         this.databaseSettings = databaseSettings;
         this.backtraceDatabaseContext = new BacktraceDatabaseContext(databaseSettings);
-        this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(), this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
+        this.backtraceDatabaseFileContext = new BacktraceDatabaseFileContext(this.getDatabasePath(),
+                this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings
+                .getMaxRecordCount());
         this.breadcrumbs = new BacktraceBreadcrumbs(getDatabasePath());
         this.crashHandlerConfiguration = new CrashHandlerConfiguration();
     }
@@ -136,7 +139,8 @@ public class BacktraceDatabase implements Database {
      * @param credentials               Backtrace credentials
      * @param enableClientSideUnwinding Enable client side unwinding
      */
-    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials, boolean enableClientSideUnwinding) {
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding) {
         return setupNativeIntegration(client, credentials, enableClientSideUnwinding, UnwindingMode.REMOTE_DUMPWITHOUTCRASH);
     }
 
@@ -153,10 +157,10 @@ public class BacktraceDatabase implements Database {
      * @param client                    Backtrace client
      * @param credentials               Backtrace credentials
      * @param enableClientSideUnwinding Enable client side unwinding
-     * @param unwindingMode             Unwinding mode to use for client side
-     *                                  unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
      */
-    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials, boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+    public Boolean setupNativeIntegration(BacktraceBase client, BacktraceCredentials credentials,
+                                          boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
         // avoid initialization when database doesn't exist
         if (_enable == false || getSettings() == null) {
             return false;
@@ -194,7 +198,15 @@ public class BacktraceDatabase implements Database {
 
         ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
 
-        _enabledNativeIntegration = nativeCommunication.initializeJavaCrashHandler(minidumpSubmissionUrl, crashpadDatabaseDirectory, this.crashHandlerConfiguration.getClassPath(), keys, values, attachmentPaths, this.crashHandlerConfiguration.getCrashHandlerEnvironmentVariables(applicationInfo).toArray(new String[0]));
+        _enabledNativeIntegration =
+                nativeCommunication.initializeJavaCrashHandler(minidumpSubmissionUrl,
+                        crashpadDatabaseDirectory,
+                        this.crashHandlerConfiguration.getClassPath(),
+                        keys,
+                        values,
+                        attachmentPaths,
+                        this.crashHandlerConfiguration.getCrashHandlerEnvironmentVariables(applicationInfo).toArray(new String[0])
+                );
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
             this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
@@ -252,7 +264,8 @@ public class BacktraceDatabase implements Database {
 
         this.removeOrphaned();
 
-        if (databaseSettings.getRetryBehavior() == RetryBehavior.ByInterval || databaseSettings.isAutoSendMode()) {
+        if (databaseSettings.getRetryBehavior() == RetryBehavior.ByInterval || databaseSettings
+                .isAutoSendMode()) {
             setupTimer();
         }
 
@@ -274,69 +287,64 @@ public class BacktraceDatabase implements Database {
             @Override
             public void run() {
                 String dateTimeNow = Calendar.getInstance().getTime().toString();
-                BacktraceLogger.d(LOG_TAG, "Timer - " + dateTimeNow);
+                BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - " + dateTimeNow);
                 if (backtraceDatabaseContext == null) {
-                    BacktraceLogger.w(LOG_TAG, "Timer - database context is null: " + dateTimeNow);
+                    BacktraceLogger.w(LOG_TAG, "Backtrace DB Timer - database context is null: " +
+                            dateTimeNow);
                     return;
                 }
 
                 if (backtraceDatabaseContext.isEmpty()) {
-                    BacktraceLogger.d(LOG_TAG, "Timer - database is empty (no records): " + dateTimeNow);
+                    BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - database is empty (no records): " +
+                            dateTimeNow);
                     return;
                 }
 
-                if (_timerBackgroundWork) {
-                    BacktraceLogger.d(LOG_TAG, "Timer - another timer works now: " + dateTimeNow);
-                    return;
-                }
-
-                BacktraceLogger.d(LOG_TAG, "Timer - continue working: " + dateTimeNow);
-                _timerBackgroundWork = true;
-                _timer.cancel();
-                _timer.purge();
-                _timer = null;
-
-                BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
-                while (record != null) {
-                    final CountDownLatch threadWaiter = new CountDownLatch(1);
-                    BacktraceData backtraceData = record.getBacktraceData();
-                    if (backtraceData == null || backtraceData.getReport() == null) {
-                        BacktraceLogger.d(LOG_TAG, "Timer - backtrace data or report is null - " + "deleting record");
-                        delete(record);
-                    } else {
-                        final BacktraceDatabaseRecord currentRecord = record;
-                        BacktraceApi.send(backtraceData, new OnServerResponseEventListener() {
-                            @Override
-                            public void onEvent(BacktraceResult backtraceResult) {
-                                if (backtraceResult.status == BacktraceResultStatus.Ok) {
-                                    BacktraceLogger.d(LOG_TAG, "Timer - deleting record");
-                                    delete(currentRecord);
-                                } else {
-                                    BacktraceLogger.d(LOG_TAG, "Timer - closing record");
-                                    currentRecord.close();
-                                    // backtraceDatabaseContext.incrementBatchRetry(); TODO: consider another way to
-                                    // remove some records after few retries
+                try {
+                    BacktraceDatabaseRecord record = backtraceDatabaseContext.first();
+                    while (record != null) {
+                        final CountDownLatch threadWaiter = new CountDownLatch(1);
+                        BacktraceData backtraceData = record.getBacktraceData();
+                        if (backtraceData == null || backtraceData.getReport() == null) {
+                            BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - backtrace data or report is null - " +
+                                    "deleting record");
+                            delete(record);
+                        } else {
+                            final BacktraceDatabaseRecord currentRecord = record;
+                            BacktraceApi.send(backtraceData, new OnServerResponseEventListener() {
+                                @Override
+                                public void onEvent(BacktraceResult backtraceResult) {
+                                    if (backtraceResult.status == BacktraceResultStatus.Ok) {
+                                        BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - deleting record");
+                                        delete(currentRecord);
+                                    } else {
+                                        BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - closing record");
+                                        currentRecord.close();
+                                        // backtraceDatabaseContext.incrementBatchRetry(); TODO: consider another way to remove some records after few retries
+                                    }
+                                    threadWaiter.countDown();
                                 }
-                                threadWaiter.countDown();
+                            });
+                            try {
+                                threadWaiter.await();
+                            } catch (Exception ex) {
+                                BacktraceLogger.e(LOG_TAG,
+                                        "Error during waiting for result in Backtrace DB Timer", ex
+                                );
                             }
-                        });
-                        try {
-                            threadWaiter.await();
-                        } catch (Exception ex) {
-                            BacktraceLogger.e(LOG_TAG, "Error during waiting for result in Timer", ex);
+                            if (currentRecord.valid() && !currentRecord.locked) {
+                                BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - record is valid and unlocked");
+                                break;
+                            }
                         }
-                        if (currentRecord.valid() && !currentRecord.locked) {
-                            BacktraceLogger.d(LOG_TAG, "Timer - record is valid and unlocked");
-                            break;
-                        }
+                        record = backtraceDatabaseContext.first();
                     }
-                    record = backtraceDatabaseContext.first();
                 }
-                BacktraceLogger.d(LOG_TAG, "Setup new timer");
-                _timerBackgroundWork = false;
-                setupTimer();
+                catch (Exception e) {
+                    BacktraceLogger.e(LOG_TAG, "Exception in Backtrace DB timer", e);
+                }
             }
-        }, databaseSettings.getRetryInterval() * 1000L);
+        }, databaseSettings.getRetryInterval() * 1000L, databaseSettings.getRetryInterval() * 1000L);
     }
 
     public void flush() {
