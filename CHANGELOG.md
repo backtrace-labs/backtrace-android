@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 3.10.4
+- Add support for Crashpad offline native crash replay
+
 ## Version 3.10.3
 - Fix default value of ANR timeout in BacktraceANRSettings
 
