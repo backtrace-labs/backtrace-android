@@ -4,12 +4,15 @@ import android.content.pm.ApplicationInfo;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import backtraceio.library.common.AbiHelper;
 import backtraceio.library.services.BacktraceCrashHandlerRunner;
@@ -36,9 +39,42 @@ public class CrashHandlerConfiguration {
     }
 
     public List<String> getCrashHandlerEnvironmentVariables(ApplicationInfo applicationInfo) {
-        return getCrashHandlerEnvironmentVariables(applicationInfo.sourceDir, applicationInfo.nativeLibraryDir, AbiHelper.getCurrentAbi());
+        final String classPathApk = applicationInfo.sourceDir;
+        final String nativeLibraryDirPath = applicationInfo.nativeLibraryDir;
+        final String arch = AbiHelper.getCurrentAbi();
+
+        final List<String> environmentVariables = new ArrayList<>();
+
+        // system environment variables
+        for (Map.Entry<String, String> variable : System.getenv().entrySet()) {
+            environmentVariables.add(String.format("%s=%s", variable.getKey(), variable.getValue()));
+        }
+
+        // LD_LIBRARY_PATH
+        File nativeLibraryDirectory = new File(nativeLibraryDirPath);
+        File allNativeLibrariesDirectory = nativeLibraryDirectory.getParentFile();
+        String allPossibleLibrarySearchPaths = TextUtils.join(File.pathSeparator, new String[]{
+                nativeLibraryDirPath,
+                allNativeLibrariesDirectory.getPath(),
+                System.getProperty("java.library.path"),
+                "/data/local"
+        });
+
+        final String backtraceNativeLibraryPath = resolveBacktraceNativeLibraryPath(applicationInfo, arch);
+
+        environmentVariables.add(String.format("CLASSPATH=%s", classPathApk));
+        environmentVariables.add(String.format("%s=%s", BACKTRACE_CRASH_HANDLER, backtraceNativeLibraryPath));
+        environmentVariables.add(String.format("LD_LIBRARY_PATH=%s", allPossibleLibrarySearchPaths));
+        environmentVariables.add("ANDROID_DATA=/data");
+
+        return environmentVariables;
     }
 
+    /**
+     * @deprecated Prefer {@link #getCrashHandlerEnvironmentVariables(android.content.pm.ApplicationInfo)} which correctly resolves split APKs on GooglePlay/AAB installs.
+     * This method may be removed in a future release.
+     */
+    @Deprecated
     public List<String> getCrashHandlerEnvironmentVariables(String apkPath, String nativeLibraryDirPath, String arch) {
         final List<String> environmentVariables = new ArrayList<>();
 
@@ -86,4 +122,51 @@ public class CrashHandlerConfiguration {
                 ? backtraceNativeLibraryPath
                 : String.format("%s!/lib/%s/%s", apkPath, arch, BACKTRACE_NATIVE_LIBRARY_NAME);
     }
+
+    /**
+     * Resolve native lib container:
+     *   extracted dir if present,
+     *   base.apk if it contains the entry,
+     *   first split that contains the entry,
+     *   fallback to base.apk path format.
+     */
+    private String resolveBacktraceNativeLibraryPath(ApplicationInfo appInfo, String arch) {
+        final String entry = "lib/" + arch + "/" + BACKTRACE_NATIVE_LIBRARY_NAME;
+
+        // extracted dir if present
+        if (appInfo.nativeLibraryDir != null) {
+            File extracted = new File(appInfo.nativeLibraryDir, BACKTRACE_NATIVE_LIBRARY_NAME);
+            if (extracted.exists()) {
+                return extracted.getAbsolutePath();
+            }
+        }
+
+        // base.apk if it contains the lib
+        if (apkContains(appInfo.sourceDir, entry)) {
+            return appInfo.sourceDir + "!/" + entry;
+        }
+
+        // first split that contains the entry
+        if (appInfo.splitSourceDirs != null) {
+            for (String split : appInfo.splitSourceDirs) {
+                if (apkContains(split, entry)) {
+                    return split + "!/" + entry;
+                }
+            }
+        }
+
+        // fallback to base.apk path format
+        return appInfo.sourceDir + "!/" + entry;
+    }
+
+    private static boolean apkContains(String apkPath, String entry) {
+        if (apkPath == null || apkPath.isEmpty()) return false;
+        try (ZipFile zf = new ZipFile(apkPath)) {
+            ZipEntry ze = zf.getEntry(entry);
+            return ze != null;
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
+
 }
