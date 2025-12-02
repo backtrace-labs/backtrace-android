@@ -1,5 +1,8 @@
 # Backtrace Android Release Notes
 
+## Version 3.10.5
+- Fix native-library loading for AAB / split APK installs
+
 ## Version 3.10.4
 - Add support for Crashpad offline native crash replay
 
