@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.10.6
+- Improve database Timer reliability
+- Update Crashpad native library
+
 ## Version 3.10.5
 - Fix native-library loading for AAB / split APK installs
 
