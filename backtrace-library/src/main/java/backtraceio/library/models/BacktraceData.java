@@ -2,7 +2,7 @@ package backtraceio.library.models;
 
 import android.content.Context;
 
-import com.google.gson.annotations.SerializedName;
+import backtraceio.gson.annotations.SerializedName;
 
 import java.util.List;
 import java.util.Map;
