@@ -2,8 +2,10 @@ package backtraceio.library.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CollectionUtils {
     public static <T> List<T> copyList(List<T> userList) {
@@ -24,5 +26,15 @@ public class CollectionUtils {
         }
 
         return copiedMap;
+    }
+
+    public static <T> Set<T> copySet(Set<T> userSet) {
+        HashSet<T> copiedSet = new HashSet<>();
+
+        if (userSet != null) {
+            copiedSet.addAll(userSet);
+
+        }
+        return copiedSet;
     }
 }
