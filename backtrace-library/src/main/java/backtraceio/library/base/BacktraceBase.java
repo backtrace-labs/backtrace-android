@@ -2,6 +2,8 @@ package backtraceio.library.base;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -245,7 +247,7 @@ public class BacktraceBase implements Client {
         this.context = context;
         this.credentials = credentials;
         this.attributes = CollectionUtils.copyMap(attributes);
-        this.attachments = CollectionUtils.copySet(new HashSet<>(attachments));
+        this.attachments = initializeAttachments(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(this.context, credentials));
         this.database.start();
@@ -253,6 +255,14 @@ public class BacktraceBase implements Client {
     }
 
     public native void crash();
+
+    @NonNull
+    private static Set<String> initializeAttachments(List<String> attachments) {
+        if (attachments == null) {
+            return new HashSet<>();
+        }
+        return CollectionUtils.copySet(new HashSet<>(attachments));
+    }
 
     private void setBacktraceApi(Api backtraceApi) {
         this.backtraceApi = backtraceApi;
