@@ -2,8 +2,7 @@ package backtraceio.library;
 
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 
@@ -17,14 +16,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import backtraceio.library.events.OnServerResponseEventListener;
-import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
@@ -32,24 +28,14 @@ import backtraceio.library.models.types.BacktraceResultStatus;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientTest {
-    private final String resultMessage = "From request handler";
+    private static final String RESULT_MESSAGE = "From request handler";
+    private static final int WAIT_TIMEOUT_SECONDS = 3;
 
     private Context context;
     private BacktraceCredentials credentials;
-    private final List<String> initAttachments = new ArrayList<String>() {{
-        add("file1.txt");
-        add("example/file2.txt");
-    }};
-
-    private final List<String> dynamicAttachments = new ArrayList<String>() {{
-        add("file3.txt");
-        add("example2/file4.txt");
-    }};
-
-    private final List<String> reportAttachments = new ArrayList<String>() {{
-        add("file5.txt");
-        add("example3/file6.txt");
-    }};
+    private final List<String> initAttachments = Arrays.asList("file1.txt", "example/file2.txt");
+    private final List<String> dynamicAttachments = Arrays.asList("file3.txt", "example2/file4.txt");
+    private final List<String> reportAttachments = Arrays.asList("file5.txt", "example3/file6.txt");
 
     @Before
     public void setUp() {
@@ -69,225 +55,186 @@ public class BacktraceClientTest {
             client.addAttachment(attachment);
         }
 
-        final Waiter waiter = new Waiter();
+        sendReportAndWait(client, report, assertFn);
+    }
+
+    private void sendReportAndWait(BacktraceClient client, BacktraceReport report, Consumer<BacktraceData> assertFn) {
+        Waiter waiter = new Waiter();
 
         client.setOnRequestHandler(data -> {
             assertFn.accept(data);
             waiter.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
+            return createSuccessResult(data);
         });
 
         client.send(report);
+        awaitWaiter(waiter);
+    }
+
+    private BacktraceResult createSuccessResult(BacktraceData data) {
+        return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
+    }
+
+    private void awaitWaiter(Waiter waiter) {
         try {
-            waiter.await(3, TimeUnit.SECONDS);
+            waiter.await(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
 
+    private void assertAttachmentsContain(BacktraceData data, List<String> expectedAttachments) {
+        List<String> actualAttachments = data.getAttachmentPaths();
+        for (String expected : expectedAttachments) {
+            assertTrue("Expected attachment '" + expected + "' not found in " + actualAttachments,
+                    actualAttachments.contains(expected));
+        }
+    }
+
+
     @Test
     public void sendBacktraceReportWithoutAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage),
+                new BacktraceReport(RESULT_MESSAGE),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                data ->
-                        assertEquals(0, data.getAttachmentPaths().size())
-        );
+                data -> assertEquals(0, data.getAttachmentPaths().size()));
     }
 
     @Test
     public void sendBacktraceReportWithInitAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage),
+                new BacktraceReport(RESULT_MESSAGE),
                 initAttachments,
                 new ArrayList<>(),
-                data ->
-                        assertEquals(initAttachments.size(), data.getAttachmentPaths().size())
-        );
+                data -> {
+                    assertEquals(initAttachments.size(), data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, initAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithDynamicAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage),
+                new BacktraceReport(RESULT_MESSAGE),
                 new ArrayList<>(),
                 dynamicAttachments,
-                data ->
-                        assertEquals(dynamicAttachments.size(), data.getAttachmentPaths().size())
-        );
+                data -> {
+                    assertEquals(dynamicAttachments.size(), data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, dynamicAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage, reportAttachments),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                data ->
-                        assertEquals(reportAttachments.size(), data.getAttachmentPaths().size())
-        );
+                data -> {
+                    assertEquals(reportAttachments.size(), data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, reportAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithInitAndReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage, reportAttachments),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
                 initAttachments,
                 new ArrayList<>(),
-                data ->
-                        assertEquals(reportAttachments.size() + initAttachments.size(), data.getAttachmentPaths().size())
-        );
+                data -> {
+                    assertEquals(reportAttachments.size() + initAttachments.size(),
+                            data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, reportAttachments);
+                    assertAttachmentsContain(data, initAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithDynamicAndReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage, reportAttachments),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
                 new ArrayList<>(),
                 dynamicAttachments,
                 data -> {
-                    assertEquals(reportAttachments.size() + dynamicAttachments.size(), data.getAttachmentPaths().size());
-//                    assertEquals("file3.txt", data.getAttachmentPaths().get(0));
-//                    assertEquals("example2/file4.txt", data.getAttachmentPaths().get(1));
-//                    assertEquals("file1.txt", data.getAttachmentPaths().get(2));
-//                    assertEquals("example/file2.txt", data.getAttachmentPaths().get(3));
-                }
-        );
+                    assertEquals(reportAttachments.size() + dynamicAttachments.size(),
+                            data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, reportAttachments);
+                    assertAttachmentsContain(data, dynamicAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithInitAndDynamicAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage),
+                new BacktraceReport(RESULT_MESSAGE),
                 initAttachments,
                 dynamicAttachments,
                 data -> {
-                    List<String> attachments = data.getAttachmentPaths();
-                    assertEquals(initAttachments.size() + dynamicAttachments.size(), attachments.size());
-//                    assertEquals("file1.txt", attachments.get(0));
-//                    assertEquals("example/file2.txt", attachments.get(1));
-//                    assertEquals("file3.txt", attachments.get(2));
-//                    assertEquals("example2/file4.txt", attachments.get(3));
-                }
-        );
+                    assertEquals(initAttachments.size() + dynamicAttachments.size(),
+                            data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, initAttachments);
+                    assertAttachmentsContain(data, dynamicAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithInitDynamicAndReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(this.resultMessage, reportAttachments),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
                 initAttachments,
                 dynamicAttachments,
                 data -> {
-                    assertEquals(reportAttachments.size() + initAttachments.size() + dynamicAttachments.size(), data.getAttachmentPaths().size());
-//                    assertEquals("file3.txt", data.getAttachmentPaths().get(0));
-//                    assertEquals("example2/file4.txt", data.getAttachmentPaths().get(1));
-//                    assertEquals("file1.txt", data.getAttachmentPaths().get(2));
-//                    assertEquals("example/file2.txt", data.getAttachmentPaths().get(3));
-//                    assertEquals("file5.txt", data.getAttachmentPaths().get(2));
-//                    assertEquals("example3/file6.txt", data.getAttachmentPaths().get(3));
-                }
-        );
+                    assertEquals(reportAttachments.size() + initAttachments.size() + dynamicAttachments.size(),
+                            data.getAttachmentPaths().size());
+                    assertAttachmentsContain(data, reportAttachments);
+                    assertAttachmentsContain(data, initAttachments);
+                    assertAttachmentsContain(data, dynamicAttachments);
+                });
     }
 
     @Test
     public void sendBacktraceReportWithDynamicAttributesModifyDuringExecution() {
-        // SEND 1-st report
-        // GIVEN
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        final Waiter waiter = new Waiter();
+        BacktraceClient client = new BacktraceClient(context, credentials);
 
-        RequestHandler rh = data -> {
+        // Send first report with no attachments
+        sendReportAndWait(client, new BacktraceReport(RESULT_MESSAGE), data -> {
             assertEquals(0, data.getAttachmentPaths().size());
-            waiter.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
-        };
+        });
 
-        backtraceClient.setOnRequestHandler(rh);
-
-        // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage));
-        // WAIT FOR THE RESULT FROM ANOTHER THREAD
-        try {
-            waiter.await(3, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            fail(ex.getMessage());
-        }
-
-        // SEND 2-nd report
-        Waiter waiter2 = new Waiter();
-
-        backtraceClient.addAttachment("test-attachment.txt");
-
-        rh = data -> {
+        // Add attachment and send second report
+        String attachment = "test-attachment.txt";
+        client.addAttachment(attachment);
+        sendReportAndWait(client, new BacktraceReport(RESULT_MESSAGE), data -> {
             assertEquals(1, data.getAttachmentPaths().size());
-            waiter2.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
-        };
-        backtraceClient.setOnRequestHandler(rh);
-
-        // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage));
-        // WAIT FOR THE RESULT FROM ANOTHER THREAD
-        try {
-            waiter2.await(3, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            fail(ex.getMessage());
-        }
+            assertTrue("Expected attachment '" + attachment + "' not found",
+                    data.getAttachmentPaths().contains(attachment));
+        });
     }
 
     @Test
     public void sendBacktraceReportWithDynamicAttributesRemovedDuringExecution() {
-        // SEND 1-st report
-        // GIVEN
-        BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
-        backtraceClient.addAttachment("file.txt");
-        backtraceClient.addAttachment("file2.txt");
+        BacktraceClient client = new BacktraceClient(context, credentials);
+        String file1 = "file.txt";
+        String file2 = "file2.txt";
+        client.addAttachment(file1);
+        client.addAttachment(file2);
 
-        final Waiter waiter = new Waiter();
-
-        RequestHandler rh = data -> {
+        // Send first report with two attachments
+        sendReportAndWait(client, new BacktraceReport(RESULT_MESSAGE), data -> {
             assertEquals(2, data.getAttachmentPaths().size());
-            waiter.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
-        };
+            assertTrue("Expected attachment '" + file1 + "' not found",
+                    data.getAttachmentPaths().contains(file1));
+            assertTrue("Expected attachment '" + file2 + "' not found",
+                    data.getAttachmentPaths().contains(file2));
+        });
 
-        backtraceClient.setOnRequestHandler(rh);
-
-        // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage));
-        // WAIT FOR THE RESULT FROM ANOTHER THREAD
-        try {
-            waiter.await(3, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            fail(ex.getMessage());
-        }
-
-        // SEND 2-nd report
-        Waiter waiter2 = new Waiter();
-        backtraceClient.getAttachments().remove("file.txt");
-
-        rh = data -> {
+        // Remove attachment and send second report
+        client.getAttachments().remove(file1);
+        sendReportAndWait(client, new BacktraceReport(RESULT_MESSAGE), data -> {
             assertEquals(1, data.getAttachmentPaths().size());
-            assertEquals("file2.txt", data.getAttachmentPaths().get(0));
-            waiter2.resume();
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
-        };
-        backtraceClient.setOnRequestHandler(rh);
-
-        // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage));
-        // WAIT FOR THE RESULT FROM ANOTHER THREAD
-        try {
-            waiter2.await(3, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            fail(ex.getMessage());
-        }
+            assertEquals(file2, data.getAttachmentPaths().get(0));
+        });
     }
 }
