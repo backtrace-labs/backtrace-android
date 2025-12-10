@@ -27,14 +27,4 @@ public class CollectionUtils {
 
         return copiedMap;
     }
-
-    public static <T> Set<T> copySet(Set<T> userSet) {
-        HashSet<T> copiedSet = new HashSet<>();
-
-        if (userSet != null) {
-            copiedSet.addAll(userSet);
-
-        }
-        return copiedSet;
-    }
 }

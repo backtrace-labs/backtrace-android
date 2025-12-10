@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -63,7 +64,7 @@ public class BacktraceBase implements Client {
     /**
      * File attachments to attach to crashes and reports.
      */
-    private final Set<String> attachments;
+    public final List<String> attachments;
     private final BacktraceCredentials credentials;
     private final ReportExceptionTransformer reportExceptionTransformer = new ReportExceptionTransformer();
     /**
@@ -257,11 +258,11 @@ public class BacktraceBase implements Client {
     public native void crash();
 
     @NonNull
-    private static Set<String> initializeAttachments(List<String> attachments) {
+    private static List<String> initializeAttachments(List<String> attachments) {
         if (attachments == null) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
-        return CollectionUtils.copySet(new HashSet<>(attachments));
+        return CollectionUtils.copyList(attachments);
     }
 
     private void setBacktraceApi(Api backtraceApi) {
@@ -329,7 +330,7 @@ public class BacktraceBase implements Client {
      *
      * @return a set of file attachment paths
      */
-    public Set<String> getAttachments() {
+    public List<String> getAttachments() {
         return this.attachments;
     }
 
