@@ -317,8 +317,6 @@ public class BacktraceBase implements Client {
      * Add a file attachment path to be included with crash reports and submissions.
      *
      * @param attachmentPath the file path to attach to reports
-     * @note Attachments for native crashes must be specified during client
-     *       initialization and cannot be changed during runtime
      */
     public void addAttachment(String attachmentPath) {
         this.attachments.add(attachmentPath);
