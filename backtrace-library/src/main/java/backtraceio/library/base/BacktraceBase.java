@@ -2,9 +2,14 @@ package backtraceio.library.base;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -51,7 +56,8 @@ public class BacktraceBase implements Client {
      */
     public final Database database;
     /**
-     * Get custom client attributes. Every argument stored in dictionary will be send to Backtrace API
+     * Get custom client attributes. Every argument stored in dictionary will be
+     * send to Backtrace API
      */
     public final Map<String, Object> attributes;
 
@@ -98,7 +104,8 @@ public class BacktraceBase implements Client {
      * @param context     context of current state of the application
      * @param credentials Backtrace credentials to access Backtrace API
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     * @note Attachments for native crashes must be specified here, and cannot be
+     *       changed during runtime
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, List<String> attachments) {
         this(context, credentials, (Database) null, attachments);
@@ -122,9 +129,11 @@ public class BacktraceBase implements Client {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param attributes  additional information about current application
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     * @note Attachments for native crashes must be specified here, and cannot be
+     *       changed during runtime
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes, List<String> attachments) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Map<String, Object> attributes,
+            List<String> attachments) {
         this(context, credentials, (Database) null, attributes, attachments);
     }
 
@@ -135,7 +144,8 @@ public class BacktraceBase implements Client {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials,
+            BacktraceDatabaseSettings databaseSettings) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings));
     }
 
@@ -146,9 +156,11 @@ public class BacktraceBase implements Client {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      * @param attachments      File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     * @note Attachments for native crashes must be specified here, and cannot be
+     *       changed during runtime
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, List<String> attachments) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings,
+            List<String> attachments) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attachments);
     }
 
@@ -160,7 +172,8 @@ public class BacktraceBase implements Client {
      * @param databaseSettings Backtrace database settings
      * @param attributes       additional information about current application
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings,
+            Map<String, Object> attributes) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes);
     }
 
@@ -172,9 +185,11 @@ public class BacktraceBase implements Client {
      * @param databaseSettings Backtrace database settings
      * @param attributes       additional information about current application
      * @param attachments      File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     * @note Attachments for native crashes must be specified here, and cannot be
+     *       changed during runtime
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings, Map<String, Object> attributes, List<String> attachments) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, BacktraceDatabaseSettings databaseSettings,
+            Map<String, Object> attributes, List<String> attachments) {
         this(context, credentials, new BacktraceDatabase(context, databaseSettings), attributes, attachments);
     }
 
@@ -196,9 +211,11 @@ public class BacktraceBase implements Client {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     * @note Attachments for native crashes must be specified here, and cannot be
+     *       changed during runtime
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, List<String> attachments) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database,
+            List<String> attachments) {
         this(context, credentials, database, null, attachments);
     }
 
@@ -210,7 +227,8 @@ public class BacktraceBase implements Client {
      * @param database    Backtrace database
      * @param attributes  additional information about current application
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database,
+            Map<String, Object> attributes) {
         this(context, credentials, database, attributes, null);
     }
 
@@ -222,13 +240,15 @@ public class BacktraceBase implements Client {
      * @param database    Backtrace database
      * @param attributes  additional information about current application
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
+     * @note Attachments for native crashes must be specified here, and cannot be
+     *       changed during runtime
      */
-    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database, Map<String, Object> attributes, List<String> attachments) {
+    public BacktraceBase(Context context, BacktraceCredentials credentials, Database database,
+            Map<String, Object> attributes, List<String> attachments) {
         this.context = context;
         this.credentials = credentials;
         this.attributes = CollectionUtils.copyMap(attributes);
-        this.attachments = CollectionUtils.copyList(attachments);
+        this.attachments = initializeAttachments(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(this.context, credentials));
         this.database.start();
@@ -236,6 +256,14 @@ public class BacktraceBase implements Client {
     }
 
     public native void crash();
+
+    @NonNull
+    private static List<String> initializeAttachments(List<String> attachments) {
+        if (attachments == null) {
+            return new ArrayList<>();
+        }
+        return CollectionUtils.copyList(attachments);
+    }
 
     private void setBacktraceApi(Api backtraceApi) {
         this.backtraceApi = backtraceApi;
@@ -245,14 +273,16 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * Capture unhandled native exceptions (Backtrace database integration is
+     * required to enable this feature).
      */
     public void enableNativeIntegration() {
         this.database.setupNativeIntegration(this, this.credentials);
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * Capture unhandled native exceptions (Backtrace database integration is
+     * required to enable this feature).
      *
      * @param enableClientSideUnwinding Enable client side unwinding
      */
@@ -261,10 +291,12 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * Capture unhandled native exceptions (Backtrace database integration is
+     * required to enable this feature).
      *
      * @param enableClientSideUnwinding Enable client side unwinding
-     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side
+     *                                  unwinding
      */
     public void enableNativeIntegration(boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
         this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding, unwindingMode);
@@ -282,6 +314,25 @@ public class BacktraceBase implements Client {
     }
 
     /**
+     * Add a file attachment path to be included with crash reports and submissions.
+     *
+     * @param attachmentPath the file path to attach to reports
+     */
+    public void addAttachment(String attachmentPath) {
+        this.attachments.add(attachmentPath);
+    }
+
+    /**
+     * Get the set of file attachment paths that will be included with crash reports
+     * and submissions.
+     *
+     * @return a set of file attachment paths
+     */
+    public List<String> getAttachments() {
+        return this.attachments;
+    }
+
+    /**
      * Get custom attributes
      *
      * @return map with custom attributes
@@ -291,10 +342,12 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Adds a new attribute to Backtrace Client. If the native integration is enabled, adds the attribute
+     * Adds a new attribute to Backtrace Client. If the native integration is
+     * enabled, adds the attribute
      * to the native report attributes if:
      * - the value exists (is not a null)
-     * - is not an object (the attribute value is primitive type like String, or Int)
+     * - is not an object (the attribute value is primitive type like String, or
+     * Int)
      *
      * @param key   attribute name
      * @param value attribute value.
@@ -309,10 +362,12 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Adds new attributes to Backtrace Client. If the native integration is enabled, adds attributes
+     * Adds new attributes to Backtrace Client. If the native integration is
+     * enabled, adds attributes
      * to the native report attributes if:
      * - the value exists (is not a null)
-     * - is not an object (the attribute value is primitive type like String, or Int)
+     * - is not an object (the attribute value is primitive type like String, or
+     * Int)
      *
      * @param attributes Map of attributes
      */
@@ -335,7 +390,8 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Set an event executed when received bad request, unauthorize request or other information from server
+     * Set an event executed when received bad request, unauthorize request or other
+     * information from server
      *
      * @param eventListener object with method which will be executed
      */
@@ -369,13 +425,15 @@ public class BacktraceBase implements Client {
      * Enable logging of breadcrumbs and submission with crash reports
      *
      * @param context                   context of current state of the application
-     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should
+     *                                  be a power of 2
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
-     * breadcrumbs will always be enabled
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers.
+     *       User created
+     *       breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context,
-                                     int maxBreadcrumbLogSizeBytes) {
+            int maxBreadcrumbLogSizeBytes) {
         if (!isBreadcrumbsAvailable()) {
             return false;
         }
@@ -386,13 +444,15 @@ public class BacktraceBase implements Client {
      * Enable logging of breadcrumbs and submission with crash reports
      *
      * @param context                 context of current state of the application
-     * @param breadcrumbTypesToEnable a set containing which breadcrumb types to enable
+     * @param breadcrumbTypesToEnable a set containing which breadcrumb types to
+     *                                enable
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
-     * breadcrumbs will always be enabled
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers.
+     *       User created
+     *       breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context,
-                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         if (!isBreadcrumbsAvailable()) {
             return false;
         }
@@ -403,15 +463,18 @@ public class BacktraceBase implements Client {
      * Enable logging of breadcrumbs and submission with crash reports
      *
      * @param context                   context of current state of the application
-     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
-     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to
+     *                                  enable
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should
+     *                                  be a power of 2
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
-     * breadcrumbs will always be enabled
+     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers.
+     *       User created
+     *       breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context,
-                                     EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
-                                     int maxBreadcrumbLogSizeBytes) {
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes) {
         if (!isBreadcrumbsAvailable()) {
             return false;
         }
@@ -429,7 +492,8 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of type "Manual" and level "Info" with the provided message string
+     * Add a breadcrumb of type "Manual" and level "Info" with the provided message
+     * string
      *
      * @param message a message which describes this breadcrumb (1KB max)
      * @return true if the breadcrumb was successfully added
@@ -442,7 +506,8 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of type "Manual" and the desired level with the provided message string
+     * Add a breadcrumb of type "Manual" and the desired level with the provided
+     * message string
      *
      * @param message a message which describes this breadcrumb (1KB max)
      * @param level   the severity level of this breadcrumb
@@ -456,10 +521,13 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of type "Manual" and level "Info" with the provided message string and attributes
+     * Add a breadcrumb of type "Manual" and level "Info" with the provided message
+     * string and attributes
      *
      * @param message    a message which describes this breadcrumb (1KB max)
-     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param attributes key-value pairs to provide additional information about
+     *                   this breadcrumb (1KB max, including some overhead per
+     *                   key-value pair)
      * @return true if the breadcrumb was successfully added
      */
     public boolean addBreadcrumb(String message, Map<String, Object> attributes) {
@@ -470,10 +538,13 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of type "Manual" and the desired level with the provided message string and attributes
+     * Add a breadcrumb of type "Manual" and the desired level with the provided
+     * message string and attributes
      *
      * @param message    a message which describes this breadcrumb (1KB max)
-     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param attributes key-value pairs to provide additional information about
+     *                   this breadcrumb (1KB max, including some overhead per
+     *                   key-value pair)
      * @param level      the severity level of this breadcrumb
      * @return true if the breadcrumb was successfully added
      */
@@ -485,7 +556,8 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of the desired type and level "Info" with the provided message string
+     * Add a breadcrumb of the desired type and level "Info" with the provided
+     * message string
      *
      * @param message a message which describes this breadcrumb (1KB max)
      * @param type    broadly describes the category of this breadcrumb
@@ -499,7 +571,8 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of the desired level and type with the provided message string
+     * Add a breadcrumb of the desired level and type with the provided message
+     * string
      *
      * @param message a message which describes this breadcrumb (1KB max)
      * @param type    broadly describes the category of this breadcrumb
@@ -514,10 +587,13 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of the desired type and level "Info" with the provided message string and attributes
+     * Add a breadcrumb of the desired type and level "Info" with the provided
+     * message string and attributes
      *
      * @param message    a message which describes this breadcrumb (1KB max)
-     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param attributes key-value pairs to provide additional information about
+     *                   this breadcrumb (1KB max, including some overhead per
+     *                   key-value pair)
      * @param type       broadly describes the category of this breadcrumb
      * @return true if the breadcrumb was successfully added
      */
@@ -529,15 +605,19 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Add a breadcrumb of the desired level and type with the provided message string and attributes
+     * Add a breadcrumb of the desired level and type with the provided message
+     * string and attributes
      *
      * @param message    a message which describes this breadcrumb (1KB max)
-     * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
+     * @param attributes key-value pairs to provide additional information about
+     *                   this breadcrumb (1KB max, including some overhead per
+     *                   key-value pair)
      * @param type       broadly describes the category of this breadcrumb
      * @param level      the severity level of this breadcrumb
      * @return true if the breadcrumb was successfully added
      */
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type,
+            BacktraceBreadcrumbLevel level) {
         if (!isBreadcrumbsAvailable()) {
             return false;
         }
@@ -573,8 +653,8 @@ public class BacktraceBase implements Client {
      */
     public void send(BacktraceReport sourceReport, final OnServerResponseEventListener callback) {
         Breadcrumbs breadcrumbs = this.database.getBreadcrumbs();
-        for (BacktraceReport report :
-                this.reportExceptionTransformer.transformReportWithInnerExceptions(sourceReport)) {
+        for (BacktraceReport report : this.reportExceptionTransformer
+                .transformReportWithInnerExceptions(sourceReport)) {
             if (breadcrumbs != null) {
                 breadcrumbs.processReportBreadcrumbs(report);
             }
@@ -593,7 +673,8 @@ public class BacktraceBase implements Client {
         }
     }
 
-    private OnServerResponseEventListener getDatabaseCallback(final BacktraceDatabaseRecord record, final OnServerResponseEventListener customCallback) {
+    private OnServerResponseEventListener getDatabaseCallback(final BacktraceDatabaseRecord record,
+            final OnServerResponseEventListener customCallback) {
         return new OnServerResponseEventListener() {
             @Override
             public void onEvent(BacktraceResult backtraceResult) {
@@ -613,8 +694,8 @@ public class BacktraceBase implements Client {
     }
 
     private void addReportAttachments(BacktraceReport report) {
-        if (this.attachments != null) {
-            report.attachmentPaths.addAll(this.attachments);
+        if (this.getAttachments() != null) {
+            report.attachmentPaths.addAll(this.getAttachments());
         }
     }
 
@@ -622,20 +703,23 @@ public class BacktraceBase implements Client {
         return database != null && database.getBreadcrumbs() != null;
     }
 
-
     /**
-     * Determine if Reports should be generated for inner exceptions. By default the value is set to false.
+     * Determine if Reports should be generated for inner exceptions. By default the
+     * value is set to false.
      *
-     * @param sendInnerExceptions boolean flag that enabled/disable sending inner exceptions
+     * @param sendInnerExceptions boolean flag that enabled/disable sending inner
+     *                            exceptions
      */
     public void sendInnerExceptions(boolean sendInnerExceptions) {
         this.reportExceptionTransformer.sendInnerExceptions(sendInnerExceptions);
     }
 
     /**
-     * Determine if Reports should be generated for suppressed exceptions. By default the value is set to false.
+     * Determine if Reports should be generated for suppressed exceptions. By
+     * default the value is set to false.
      *
-     * @param sendSuppressedExceptions boolean flag that enabled/disable sending suppressed exceptions
+     * @param sendSuppressedExceptions boolean flag that enabled/disable sending
+     *                                 suppressed exceptions
      */
     public void sendSuppressedExceptions(boolean sendSuppressedExceptions) {
         this.reportExceptionTransformer.sendSuppressedExceptions(sendSuppressedExceptions);

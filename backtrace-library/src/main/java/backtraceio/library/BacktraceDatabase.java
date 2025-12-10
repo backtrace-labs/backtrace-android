@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
@@ -186,15 +189,9 @@ public class BacktraceDatabase implements Database {
         String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
 
         // Leave room for breadcrumbs attachment path too
-        String[] attachmentPaths = new String[client.attachments.size() + 1];
-
-        // Paths to Crashpad attachments
-        if (client.attachments != null) {
-            for (int i = 0; i < client.attachments.size(); i++) {
-                attachmentPaths[i] = client.attachments.get(i);
-            }
-        }
-        attachmentPaths[attachmentPaths.length - 1] = this.breadcrumbs.getBreadcrumbLogPath();
+        List<String> attachmentList = new ArrayList<>(client.getAttachments());
+        attachmentList.add(this.breadcrumbs.getBreadcrumbLogPath());
+        String[] attachmentPaths = attachmentList.toArray(new String[0]);
 
         ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
 
