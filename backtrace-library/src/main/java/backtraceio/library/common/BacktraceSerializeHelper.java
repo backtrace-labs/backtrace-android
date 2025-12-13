@@ -1,6 +1,6 @@
 package backtraceio.library.common;
 
-import com.google.gson.Gson;
+import backtraceio.gson.Gson;
 
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
 
