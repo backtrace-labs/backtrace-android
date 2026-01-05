@@ -114,13 +114,18 @@ mavenPublishing {
     }
 }
 
-def gsonJar = project(':gson')
-        .layout.buildDirectory.file("libs/gson-backtrace.jar")
+def shadedGsonJar = project(":gson").provider {
+    project(":gson")
+            .tasks
+            .named("shadowJar")
+            .get()
+            .archiveFile
+}
 
 dependencies {
     implementation 'com.squareup:tape:1.2.3'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation files(gsonJar)
+    implementation(files(shadedGsonJar))
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:5.19.0"
     testImplementation 'org.json:json:20250517'
@@ -132,4 +137,6 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:5.19.0"
 }
 
-tasks.preBuild.dependsOn(':gson:shadowJar')
+afterEvaluate {
+    preBuild.dependsOn(":gson:shadowJar")
+}

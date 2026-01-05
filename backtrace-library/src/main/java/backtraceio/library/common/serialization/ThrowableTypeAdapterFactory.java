@@ -17,9 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
-
-import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.logger.BacktraceLogger;
 
 public class ThrowableTypeAdapterFactory implements TypeAdapterFactory {
