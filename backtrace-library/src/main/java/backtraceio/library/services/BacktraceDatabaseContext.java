@@ -244,7 +244,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             Queue<BacktraceDatabaseRecord> records = entry.getValue();
 
             for (BacktraceDatabaseRecord databaseRecord : records) {
-                if (databaseRecord != null && databaseRecord.id == record.id) {
+                if (databaseRecord != null && databaseRecord.id.equals(record.id)) {
                     return true;
                 }
             }
@@ -336,24 +336,19 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Remove last batch
      */
     private void removeMaxRetries() {
-        Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(_retryNumber - 1);
+        Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());
 
         if (currentBatch == null) {
             this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());
             return;
         }
 
-        Iterator<BacktraceDatabaseRecord> iterator = currentBatch.iterator();
-        while (iterator.hasNext()) {
-            BacktraceDatabaseRecord record = iterator.next();
+        for (BacktraceDatabaseRecord record : currentBatch) {
             if (record.valid()) {
                 record.delete();
                 this.totalRecords.decrementAndGet();
                 totalSize.addAndGet(-record.getSize());
             }
-            // Remove record from queue whether valid or not (after max retries, it should
-            // be removed)
-            iterator.remove();
         }
     }
 
