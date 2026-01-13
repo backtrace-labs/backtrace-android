@@ -76,6 +76,10 @@ public class BacktraceBase implements Client {
      */
     protected Context context;
     /**
+     * Static attributes that don't change between reports (initialized once)
+     */
+    public final backtraceio.library.models.json.BacktraceStaticAttributes staticAttributes;
+    /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
     private Api backtraceApi;
@@ -251,6 +255,8 @@ public class BacktraceBase implements Client {
         this.attachments = initializeAttachments(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(this.context, credentials));
+        // Initialize static attributes once during SDK initialization
+        this.staticAttributes = new backtraceio.library.models.json.BacktraceStaticAttributes(this.context);
         this.database.start();
         this.metrics = new BacktraceMetrics(context, this.attributes, backtraceApi, credentials);
     }
