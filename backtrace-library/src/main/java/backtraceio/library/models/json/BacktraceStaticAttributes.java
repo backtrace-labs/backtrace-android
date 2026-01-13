@@ -19,30 +19,51 @@ import backtraceio.library.common.BacktraceStringHelper;
 /**
  * Class to hold static attributes that don't change between reports.
  * These attributes are initialized once when the SDK is initialized.
+ * This is a singleton since static attributes are the same for all instances.
  */
 public class BacktraceStaticAttributes {
-    
+
+    /**
+     * Singleton instance
+     */
+    private static volatile BacktraceStaticAttributes instance;
+
     /**
      * Cached device UUID
      */
     private static String uuid;
-    
+
     /**
      * Static attributes that remain constant for all reports
      */
     private final Map<String, String> staticAttributes = new HashMap<>();
-    
+
     /**
-     * Initialize static attributes once during SDK initialization
+     * Private constructor to enforce singleton pattern
      *
      * @param context application context
      */
-    public BacktraceStaticAttributes(Context context) {
+    private BacktraceStaticAttributes(Context context) {
         setAppInformation(context);
         setDeviceInformation(context);
         setScreenInformation(context);
     }
-    
+
+    /**
+     * Init instance of BacktraceStaticAttributes
+     *
+     * @param context application context (used only for first initialization)
+     */
+    public static void init(Context context) {
+        synchronized (BacktraceStaticAttributes.class) {
+            instance = new BacktraceStaticAttributes(context);
+        }
+    }
+
+    public static BacktraceStaticAttributes getInstance() {
+        return instance;
+    }
+
     /**
      * Set application information (package name, application name, version)
      */
@@ -60,7 +81,7 @@ public class BacktraceStaticAttributes {
         this.staticAttributes.put("backtrace.agent", "backtrace-android");
         this.staticAttributes.put("backtrace.version", BacktraceClient.version);
     }
-    
+
     /**
      * Set device information (model, brand, SDK, manufacturer, OS version, etc.)
      */
@@ -79,7 +100,7 @@ public class BacktraceStaticAttributes {
         this.staticAttributes.put("device.manufacturer", android.os.Build.MANUFACTURER);
         this.staticAttributes.put("device.os_version", System.getProperty("os.version"));
     }
-    
+
     /**
      * Generate unique identifier to unambiguously identify the device
      *
@@ -94,7 +115,7 @@ public class BacktraceStaticAttributes {
         String androidId = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        // if the android id is not defined we want to cache at least guid 
+        // if the android id is not defined we want to cache at least guid
         // for the current session
         uuid = TextUtils.isEmpty(androidId)
                 ? UUID.randomUUID().toString()
@@ -102,9 +123,10 @@ public class BacktraceStaticAttributes {
 
         return uuid;
     }
-    
+
     /**
-     * Set screen information (width, height, DPI - these represent device capabilities)
+     * Set screen information (width, height, DPI - these represent device
+     * capabilities)
      */
     private void setScreenInformation(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -115,7 +137,7 @@ public class BacktraceStaticAttributes {
         this.staticAttributes.put("screen.height", String.valueOf(metrics.heightPixels));
         this.staticAttributes.put("screen.dpi", String.valueOf(metrics.densityDpi));
     }
-    
+
     /**
      * Get all static attributes
      *

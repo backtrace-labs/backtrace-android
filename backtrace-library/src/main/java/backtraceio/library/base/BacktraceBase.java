@@ -252,11 +252,10 @@ public class BacktraceBase implements Client {
         this.context = context;
         this.credentials = credentials;
         this.attributes = CollectionUtils.copyMap(attributes);
+        BacktraceStaticAttributes.init(this.context);
         this.attachments = initializeAttachments(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(this.context, credentials));
-        // Initialize static attributes once during SDK initialization
-        this.staticAttributes = new backtraceio.library.models.json.BacktraceStaticAttributes(this.context);
         this.database.start();
         this.metrics = new BacktraceMetrics(context, this.attributes, backtraceApi, credentials);
     }

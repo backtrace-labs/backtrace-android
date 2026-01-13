@@ -40,19 +40,18 @@ public class BacktraceAttributes {
     /**
      * Create instance of Backtrace Attribute
      *
-     * @param context              application context
-     * @param report               received Backtrace report
-     * @param clientAttributes     client's attributes (report and client)
-     * @param staticAttributes     pre-initialized static attributes
+     * @param context                  application context
+     * @param report                   received Backtrace report
+     * @param clientAttributes         client's attributes (report and client)
      * @param includeDynamicAttributes whether to include dynamic attributes
      */
-    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
-            clientAttributes, BacktraceStaticAttributes staticAttributes, Boolean includeDynamicAttributes) {
+    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object> clientAttributes,
+            Boolean includeDynamicAttributes) {
         this.context = context;
-        
+
         // Start with static attributes
-        this.attributes.putAll(staticAttributes.getAttributes());
-        
+        this.attributes.putAll(BacktraceStaticAttributes.getInstance().getAttributes());
+
         if (report != null) {
             this.convertReportAttributes(report);
             this.setExceptionAttributes(report);
@@ -63,10 +62,18 @@ public class BacktraceAttributes {
         if (report != null && clientAttributes != null) {
             BacktraceReport.concatAttributes(report, clientAttributes);
         }
-        
+
         // Set session ID and dynamic attributes
         this.attributes.put("application.session", sessionId);
         setDynamicAttributes(includeDynamicAttributes);
+    }
+
+    private void setStaticAttributes() {
+        BacktraceStaticAttributes staticAttributes = BacktraceStaticAttributes.getInstance();
+        if (staticAttributes == null) {
+            return;
+        }
+        this.attributes.putAll(staticAttributes.getAttributes());
     }
 
     private void setDynamicAttributes(Boolean includeDynamicAttributes) {
@@ -103,7 +110,7 @@ public class BacktraceAttributes {
      * @param report received report
      */
     private void setExceptionAttributes(BacktraceReport report) {
-        //there is no information to analyse
+        // there is no information to analyse
         if (report == null) {
             return;
         }
@@ -143,7 +150,8 @@ public class BacktraceAttributes {
     }
 
     /**
-     * Divide report attributes into primitive and complex attributes and add to this object
+     * Divide report attributes into primitive and complex attributes and add to
+     * this object
      *
      * @param report report to extract attributes from
      */
@@ -164,7 +172,6 @@ public class BacktraceAttributes {
         this.attributes.putAll(data.getAttributes());
         this.complexAttributes.putAll(data.getAnnotations());
     }
-
 
     public Map<String, Object> getAllAttributes() {
         Map<String, Object> attributes = new HashMap<String, Object>();
