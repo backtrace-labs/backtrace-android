@@ -40,6 +40,21 @@ public class BacktraceAttributes {
     /**
      * Create instance of Backtrace Attribute
      *
+     * @param context          application context
+     * @param report           received Backtrace report
+     * @param clientAttributes client's attributes (report and client)
+     */
+    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
+            clientAttributes) {
+        this(context, report, clientAttributes, true);
+    }
+
+    public BacktraceAttributes(Context context, Map<String, Object> clientAttributes) {
+        this(context, null, clientAttributes, false);
+    }
+    /**
+     * Create instance of Backtrace Attribute
+     *
      * @param context                  application context
      * @param report                   received Backtrace report
      * @param clientAttributes         client's attributes (report and client)
