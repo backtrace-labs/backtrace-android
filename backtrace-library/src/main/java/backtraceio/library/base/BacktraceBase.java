@@ -31,6 +31,7 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.json.BacktraceStaticAttributes;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 import backtraceio.library.services.BacktraceMetrics;
@@ -75,10 +76,7 @@ public class BacktraceBase implements Client {
      * Application context
      */
     protected Context context;
-    /**
-     * Static attributes that don't change between reports (initialized once)
-     */
-    public final backtraceio.library.models.json.BacktraceStaticAttributes staticAttributes;
+
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
