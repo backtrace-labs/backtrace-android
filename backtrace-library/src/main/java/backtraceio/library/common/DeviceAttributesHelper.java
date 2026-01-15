@@ -23,18 +23,21 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.UUID;
 
+import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.BatteryState;
 import backtraceio.library.enums.BluetoothStatus;
 import backtraceio.library.enums.GpsStatus;
 import backtraceio.library.enums.LocationStatus;
 import backtraceio.library.enums.NfcStatus;
 import backtraceio.library.enums.WifiStatus;
+import backtraceio.library.logger.BacktraceLogger;
 
 /**
  * Helper class for extract a device attributes
  */
 public class DeviceAttributesHelper {
     private final Context context;
+    private transient final String LOG_TAG = DeviceAttributesHelper.class.getSimpleName();
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;
@@ -141,9 +144,7 @@ public class DeviceAttributesHelper {
      * @return measured temperature value in degrees Celsius
      */
     private float getCpuTemperature() {
-        Process p;
         try {
-
             BufferedReader reader = new BufferedReader(new FileReader("/sys/class/thermal/thermal_zone0/temp"));
             String line = reader.readLine();
             if (line == null) {
@@ -265,7 +266,7 @@ public class DeviceAttributesHelper {
             totalSize = info.totalMemory();
             usedSize = totalSize - freeSize;
         } catch (Exception e) {
-            e.printStackTrace();
+            BacktraceLogger.e(LOG_TAG, "Error during getting app used storage size", e);
         }
         return Long.toString(usedSize);
     }
