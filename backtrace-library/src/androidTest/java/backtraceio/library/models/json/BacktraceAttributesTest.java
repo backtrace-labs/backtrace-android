@@ -1,6 +1,7 @@
 package backtraceio.library.models.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -81,7 +82,6 @@ public class BacktraceAttributesTest {
         Exception resultException = (Exception) complexAttributes.get("Exception properties");
         assertEquals(ex.getMessage(), resultException.getMessage());
         assertEquals(ex.getStackTrace().length, resultException.getStackTrace().length);
-
     }
 
     @Test
@@ -100,7 +100,8 @@ public class BacktraceAttributesTest {
         
         // Dynamic attributes should NOT be included by default in this constructor 
         // because it calls this(context, null, clientAttributes, false);
-        assertTrue(!allAttributes.containsKey("screen.orientation"));
+        assertFalse(allAttributes.containsKey("screen.orientation"));
+        assertFalse(allAttributes.containsKey("screen.brightness"));
     }
 
     @Test
@@ -116,6 +117,6 @@ public class BacktraceAttributesTest {
 
         // THEN
         assertTrue(attrWithDynamic.getAllAttributes().containsKey("screen.orientation"));
-        assertTrue(!attrWithoutDynamic.getAllAttributes().containsKey("screen.orientation"));
+        assertFalse(attrWithoutDynamic.getAllAttributes().containsKey("screen.orientation"));
     }
 }

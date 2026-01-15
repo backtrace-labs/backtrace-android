@@ -83,14 +83,6 @@ public class BacktraceAttributes {
         setDynamicAttributes(includeDynamicAttributes);
     }
 
-    private void setStaticAttributes() {
-        BacktraceStaticAttributes staticAttributes = BacktraceStaticAttributes.getInstance();
-        if (staticAttributes == null) {
-            return;
-        }
-        this.attributes.putAll(staticAttributes.getAttributes());
-    }
-
     private void setDynamicAttributes(Boolean includeDynamicAttributes) {
         if (includeDynamicAttributes) {
             setDynamicDeviceInformation();
