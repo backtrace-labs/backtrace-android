@@ -102,7 +102,7 @@ public class BacktraceClientMetricsTest {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 1;
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -131,6 +131,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
         backtraceClient.metrics.send();
@@ -206,8 +207,6 @@ public class BacktraceClientMetricsTest {
     public void shouldUploadEventsWhenMaxNumEventsReached() {
         final int maximumNumberOfEvents = 3;
         final Waiter waiter = new Waiter();
-
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
@@ -222,6 +221,7 @@ public class BacktraceClientMetricsTest {
                 waiter.resume();
             }
         });
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
         for (int i = 0; i < maximumNumberOfEvents; i++) {
             backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[i]);
@@ -242,8 +242,6 @@ public class BacktraceClientMetricsTest {
     public void shouldNotUploadEventsBeforeMaxNumEventsReached() {
         final int maximumNumberOfEvents = 3;
         final Waiter waiter = new Waiter();
-
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
@@ -259,6 +257,8 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
+
         // Account for unique events startup event
         for (int i = 0; i < maximumNumberOfEvents - 2; i++) {
             backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
@@ -273,7 +273,7 @@ public class BacktraceClientMetricsTest {
     public void uploadEventsAutomatic() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
+        // Set up mock handlers BEFORE enabling metrics to capture startup events
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -300,6 +300,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
         try {
@@ -316,10 +317,8 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotUploadEventsAutomaticBeforeTime() {
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
-
         backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
@@ -330,6 +329,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
         backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         // We will always have startup unique event GUID
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
@@ -445,7 +445,6 @@ public class BacktraceClientMetricsTest {
 
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-
         try {
             waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
@@ -467,7 +466,6 @@ public class BacktraceClientMetricsTest {
         final Waiter waiter = new Waiter();
 
         backtraceClient.attributes.put("foo", "bar");
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -496,6 +494,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.metrics.addSummedEvent(summedEventName);
         backtraceClient.metrics.send();
 
