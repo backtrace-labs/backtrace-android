@@ -104,8 +104,13 @@ jobs:
       - name: Get Saucectl
         run: curl -L https://saucelabs.github.io/saucectl/install | bash
 
+      - name: TEST
+        run: echo ${{ github.token }}
+
       - name: Install saucectl
         uses: saucelabs/saucectl-run-action@v4
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           skip-run: true
 
