@@ -20,7 +20,7 @@ public class BacktraceAttributes {
     /**
      * Get built-in primitive attributes
      */
-    public Map<String, String> attributes = new HashMap<>();
+    public final Map<String, String> attributes = new HashMap<>();
 
     /**
      * Get built-in complex attributes
@@ -64,8 +64,7 @@ public class BacktraceAttributes {
             Boolean includeDynamicAttributes) {
         this.context = context;
 
-        // Start with static attributes
-        this.attributes.putAll(BacktraceStaticAttributes.getInstance().getAttributes());
+        this.setStaticAttributes();
 
         if (report != null) {
             this.convertReportAttributes(report);
@@ -88,6 +87,16 @@ public class BacktraceAttributes {
             setDynamicDeviceInformation();
             setDynamicScreenInformation();
         }
+    }
+
+    private void setStaticAttributes() {
+        BacktraceStaticAttributes staticAttributes = BacktraceStaticAttributes.getInstance();
+
+        if (staticAttributes == null) {
+            return;
+        }
+
+        this.attributes.putAll(staticAttributes.getAttributes());
     }
 
     public Map<String, Object> getComplexAttributes() {
