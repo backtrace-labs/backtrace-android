@@ -19,7 +19,6 @@ import backtraceio.library.common.BacktraceStringHelper;
 /**
  * Class to hold static attributes that don't change between reports.
  * These attributes are initialized once when the SDK is initialized.
- * This is a singleton since static attributes are the same for all instances.
  */
 public class BacktraceStaticAttributes {
 
