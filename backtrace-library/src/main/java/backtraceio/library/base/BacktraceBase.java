@@ -31,6 +31,7 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.json.BacktraceStaticAttributes;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceApi;
 import backtraceio.library.services.BacktraceMetrics;
@@ -75,6 +76,7 @@ public class BacktraceBase implements Client {
      * Application context
      */
     protected Context context;
+
     /**
      * Instance of BacktraceApi that allows to send data to Backtrace API
      */
@@ -248,6 +250,7 @@ public class BacktraceBase implements Client {
         this.context = context;
         this.credentials = credentials;
         this.attributes = CollectionUtils.copyMap(attributes);
+        BacktraceStaticAttributes.init(this.context);
         this.attachments = initializeAttachments(attachments);
         this.database = database != null ? database : new BacktraceDatabase();
         this.setBacktraceApi(new BacktraceApi(this.context, credentials));
