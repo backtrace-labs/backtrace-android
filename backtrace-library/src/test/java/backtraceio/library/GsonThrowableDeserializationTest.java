@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.JsonParseException;
+import backtraceio.gson.JsonParseException;
 
 import org.junit.Test;
 
