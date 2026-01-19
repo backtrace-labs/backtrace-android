@@ -23,38 +23,33 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.UUID;
 
+import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.BatteryState;
 import backtraceio.library.enums.BluetoothStatus;
 import backtraceio.library.enums.GpsStatus;
 import backtraceio.library.enums.LocationStatus;
 import backtraceio.library.enums.NfcStatus;
 import backtraceio.library.enums.WifiStatus;
+import backtraceio.library.logger.BacktraceLogger;
 
 /**
  * Helper class for extract a device attributes
  */
 public class DeviceAttributesHelper {
     private final Context context;
-
-    /*
-     * Current Device id
-     */
-    private static String uuid;
+    private transient final String LOG_TAG = DeviceAttributesHelper.class.getSimpleName();
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;
     }
 
     /**
-     * Get attributes about device such as GPS status, Bluetooth status, NFC status
+     * Get dynamic attributes about device such as GPS status, Bluetooth status, NFC status
      *
-     * @return device attributes
+     * @return dynamic device attributes (only when includeDynamicAttributes is true)
      */
     public HashMap<String, String> getDeviceAttributes(Boolean includeDynamicAttributes) {
         HashMap<String, String> result = new HashMap<>();
-        result.put("guid", this.generateDeviceId());
-        result.put("uname.sysname", "Android");
-        result.put("uname.machine", System.getProperty("os.arch"));
         if (includeDynamicAttributes == false) {
             return result;
         }
@@ -149,9 +144,7 @@ public class DeviceAttributesHelper {
      * @return measured temperature value in degrees Celsius
      */
     private float getCpuTemperature() {
-        Process p;
         try {
-
             BufferedReader reader = new BufferedReader(new FileReader("/sys/class/thermal/thermal_zone0/temp"));
             String line = reader.readLine();
             if (line == null) {
@@ -255,28 +248,6 @@ public class DeviceAttributesHelper {
         }
     }
 
-    /**
-     * Generate unique identifier to unambiguously identify the device
-     *
-     * @return unique device identifier
-     */
-    private String generateDeviceId() {
-        if (!BacktraceStringHelper.isNullOrEmpty(uuid)) {
-            return uuid;
-        }
-
-        String androidId = Settings.Secure.getString(this.context.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-
-        // if the android id is not defined we want to cache at least guid 
-        // for the current session
-        uuid = TextUtils.isEmpty(androidId)
-                ? UUID.randomUUID().toString()
-                : UUID.nameUUIDFromBytes(androidId.getBytes()).toString();
-
-        return uuid;
-    }
-
     private ActivityManager.MemoryInfo getMemoryInformation() {
         ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
         ActivityManager activityManager = (ActivityManager) this.context.getSystemService
@@ -295,7 +266,7 @@ public class DeviceAttributesHelper {
             totalSize = info.totalMemory();
             usedSize = totalSize - freeSize;
         } catch (Exception e) {
-            e.printStackTrace();
+            BacktraceLogger.e(LOG_TAG, "Error during getting app used storage size", e);
         }
         return Long.toString(usedSize);
     }
