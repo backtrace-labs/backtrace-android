@@ -103,6 +103,10 @@ public class BacktraceClientMetricsTest {
 
         final int timeBetweenRetriesMillis = 1;
 
+        // Enable metrics first - this will send startup events with default handlers
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+
+        // Set up mock handlers AFTER enable() so we only track the explicit send() call
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -131,7 +135,6 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
         backtraceClient.metrics.send();
@@ -300,7 +303,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1000));
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
         try {
