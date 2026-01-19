@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.13.1'
+}
+
+shadowJar {
+    relocate 'com.google.gson', 'backtraceio.gson'
+    archiveClassifier.set('backtrace')
+
+    // Exclude everything from error_prone
+    exclude 'com/google/errorprone/**'
+}
+
+tasks.build.dependsOn(shadowJar)
