@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import backtraceio.library.logger.BacktraceLogger;
 
@@ -35,9 +36,9 @@ public class FileHelper {
      * @return filtered list of file paths
      */
     public static ArrayList<String> filterOutFiles(Context context, List<String> paths) {
-        ArrayList<String> result = new ArrayList<>();
+        Set<String> result = new HashSet<>();
         if (paths == null) {
-            return result;
+            return new ArrayList<>(result);
         }
         paths = new ArrayList<>(new HashSet<>(paths)); // get only unique elements
 
@@ -56,7 +57,7 @@ public class FileHelper {
             }
             result.add(path);
         }
-        return result;
+        return new ArrayList<>(result);
     }
 
     /**

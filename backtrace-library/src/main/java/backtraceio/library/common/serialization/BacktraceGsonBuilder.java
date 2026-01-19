@@ -1,8 +1,8 @@
 package backtraceio.library.common.serialization;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import backtraceio.gson.FieldNamingPolicy;
+import backtraceio.gson.Gson;
+import backtraceio.gson.GsonBuilder;
 
 public class BacktraceGsonBuilder implements CustomGsonBuilder {
 

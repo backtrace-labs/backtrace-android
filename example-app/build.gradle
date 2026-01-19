@@ -72,3 +72,5 @@ dependencies {
     implementation project(':backtrace-library')
     androidTestImplementation project(path: ':coroner-client')
 }
+
+tasks.preBuild.dependsOn(':gson:shadowJar')
