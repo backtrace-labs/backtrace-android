@@ -1,9 +1,9 @@
 package backtraceio.library.common.serialization;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
+import backtraceio.gson.TypeAdapter;
+import backtraceio.gson.stream.JsonReader;
+import backtraceio.gson.stream.JsonToken;
+import backtraceio.gson.stream.JsonWriter;
 
 import java.io.IOException;
 
