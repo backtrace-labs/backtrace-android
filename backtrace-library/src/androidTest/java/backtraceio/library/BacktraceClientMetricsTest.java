@@ -320,6 +320,8 @@ public class BacktraceClientMetricsTest {
 
     @Test
     public void doNotUploadEventsAutomaticBeforeTime() {
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
+
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
         backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
@@ -332,7 +334,6 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
         backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
         // We will always have startup unique event GUID
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
