@@ -468,8 +468,8 @@ public class BacktraceClientMetricsTest {
     @Test
     public void metricsAttributesShouldChangeIfClientAttributeChanges() {
         final Waiter waiter = new Waiter();
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.attributes.put("foo", "bar");
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
