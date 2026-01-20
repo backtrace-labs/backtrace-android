@@ -467,7 +467,7 @@ public class BacktraceClientMetricsTest {
     @Test
     public void metricsAttributesShouldChangeIfClientAttributeChanges() {
         final Waiter waiter = new Waiter();
-
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.attributes.put("foo", "bar");
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
@@ -497,7 +497,6 @@ public class BacktraceClientMetricsTest {
             }
         });
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.metrics.addSummedEvent(summedEventName);
         backtraceClient.metrics.send();
 
