@@ -102,7 +102,11 @@ public class BacktraceClientMetricsTest {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 1;
+
+        // Enable metrics first - this will send startup events with default handlers
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+
+        // Set up mock handlers AFTER enable() so we only track the explicit send() call
         final MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         mockUniqueRequestHandler.statusCode = 503;
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -132,7 +136,6 @@ public class BacktraceClientMetricsTest {
         });
 
         backtraceClient.metrics.addSummedEvent(summedEventName);
-
         backtraceClient.metrics.send();
 
         try {
@@ -206,7 +209,6 @@ public class BacktraceClientMetricsTest {
     public void shouldUploadEventsWhenMaxNumEventsReached() {
         final int maximumNumberOfEvents = 3;
         final Waiter waiter = new Waiter();
-
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
@@ -242,7 +244,6 @@ public class BacktraceClientMetricsTest {
     public void shouldNotUploadEventsBeforeMaxNumEventsReached() {
         final int maximumNumberOfEvents = 3;
         final Waiter waiter = new Waiter();
-
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         backtraceClient.metrics.setMaximumNumberOfEvents(maximumNumberOfEvents);
         final MockRequestHandler mockRequestHandler = new MockRequestHandler();
@@ -259,6 +260,8 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+
+
         // Account for unique events startup event
         for (int i = 0; i < maximumNumberOfEvents - 2; i++) {
             backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]);
@@ -273,7 +276,7 @@ public class BacktraceClientMetricsTest {
     public void uploadEventsAutomatic() {
         final Waiter waiter = new Waiter();
 
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1));
+        // Set up mock handlers BEFORE enabling metrics to capture startup events
         MockRequestHandler mockUniqueRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockUniqueRequestHandler);
         MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
@@ -300,6 +303,7 @@ public class BacktraceClientMetricsTest {
             }
         });
 
+        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 1000));
         backtraceClient.metrics.addSummedEvent(summedEventName);
 
         try {
@@ -317,9 +321,9 @@ public class BacktraceClientMetricsTest {
     @Test
     public void doNotUploadEventsAutomaticBeforeTime() {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 100));
+
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
         backtraceClient.metrics.setUniqueEventsRequestHandler(mockRequestHandler);
-
         backtraceClient.metrics.setUniqueEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
@@ -445,7 +449,6 @@ public class BacktraceClientMetricsTest {
 
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-
         try {
             waiter.await(5, TimeUnit.SECONDS, 2);
         } catch (Exception e) {
@@ -465,7 +468,6 @@ public class BacktraceClientMetricsTest {
     @Test
     public void metricsAttributesShouldChangeIfClientAttributeChanges() {
         final Waiter waiter = new Waiter();
-
         backtraceClient.attributes.put("foo", "bar");
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
         MockRequestHandler mockRequestHandler = new MockRequestHandler();
