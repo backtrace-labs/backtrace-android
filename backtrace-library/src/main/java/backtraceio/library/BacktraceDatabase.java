@@ -316,7 +316,7 @@ public class BacktraceDatabase implements Database {
                                     } else {
                                         BacktraceLogger.d(LOG_TAG, "Backtrace DB Timer - closing record");
                                         currentRecord.close();
-                                        // backtraceDatabaseContext.incrementBatchRetry(); TODO: consider another way to remove some records after few retries
+                                        backtraceDatabaseContext.incrementBatchRetry(); // If we are not able to send single record we are moving all reports to next batch
                                     }
                                     threadWaiter.countDown();
                                 }

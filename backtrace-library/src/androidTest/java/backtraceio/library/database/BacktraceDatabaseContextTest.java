@@ -33,11 +33,14 @@ public class BacktraceDatabaseContextTest {
     private BacktraceDatabaseSettings databaseSettings;
     private final String testMessage = "Example test string";
 
+    private final int RETRY_LIMIT = 5;
+
     @Before
     public void setUp() {
         this.context = InstrumentationRegistry.getInstrumentation().getContext();
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
+        this.databaseSettings.setRetryLimit(RETRY_LIMIT);
         this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
     }
     @After
@@ -254,17 +257,40 @@ public class BacktraceDatabaseContextTest {
         databaseContext.add((BacktraceDatabaseRecord) null);
     }
 
+    @Test
+    public void testIncrementBatchRetry() {
+        // GIVEN
+        int numberOfRetries = 0;
+        fillDatabase(10);
+
+        // WHEN
+
+        for (int i = 0; i < 10; i++) {
+            BacktraceDatabaseRecord first = databaseContext.first(); // QUEUE
+            if (first == null) {
+                break;
+            }
+            first.close();
+            this.databaseContext.incrementBatchRetry();
+            numberOfRetries++;
+        }
+
+        // THEN
+        assertEquals(0, databaseContext.count());
+        assertEquals(RETRY_LIMIT, numberOfRetries);
+    }
+
     private List<BacktraceDatabaseRecord> fillDatabase() {
+        return this.fillDatabase(3);
+    }
+    private List<BacktraceDatabaseRecord> fillDatabase(int numberOfReports) {
         List<BacktraceDatabaseRecord> result = new ArrayList<>();
-        BacktraceReport report = new BacktraceReport(this.testMessage);
-        BacktraceReport report2 = new BacktraceReport(this.testMessage);
-        BacktraceReport report3 = new BacktraceReport(this.testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        BacktraceData data2 = new BacktraceData.Builder(report2).setAttributes(this.context, null).build();
-        BacktraceData data3 = new BacktraceData.Builder(report3).setAttributes(this.context, null).build();
-        result.add(databaseContext.add(data));
-        result.add(databaseContext.add(data2));
-        result.add(databaseContext.add(data3));
+
+        for (int i = 0; i < numberOfReports; i++) {
+            BacktraceReport report = new BacktraceReport(testMessage);
+            BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
+            result.add(databaseContext.add(data));
+        }
 
         // Dispose all records
         for (BacktraceDatabaseRecord record : result) {
