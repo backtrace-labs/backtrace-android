@@ -56,12 +56,15 @@ public class BacktraceDatabaseContext implements DatabaseContext {
 
     /**
      * @deprecated This constructor will be removed in future versions.
-     * The {@code context} parameter is no longer used.
-     * Please use the constructor without the {@code context} parameter.
+     *             The {@code context} parameter is no longer used.
+     *             Please use the constructor without the {@code context} parameter.
      *
-     * <p>Use {@link #BacktraceDatabaseContext(BacktraceDatabaseSettings)} instead.</p>
+     *             <p>
+     *             Use {@link #BacktraceDatabaseContext(BacktraceDatabaseSettings)}
+     *             instead.
+     *             </p>
      *
-     * @param context The unused Android context parameter.
+     * @param context  The unused Android context parameter.
      * @param settings The database settings.
      */
     @Deprecated
@@ -145,7 +148,8 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     }
 
     /**
-     * Get first existing database record. Method returns record based on order in database
+     * Get first existing database record. Method returns record based on order in
+     * database
      *
      * @return first Backtrace database record
      */
@@ -156,14 +160,14 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     }
 
     /**
-     * Get last existing database record. Method returns record based on order in database
+     * Get last existing database record. Method returns record based on order in
+     * database
      *
      * @return last Backtrace database record
      */
     public BacktraceDatabaseRecord last() {
         return this.retryOrder == RetryOrder.Queue ? getLastRecord() : getFirstRecord();
     }
-
 
     /**
      * Get all database records
@@ -186,7 +190,6 @@ public class BacktraceDatabaseContext implements DatabaseContext {
     public long getDatabaseSize() {
         return this.totalSize.get();
     }
-
 
     /**
      * Delete existing record from database
@@ -241,7 +244,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
             Queue<BacktraceDatabaseRecord> records = entry.getValue();
 
             for (BacktraceDatabaseRecord databaseRecord : records) {
-                if (databaseRecord != null && databaseRecord.id == record.id) {
+                if (databaseRecord != null && databaseRecord.id.equals(record.id)) {
                     return true;
                 }
             }
@@ -288,7 +291,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
     }
 
-        /**
+    /**
      * Delete the oldest file
      *
      * @return is deletion was successful
@@ -308,10 +311,24 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Increment each batch
      */
     private void incrementBatches() {
+        // Move batches forward: batch i -> batch i+1
+        // Iterate in reverse to avoid overwriting data before moving it
         for (int i = this._retryNumber - 2; i >= 0; i--) {
             Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(i);
-            batchRetry.put(i, new ConcurrentLinkedQueue<>());
-            batchRetry.put(i + 1, currentBatch);
+
+            // Ensure we have a valid queue (shouldn't be null, but handle it safely)
+            if (currentBatch == null) {
+                currentBatch = new ConcurrentLinkedQueue<>();
+            }
+
+            // Store reference to the batch we're moving
+            Queue<BacktraceDatabaseRecord> batchToMove = currentBatch;
+
+            // Clear batch at position i and replace with new empty queue
+            this.batchRetry.put(i, new ConcurrentLinkedQueue<>());
+
+            // Move the batch to the next position (overwriting whatever was there)
+            this.batchRetry.put(i + 1, batchToMove);
         }
     }
 
@@ -319,15 +336,19 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Remove last batch
      */
     private void removeMaxRetries() {
-        Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.get(_retryNumber - 1);
+        Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());
+
+        if (currentBatch == null) {
+            this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());
+            return;
+        }
 
         for (BacktraceDatabaseRecord record : currentBatch) {
-            if (!record.valid()) {
-                continue;
+            if (record.valid()) {
+                record.delete();
+                this.totalRecords.decrementAndGet();
+                totalSize.addAndGet(-record.getSize());
             }
-            record.delete();
-            this.totalRecords.decrementAndGet();
-            totalSize.addAndGet(-record.getSize());
         }
     }
 
