@@ -1,20 +1,17 @@
 package backtraceio.coroner.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static backtraceio.coroner.utils.ResourceUtils.EXPECTED_FRAMES;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.readResourceFile;
-
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import backtraceio.coroner.response.CoronerApiResponse;
 import backtraceio.coroner.response.CoronerResponseGroup;
-
+import java.io.IOException;
+import java.util.List;
+import org.junit.Test;
 
 public class GsonWrapperTest {
 
@@ -23,7 +20,7 @@ public class GsonWrapperTest {
     }
 
     @Test
-    public void deserializeApiResponse() throws IOException{
+    public void deserializeApiResponse() throws IOException {
         // GIVEN
         final String json = readResourceFile(RESPONSE_RX_FILTER_CORONER_JSON);
         final String expectedFrames = readResourceFile(EXPECTED_FRAMES);
@@ -38,9 +35,12 @@ public class GsonWrapperTest {
         assertEquals(1, result.getResponse().getResultsNumber());
 
         CoronerResponseGroup responseGroup = result.getResponse().values.get(0);
-        assertEquals("Invalid index of selected element!", getResponseGroupAttributeValue(responseGroup.getAttribute(0)));
+        assertEquals(
+                "Invalid index of selected element!", getResponseGroupAttributeValue(responseGroup.getAttribute(0)));
         assertEquals(expectedFrames, getResponseGroupAttributeValue(responseGroup.getAttribute(1)));
-        assertEquals("e4c57699-0dc9-35e2-b4a0-2ffff1925ca7", getResponseGroupAttributeValue(responseGroup.getAttribute(2)));
-        assertEquals("java.lang.IndexOutOfBoundsException", getResponseGroupAttributeValue(responseGroup.getAttribute(3)));
+        assertEquals(
+                "e4c57699-0dc9-35e2-b4a0-2ffff1925ca7", getResponseGroupAttributeValue(responseGroup.getAttribute(2)));
+        assertEquals(
+                "java.lang.IndexOutOfBoundsException", getResponseGroupAttributeValue(responseGroup.getAttribute(3)));
     }
 }

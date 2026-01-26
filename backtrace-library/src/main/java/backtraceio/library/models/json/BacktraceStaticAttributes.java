@@ -6,15 +6,13 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
-
+import backtraceio.library.BacktraceClient;
+import backtraceio.library.common.ApplicationMetadataCache;
+import backtraceio.library.common.BacktraceStringHelper;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-
-import backtraceio.library.BacktraceClient;
-import backtraceio.library.common.ApplicationMetadataCache;
-import backtraceio.library.common.BacktraceStringHelper;
 
 /**
  * Class to hold static attributes that don't change between reports.
@@ -111,8 +109,7 @@ public class BacktraceStaticAttributes {
             return uuid;
         }
 
-        String androidId = Settings.Secure.getString(context.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
+        String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // if the android id is not defined we want to cache at least guid
         // for the current session

@@ -1,13 +1,11 @@
 package backtraceio.library.breadcrumbs;
 
+import backtraceio.library.logger.BacktraceLogger;
 import com.squareup.tape.QueueFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-
-import backtraceio.library.logger.BacktraceLogger;
 
 public class BacktraceQueueFileHelper {
     /**
@@ -31,7 +29,8 @@ public class BacktraceQueueFileHelper {
 
     // Let our exceptions bubble all the way up to BacktraceBreadcrumbsLogManager constructor
     // We definitely cannot construct BacktraceBreadcrumbsLogManager without an open file log
-    public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
+    public BacktraceQueueFileHelper(String breadcrumbLogDirectory, int maxQueueFileSizeBytes)
+            throws IOException, NoSuchMethodException {
         this.breadcrumbLogDirectory = breadcrumbLogDirectory;
         breadcrumbStore = new QueueFile(new File(this.breadcrumbLogDirectory));
 
@@ -60,19 +59,22 @@ public class BacktraceQueueFileHelper {
             // We clear the space we need from the QueueFile first to prevent
             // the QueueFile from expanding to accommodate the new breadcrumb
             // Note!
-            // In the 1.2.3 version we use, the usedBytes is int, not long, and the 
+            // In the 1.2.3 version we use, the usedBytes is int, not long, and the
             // implementation is synchronized thus safe for multithreaded access.
-            // see https://github.com/square/tape/blob/tape-parent-1.2.3/tape/src/main/java/com/squareup/tape/QueueFile.java
+            // see
+            // https://github.com/square/tape/blob/tape-parent-1.2.3/tape/src/main/java/com/squareup/tape/QueueFile.java
             for (int usedBytes = (int) this.usedBytes.invoke(breadcrumbStore);
-                 !breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes;
-                 usedBytes = (int) this.usedBytes.invoke(breadcrumbStore)) {
+                    !breadcrumbStore.isEmpty() && (usedBytes + breadcrumbLength) > maxQueueFileSizeBytes;
+                    usedBytes = (int) this.usedBytes.invoke(breadcrumbStore)) {
                 breadcrumbStore.remove();
             }
 
             breadcrumbStore.add(bytes);
         } catch (Exception ex) {
-            BacktraceLogger.w(LOG_TAG, "Exception: " + ex.getMessage() +
-                    "\nWhen adding breadcrumb: " + new String(bytes, StandardCharsets.UTF_8));
+            BacktraceLogger.w(
+                    LOG_TAG,
+                    "Exception: " + ex.getMessage() + "\nWhen adding breadcrumb: "
+                            + new String(bytes, StandardCharsets.UTF_8));
             return false;
         }
 
@@ -83,8 +85,7 @@ public class BacktraceQueueFileHelper {
         try {
             breadcrumbStore.clear();
         } catch (Exception ex) {
-            BacktraceLogger.w(LOG_TAG, "Exception: " + ex.getMessage() +
-                    "\nWhen clearing breadcrumbs");
+            BacktraceLogger.w(LOG_TAG, "Exception: " + ex.getMessage() + "\nWhen clearing breadcrumbs");
             return false;
         }
         return true;

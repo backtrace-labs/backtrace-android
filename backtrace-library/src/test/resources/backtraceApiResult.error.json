@@ -1,1 +1,4 @@
-{"error":{"code":32768, "message":"no root object supplied"}}
+{"error": {
+    "code": 32768,
+    "message": "no root object supplied"
+}}

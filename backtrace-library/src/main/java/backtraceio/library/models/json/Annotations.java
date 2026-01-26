@@ -31,5 +31,4 @@ class AnnotationException {
     public Object getMessage() {
         return message;
     }
-
 }

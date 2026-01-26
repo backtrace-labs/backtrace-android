@@ -6,27 +6,22 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
+import backtraceio.coroner.response.CoronerResponse;
+import backtraceio.coroner.response.CoronerResponseProcessingException;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.logger.LogLevel;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import net.jodah.concurrentunit.Waiter;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import backtraceio.coroner.response.CoronerResponse;
-import backtraceio.coroner.response.CoronerResponseProcessingException;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.logger.LogLevel;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -38,8 +33,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     private final int THREAD_SLEEP_TIME_MS = 2000;
 
     @Rule
-    public ActivityScenarioRule<MainActivity> mActivityRule =
-            new ActivityScenarioRule<>(MainActivity.class);
+    public ActivityScenarioRule<MainActivity> mActivityRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @Before
     public void enableMetricsAndBreadcrumbs() {
@@ -59,11 +53,12 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         // GIVEN
         final String[] rxId = new String[1];
         final Waiter waiter = new Waiter();
-        mActivityRule.getScenario().onActivity(activity ->
-                activity.setOnServerResponseEventListener(backtraceResult -> {
-            rxId[0] = backtraceResult.rxId;
-            waiter.resume();
-        }));
+        mActivityRule
+                .getScenario()
+                .onActivity(activity -> activity.setOnServerResponseEventListener(backtraceResult -> {
+                    rxId[0] = backtraceResult.rxId;
+                    waiter.resume();
+                }));
 
         // WHEN
         onView(withId(R.id.handledException)).perform(click()); // UI action
@@ -101,10 +96,12 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
 
         // THEN
         try {
-            response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
-                    Long.toString(timestampStart),
-                    Long.toString(this.getSecondsTimestampNowGMT()),
-                    Arrays.asList("error.message"));
+            response = this.getCoronerClient()
+                    .errorTypeTimestampFilter(
+                            "Crash",
+                            Long.toString(timestampStart),
+                            Long.toString(this.getSecondsTimestampNowGMT()),
+                            Arrays.asList("error.message"));
         } catch (Exception ex) {
             Assert.fail(ex.getMessage());
         }
@@ -115,7 +112,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         Assert.assertEquals("DumpWithoutCrash", val);
     }
 
-    //@Test
+    // @Test
     public void unhandledException() throws CoronerResponseProcessingException, InterruptedException {
         // GIVEN
         CoronerResponse response = null;
@@ -126,16 +123,19 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         // onView(withId(R.id.unhandledException)).perform(click()); // UI action
 
         // call BacktraceExceptionHandler directly instead
-        Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), new NullPointerException());
+        Thread.getDefaultUncaughtExceptionHandler()
+                .uncaughtException(Thread.currentThread(), new NullPointerException());
 
         Thread.sleep(THREAD_SLEEP_TIME_MS);
 
         // THEN
         try {
-            response = this.getCoronerClient().errorTypeTimestampFilter("Crash",
-                    Long.toString(timestampStart),
-                    Long.toString(this.getSecondsTimestampNowGMT()),
-                    Arrays.asList("error.message"));
+            response = this.getCoronerClient()
+                    .errorTypeTimestampFilter(
+                            "Crash",
+                            Long.toString(timestampStart),
+                            Long.toString(this.getSecondsTimestampNowGMT()),
+                            Arrays.asList("error.message"));
         } catch (Exception ex) {
             Assert.fail(ex.getMessage());
         }
@@ -152,7 +152,7 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     }
 
     // Will break build, obviously.
-    //@Test
+    // @Test
     public void nativeCrash() {
         onView(withId(R.id.nativeCrash)).perform(click());
     }

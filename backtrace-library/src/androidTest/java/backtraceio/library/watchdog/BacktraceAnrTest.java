@@ -3,24 +3,19 @@ package backtraceio.library.watchdog;
 import static org.junit.Assert.fail;
 
 import android.content.Context;
-
 import androidx.test.annotation.UiThreadTest;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.LogLevel;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceAnrTest {

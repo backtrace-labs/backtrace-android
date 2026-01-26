@@ -6,21 +6,7 @@ import android.system.ErrnoException;
 import android.system.Os;
 import android.util.Log;
 import android.view.View;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -32,6 +18,17 @@ import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.models.BacktraceExceptionHandler;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -87,13 +84,17 @@ public class MainActivity extends AppCompatActivity {
         settings.setAutoSendMode(true);
         settings.setRetryOrder(RetryOrder.Queue);
 
-        Map<String, Object> attributes = new HashMap<String, Object>() {{
-            put("custom.attribute", "My Custom Attribute");
-        }};
+        Map<String, Object> attributes = new HashMap<String, Object>() {
+            {
+                put("custom.attribute", "My Custom Attribute");
+            }
+        };
 
-        List<String> attachments = new ArrayList<String>() {{
-            add(context.getFilesDir() + "/" + "myCustomFile.txt");
-        }};
+        List<String> attachments = new ArrayList<String>() {
+            {
+                add(context.getFilesDir() + "/" + "myCustomFile.txt");
+            }
+        };
 
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attributes, attachments);
@@ -198,9 +199,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendReport(View view) {
         final long id = Thread.currentThread().getId();
-        Map<String, Object> attributes = new HashMap<String, Object>() {{
-            put("Caller thread", id);
-        }};
+        Map<String, Object> attributes = new HashMap<String, Object>() {
+            {
+                put("Caller thread", id);
+            }
+        };
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();

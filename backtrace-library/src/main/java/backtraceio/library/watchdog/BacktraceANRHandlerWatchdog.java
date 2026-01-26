@@ -3,14 +3,11 @@ package backtraceio.library.watchdog;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
-
-import java.util.Calendar;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.anr.BacktraceANRHandler;
 import backtraceio.library.anr.BacktraceANRSettings;
 import backtraceio.library.logger.BacktraceLogger;
-
+import java.util.Calendar;
 
 /**
  * This is the class that is responsible for monitoring the
@@ -18,7 +15,7 @@ import backtraceio.library.logger.BacktraceLogger;
  */
 public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRHandler {
 
-    private final static String LOG_TAG = BacktraceANRHandlerWatchdog.class.getSimpleName();
+    private static final String LOG_TAG = BacktraceANRHandlerWatchdog.class.getSimpleName();
 
     /**
      * Current Backtrace client instance which will be used to send information about exception
@@ -84,8 +81,7 @@ public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRH
         this.start();
     }
 
-    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
-                                                           onApplicationNotRespondingEvent) {
+    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {
         this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
     }
 
@@ -129,8 +125,8 @@ public class BacktraceANRHandlerWatchdog extends Thread implements BacktraceANRH
                 continue;
             }
             reported = true;
-            BacktraceWatchdogShared.sendReportCauseBlockedThread(backtraceClient,
-                    Looper.getMainLooper().getThread(), onApplicationNotRespondingEvent, LOG_TAG);
+            BacktraceWatchdogShared.sendReportCauseBlockedThread(
+                    backtraceClient, Looper.getMainLooper().getThread(), onApplicationNotRespondingEvent, LOG_TAG);
         }
     }
 

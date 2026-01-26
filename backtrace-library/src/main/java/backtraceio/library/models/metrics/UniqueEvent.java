@@ -1,19 +1,16 @@
 package backtraceio.library.models.metrics;
 
 import backtraceio.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import backtraceio.library.common.BacktraceStringHelper;
 import backtraceio.library.common.BacktraceTimeHelper;
 import backtraceio.library.logger.BacktraceLogger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class UniqueEvent extends Event {
 
-    private final static transient String LOG_TAG = UniqueEvent.class.getSimpleName();
+    private static final transient String LOG_TAG = UniqueEvent.class.getSimpleName();
 
     /**
      * Unique events API spec requires unique events to be a JSON array, but we still treat it as a single string
@@ -31,9 +28,11 @@ public class UniqueEvent extends Event {
 
     public UniqueEvent(String name, long timestamp, Map<String, String> attributes) {
         super(timestamp);
-        this.name = new ArrayList<String>() {{
-            add(name);
-        }};
+        this.name = new ArrayList<String>() {
+            {
+                add(name);
+            }
+        };
         addAttributesImpl(attributes);
     }
 

@@ -1,12 +1,16 @@
 package backtraceio.library.crashHandler;
 
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
+import backtraceio.library.nativeCalls.BacktraceCrashHandlerWrapper;
+import backtraceio.library.nativeCalls.SystemLoader;
+import backtraceio.library.services.BacktraceCrashHandlerRunner;
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,17 +18,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
-
-import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
-import backtraceio.library.nativeCalls.BacktraceCrashHandlerWrapper;
-import backtraceio.library.nativeCalls.SystemLoader;
-import backtraceio.library.services.BacktraceCrashHandlerRunner;
-
 @RunWith(MockitoJUnitRunner.class)
 public class CrashHandlerRunnerInvocationTest {
 
-    private final static String fakePathLibrary = "path/to/lib";
+    private static final String fakePathLibrary = "path/to/lib";
+
     @Mock
     BacktraceCrashHandlerWrapper backtraceCrashHandlerWrapper;
 
@@ -36,13 +34,13 @@ public class CrashHandlerRunnerInvocationTest {
     @Test
     public void failIfEnvVariablesAreNotDefined() {
         BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner();
-        assertFalse(runner.run(new String[]{}, null));
+        assertFalse(runner.run(new String[] {}, null));
     }
 
     @Test
     public void failIfEnvVariablesDontStoreHandlerPath() {
         BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner();
-        assertFalse(runner.run(new String[]{}, new HashMap<>()));
+        assertFalse(runner.run(new String[] {}, new HashMap<>()));
     }
 
     @Test
@@ -52,8 +50,9 @@ public class CrashHandlerRunnerInvocationTest {
 
         when(backtraceCrashHandlerWrapper.handleCrash(any(String[].class))).thenReturn(true);
 
-        BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, mock(SystemLoader.class));
-        assertTrue(runner.run(new String[]{}, envVariables));
+        BacktraceCrashHandlerRunner runner =
+                new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, mock(SystemLoader.class));
+        assertTrue(runner.run(new String[] {}, envVariables));
     }
 
     @Test
@@ -63,7 +62,8 @@ public class CrashHandlerRunnerInvocationTest {
 
         when(backtraceCrashHandlerWrapper.handleCrash(any(String[].class))).thenReturn(true);
 
-        BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, mock(SystemLoader.class));
-        assertTrue(runner.run(new String[]{}, envVariables));
+        BacktraceCrashHandlerRunner runner =
+                new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, mock(SystemLoader.class));
+        assertTrue(runner.run(new String[] {}, envVariables));
     }
 }

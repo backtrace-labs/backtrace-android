@@ -1,7 +1,6 @@
 package backtraceio.library.models;
 
 import backtraceio.gson.annotations.SerializedName;
-
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 
@@ -34,8 +33,7 @@ public class BacktraceResult {
     /**
      * Create new instance of BacktraceResult
      */
-    public BacktraceResult() {
-    }
+    public BacktraceResult() {}
 
     public BacktraceResult(BacktraceApiResult apiResult) {
         this(apiResult.rxId, apiResult.getResponse());
@@ -91,9 +89,7 @@ public class BacktraceResult {
      * @return BacktraceResult with exception information
      */
     public static BacktraceResult OnError(BacktraceReport report, Exception exception) {
-        return new BacktraceResult(
-                report, exception.getMessage(),
-                BacktraceResultStatus.ServerError);
+        return new BacktraceResult(report, exception.getMessage(), BacktraceResultStatus.ServerError);
     }
 
     @SuppressWarnings({"UnusedDeclaration"})

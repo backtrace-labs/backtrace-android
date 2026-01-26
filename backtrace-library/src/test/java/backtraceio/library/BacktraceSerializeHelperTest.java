@@ -5,11 +5,10 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 
-import org.junit.Test;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import org.junit.Test;
 
 public class BacktraceSerializeHelperTest {
     static class MyCustomException extends Exception {
@@ -23,9 +22,8 @@ public class BacktraceSerializeHelperTest {
     public void testSerializeAndDeserializeException() {
         // GIVEN
         IllegalArgumentException illegalArgumentException = new IllegalArgumentException("test-exception-1");
-        illegalArgumentException.setStackTrace(new StackTraceElement[]{
-                new StackTraceElement("test-1", "test-2", "test-3", 1)
-        });
+        illegalArgumentException.setStackTrace(
+                new StackTraceElement[] {new StackTraceElement("test-1", "test-2", "test-3", 1)});
 
         MyCustomException exception = new MyCustomException("test-exception-2", illegalArgumentException);
 
@@ -55,16 +53,16 @@ public class BacktraceSerializeHelperTest {
     public void testSerializeAndDeserializeError() {
         // GIVEN
         OutOfMemoryError outOfMemoryError = new OutOfMemoryError("test-error-1");
-        outOfMemoryError.setStackTrace(new StackTraceElement[]{
-                new StackTraceElement("test-1", "test-2", "test-3", 1)
-        });
+        outOfMemoryError.setStackTrace(
+                new StackTraceElement[] {new StackTraceElement("test-1", "test-2", "test-3", 1)});
 
         ExceptionInInitializerError error = new ExceptionInInitializerError(outOfMemoryError);
 
         // WHEN
         String json = BacktraceSerializeHelper.toJson(error);
 
-        ExceptionInInitializerError deserializedError = BacktraceSerializeHelper.fromJson(json, ExceptionInInitializerError.class);
+        ExceptionInInitializerError deserializedError =
+                BacktraceSerializeHelper.fromJson(json, ExceptionInInitializerError.class);
 
         // THEN
         assertNotNull(deserializedError);
@@ -98,7 +96,7 @@ public class BacktraceSerializeHelperTest {
         String json = "{\"_rxid\": \"12345\", \"message\":\"result-message\",\"status\":\"Ok\"}";
 
         // WHEN
-        BacktraceResult result = BacktraceSerializeHelper.fromJson(json ,BacktraceResult.class);
+        BacktraceResult result = BacktraceSerializeHelper.fromJson(json, BacktraceResult.class);
 
         // THEN
         assertNotNull(result);

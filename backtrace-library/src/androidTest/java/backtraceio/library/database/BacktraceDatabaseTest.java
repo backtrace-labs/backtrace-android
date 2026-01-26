@@ -3,26 +3,8 @@ package backtraceio.library.database;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -32,6 +14,19 @@ import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseTest {
@@ -107,7 +102,8 @@ public class BacktraceDatabaseTest {
 
         // THEN
         assertEquals(report, database.get().iterator().next().getBacktraceData().getReport());
-        assertEquals(testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
+        assertEquals(
+                testMessage, database.get().iterator().next().getBacktraceData().getReport().message);
         assertEquals(1, database.count());
     }
 
@@ -140,12 +136,14 @@ public class BacktraceDatabaseTest {
         database.delete(record);
         assertEquals(1, database.count());
 
-        final BacktraceDatabaseRecord recordFromDatabase = database.get().iterator().next();
+        final BacktraceDatabaseRecord recordFromDatabase =
+                database.get().iterator().next();
         assertEquals(record2, recordFromDatabase);
         assertEquals(report2, recordFromDatabase.getBacktraceData().getReport());
-        assertEquals(report2.exception.getMessage(), recordFromDatabase.getBacktraceData().getReport().exception.getMessage());
+        assertEquals(
+                report2.exception.getMessage(),
+                recordFromDatabase.getBacktraceData().getReport().exception.getMessage());
     }
-
 
     @Test
     public void clearDatabase() {
@@ -235,15 +233,16 @@ public class BacktraceDatabaseTest {
 
         // THEN
         assertEquals(1, database.count());
-        assertEquals(report2.message, database.get().iterator().next().getBacktraceData().getReport().message);
+        assertEquals(
+                report2.message,
+                database.get().iterator().next().getBacktraceData().getReport().message);
     }
 
     @Test
     public void addEmptyFileAndStartDatabase() throws IOException {
         // GIVEN
-        File file = new File(
-                new File(this.dbPath, String.format("%s-record.json", UUID.randomUUID())).getAbsolutePath()
-        );
+        File file =
+                new File(new File(this.dbPath, String.format("%s-record.json", UUID.randomUUID())).getAbsolutePath());
         file.createNewFile();
 
         // WHEN
@@ -253,5 +252,4 @@ public class BacktraceDatabaseTest {
         // THEN
         assertEquals(database.count(), 0);
     }
-
 }

@@ -6,25 +6,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientAttachmentsTest {
@@ -50,10 +45,12 @@ public class BacktraceClientAttachmentsTest {
         // GIVEN
         final String attachment0 = "/someDir/someFile.log";
         final String attachment1 = "/someDir/someOtherFile.log";
-        List<String> attachments = new ArrayList<String>() {{
-            add(attachment0);
-            add(attachment1);
-        }};
+        List<String> attachments = new ArrayList<String>() {
+            {
+                add(attachment0);
+                add(attachment1);
+            }
+        };
 
         BacktraceClient backtraceClient = new BacktraceClient(context, credentials, database, attachments);
 
@@ -61,32 +58,31 @@ public class BacktraceClientAttachmentsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNotNull(backtraceResult.getBacktraceReport().exception);
+        backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                        // We should have the file attachment paths included
-                        assertEquals(2, backtraceResult.getBacktraceReport().attachmentPaths.size());
-                        assertTrue(backtraceResult.getBacktraceReport().attachmentPaths.contains(attachment0));
-                        assertTrue(backtraceResult.getBacktraceReport().attachmentPaths.contains(attachment1));
+                // We should have the file attachment paths included
+                assertEquals(
+                        2, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                assertTrue(backtraceResult.getBacktraceReport().attachmentPaths.contains(attachment0));
+                assertTrue(backtraceResult.getBacktraceReport().attachmentPaths.contains(attachment1));
 
-                        waiter.resume();
-                    }
-                }
-        );
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -104,30 +100,29 @@ public class BacktraceClientAttachmentsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNotNull(backtraceResult.getBacktraceReport().exception);
+        backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                        // We should NOT have any attachment paths included by default
-                        assertEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                // We should NOT have any attachment paths included by default
+                assertEquals(
+                        0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
-                        waiter.resume();
-                    }
-                }
-        );
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);

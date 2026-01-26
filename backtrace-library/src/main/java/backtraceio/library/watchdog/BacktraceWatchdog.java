@@ -1,17 +1,16 @@
 package backtraceio.library.watchdog;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.logger.BacktraceLogger;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Watchdog to monitor that any thread has blocked
  */
 public class BacktraceWatchdog {
 
-    private final static transient String LOG_TAG = BacktraceWatchdog.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceWatchdog.class.getSimpleName();
     private final BacktraceClient backtraceClient;
     private final boolean sendException;
     private final Map<Thread, BacktraceThreadWatcher> threadsIdWatcher = new HashMap<>();
@@ -41,8 +40,7 @@ public class BacktraceWatchdog {
      *
      * @param onApplicationNotRespondingEvent event that will be executed instead of the default sending of the error information to the Backtrace console
      */
-    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent
-                                                           onApplicationNotRespondingEvent) {
+    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {
         this.onApplicationNotRespondingEvent = onApplicationNotRespondingEvent;
     }
 
@@ -60,8 +58,7 @@ public class BacktraceWatchdog {
             final Thread currentThread = entry.getKey();
             final BacktraceThreadWatcher currentWatcher = entry.getValue();
 
-            if (currentThread == null || currentWatcher == null ||
-                    currentThread == Thread.currentThread()) {
+            if (currentThread == null || currentWatcher == null || currentThread == Thread.currentThread()) {
                 continue;
             }
 
@@ -75,19 +72,23 @@ public class BacktraceWatchdog {
                 continue;
             }
 
-            BacktraceLogger.w(LOG_TAG, String.format("Thread %d %s  might be hung, timestamp: %s",
-                    currentThread.getId(), currentThread.getName(), now_str));
+            BacktraceLogger.w(
+                    LOG_TAG,
+                    String.format(
+                            "Thread %d %s  might be hung, timestamp: %s",
+                            currentThread.getId(), currentThread.getName(), now_str));
 
             // Otherwise, the thread has not made forward progress.
             // Determine whether the timeout has been exceeded.
             long timestamp = currentWatcher.getLastTimestamp();
-            long timeout = timestamp == 0 ? currentWatcher.getTimeout() :
-                    currentWatcher.getTimeout() + currentWatcher.getDelay();
+            long timeout = timestamp == 0
+                    ? currentWatcher.getTimeout()
+                    : currentWatcher.getTimeout() + currentWatcher.getDelay();
 
             if (now - timestamp > timeout) {
                 if (this.sendException) {
-                    BacktraceWatchdogShared.sendReportCauseBlockedThread(backtraceClient,
-                            currentThread, onApplicationNotRespondingEvent, LOG_TAG);
+                    BacktraceWatchdogShared.sendReportCauseBlockedThread(
+                            backtraceClient, currentThread, onApplicationNotRespondingEvent, LOG_TAG);
                 }
                 return true;
             }
