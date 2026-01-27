@@ -51,16 +51,7 @@ subprojects {
             targetExclude spotlessExcludes
             simple()
         }
-
-        format 'gradle', {
-            target '**/*.gradle'
-            targetExclude spotlessExcludes
-            leadingTabsToSpaces(4)
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
-
-
+        
         format 'misc', {
             target '*.md', '.gitignore'
             targetExclude spotlessExcludes
