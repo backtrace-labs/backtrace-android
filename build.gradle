@@ -39,25 +39,34 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
-            target '**/*.java'
+            target fileTree(dir: projectDir, include: '**/*.java', exclude: spotlessExcludes)
             targetExclude spotlessExcludes
             palantirJavaFormat()
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
         }
-        json {
-            target '**/*.json'
-            targetExclude spotlessExcludes
-            simple()
-        }
-        
-        format 'misc', {
-            target '*.md', '.gitignore'
-            targetExclude spotlessExcludes
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
+//        json {
+//            target fileTree(dir: projectDir, include: '**/*.json', exclude: spotlessExcludes)
+//            targetExclude spotlessExcludes
+//            simple()
+//        }
+
+//        format 'gradle', {
+//            target '**/*.gradle'
+//            targetExclude spotlessExcludes
+//            leadingTabsToSpaces(4)
+//            trimTrailingWhitespace()
+//            endWithNewline()
+//        }
+//
+//
+//        format 'misc', {
+//            target '*.md', '.gitignore'
+//            targetExclude spotlessExcludes
+//            trimTrailingWhitespace()
+//            endWithNewline()
+//        }
     }
 }
 
