@@ -39,7 +39,7 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
-            target fileTree(dir: projectDir, include: '**/*.java', exclude: spotlessExcludes)
+            target '**/*.java'
             targetExclude spotlessExcludes
             palantirJavaFormat()
             removeUnusedImports()
@@ -51,7 +51,7 @@ subprojects {
 //            targetExclude spotlessExcludes
 //            simple()
 //        }
-
+//
 //        format 'gradle', {
 //            target '**/*.gradle'
 //            targetExclude spotlessExcludes
