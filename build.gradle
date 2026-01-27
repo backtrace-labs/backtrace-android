@@ -50,7 +50,11 @@ subprojects {
         }
 
         format 'gradle', {
-            target '**/*.gradle'
+            target fileTree('.') {
+                include '**/*.gradle'
+                exclude '**/src/main/cpp/**'
+                exclude '**/external/**'
+            }
             targetExclude spotlessExcludes
             leadingTabsToSpaces(4)
             trimTrailingWhitespace()
