@@ -36,6 +36,9 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
+      - name: Bugfix libunwindstack-ndk .clang-format symbolic link issue
+        run: rm ./backtrace-library/src/main/cpp/libbun/external/libunwindstack-ndk/.clang-format
+
       - name: Check Code Style
         run: ./gradlew spotlessCheck --debug --scan
 
