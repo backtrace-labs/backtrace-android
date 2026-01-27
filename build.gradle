@@ -44,6 +44,7 @@ subprojects {
                 exclude 'src/main/cpp/**'
                 exclude '**/build/**'
                 exclude '.cxx/**'
+                exclude '**/libbun/**'
                 // Add any other paths from your spotlessExcludes list here
             }
             targetExclude spotlessExcludes
