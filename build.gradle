@@ -28,8 +28,11 @@ def spotlessExcludes = [
         '**/build-*/**',
         '**/.cxx/**',
         '**/generated/**',
-        '**/.clang-format',
-        '**/external/**',
+        '**/jniLibs/**',
+        '**/libbun/**',
+        '**/breakpad-builds/**',
+        '**/crashpad/**',
+        '**/cpp/**',
 ]
 
 subprojects {
@@ -50,11 +53,7 @@ subprojects {
         }
 
         format 'gradle', {
-            target fileTree('.') {
-                include '**/*.gradle'
-                exclude '**/src/main/cpp/**'
-                exclude '**/external/**'
-            }
+            target '**/*.gradle'
             targetExclude spotlessExcludes
             leadingTabsToSpaces(4)
             trimTrailingWhitespace()
