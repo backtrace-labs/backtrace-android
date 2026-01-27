@@ -36,11 +36,11 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
+      - name: Check Code Style
+        run: ./gradlew spotlessCheck --debug --scan
+
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check
-
-      - name: Check Code Style
-        run: ./gradlew spotlessCheck
 
       - name: Alignment script executable
         run: chmod +x scripts/check_elf_alignment.sh
