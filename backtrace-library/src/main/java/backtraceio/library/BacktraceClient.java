@@ -25,7 +25,6 @@ public class BacktraceClient extends BacktraceBase {
      * Backtrace ANR watchdog instance
      */
     private BacktraceANRHandler anrHandler;
-    private BacktraceANRHandler anrHandlertmp;
 
     /**
      * Initializing Backtrace client instance with BacktraceCredentials
@@ -46,7 +45,7 @@ public class BacktraceClient extends BacktraceBase {
      * @note Attachments for native crashes must be specified here, and cannot be changed during runtime
      */
     public BacktraceClient(Context context, BacktraceCredentials credentials, List<String> attachments) {
-             this(context, credentials, (BacktraceDatabase) null, attachments);
+        this(context, credentials, (BacktraceDatabase) null, attachments);
     }
 
     /**
@@ -56,8 +55,7 @@ public class BacktraceClient extends BacktraceBase {
      * @param credentials credentials to Backtrace API server
      * @param attributes  additional information about current application
      */
-    public BacktraceClient(Context context, 
-                           BacktraceCredentials credentials, Map<String, Object> attributes) {
+    public BacktraceClient(Context context, BacktraceCredentials credentials, Map<String, Object> attributes) {
         this(context, credentials, (BacktraceDatabase) null, attributes);
     }
 
@@ -74,8 +72,6 @@ public class BacktraceClient extends BacktraceBase {
             Context context,
             BacktraceCredentials credentials,
             Map<String, Object> attributes,
-
-        
             List<String> attachments) {
         this(context, credentials, (BacktraceDatabase) null, attributes, attachments);
     }
