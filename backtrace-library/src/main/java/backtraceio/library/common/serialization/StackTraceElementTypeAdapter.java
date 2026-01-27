@@ -55,7 +55,7 @@ public class StackTraceElementTypeAdapter extends TypeAdapter<StackTraceElement>
                 case "line-number":
                     lineNumber = in.nextInt();
                     break;
-                    // Ignore any unknown fields (including classLoaderName)
+                // Ignore any unknown fields (including classLoaderName)
                 default:
                     in.skipValue();
             }
