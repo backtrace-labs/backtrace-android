@@ -8,7 +8,6 @@ public class ReportDataAttributes {
 
     private final Map<String, Object> reportAnnotations = new HashMap<>();
 
-
     public void addAnnotation(String key, Object value) {
         reportAnnotations.put(key, value);
     }

@@ -4,13 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-
+import backtraceio.library.TestUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import backtraceio.library.TestUtils;
+import org.junit.Test;
 
 public class ExitInfoStackTraceParserTest {
     private final String ANR_APPEXIT_STACKTRACE_FILE = "anrAppExitInfoStacktrace.txt";
@@ -31,14 +29,17 @@ public class ExitInfoStackTraceParserTest {
     @Test
     public void parseFrameNative() {
         // GIVEN
-        String frame = "native: #19 pc 00630008  /apex/com.android.art/lib/libart.so (art::InvokeMethod(art::ScopedObjectAccessAlreadyRunnable const&, _jobject*, _jobject*, _jobject*, unsigned int)+1464)";
+        String frame =
+                "native: #19 pc 00630008  /apex/com.android.art/lib/libart.so (art::InvokeMethod(art::ScopedObjectAccessAlreadyRunnable const&, _jobject*, _jobject*, _jobject*, unsigned int)+1464)";
         // WHEN
         StackTraceElement stackTraceElement = ExitInfoStackTraceParser.parseFrame(frame);
         // THEN
         assertEquals("/apex/com.android.art/lib/libart.so", stackTraceElement.getClassName());
         assertEquals("address: 00630008", stackTraceElement.getFileName());
         assertEquals(0, stackTraceElement.getLineNumber());
-        assertEquals("(art::InvokeMethod(art::ScopedObjectAccessAlreadyRunnable const&, _jobject*, _jobject*, _jobject*, unsigned int)+1464)", stackTraceElement.getMethodName());
+        assertEquals(
+                "(art::InvokeMethod(art::ScopedObjectAccessAlreadyRunnable const&, _jobject*, _jobject*, _jobject*, unsigned int)+1464)",
+                stackTraceElement.getMethodName());
     }
 
     @Test
@@ -54,7 +55,9 @@ public class ExitInfoStackTraceParserTest {
         assertNotNull(anrStacktrace.get("main_thread"));
         assertEquals("x86", anrStacktrace.get("abi"));
         assertEquals("74% free, 6892KB/25MB; 138095 objects", anrStacktrace.get("heap_info"));
-        assertEquals("google/sdk_gphone_x86/generic_x86_arm:11/RSR1.201013.001/6903271:user/release-keys", anrStacktrace.get("build_fingerprint"));
+        assertEquals(
+                "google/sdk_gphone_x86/generic_x86_arm:11/RSR1.201013.001/6903271:user/release-keys",
+                anrStacktrace.get("build_fingerprint"));
         assertEquals("optimized", anrStacktrace.get("build_type"));
         assertEquals("backtraceio.backtraceio", anrStacktrace.get("command_line"));
         assertEquals("2025-03-27 21:02:38", anrStacktrace.get("timestamp"));
@@ -71,7 +74,9 @@ public class ExitInfoStackTraceParserTest {
         assertEquals("at java.lang.Thread.sleep(Native method)", thread4StackTrace.get(0));
         assertEquals("at java.lang.Thread.sleep(Thread.java:442)", thread4StackTrace.get(1));
         assertEquals("at java.lang.Thread.sleep(Thread.java:358)", thread4StackTrace.get(2));
-        assertEquals("at backtraceio.library.watchdog.BacktraceANRHandlerWatchdog.run(BacktraceANRHandlerWatchdog.java:118)", thread4StackTrace.get(3));
+        assertEquals(
+                "at backtraceio.library.watchdog.BacktraceANRHandlerWatchdog.run(BacktraceANRHandlerWatchdog.java:118)",
+                thread4StackTrace.get(3));
 
         // THEN MAIN THREAD
         Map<String, Object> mainThread = (Map<String, Object>) anrStacktrace.get("main_thread");
@@ -82,9 +87,14 @@ public class ExitInfoStackTraceParserTest {
         ArrayList<?> stackTrace = (ArrayList<?>) mainThread.get("stack_trace");
         assertEquals(36, stackTrace.size());
 
-        assertEquals("native: #20 pc 005886a0  /apex/com.android.art/lib/libart.so (art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*)+80)", stackTrace.get(20));
-        assertEquals("at androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener.onClick(AppCompatViewInflater.java:468)", stackTrace.get(24));
+        assertEquals(
+                "native: #20 pc 005886a0  /apex/com.android.art/lib/libart.so (art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*)+80)",
+                stackTrace.get(20));
+        assertEquals(
+                "at androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener.onClick(AppCompatViewInflater.java:468)",
+                stackTrace.get(24));
     }
+
     @Test
     public void parseAnrMainThreadStackTrace() {
         // GIVEN
@@ -102,7 +112,9 @@ public class ExitInfoStackTraceParserTest {
         assertEquals("address: 00000b97", anrMainThreadStacktrace[0].getFileName());
         assertEquals("[vdso]", anrMainThreadStacktrace[0].getClassName());
 
-        assertEquals("(art::interpreter::EnterInterpreterFromEntryPoint(art::Thread*, art::CodeItemDataAccessor const&, art::ShadowFrame*)+176)", anrMainThreadStacktrace[14].getMethodName());
+        assertEquals(
+                "(art::interpreter::EnterInterpreterFromEntryPoint(art::Thread*, art::CodeItemDataAccessor const&, art::ShadowFrame*)+176)",
+                anrMainThreadStacktrace[14].getMethodName());
         assertEquals(0, anrMainThreadStacktrace[14].getLineNumber());
         assertEquals("address: 00379b00", anrMainThreadStacktrace[14].getFileName());
         assertEquals("/apex/com.android.art/lib/libart.so", anrMainThreadStacktrace[14].getClassName());
@@ -110,7 +122,9 @@ public class ExitInfoStackTraceParserTest {
         assertEquals("onClick", anrMainThreadStacktrace[22].getMethodName());
         assertEquals(468, anrMainThreadStacktrace[22].getLineNumber());
         assertEquals("AppCompatViewInflater.java", anrMainThreadStacktrace[22].getFileName());
-        assertEquals("androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener", anrMainThreadStacktrace[22].getClassName());
+        assertEquals(
+                "androidx.appcompat.app.AppCompatViewInflater$DeclaredOnClickListener",
+                anrMainThreadStacktrace[22].getClassName());
 
         assertEquals("main", anrMainThreadStacktrace[32].getMethodName());
         assertEquals(947, anrMainThreadStacktrace[32].getLineNumber());

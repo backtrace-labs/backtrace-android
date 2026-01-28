@@ -1,8 +1,7 @@
 package backtraceio.library.interfaces;
 
-import java.util.Map;
-
 import backtraceio.library.models.json.BacktraceReport;
+import java.util.Map;
 
 /**
  * Client interface.

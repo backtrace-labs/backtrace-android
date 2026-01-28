@@ -6,19 +6,8 @@ import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceData;
@@ -26,7 +15,13 @@ import backtraceio.library.models.BacktraceDataAttachmentsFileHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseRecordTest {
@@ -51,8 +46,11 @@ public class BacktraceDatabaseRecordTest {
     public void saveAndGetRecord() {
         // GIVEN
         final BacktraceReport report = new BacktraceReport(testMessage);
-        final BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
+        final BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        final BacktraceDatabaseRecord record =
+                new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         final boolean saveResult = record.save();
@@ -72,10 +70,12 @@ public class BacktraceDatabaseRecordTest {
         // GIVEN
         final String attachment0 = context.getFilesDir() + "/someFile.log";
         final String attachment1 = context.getFilesDir() + "/someOtherFile.log";
-        final List<String> attachments = new ArrayList<String>() {{
-            add(attachment0);
-            add(attachment1);
-        }};
+        final List<String> attachments = new ArrayList<String>() {
+            {
+                add(attachment0);
+                add(attachment1);
+            }
+        };
 
         try {
             assertTrue(new File(attachment0).createNewFile());
@@ -85,8 +85,11 @@ public class BacktraceDatabaseRecordTest {
         }
 
         final BacktraceReport report = new BacktraceReport(testMessage, attachments);
-        final BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
+        final BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        final BacktraceDatabaseRecord record =
+                new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         final boolean saveResult = record.save();
@@ -107,8 +110,11 @@ public class BacktraceDatabaseRecordTest {
     public void deleteFileDiagnosticPathToCorruptRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
+        BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        BacktraceDatabaseRecord record =
+                new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         boolean saveResult = record.save();
@@ -125,8 +131,11 @@ public class BacktraceDatabaseRecordTest {
     public void deleteFileReportPathToCorruptRecord() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
+        BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        BacktraceDatabaseRecord record =
+                new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         boolean saveResult = record.save();
@@ -143,8 +152,11 @@ public class BacktraceDatabaseRecordTest {
     public void createAndDeleteRecordFiles() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
+        BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        BacktraceDatabaseRecord record =
+                new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
 
         // WHEN
         boolean saveResult = record.save();
@@ -163,12 +175,16 @@ public class BacktraceDatabaseRecordTest {
     public void readFileAndDeserialize() {
         // GIVEN
         final BacktraceReport report = new BacktraceReport(testMessage);
-        final BacktraceData data = new BacktraceData.Builder(report).setAttributes(this.context, null).build();
-        final BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
+        final BacktraceData data = new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build();
+        final BacktraceDatabaseRecord record =
+                new BacktraceDatabaseRecord(data, this.database.getSettings().getDatabasePath());
         record.save();
 
         // WHEN
-        final BacktraceDatabaseRecord recordFromFile = BacktraceDatabaseRecord.readFromFile(new File(record.getRecordPath()));
+        final BacktraceDatabaseRecord recordFromFile =
+                BacktraceDatabaseRecord.readFromFile(new File(record.getRecordPath()));
         final BacktraceData dataFromFile = recordFromFile.getBacktraceData();
 
         // THEN

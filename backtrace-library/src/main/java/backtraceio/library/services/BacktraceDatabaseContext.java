@@ -1,7 +1,12 @@
 package backtraceio.library.services;
 
 import android.content.Context;
-
+import backtraceio.library.enums.database.RetryOrder;
+import backtraceio.library.interfaces.DatabaseContext;
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,13 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import backtraceio.library.enums.database.RetryOrder;
-import backtraceio.library.interfaces.DatabaseContext;
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.database.BacktraceDatabaseRecord;
-import backtraceio.library.models.database.BacktraceDatabaseSettings;
 
 public class BacktraceDatabaseContext implements DatabaseContext {
 
@@ -154,9 +152,7 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * @return first Backtrace database record
      */
     public BacktraceDatabaseRecord first() {
-        return retryOrder == RetryOrder.Queue
-                ? getFirstRecord()
-                : getLastRecord();
+        return retryOrder == RetryOrder.Queue ? getFirstRecord() : getLastRecord();
     }
 
     /**
@@ -222,8 +218,10 @@ public class BacktraceDatabaseContext implements DatabaseContext {
                     this.totalSize.addAndGet(-databaseRecord.getSize());
                     return true;
                 } catch (Exception e) {
-                    BacktraceLogger.d(LOG_TAG, "Exception on removing record "
-                            + databaseRecord.id + " from db context: " + e.getMessage());
+                    BacktraceLogger.d(
+                            LOG_TAG,
+                            "Exception on removing record " + databaseRecord.id + " from db context: "
+                                    + e.getMessage());
                 }
             }
         }
@@ -336,7 +334,8 @@ public class BacktraceDatabaseContext implements DatabaseContext {
      * Remove last batch
      */
     private void removeMaxRetries() {
-        Queue<BacktraceDatabaseRecord> currentBatch = this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());
+        Queue<BacktraceDatabaseRecord> currentBatch =
+                this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());
 
         if (currentBatch == null) {
             this.batchRetry.put(_retryNumber - 1, new ConcurrentLinkedQueue<>());

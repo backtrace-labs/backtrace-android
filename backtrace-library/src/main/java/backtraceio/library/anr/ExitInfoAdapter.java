@@ -2,9 +2,7 @@ package backtraceio.library.anr;
 
 import android.app.ApplicationExitInfo;
 import android.os.Build;
-
 import androidx.annotation.RequiresApi;
-
 import java.io.IOException;
 import java.io.InputStream;
 

@@ -1,20 +1,16 @@
 package backtraceio.library.watchdog;
 
 import android.content.Context;
-
 import androidx.test.annotation.UiThreadTest;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
+import backtraceio.library.BacktraceClient;
+import backtraceio.library.BacktraceCredentials;
 import net.jodah.concurrentunit.Waiter;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import backtraceio.library.BacktraceClient;
-import backtraceio.library.BacktraceCredentials;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceWatchdogTest {
@@ -67,8 +63,7 @@ public class BacktraceWatchdogTest {
         final Waiter waiter = new Waiter();
         Thread t = new Thread() {
             public void run() {
-                while (true) {
-                }
+                while (true) {}
             }
         };
         watchdog.registerThread(t, 200, 50);
@@ -78,7 +73,7 @@ public class BacktraceWatchdogTest {
             Thread.sleep(300);
             boolean result = watchdog.checkIsAnyThreadIsBlocked();
 
-            //THEN
+            // THEN
             Assert.assertTrue(result);
         } catch (Exception e) {
             waiter.fail(e);
@@ -93,8 +88,7 @@ public class BacktraceWatchdogTest {
         final Waiter waiter = new Waiter();
         Thread t = new Thread() {
             public void run() {
-                while (true) {
-                }
+                while (true) {}
             }
         };
         watchdog.registerThread(t, 200, 50);
@@ -120,8 +114,7 @@ public class BacktraceWatchdogTest {
         final Waiter waiter = new Waiter();
         Thread t = new Thread() {
             public void run() {
-                while (true) {
-                }
+                while (true) {}
             }
         };
         t.start();
@@ -148,8 +141,7 @@ public class BacktraceWatchdogTest {
         final BacktraceWatchdog watchdog = new BacktraceWatchdog(this.backtraceClient);
         Thread t = new Thread() {
             public void run() {
-                while (true) {
-                }
+                while (true) {}
             }
         };
         t.start();
@@ -190,8 +182,7 @@ public class BacktraceWatchdogTest {
         });
         Thread t = new Thread() {
             public void run() {
-                while (true) {
-                }
+                while (true) {}
             }
         };
         t.start();

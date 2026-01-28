@@ -46,7 +46,8 @@ public class PermissionHelper {
      */
     public static boolean isPermissionForAccessWifiStateGranted(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED;
+            return context.checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE)
+                    == PackageManager.PERMISSION_GRANTED;
         } else {
             return true;
         }
@@ -60,7 +61,8 @@ public class PermissionHelper {
      */
     public static boolean isPermissionForReadExternalStorageGranted(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+            return context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
         } else {
             return true;
         }

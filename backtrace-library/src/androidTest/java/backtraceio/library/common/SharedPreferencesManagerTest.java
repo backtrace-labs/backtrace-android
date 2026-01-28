@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.diffplug.spotless' version '8.0.0' apply false
+    id 'com.diffplug.spotless' version '8.2.0' apply false
 }
 
 def spotlessExcludes = [
@@ -27,7 +27,12 @@ def spotlessExcludes = [
         '**/build/**',
         '**/build-*/**',
         '**/.cxx/**',
-        '**/generated/**'
+        '**/generated/**',
+        '**/jniLibs/**',
+        '**/libbun/**',
+        '**/breakpad-builds/**',
+        '**/crashpad/**',
+        '**/cpp/**',
 ]
 
 subprojects {

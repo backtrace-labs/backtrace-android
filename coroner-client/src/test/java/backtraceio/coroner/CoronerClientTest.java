@@ -1,9 +1,5 @@
 package backtraceio.coroner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123_ATTR_ERR_MSG;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_TIMESTAMP_ERR_TYPE;
@@ -11,14 +7,11 @@ import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_OPERATION_ERROR_J
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_TIMESTAMP_ERR_TYPE_CORONER_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.readResourceFile;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import backtraceio.coroner.response.CoronerApiResponse;
 import backtraceio.coroner.response.CoronerHttpException;
@@ -26,10 +19,17 @@ import backtraceio.coroner.response.CoronerResponse;
 import backtraceio.coroner.response.CoronerResponseException;
 import backtraceio.coroner.response.CoronerResponseProcessingException;
 import backtraceio.coroner.serialization.GsonWrapper;
+import backtraceio.coroner.utils.JsonMatchers;
 import backtraceio.coroner.utils.MockHttpClient;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class CoronerClientTest {
-    private final static String rxId = "12345";
+    private static final String rxId = "12345";
     private MockHttpClient mockHttpClient;
     private CoronerClient client;
 
@@ -40,7 +40,8 @@ public class CoronerClientTest {
     }
 
     @Test
-    public void rxIdFilter() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
+    public void rxIdFilter()
+            throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
         // GIVEN
         final String expectedJsonQuery = readResourceFile(QUERY_CORONER_RXID_123);
         final String jsonResponse = readResourceFile(RESPONSE_RX_FILTER_CORONER_JSON);
@@ -48,7 +49,8 @@ public class CoronerClientTest {
         final CoronerApiResponse expectedResponse = GsonWrapper.fromJson(jsonResponse, CoronerApiResponse.class);
 
         // MOCK
-        when(mockHttpClient.get(Mockito.contains(expectedJsonQuery))).thenReturn(expectedResponse);
+        when(mockHttpClient.get(argThat(JsonMatchers.jsonEquals(expectedJsonQuery))))
+                .thenReturn(expectedResponse);
 
         // WHEN
         final CoronerResponse result = client.rxIdFilter(rxId);
@@ -60,7 +62,8 @@ public class CoronerClientTest {
     }
 
     @Test
-    public void rxIdFilterAttributes() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
+    public void rxIdFilterAttributes()
+            throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
         // GIVEN
         final String expectedJsonQuery = readResourceFile(QUERY_CORONER_RXID_123_ATTR_ERR_MSG);
         final String jsonResponse = readResourceFile(RESPONSE_RX_FILTER_CORONER_JSON);
@@ -68,7 +71,8 @@ public class CoronerClientTest {
         final CoronerApiResponse expectedResponse = GsonWrapper.fromJson(jsonResponse, CoronerApiResponse.class);
 
         // MOCK
-        when(mockHttpClient.get(Mockito.contains(expectedJsonQuery))).thenReturn(expectedResponse);
+        when(mockHttpClient.get(argThat(JsonMatchers.jsonEquals(expectedJsonQuery))))
+                .thenReturn(expectedResponse);
 
         // WHEN
         final CoronerResponse result = client.rxIdFilter(rxId, customAttributes);
@@ -80,7 +84,8 @@ public class CoronerClientTest {
     }
 
     @Test
-    public void errorTypeTimestampFilter() throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
+    public void errorTypeTimestampFilter()
+            throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
         // GIVEN
         final String expectedJsonQuery = readResourceFile(QUERY_CORONER_TIMESTAMP_ERR_TYPE);
         final String jsonResponse = readResourceFile(RESPONSE_TIMESTAMP_ERR_TYPE_CORONER_JSON);
@@ -92,13 +97,12 @@ public class CoronerClientTest {
         final List<String> customAttributes = Arrays.asList("error.message");
 
         // MOCK
-        when(mockHttpClient.get(Mockito.contains(expectedJsonQuery))).thenReturn(expectedResponse);
+        when(mockHttpClient.get(argThat(JsonMatchers.jsonEquals(expectedJsonQuery))))
+                .thenReturn(expectedResponse);
 
         // WHEN
-        final CoronerResponse result = client.errorTypeTimestampFilter(errorType,
-                Long.toString(timestampStart),
-                Long.toString(timestampEnd),
-                customAttributes);
+        final CoronerResponse result = client.errorTypeTimestampFilter(
+                errorType, Long.toString(timestampStart), Long.toString(timestampEnd), customAttributes);
 
         // THEN
         assertNotNull(result);
@@ -120,8 +124,7 @@ public class CoronerClientTest {
         // WHEN
         try {
             client.rxIdFilter(rxId);
-        }
-        catch (CoronerResponseException exception) {
+        } catch (CoronerResponseException exception) {
             // THEN
             assertEquals(errorMessage, exception.getMessage());
             assertNotNull(exception.getCoronerError());

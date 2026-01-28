@@ -1,13 +1,13 @@
 package backtraceio.library.database;
 
+import static backtraceio.library.TestUtils.compareJson;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
-
-import org.junit.Test;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import org.junit.Test;
 
 public class BacktraceDatabaseRecordTest {
     private final String JSON_FILE = "backtraceDatabaseRecord.json";
@@ -15,6 +15,7 @@ public class BacktraceDatabaseRecordTest {
     private final String dbPath = "/data/user/0/backtraceio.library.test/files/";
 
     private final int expectedSize = 25362;
+
     @Test
     public void serialize() {
         // GIVEN
@@ -22,17 +23,16 @@ public class BacktraceDatabaseRecordTest {
                 uuid,
                 dbPath + uuid + "-report.json",
                 dbPath + uuid + "-record.json",
-                dbPath+ uuid + "-attachment.json",
+                dbPath + uuid + "-attachment.json",
                 dbPath + uuid + "-report.json",
-                expectedSize
-        );
+                expectedSize);
 
         // WHEN
         String json = BacktraceSerializeHelper.toJson(obj);
 
         // THEN
         String expectedJson = TestUtils.readFileAsString(this, JSON_FILE);
-        assertEquals(expectedJson, json);
+        compareJson(expectedJson, json);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class BacktraceDatabaseRecordTest {
         // THEN
         assertEquals(dbPath + uuid + "-record.json", obj.getRecordPath());
         assertEquals(expectedSize, obj.getSize());
-        assertEquals(dbPath+ uuid + "-attachment.json", obj.getDiagnosticDataPath());
+        assertEquals(dbPath + uuid + "-attachment.json", obj.getDiagnosticDataPath());
         assertNull(obj.getBacktraceData());
     }
 
@@ -55,10 +55,9 @@ public class BacktraceDatabaseRecordTest {
                 uuid,
                 dbPath + uuid + "-report.json",
                 dbPath + uuid + "-record.json",
-                dbPath+ uuid + "-attachment.json",
+                dbPath + uuid + "-attachment.json",
                 dbPath + uuid + "-report.json",
-                expectedSize
-        );
+                expectedSize);
         String json = BacktraceSerializeHelper.toJson(obj);
 
         // WHEN
@@ -67,7 +66,7 @@ public class BacktraceDatabaseRecordTest {
         // THEN
         assertEquals(dbPath + uuid + "-record.json", output.getRecordPath());
         assertEquals(expectedSize, output.getSize());
-        assertEquals(dbPath+ uuid + "-attachment.json", output.getDiagnosticDataPath());
+        assertEquals(dbPath + uuid + "-attachment.json", output.getDiagnosticDataPath());
         assertNull(output.getBacktraceData());
     }
 }

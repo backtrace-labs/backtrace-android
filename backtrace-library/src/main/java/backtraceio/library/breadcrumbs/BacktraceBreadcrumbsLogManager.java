@@ -1,13 +1,11 @@
 package backtraceio.library.breadcrumbs;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.Map;
-
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.logger.BacktraceLogger;
+import java.io.IOException;
+import java.util.Map;
+import org.json.JSONObject;
 
 public class BacktraceBreadcrumbsLogManager {
 
@@ -27,11 +25,16 @@ public class BacktraceBreadcrumbsLogManager {
      */
     private final int maxAttributeSizeBytes = 1024;
 
-    public BacktraceBreadcrumbsLogManager(String breadcrumbLogPath, int maxQueueFileSizeBytes) throws IOException, NoSuchMethodException {
+    public BacktraceBreadcrumbsLogManager(String breadcrumbLogPath, int maxQueueFileSizeBytes)
+            throws IOException, NoSuchMethodException {
         this.backtraceQueueFileHelper = new BacktraceQueueFileHelper(breadcrumbLogPath, maxQueueFileSizeBytes);
     }
 
-    public boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level) {
+    public boolean addBreadcrumb(
+            String message,
+            Map<String, Object> attributes,
+            BacktraceBreadcrumbType type,
+            BacktraceBreadcrumbLevel level) {
         // We use currentTimeMillis in the BacktraceReport too, so for consistency
         // we will use it here.
         long time = System.currentTimeMillis();
@@ -50,7 +53,8 @@ public class BacktraceBreadcrumbsLogManager {
                 JSONObject attributesJson = new JSONObject();
                 int currentAttributeSize = 0;
                 for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-                    currentAttributeSize += entry.getKey().length() + entry.getValue().toString().length();
+                    currentAttributeSize += entry.getKey().length()
+                            + entry.getValue().toString().length();
                     if (currentAttributeSize < maxAttributeSizeBytes) {
                         attributesJson.put(entry.getKey(), entry.getValue());
                     }
@@ -69,7 +73,8 @@ public class BacktraceBreadcrumbsLogManager {
         breadcrumbSerializedString.append(breadcrumb.toString().replace("\\n", ""));
         breadcrumbSerializedString.append("\n");
 
-        return backtraceQueueFileHelper.add(breadcrumbSerializedString.toString().getBytes());
+        return backtraceQueueFileHelper.add(
+                breadcrumbSerializedString.toString().getBytes());
     }
 
     public boolean clear() {

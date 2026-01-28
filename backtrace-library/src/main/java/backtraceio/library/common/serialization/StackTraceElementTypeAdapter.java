@@ -4,7 +4,6 @@ import backtraceio.gson.TypeAdapter;
 import backtraceio.gson.stream.JsonReader;
 import backtraceio.gson.stream.JsonToken;
 import backtraceio.gson.stream.JsonWriter;
-
 import java.io.IOException;
 
 public class StackTraceElementTypeAdapter extends TypeAdapter<StackTraceElement> {

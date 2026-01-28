@@ -2,10 +2,6 @@ package backtraceio.library.services;
 
 import android.os.Handler;
 import android.os.Message;
-
-import java.net.HttpURLConnection;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import backtraceio.library.common.BacktraceMathHelper;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.interfaces.Api;
@@ -13,10 +9,12 @@ import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.metrics.Event;
 import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.EventsResult;
+import java.net.HttpURLConnection;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 abstract class BacktraceEventsHandler<T extends Event> extends Handler {
 
-    private final static transient String LOG_TAG = BacktraceEventsHandler.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceEventsHandler.class.getSimpleName();
 
     protected final BacktraceHandlerThread backtraceHandlerThread;
 
@@ -59,10 +57,11 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
      * @param backtraceHandlerThread Backtrace handler thread object
      * @param urlPrefix              Url routing prefix for metrics
      */
-    public BacktraceEventsHandler(BacktraceMetrics backtraceMetrics,
-                                  Api api,
-                                  final BacktraceHandlerThread backtraceHandlerThread,
-                                  String urlPrefix) {
+    public BacktraceEventsHandler(
+            BacktraceMetrics backtraceMetrics,
+            Api api,
+            final BacktraceHandlerThread backtraceHandlerThread,
+            String urlPrefix) {
         // This should always have a nonnull looper because BacktraceHandlerThread starts in the
         // constructor and getLooper blocks until the looper is ready if the thread is started
         //
@@ -79,16 +78,18 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         this.timeBetweenRetriesMillis = backtraceMetrics.settings.getTimeBetweenRetriesMillis();
 
         long timeIntervalMillis = backtraceMetrics.settings.getTimeIntervalMillis();
-        
+
         if (timeIntervalMillis != 0) {
             final BacktraceEventsHandler handler = this;
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    handler.send();
-                    handler.postDelayed(this, timeIntervalMillis);
-                }
-            }, timeIntervalMillis);
+            handler.postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.send();
+                            handler.postDelayed(this, timeIntervalMillis);
+                        }
+                    },
+                    timeIntervalMillis);
         }
     }
 
@@ -155,7 +156,8 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
         } else {
             BacktraceLogger.d(LOG_TAG, "Sending report using default request handler");
             String json = BacktraceSerializeHelper.toJson(input.payload);
-            result = BacktraceReportSender.sendEvents(submissionUrl, json, input.payload, input.serverErrorEventListener);
+            result = BacktraceReportSender.sendEvents(
+                    submissionUrl, json, input.payload, input.serverErrorEventListener);
         }
 
         return result;
@@ -169,14 +171,16 @@ abstract class BacktraceEventsHandler<T extends Event> extends Handler {
                 return;
             }
             final BacktraceEventsHandler handler = this;
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    EventsPayload<T> payload = input.payload;
-                    payload.setDroppedEvents(numRetries);
-                    sendEventsPayload(payload);
-                }
-            }, calculateNextRetryTime(numRetries));
+            handler.postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            EventsPayload<T> payload = input.payload;
+                            payload.setDroppedEvents(numRetries);
+                            sendEventsPayload(payload);
+                        }
+                    },
+                    calculateNextRetryTime(numRetries));
         }
     }
 }

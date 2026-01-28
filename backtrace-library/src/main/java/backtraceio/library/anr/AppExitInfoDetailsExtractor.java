@@ -2,9 +2,8 @@ package backtraceio.library.anr;
 
 import android.app.ApplicationExitInfo;
 import android.os.Build;
-
 import androidx.annotation.RequiresApi;
-
+import backtraceio.library.logger.BacktraceLogger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,11 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import backtraceio.library.logger.BacktraceLogger;
-
-
 public class AppExitInfoDetailsExtractor {
-    private final static String LOG_TAG = AppExitInfoDetailsExtractor.class.getSimpleName();
+    private static final String LOG_TAG = AppExitInfoDetailsExtractor.class.getSimpleName();
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     public static HashMap<String, Object> getANRAttributes(ExitInfo appExitInfo) {
@@ -40,9 +36,9 @@ public class AppExitInfoDetailsExtractor {
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     public static String getANRMessage(ExitInfo appExitInfo) {
-        return "Application Not Responding" + " | " +
-                "Description: " + appExitInfo.getDescription() + " | " +
-                "Timestamp: " + getANRTimestamp(appExitInfo);
+        return "Application Not Responding" + " | " + "Description: "
+                + appExitInfo.getDescription() + " | " + "Timestamp: "
+                + getANRTimestamp(appExitInfo);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)

@@ -9,7 +9,8 @@ java {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.code.gson:gson:2.13.1'
+    implementation 'com.google.code.gson:gson:2.13.2'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.21.0'
+    testImplementation "com.google.guava:guava:33.4.8-jre"
 }

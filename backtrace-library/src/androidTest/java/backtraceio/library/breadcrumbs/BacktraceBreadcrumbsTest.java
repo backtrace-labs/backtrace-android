@@ -7,24 +7,20 @@ import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceBreadcrumbsTest {
@@ -53,7 +49,8 @@ public class BacktraceBreadcrumbsTest {
         try {
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -70,7 +67,8 @@ public class BacktraceBreadcrumbsTest {
         try {
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
             assertEquals(2, breadcrumbLogFileData.size());
 
             // First breadcrumb is configuration breadcrumb
@@ -83,7 +81,8 @@ public class BacktraceBreadcrumbsTest {
 
             // Should have cleared the breadcrumb we just read but
             // We should still have a configuration breadcrumb
-            breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
             assertEquals(1, breadcrumbLogFileData.size());
             parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
 
@@ -98,12 +97,14 @@ public class BacktraceBreadcrumbsTest {
         try {
             cleanUp();
 
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
             assertTrue(backtraceBreadcrumbs.enableBreadcrumbs(context));
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("Test"));
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -119,14 +120,17 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testAddBreadcrumbWithAttributes() {
         try {
-            Map<String, Object> attributes = new HashMap<String, Object>() {{
-                put("floopy", "doopy");
-                put("flim", "flam");
-            }};
+            Map<String, Object> attributes = new HashMap<String, Object>() {
+                {
+                    put("floopy", "doopy");
+                    put("flim", "flam");
+                }
+            };
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -146,7 +150,8 @@ public class BacktraceBreadcrumbsTest {
         try {
             backtraceBreadcrumbs.addBreadcrumb("Testing 1 2 3");
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -164,7 +169,8 @@ public class BacktraceBreadcrumbsTest {
         try {
             backtraceBreadcrumbs.addBreadcrumb("Testing\n 1 2\n 3\n");
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -180,22 +186,26 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testInvalidCharsInAttribute() {
         try {
-            Map<String, Object> attributes = new HashMap<String, Object>() {{
-                put(" flo opy", "do o py ");
-                put("fl\nim", "fl\nam\n");
-                put(" foo ", "b\na r ");
-            }};
+            Map<String, Object> attributes = new HashMap<String, Object>() {
+                {
+                    put(" flo opy", "do o py ");
+                    put("fl\nim", "fl\nam\n");
+                    put(" foo ", "b\na r ");
+                }
+            };
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals("do o py ", parsedBreadcrumb.getJSONObject("attributes").get(" flo opy"));
+            assertEquals(
+                    "do o py ", parsedBreadcrumb.getJSONObject("attributes").get(" flo opy"));
             assertEquals("flam", parsedBreadcrumb.getJSONObject("attributes").get("flim"));
             assertEquals("ba r ", parsedBreadcrumb.getJSONObject("attributes").get(" foo "));
         } catch (Exception ex) {
@@ -208,7 +218,8 @@ public class BacktraceBreadcrumbsTest {
         try {
             backtraceBreadcrumbs.addBreadcrumb(longTestMessage);
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -223,21 +234,26 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testLongAttributesLongFirst() {
         try {
-            final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {{
-                put(longTestAttributeKey, longTestAttributeValue);
-                put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
-            }};
+            final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {
+                {
+                    put(longTestAttributeKey, longTestAttributeValue);
+                    put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
+                }
+            };
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals(expectedLongTestAttributeValue, parsedBreadcrumb.getJSONObject("attributes").get(expectedLongTestAttributeKey));
+            assertEquals(
+                    expectedLongTestAttributeValue,
+                    parsedBreadcrumb.getJSONObject("attributes").get(expectedLongTestAttributeKey));
             assertFalse(parsedBreadcrumb.getJSONObject("attributes").has(reasonableLengthAttributeKey));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -247,21 +263,26 @@ public class BacktraceBreadcrumbsTest {
     @Test
     public void testLongAttributesShortFirst() {
         try {
-            final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {{
-                put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
-                put(longTestAttributeKey, longTestAttributeValue);
-            }};
+            final Map<String, Object> attributes = new LinkedHashMap<String, Object>() {
+                {
+                    put(reasonableLengthAttributeKey, reasonableLengthAttributeValue);
+                    put(longTestAttributeKey, longTestAttributeValue);
+                }
+            };
 
             backtraceBreadcrumbs.addBreadcrumb("Test", attributes);
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
-            assertEquals(reasonableLengthAttributeValue, parsedBreadcrumb.getJSONObject("attributes").get(reasonableLengthAttributeKey));
+            assertEquals(
+                    reasonableLengthAttributeValue,
+                    parsedBreadcrumb.getJSONObject("attributes").get(reasonableLengthAttributeKey));
             assertFalse(parsedBreadcrumb.getJSONObject("attributes").has(expectedLongTestAttributeKey));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -277,13 +298,16 @@ public class BacktraceBreadcrumbsTest {
         try {
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
-                Map<String, Object> attributes = new HashMap<String, Object>() {{
-                    put("From Thread", threadId);
-                }};
+                Map<String, Object> attributes = new HashMap<String, Object>() {
+                    {
+                        put("From Thread", threadId);
+                    }
+                };
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb, it should be valid
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
@@ -316,18 +340,24 @@ public class BacktraceBreadcrumbsTest {
         try {
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
-                Map<String, Object> attributes = new HashMap<String, Object>() {{
-                    put("From Thread", threadId);
-                }};
+                Map<String, Object> attributes = new HashMap<String, Object>() {
+                    {
+                        put("From Thread", threadId);
+                    }
+                };
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
             long breadcrumbsFileSize = new File(backtraceBreadcrumbs.getBreadcrumbLogPath()).length();
-            assertTrue(String.format("Size of breadcrumbs file (%s) not close enough to a full breadcrumb file (%s)", breadcrumbsFileSize, 64 * 1024),
+            assertTrue(
+                    String.format(
+                            "Size of breadcrumbs file (%s) not close enough to a full breadcrumb file (%s)",
+                            breadcrumbsFileSize, 64 * 1024),
                     breadcrumbsFileSize > 63 * 1024);
 
             // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
             for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
                 JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(i));
                 assertEquals("I am a breadcrumb", parsedBreadcrumb.get("message"));
@@ -337,8 +367,10 @@ public class BacktraceBreadcrumbsTest {
                 // Timestamp should be convertible to a long
                 assertTrue(parsedBreadcrumb.get("timestamp") instanceof Long);
                 final int id = (int) parsedBreadcrumb.get("id");
-                assertTrue(String.format("Breadcrumb ID %s was higher than the expected numIterations %s",
-                        id, numIterations), id <= numIterations);
+                assertTrue(
+                        String.format(
+                                "Breadcrumb ID %s was higher than the expected numIterations %s", id, numIterations),
+                        id <= numIterations);
             }
 
         } catch (Exception ex) {
@@ -354,20 +386,24 @@ public class BacktraceBreadcrumbsTest {
         cleanUp();
 
         try {
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
             backtraceBreadcrumbs.enableBreadcrumbs(context, 6400);
             // Account for mandatory configuration breadcrumb
             backtraceBreadcrumbs.setCurrentBreadcrumbId(1);
 
             for (int i = 0; i < numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
-                Map<String, Object> attributes = new HashMap<String, Object>() {{
-                    put("From Thread", threadId);
-                }};
+                Map<String, Object> attributes = new HashMap<String, Object>() {
+                    {
+                        put("From Thread", threadId);
+                    }
+                };
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb, it should be valid
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
@@ -404,13 +440,16 @@ public class BacktraceBreadcrumbsTest {
 
         for (int i = 0; i < numIterations; i++) {
             final long threadId = Thread.currentThread().getId();
-            Map<String, Object> attributes = new HashMap<String, Object>() {{
-                put("From Thread", threadId);
-            }};
+            Map<String, Object> attributes = new HashMap<String, Object>() {
+                {
+                    put("From Thread", threadId);
+                }
+            };
             backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
         }
 
-        List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+        List<String> breadcrumbLogFileData =
+                BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
 
         // We should have rolled over the configuration breadcrumb, consider all breadcrumbs here
         for (int i = 0; i < breadcrumbLogFileData.size(); i++) {
@@ -440,7 +479,8 @@ public class BacktraceBreadcrumbsTest {
                 threads[i].join();
             }
 
-            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
 
             // First breadcrumb is configuration breadcrumb
             // We start from the second breadcrumb
@@ -483,30 +523,38 @@ public class BacktraceBreadcrumbsTest {
         public void run() {
             for (int i = 0; i < this.numIterations; i++) {
                 final long threadId = Thread.currentThread().getId();
-                Map<String, Object> attributes = new HashMap<String, Object>() {{
-                    put("From Thread", threadId);
-                }};
+                Map<String, Object> attributes = new HashMap<String, Object>() {
+                    {
+                        put("From Thread", threadId);
+                    }
+                };
 
                 backtraceBreadcrumbs.addBreadcrumb("I am a breadcrumb", attributes);
             }
         }
     }
 
-    private final String longTestMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.\n" +
-            "\n" +
-            "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra diam sit amet. Ipsum dolor sit amet consectetur adipiscing elit duis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus. Faucibus interdum posuere lorem ipsum dolor. Aliquet risus feugiat in ante metus dictum at. Pretium aenean pharetra magna ac placerat vestibulum lectus mauris ultrices. Enim nulla aliquet porttitor lacus luctus accumsan. Diam ut venenatis tellus in metus. Facilisi nullam vehicula ipsum a arcu cursus.\n" +
-            "\n" +
-            "Sed faucibus turpis in eu mi bibendum neque egestas congue. Ipsum nunc aliquet bibendum enim facilisis gravida neque convallis. Vitae congue mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Id donec ultrices tincidunt arcu non sodales neque. Eu turpis egestas pretium aenean pharetra magna ac. Est ullamcorper eget nulla facilisi etiam dignissim diam. Eget arcu dictum varius duis at. Pretium quam vulputate dignissim suspendisse in est. Morbi quis commodo odio aenean sed adipiscing diam. Leo urna molestie at elementum eu.";
+    private final String longTestMessage =
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.\n"
+                    + "\n"
+                    + "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra diam sit amet. Ipsum dolor sit amet consectetur adipiscing elit duis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus. Faucibus interdum posuere lorem ipsum dolor. Aliquet risus feugiat in ante metus dictum at. Pretium aenean pharetra magna ac placerat vestibulum lectus mauris ultrices. Enim nulla aliquet porttitor lacus luctus accumsan. Diam ut venenatis tellus in metus. Facilisi nullam vehicula ipsum a arcu cursus.\n"
+                    + "\n"
+                    + "Sed faucibus turpis in eu mi bibendum neque egestas congue. Ipsum nunc aliquet bibendum enim facilisis gravida neque convallis. Vitae congue mauris rhoncus aenean vel elit scelerisque mauris pellentesque. Id donec ultrices tincidunt arcu non sodales neque. Eu turpis egestas pretium aenean pharetra magna ac. Est ullamcorper eget nulla facilisi etiam dignissim diam. Eget arcu dictum varius duis at. Pretium quam vulputate dignissim suspendisse in est. Morbi quis commodo odio aenean sed adipiscing diam. Leo urna molestie at elementum eu.";
 
-    private final String expectedLongTestMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra dia";
+    private final String expectedLongTestMessage =
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio ut sem nulla pharetra dia";
 
-    private final String longTestAttributeKey = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.";
+    private final String longTestAttributeKey =
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.";
 
-    private final String longTestAttributeValue = "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio";
+    private final String longTestAttributeValue =
+            "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio";
 
-    private final String expectedLongTestAttributeKey = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.";
+    private final String expectedLongTestAttributeKey =
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum consequat nisl vel pretium lectus quam id. Velit dignissim sodales ut eu sem integer vitae justo. Cursus euismod quis viverra nibh cras pulvinar. Pellentesque adipiscing commodo elit at imperdiet. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Elementum facilisis leo vel fringilla est ullamcorper eget nulla. Purus sit amet luctus venenatis. Non consectetur a erat nam at. Pellentesque id nibh tortor id aliquet lectus proin. Purus semper eget duis at tellus. Sodales ut etiam sit amet nisl purus. Viverra justo nec ultrices dui sapien eget.";
 
-    private final String expectedLongTestAttributeValue = "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio";
+    private final String expectedLongTestAttributeValue =
+            "Et ultrices neque ornare aenean euismod elementum nisi quis eleifend. Ut diam quam nulla porttitor. Vitae elementum curabitur vitae nunc sed. Feugiat sed lectus vestibulum mattis ullamcorper velit sed. A diam sollicitudin tempor id eu nisl nunc. At urna condimentum mattis pellentesque id. Arcu odio";
 
     private final String reasonableLengthAttributeKey = "reasonablySizedKey";
 

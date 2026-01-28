@@ -1,8 +1,7 @@
 package backtraceio.library.interfaces;
 
-import java.io.File;
-
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import java.io.File;
 
 public interface DatabaseFileContext {
 
@@ -20,14 +19,12 @@ public interface DatabaseFileContext {
      */
     Iterable<File> getAll();
 
-
     /**
      * Valid all database files consistency
      *
      * @return is a file consistent
      */
     boolean validFileConsistency();
-
 
     /**
      * Remove orphaned files existing in database directory
@@ -41,4 +38,3 @@ public interface DatabaseFileContext {
      */
     void clear();
 }
-
