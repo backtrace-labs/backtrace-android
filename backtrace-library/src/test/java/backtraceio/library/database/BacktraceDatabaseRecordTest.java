@@ -3,6 +3,8 @@ package backtraceio.library.database;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import static backtraceio.library.TestUtils.compareJson;
+
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -31,7 +33,7 @@ public class BacktraceDatabaseRecordTest {
 
         // THEN
         String expectedJson = TestUtils.readFileAsString(this, JSON_FILE);
-        assertEquals(expectedJson, json);
+        compareJson(expectedJson, json);
     }
 
     @Test
