@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         armor.remove(index);
     }
 
-    void equipItem(List<String> armor, int index) {
+       void equipItem(List<String> armor, int index) {
         equippedItems.add(armor.get(index));
     }
 
