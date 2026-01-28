@@ -1,21 +1,10 @@
 repos:
   - repo: local
     hooks:
-      - id: start-hook
-        name: start-hook
-        entry: echo 'Start pre-commit'
-        language: system
-        stages: [pre-commit]
-        pass_filenames: false
       - id: spotless-apply
         name: Spotless Apply
-        entry: ./gradlew spotlessApply
+        entry: ./gradlew spotlessApply --quiet --no-daemon
         language: system
-        stages: [pre-commit]
         pass_filenames: false
-      - id: spotless-check
-        name: Spotless Check
-        entry: ./gradlew spotlessCheck
-        language: system
-        stages: [pre-commit]
-        pass_filenames: false
+        require_serial: true
+        always_run: true
