@@ -1,9 +1,8 @@
 package backtraceio.library.database;
 
+import static backtraceio.library.TestUtils.compareJson;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
-
-import static backtraceio.library.TestUtils.compareJson;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
