@@ -1,8 +1,7 @@
 package backtraceio.library.models;
 
-import java.util.ArrayList;
-
 import backtraceio.library.logger.BacktraceLogger;
+import java.util.ArrayList;
 
 /**
  * Backtrace stack trace
@@ -40,8 +39,9 @@ public class BacktraceStackTrace {
     }
 
     private void initialize() {
-        StackTraceElement[] stackTraceElements = this.exception != null ?
-                this.exception.getStackTrace() : Thread.currentThread().getStackTrace();
+        StackTraceElement[] stackTraceElements = this.exception != null
+                ? this.exception.getStackTrace()
+                : Thread.currentThread().getStackTrace();
         if (stackTraceElements == null || stackTraceElements.length == 0) {
             BacktraceLogger.w(LOG_TAG, "StackTraceElements are null or empty");
             return;
@@ -56,8 +56,9 @@ public class BacktraceStackTrace {
         }
 
         for (StackTraceElement frame : frames) {
-            if (frame != null && frame.getFileName() != null &&
-                    frame.getFileName().startsWith("Backtrace")) {
+            if (frame != null
+                    && frame.getFileName() != null
+                    && frame.getFileName().startsWith("Backtrace")) {
                 BacktraceLogger.d(LOG_TAG, "Skipping frame because it comes from inside the Backtrace library");
                 continue;
             }

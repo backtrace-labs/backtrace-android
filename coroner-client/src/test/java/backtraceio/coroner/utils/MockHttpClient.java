@@ -1,10 +1,9 @@
 package backtraceio.coroner.utils;
 
-import java.io.IOException;
-
 import backtraceio.coroner.common.HttpClient;
 import backtraceio.coroner.response.CoronerApiResponse;
 import backtraceio.coroner.response.CoronerHttpException;
+import java.io.IOException;
 
 public class MockHttpClient implements HttpClient {
 

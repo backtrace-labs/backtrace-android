@@ -1,10 +1,9 @@
 package backtraceio.coroner.serialization;
 
+import backtraceio.coroner.response.CoronerResponseGroup;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import backtraceio.coroner.response.CoronerResponseGroup;
 
 public class GsonWrapper {
 
@@ -16,5 +15,4 @@ public class GsonWrapper {
 
         return gson.fromJson(json, type);
     }
-
 }

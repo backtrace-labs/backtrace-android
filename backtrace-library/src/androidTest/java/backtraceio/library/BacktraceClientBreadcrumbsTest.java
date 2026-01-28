@@ -7,27 +7,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import junit.framework.TestCase;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
@@ -35,6 +16,19 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import junit.framework.TestCase;
+import net.jodah.concurrentunit.Waiter;
+import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientBreadcrumbsTest {
@@ -52,7 +46,8 @@ public class BacktraceClientBreadcrumbsTest {
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://example-endpoint.com/", "");
 
-        BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        BacktraceDatabase database =
+                new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
         backtraceClient = new BacktraceClient(context, credentials, database);
     }
 
@@ -73,36 +68,34 @@ public class BacktraceClientBreadcrumbsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNotNull(backtraceResult.getBacktraceReport().attributes);
-                        assertNotNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
-                        assertNotNull(backtraceResult.getBacktraceReport().exception);
+        backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().attributes);
+                assertNotNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                        // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
-                        assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
+                assertNotEquals(
+                        0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
-                        // We log one breadcrumb by default, the breadcrumb configuration
-                        assertEquals(1L,
-                                backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                // We log one breadcrumb by default, the breadcrumb configuration
+                assertEquals(1L, backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
-                        waiter.resume();
-                    }
-                }
-        );
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -122,8 +115,8 @@ public class BacktraceClientBreadcrumbsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -141,29 +134,30 @@ public class BacktraceClientBreadcrumbsTest {
             TestCase.assertEquals("breadcrumb", parsedBreadcrumb.get("message"));
 
             // WHEN
-            backtraceClient.send(new Exception(resultMessage), new
-                    OnServerResponseEventListener() {
-                        @Override
-                        public void onEvent(BacktraceResult backtraceResult) {
-                            // THEN
-                            assertEquals(resultMessage, backtraceResult.message);
-                            assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                            assertNotNull(backtraceResult.getBacktraceReport());
-                            assertNotNull(backtraceResult.getBacktraceReport().attributes);
-                            assertNotNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
-                            assertNotNull(backtraceResult.getBacktraceReport().exception);
+            backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+                @Override
+                public void onEvent(BacktraceResult backtraceResult) {
+                    // THEN
+                    assertEquals(resultMessage, backtraceResult.message);
+                    assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                    assertNotNull(backtraceResult.getBacktraceReport());
+                    assertNotNull(backtraceResult.getBacktraceReport().attributes);
+                    assertNotNull(
+                            backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                    assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                            // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
-                            assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                    // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
+                    assertNotEquals(
+                            0,
+                            backtraceResult.getBacktraceReport().attachmentPaths.size());
 
-                            // After adding a new breadcrumb, we should have incremented the breadcrumbs.lastId
-                            assertEquals(2L,
-                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                    // After adding a new breadcrumb, we should have incremented the breadcrumbs.lastId
+                    assertEquals(
+                            2L, backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
-                            waiter.resume();
-                        }
-                    }
-            );
+                    waiter.resume();
+                }
+            });
             waiter.await(5, TimeUnit.SECONDS);
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -181,8 +175,8 @@ public class BacktraceClientBreadcrumbsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
@@ -193,29 +187,30 @@ public class BacktraceClientBreadcrumbsTest {
             backtraceClient.addBreadcrumb("breadcrumb2");
 
             // WHEN
-            backtraceClient.send(new Exception(resultMessage), new
-                    OnServerResponseEventListener() {
-                        @Override
-                        public void onEvent(BacktraceResult backtraceResult) {
-                            // THEN
-                            assertEquals(resultMessage, backtraceResult.message);
-                            assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                            assertNotNull(backtraceResult.getBacktraceReport());
-                            assertNotNull(backtraceResult.getBacktraceReport().attributes);
-                            assertNotNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
-                            assertNotNull(backtraceResult.getBacktraceReport().exception);
+            backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+                @Override
+                public void onEvent(BacktraceResult backtraceResult) {
+                    // THEN
+                    assertEquals(resultMessage, backtraceResult.message);
+                    assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                    assertNotNull(backtraceResult.getBacktraceReport());
+                    assertNotNull(backtraceResult.getBacktraceReport().attributes);
+                    assertNotNull(
+                            backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                    assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                            // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
-                            assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                    // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
+                    assertNotEquals(
+                            0,
+                            backtraceResult.getBacktraceReport().attachmentPaths.size());
 
-                            // After adding new breadcrumbs, we should have incremented the breadcrumbs.lastId
-                            assertEquals(3L,
-                                    (long) backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                    // After adding new breadcrumbs, we should have incremented the breadcrumbs.lastId
+                    assertEquals(3L, (long)
+                            backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
-                            waiter.resume();
-                        }
-                    }
-            );
+                    waiter.resume();
+                }
+            });
 
             List<String> breadcrumbLogFileData = readBreadcrumbLogFile();
             TestCase.assertEquals(3, breadcrumbLogFileData.size());
@@ -231,29 +226,30 @@ public class BacktraceClientBreadcrumbsTest {
             backtraceClient.clearBreadcrumbs();
 
             // WHEN
-            backtraceClient.send(new Exception(resultMessage), new
-                    OnServerResponseEventListener() {
-                        @Override
-                        public void onEvent(BacktraceResult backtraceResult) {
-                            // THEN
-                            assertEquals(resultMessage, backtraceResult.message);
-                            assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                            assertNotNull(backtraceResult.getBacktraceReport());
-                            assertNotNull(backtraceResult.getBacktraceReport().attributes);
-                            assertNotNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
-                            assertNotNull(backtraceResult.getBacktraceReport().exception);
+            backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+                @Override
+                public void onEvent(BacktraceResult backtraceResult) {
+                    // THEN
+                    assertEquals(resultMessage, backtraceResult.message);
+                    assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                    assertNotNull(backtraceResult.getBacktraceReport());
+                    assertNotNull(backtraceResult.getBacktraceReport().attributes);
+                    assertNotNull(
+                            backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                    assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                            // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
-                            assertNotEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                    // We should have the breadcrumbs attachment path included if breadcrumbs are enabled
+                    assertNotEquals(
+                            0,
+                            backtraceResult.getBacktraceReport().attachmentPaths.size());
 
-                            // Since we cleared, we should only have the configuration breadcrumb
-                            assertEquals(1L,
-                                    backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                    // Since we cleared, we should only have the configuration breadcrumb
+                    assertEquals(
+                            1L, backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
 
-                            waiter.resume();
-                        }
-                    }
-            );
+                    waiter.resume();
+                }
+            });
 
             breadcrumbLogFileData = readBreadcrumbLogFile();
             TestCase.assertEquals(1, breadcrumbLogFileData.size());
@@ -276,32 +272,31 @@ public class BacktraceClientBreadcrumbsTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNotNull(backtraceResult.getBacktraceReport().attributes);
-                        assertNotNull(backtraceResult.getBacktraceReport().exception);
+        backtraceClient.send(new Exception(resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNotNull(backtraceResult.getBacktraceReport().attributes);
+                assertNotNull(backtraceResult.getBacktraceReport().exception);
 
-                        // We should NOT have the breadcrumbs attachment path included by default
-                        assertEquals(0, backtraceResult.getBacktraceReport().attachmentPaths.size());
+                // We should NOT have the breadcrumbs attachment path included by default
+                assertEquals(
+                        0, backtraceResult.getBacktraceReport().attachmentPaths.size());
 
-                        assertNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
-                        waiter.resume();
-                    }
-                }
-        );
+                assertNull(backtraceResult.getBacktraceReport().attributes.get("breadcrumbs.lastId"));
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -324,7 +319,8 @@ public class BacktraceClientBreadcrumbsTest {
     }
 
     public List<String> readBreadcrumbLogFile() throws IOException {
-        BacktraceBreadcrumbs breadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+        BacktraceBreadcrumbs breadcrumbs =
+                new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
         File breadcrumbLogFile = new File(breadcrumbs.getBreadcrumbLogPath());
 
         List<String> breadcrumbLogFileData = new ArrayList<String>();

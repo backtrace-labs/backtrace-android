@@ -1,5 +1,11 @@
 package backtraceio.coroner;
 
+import backtraceio.coroner.common.Common;
+import backtraceio.coroner.common.HttpClient;
+import backtraceio.coroner.response.CoronerApiResponse;
+import backtraceio.coroner.response.CoronerHttpException;
+import backtraceio.coroner.serialization.CoronerResponseGroupDeserializer;
+import backtraceio.coroner.serialization.GsonWrapper;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,38 +16,30 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import backtraceio.coroner.common.Common;
-import backtraceio.coroner.common.HttpClient;
-import backtraceio.coroner.response.CoronerApiResponse;
-import backtraceio.coroner.response.CoronerHttpException;
-import backtraceio.coroner.serialization.CoronerResponseGroupDeserializer;
-import backtraceio.coroner.serialization.GsonWrapper;
-
 class CoronerHttpClient implements HttpClient {
     private static final Logger LOGGER = Logger.getLogger(CoronerResponseGroupDeserializer.class.getName());
     private final String apiUrl;
     private final String coronerToken;
     private final String ENCODING = "utf-8";
+
     public CoronerHttpClient(final String apiUrl, final String coronerToken) {
         this.apiUrl = apiUrl;
         this.coronerToken = coronerToken;
     }
+
     public CoronerApiResponse get(final String requestJson) throws CoronerHttpException, IOException {
         final HttpURLConnection urlConnection = prepareHttpRequest(requestJson);
         final int statusCode = urlConnection.getResponseCode();
 
         if (statusCode != HttpURLConnection.HTTP_OK) {
             String message = getResponseMessage(urlConnection);
-            message = (Common.isNullOrEmpty(message)) ?
-                    urlConnection.getResponseMessage() : message;
+            message = (Common.isNullOrEmpty(message)) ? urlConnection.getResponseMessage() : message;
             throw new CoronerHttpException(statusCode, String.format("%s: %s", statusCode, message));
         }
 
         final String resultJson = getResponseMessage(urlConnection);
 
-        return GsonWrapper.fromJson(
-                resultJson,
-                CoronerApiResponse.class);
+        return GsonWrapper.fromJson(resultJson, CoronerApiResponse.class);
     }
 
     private static String getResponseMessage(final HttpURLConnection urlConnection) throws IOException {
@@ -49,8 +47,7 @@ class CoronerHttpClient implements HttpClient {
 
         final InputStream inputStream = getInputStream(urlConnection);
 
-        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-                inputStream));
+        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
         final StringBuilder responseStringBuilder = new StringBuilder();
         String line;

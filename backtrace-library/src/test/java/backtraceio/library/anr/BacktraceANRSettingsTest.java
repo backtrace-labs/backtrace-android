@@ -4,10 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-
-import backtraceio.library.watchdog.BacktraceWatchdogTimeoutException;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
+import org.junit.Test;
 
 public class BacktraceANRSettingsTest {
 
@@ -26,9 +24,8 @@ public class BacktraceANRSettingsTest {
         // GIVEN
         int timeout = 2000;
         boolean debug = true;
-        OnApplicationNotRespondingEvent event = exception -> {
+        OnApplicationNotRespondingEvent event = exception -> {};
 
-        };
         // WHEN
         BacktraceANRSettings settings = new BacktraceANRSettings(timeout, event, debug);
 
@@ -37,5 +34,4 @@ public class BacktraceANRSettingsTest {
         assertEquals(event, settings.getOnApplicationNotRespondingEvent());
         assertEquals(debug, settings.isDebug());
     }
-
 }

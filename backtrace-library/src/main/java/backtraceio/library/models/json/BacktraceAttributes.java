@@ -3,15 +3,13 @@ package backtraceio.library.models.json;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.provider.Settings;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import backtraceio.library.common.DeviceAttributesHelper;
 import backtraceio.library.enums.ScreenOrientation;
 import backtraceio.library.models.attributes.ReportDataAttributes;
 import backtraceio.library.models.attributes.ReportDataBuilder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Class instance to get a built-in attributes from current application
@@ -44,8 +42,7 @@ public class BacktraceAttributes {
      * @param report           received Backtrace report
      * @param clientAttributes client's attributes (report and client)
      */
-    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object>
-            clientAttributes) {
+    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object> clientAttributes) {
         this(context, report, clientAttributes, true);
     }
 
@@ -60,7 +57,10 @@ public class BacktraceAttributes {
      * @param clientAttributes         client's attributes (report and client)
      * @param includeDynamicAttributes whether to include dynamic attributes
      */
-    public BacktraceAttributes(Context context, BacktraceReport report, Map<String, Object> clientAttributes,
+    public BacktraceAttributes(
+            Context context,
+            BacktraceReport report,
+            Map<String, Object> clientAttributes,
             Boolean includeDynamicAttributes) {
         this.context = context;
 
@@ -159,10 +159,7 @@ public class BacktraceAttributes {
      * @return screen backlight brightness between 0 and 255
      */
     private int getScreenBrightness() {
-        return Settings.System.getInt(
-                this.context.getContentResolver(),
-                Settings.System.SCREEN_BRIGHTNESS,
-                0);
+        return Settings.System.getInt(this.context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 0);
     }
 
     /**

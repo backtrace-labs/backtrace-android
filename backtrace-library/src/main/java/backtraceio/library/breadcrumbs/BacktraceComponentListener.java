@@ -2,12 +2,10 @@ package backtraceio.library.breadcrumbs;
 
 import android.content.ComponentCallbacks2;
 import android.content.res.Configuration;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BacktraceComponentListener implements ComponentCallbacks2 {
 
@@ -57,9 +55,7 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
     public void onTrimMemory(int level) {
         String messageString = getMemoryWarningString(level);
         BacktraceBreadcrumbLevel breadcrumbLevel = getMemoryWarningLevel(level);
-        backtraceBreadcrumbs.addBreadcrumb(messageString,
-                BacktraceBreadcrumbType.SYSTEM,
-                breadcrumbLevel);
+        backtraceBreadcrumbs.addBreadcrumb(messageString, BacktraceBreadcrumbType.SYSTEM, breadcrumbLevel);
     }
 
     private String stringifyOrientation(final int orientation) {
@@ -78,16 +74,13 @@ public class BacktraceComponentListener implements ComponentCallbacks2 {
         Map<String, Object> attributes = new HashMap<String, Object>();
         String orientation = stringifyOrientation(newConfig.orientation);
         attributes.put("orientation", orientation);
-        backtraceBreadcrumbs.addBreadcrumb("Configuration changed",
-                attributes,
-                BacktraceBreadcrumbType.SYSTEM,
-                BacktraceBreadcrumbLevel.INFO);
+        backtraceBreadcrumbs.addBreadcrumb(
+                "Configuration changed", attributes, BacktraceBreadcrumbType.SYSTEM, BacktraceBreadcrumbLevel.INFO);
     }
 
     @Override
     public void onLowMemory() {
-        backtraceBreadcrumbs.addBreadcrumb("Critical low memory warning!",
-                BacktraceBreadcrumbType.SYSTEM,
-                BacktraceBreadcrumbLevel.FATAL);
+        backtraceBreadcrumbs.addBreadcrumb(
+                "Critical low memory warning!", BacktraceBreadcrumbType.SYSTEM, BacktraceBreadcrumbLevel.FATAL);
     }
 }

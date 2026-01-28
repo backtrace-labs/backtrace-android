@@ -1,7 +1,6 @@
 package backtraceio.library.logger;
 
 import android.util.Log;
-
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -5,15 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Map;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceStaticAttributesTest {
@@ -37,7 +34,6 @@ public class BacktraceStaticAttributesTest {
         // THEN
         assertNotNull(instance);
         assertNotNull(attributes);
-
 
         // Check app information
         assertTrue(attributes.containsKey("application.package"));
@@ -77,7 +73,8 @@ public class BacktraceStaticAttributesTest {
         BacktraceStaticAttributes instance2 = BacktraceStaticAttributes.getInstance();
 
         // THEN
-        // Note: The current implementation of init(context) always creates a new instance and assigns it to the static variable.
+        // Note: The current implementation of init(context) always creates a new instance and assigns it to the static
+        // variable.
         // It's not a strict singleton in the sense that it doesn't check if instance is null before overwriting.
         // However, we expect getInstance() to return the latest initialized instance.
         assertNotNull(instance1);

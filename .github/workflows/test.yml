@@ -5,7 +5,7 @@ on:
     branches: [master]
   pull_request:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -34,7 +34,13 @@ jobs:
           echo BACKTRACE_CORONER_TOKEN=\"${{ secrets.BACKTRACE_CORONER_TOKEN }}\" >> ./local.properties
 
       - name: Accept Android SDK licences
-        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses    
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Bugfix libunwindstack-ndk .clang-format symbolic link issue
+        run: rm ./backtrace-library/src/main/cpp/libbun/external/libunwindstack-ndk/.clang-format
+
+      - name: Check Code Style
+        run: ./gradlew spotlessCheck
 
       - name: Build and check
         run: ./gradlew assembleDebug assembleDebugAndroidTest build check

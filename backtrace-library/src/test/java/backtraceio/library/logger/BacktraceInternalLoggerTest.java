@@ -3,11 +3,10 @@ package backtraceio.library.logger;
 import static org.mockito.Mockito.mockStatic;
 
 import android.util.Log;
-
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -24,11 +23,14 @@ public class BacktraceInternalLoggerTest {
 
     public class LogMockAnswer implements Answer<Integer> {
         @Override
-        public Integer answer(InvocationOnMock invocation) { return LOG_ENABLED; }
+        public Integer answer(InvocationOnMock invocation) {
+            return LOG_ENABLED;
+        }
     }
 
     @Mock
     private static MockedStatic<Log> mockLog;
+
     private BacktraceInternalLogger logger;
 
     @BeforeClass
@@ -49,20 +51,12 @@ public class BacktraceInternalLoggerTest {
 
     private void mockLogMethods() {
         try {
-            mockLog.when(() -> Log.d(Mockito.any(), Mockito.any())).thenAnswer(
-                    new LogMockAnswer()
-            );
-            mockLog.when(() -> Log.w(Mockito.any(), Mockito.anyString())).thenAnswer(
-                    new LogMockAnswer()
-            );
-            mockLog.when(() -> Log.e(Mockito.any(), Mockito.any())).thenAnswer(
-                    new LogMockAnswer()
-            );
-            mockLog.when(() -> Log.e(Mockito.any(), Mockito.any(), Mockito.any())).thenAnswer(
-                    new LogMockAnswer()
-            );
-        }
-        catch (Exception e) {
+            mockLog.when(() -> Log.d(Mockito.any(), Mockito.any())).thenAnswer(new LogMockAnswer());
+            mockLog.when(() -> Log.w(Mockito.any(), Mockito.anyString())).thenAnswer(new LogMockAnswer());
+            mockLog.when(() -> Log.e(Mockito.any(), Mockito.any())).thenAnswer(new LogMockAnswer());
+            mockLog.when(() -> Log.e(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenAnswer(new LogMockAnswer());
+        } catch (Exception e) {
             Assert.fail(e.toString());
         }
     }

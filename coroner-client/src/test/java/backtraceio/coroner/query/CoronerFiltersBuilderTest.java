@@ -2,11 +2,9 @@ package backtraceio.coroner.query;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.gson.JsonArray;
-
-import org.junit.Test;
-
 import backtraceio.coroner.utils.StringUtils;
+import com.google.gson.JsonArray;
+import org.junit.Test;
 
 public class CoronerFiltersBuilderTest {
 
@@ -64,7 +62,8 @@ public class CoronerFiltersBuilderTest {
         final String result = filtersBuilder.getJson().toString();
 
         // THEN
-        final String expectedResult = "[{\"_rxid\":[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"],[\"at-least\",\"4f0a0000-4f0a-fd08-0000-999000999000\"]],\"example_field\":[[\"at-most\",\"12345678-4f0b-fdp2-0001-000094000000\"]]}]";
+        final String expectedResult =
+                "[{\"_rxid\":[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"],[\"at-least\",\"4f0a0000-4f0a-fd08-0000-999000999000\"]],\"example_field\":[[\"at-most\",\"12345678-4f0b-fdp2-0001-000094000000\"]]}]";
         assertEquals(expectedResult, result);
     }
 }

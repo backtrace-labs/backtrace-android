@@ -1,11 +1,8 @@
 package backtraceio.library.models.metrics;
 
 import backtraceio.gson.annotations.SerializedName;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import backtraceio.library.common.BacktraceStringHelper;
 
 public abstract class Event {
 

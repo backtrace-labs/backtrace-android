@@ -4,14 +4,7 @@ import static backtraceio.library.anr.AppExitInfoDetailsExtractor.getANRAttribut
 
 import android.content.Context;
 import android.os.Build;
-
 import androidx.annotation.RequiresApi;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.common.ApplicationMetadataCache;
 import backtraceio.library.logger.BacktraceLogger;
@@ -19,13 +12,17 @@ import backtraceio.library.models.BacktraceAttributeConsts;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.watchdog.OnApplicationNotRespondingEvent;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BacktraceAppExitInfoSenderHandler extends Thread implements BacktraceANRHandler {
-    private final static String THREAD_NAME = "main-anr-appexit";
-    private final static String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
-    private final static String ANR_COMPLEX_ATTR_KEY = "ANR annotations";
-    private final static String ANR_STACKTRACE_PARSED_ATTR_KEY = "ANR parsed stacktrace";
-    private final static String ANR_STACKTRACE_ATTR_KEY = "ANR stacktrace";
+    private static final String THREAD_NAME = "main-anr-appexit";
+    private static final String LOG_TAG = BacktraceAppExitInfoSenderHandler.class.getSimpleName();
+    private static final String ANR_COMPLEX_ATTR_KEY = "ANR annotations";
+    private static final String ANR_STACKTRACE_PARSED_ATTR_KEY = "ANR parsed stacktrace";
+    private static final String ANR_STACKTRACE_ATTR_KEY = "ANR stacktrace";
 
     private final BacktraceClient backtraceClient;
     private final String packageName;
@@ -35,14 +32,18 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     private final AnrExitInfoState anrAppExitInfoState;
 
     public BacktraceAppExitInfoSenderHandler(BacktraceClient client, Context context) {
-        this(client,
+        this(
+                client,
                 ApplicationMetadataCache.getInstance(context).getPackageName(),
                 new AnrExitInfoState(context),
-                new ActivityManagerExitInfoProvider(context)
-        );
+                new ActivityManagerExitInfoProvider(context));
     }
 
-    protected BacktraceAppExitInfoSenderHandler(BacktraceClient client, String packageName, AnrExitInfoState anrAppExitInfoState, ProcessExitInfoProvider activityManager) {
+    protected BacktraceAppExitInfoSenderHandler(
+            BacktraceClient client,
+            String packageName,
+            AnrExitInfoState anrAppExitInfoState,
+            ProcessExitInfoProvider activityManager) {
         super(THREAD_NAME);
         this.backtraceClient = client;
         this.packageName = packageName;
@@ -59,11 +60,15 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
 
     private void send() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
-            BacktraceLogger.d(LOG_TAG, "Unsupported Android version " + android.os.Build.VERSION.SDK_INT + " to send ANR based on applicationExitInfoList");
+            BacktraceLogger.d(
+                    LOG_TAG,
+                    "Unsupported Android version " + android.os.Build.VERSION.SDK_INT
+                            + " to send ANR based on applicationExitInfoList");
             return;
         }
 
-        final List<ExitInfo> applicationExitInfoList = this.activityManager.getHistoricalExitInfo(this.packageName, 0, 0);
+        final List<ExitInfo> applicationExitInfoList =
+                this.activityManager.getHistoricalExitInfo(this.packageName, 0, 0);
 
         Collections.reverse(applicationExitInfoList);
         for (ExitInfo appExitInfo : applicationExitInfoList) {
@@ -99,7 +104,8 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {;
+    private BacktraceReport generateBacktraceReport(ExitInfo appExitInfo) {
+        ;
         final Map<String, Object> anrAttributes = getANRAttributes(appExitInfo);
         final String stackTrace = AppExitInfoDetailsExtractor.getStackTraceInfo(appExitInfo);
 
@@ -109,14 +115,17 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
         }
 
         final Map<String, Object> parsedStackTraceAttributes = this.getAttributesFromStacktrace(stackTrace);
-        final StackTraceElement[] anrStackTrace = ExitInfoStackTraceParser.parseMainThreadStackTrace(parsedStackTraceAttributes);
+        final StackTraceElement[] anrStackTrace =
+                ExitInfoStackTraceParser.parseMainThreadStackTrace(parsedStackTraceAttributes);
 
-        final HashMap<String, Object> attributes = new HashMap<String, Object>(){{
-            put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
-            put(ANR_COMPLEX_ATTR_KEY, anrAttributes);
-            put(ANR_STACKTRACE_ATTR_KEY, stackTrace);
-            put(ANR_STACKTRACE_PARSED_ATTR_KEY, parsedStackTraceAttributes);
-        }};
+        final HashMap<String, Object> attributes = new HashMap<String, Object>() {
+            {
+                put(BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.AnrAttributeType);
+                put(ANR_COMPLEX_ATTR_KEY, anrAttributes);
+                put(ANR_STACKTRACE_ATTR_KEY, stackTrace);
+                put(ANR_STACKTRACE_PARSED_ATTR_KEY, parsedStackTraceAttributes);
+            }
+        };
 
         return new BacktraceReport(new BacktraceANRExitInfoException(appExitInfo, anrStackTrace), attributes);
     }
@@ -154,9 +163,7 @@ public class BacktraceAppExitInfoSenderHandler extends Thread implements Backtra
     }
 
     @Override
-    public void setOnApplicationNotRespondingEvent(
-            OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {
-    }
+    public void setOnApplicationNotRespondingEvent(OnApplicationNotRespondingEvent onApplicationNotRespondingEvent) {}
 
     @Override
     public void stopMonitoringAnr() {

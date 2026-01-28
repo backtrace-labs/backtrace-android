@@ -2,22 +2,18 @@ package backtraceio.library.crashHandler;
 
 import static org.junit.Assert.assertEquals;
 
+import android.content.pm.ApplicationInfo;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import backtraceio.library.common.AbiHelper;
+import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import android.content.pm.ApplicationInfo;
-
-import backtraceio.library.common.AbiHelper;
-import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class CrashHandlerNativeLibraryResolutionTest {
@@ -25,8 +21,8 @@ public class CrashHandlerNativeLibraryResolutionTest {
     private static final String LIB = "libbacktrace-native.so";
 
     private File tempDir(String name) {
-        File cache = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext().getCacheDir();
+        File cache =
+                InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir();
         File d = new File(cache, name);
         //noinspection ResultOfMethodCallIgnored
         d.mkdirs();
@@ -39,7 +35,7 @@ public class CrashHandlerNativeLibraryResolutionTest {
             if (includeLib) {
                 String entry = "lib/" + abi + "/" + LIB;
                 zos.putNextEntry(new ZipEntry(entry));
-                zos.write(new byte[]{1, 2, 3, 4});
+                zos.write(new byte[] {1, 2, 3, 4});
                 zos.closeEntry();
             } else {
                 zos.putNextEntry(new ZipEntry("META-INF/MANIFEST.MF"));
@@ -67,7 +63,7 @@ public class CrashHandlerNativeLibraryResolutionTest {
 
         ApplicationInfo ai = new ApplicationInfo();
         ai.sourceDir = base.getAbsolutePath();
-        ai.splitSourceDirs = new String[]{split.getAbsolutePath()};
+        ai.splitSourceDirs = new String[] {split.getAbsolutePath()};
         ai.nativeLibraryDir = "/nonexistent";
 
         CrashHandlerConfiguration cfg = new CrashHandlerConfiguration();
@@ -93,12 +89,12 @@ public class CrashHandlerNativeLibraryResolutionTest {
         nativeDir.mkdirs();
         File extracted = new File(nativeDir, LIB);
         try (FileOutputStream fos = new FileOutputStream(extracted)) {
-            fos.write(new byte[]{9, 9, 9});
+            fos.write(new byte[] {9, 9, 9});
         }
 
         ApplicationInfo ai = new ApplicationInfo();
         ai.sourceDir = base.getAbsolutePath();
-        ai.splitSourceDirs = new String[]{split.getAbsolutePath()};
+        ai.splitSourceDirs = new String[] {split.getAbsolutePath()};
         ai.nativeLibraryDir = nativeDir.getAbsolutePath();
 
         CrashHandlerConfiguration cfg = new CrashHandlerConfiguration();
@@ -120,7 +116,7 @@ public class CrashHandlerNativeLibraryResolutionTest {
 
         ApplicationInfo ai = new ApplicationInfo();
         ai.sourceDir = base.getAbsolutePath();
-        ai.splitSourceDirs = new String[]{split.getAbsolutePath()};
+        ai.splitSourceDirs = new String[] {split.getAbsolutePath()};
         ai.nativeLibraryDir = "/nonexistent";
 
         CrashHandlerConfiguration cfg = new CrashHandlerConfiguration();

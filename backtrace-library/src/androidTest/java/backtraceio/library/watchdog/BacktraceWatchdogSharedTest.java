@@ -1,31 +1,26 @@
 package backtraceio.library.watchdog;
 
+import static backtraceio.library.models.BacktraceAttributeConsts.AnrAttributeType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static backtraceio.library.models.BacktraceAttributeConsts.AnrAttributeType;
 
 import android.content.Context;
-
 import androidx.test.annotation.UiThreadTest;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.breadcrumbs.BreadcrumbsReader;
 import backtraceio.library.logger.BacktraceLogger;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceWatchdogSharedTest {
@@ -70,8 +65,7 @@ public class BacktraceWatchdogSharedTest {
         });
 
         // WHEN
-        BacktraceWatchdogShared.sendReportCauseBlockedThread(
-                backtraceClient, new Thread(), null, "");
+        BacktraceWatchdogShared.sendReportCauseBlockedThread(backtraceClient, new Thread(), null, "");
 
         // THEN
         try {
@@ -87,8 +81,8 @@ public class BacktraceWatchdogSharedTest {
             JSONObject anrBreadcrumb = new JSONObject(breadcrumbs.get(1));
             return anrBreadcrumb.getString("message");
         } catch (Exception e) {
-            BacktraceLogger.e(BacktraceWatchdogSharedTest.class.getName(),
-                    "Exception on looking for ANR breadcrumb", e);
+            BacktraceLogger.e(
+                    BacktraceWatchdogSharedTest.class.getName(), "Exception on looking for ANR breadcrumb", e);
             return null;
         }
     }

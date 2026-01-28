@@ -5,19 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import backtraceio.library.enums.database.RetryOrder;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -25,7 +14,13 @@ import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceDatabaseContext;
 import backtraceio.library.services.BacktraceDatabaseFileContext;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseFileContextTest {
@@ -42,7 +37,8 @@ public class BacktraceDatabaseFileContextTest {
         this.dbPath = this.context.getFilesDir().getAbsolutePath();
         this.databaseSettings = new BacktraceDatabaseSettings(this.dbPath, RetryOrder.Queue);
         this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
-        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
+        this.databaseFileContext = new BacktraceDatabaseFileContext(
+                this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
         this.databaseContext.clear();
         this.databaseFileContext.clear();
     }
@@ -52,12 +48,13 @@ public class BacktraceDatabaseFileContextTest {
         this.databaseContext.clear();
     }
 
-
     @Test
     public void getFilesAfterAddOne() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context,  null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         int files = countAllFiles();
@@ -73,9 +70,15 @@ public class BacktraceDatabaseFileContextTest {
         BacktraceReport report2 = new BacktraceReport(testMessage);
         BacktraceReport report3 = new BacktraceReport(testMessage);
 
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report3).setAttributes(this.context, null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report3)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         int files = countAllFiles();
@@ -91,9 +94,15 @@ public class BacktraceDatabaseFileContextTest {
         BacktraceReport report2 = new BacktraceReport(testMessage);
         BacktraceReport report3 = new BacktraceReport(testMessage);
 
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report3).setAttributes(this.context, null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report3)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         int files = countRecords();
@@ -102,21 +111,23 @@ public class BacktraceDatabaseFileContextTest {
         assertEquals(3, files); // 3x BacktraceDatabaseRecord, 3x BacktraceData, 3x BacktraceReport
     }
 
-
     @Test
     public void clear() {
         // GIVEN
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
 
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         int filesAfterAdd = countAllFiles();
         this.databaseFileContext.clear();
         int filesAfterClear = countAllFiles();
-
 
         // THEN
         assertEquals(6, filesAfterAdd); // 3x BacktraceDatabaseRecord, 3x BacktraceData, 3x BacktraceReport
@@ -129,8 +140,12 @@ public class BacktraceDatabaseFileContextTest {
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
 
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         boolean result = this.databaseFileContext.validFileConsistency();
@@ -143,14 +158,19 @@ public class BacktraceDatabaseFileContextTest {
     public void forceInconsistencyMaxRecordCount() {
         // GIVEN
         this.databaseSettings.setMaxRecordCount(1);
-        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
+        this.databaseFileContext = new BacktraceDatabaseFileContext(
+                this.dbPath, this.databaseSettings.getMaxDatabaseSize(), this.databaseSettings.getMaxRecordCount());
         this.databaseContext = new BacktraceDatabaseContext(this.databaseSettings);
 
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
 
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         boolean result = this.databaseFileContext.validFileConsistency();
@@ -162,13 +182,18 @@ public class BacktraceDatabaseFileContextTest {
     @Test
     public void forceInconsistencyMaxDatabaseSize() {
         // GIVEN
-        this.databaseFileContext = new BacktraceDatabaseFileContext(this.dbPath, 1, this.databaseSettings.getMaxRecordCount());
+        this.databaseFileContext =
+                new BacktraceDatabaseFileContext(this.dbPath, 1, this.databaseSettings.getMaxRecordCount());
 
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
 
-        this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
+        this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         boolean result = this.databaseFileContext.validFileConsistency();
@@ -183,14 +208,20 @@ public class BacktraceDatabaseFileContextTest {
         BacktraceReport report = new BacktraceReport(testMessage);
         BacktraceReport report2 = new BacktraceReport(testMessage);
 
-        final BacktraceDatabaseRecord record = this.databaseContext.add(new BacktraceData.Builder(report).setAttributes(this.context, null).build());
-        this.databaseContext.add(new BacktraceData.Builder(report2).setAttributes(this.context, null).build());
+        final BacktraceDatabaseRecord record = this.databaseContext.add(new BacktraceData.Builder(report)
+                .setAttributes(this.context, null)
+                .build());
+        this.databaseContext.add(new BacktraceData.Builder(report2)
+                .setAttributes(this.context, null)
+                .build());
 
         // WHEN
         int countRecords = countRecords();
-        List<BacktraceDatabaseRecord> records = new ArrayList<BacktraceDatabaseRecord>() {{
-            add(record);
-        }};
+        List<BacktraceDatabaseRecord> records = new ArrayList<BacktraceDatabaseRecord>() {
+            {
+                add(record);
+            }
+        };
         this.databaseFileContext.removeOrphaned(records);
 
         int countRecordAfterRemoveOrphaned = countRecords();
