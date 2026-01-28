@@ -39,14 +39,7 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
     spotless {
         java {
-            target fileTree(projectDir) {
-                include '**/*.java'
-                exclude 'src/main/cpp/**'
-                exclude '**/build/**'
-                exclude '.cxx/**'
-                exclude '**/libbun/**'
-                // Add any other paths from your spotlessExcludes list here
-            }
+            target '**/*.java'
             targetExclude spotlessExcludes
             palantirJavaFormat()
             removeUnusedImports()
@@ -54,7 +47,7 @@ subprojects {
             endWithNewline()
         }
         json {
-            target fileTree(dir: projectDir, include: '**/*.json', exclude: spotlessExcludes)
+            target '**/*.json'
             targetExclude spotlessExcludes
             simple()
         }
