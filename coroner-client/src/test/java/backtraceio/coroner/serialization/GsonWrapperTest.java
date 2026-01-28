@@ -3,9 +3,11 @@ package backtraceio.coroner.serialization;
 import static backtraceio.coroner.utils.ResourceUtils.EXPECTED_FRAMES;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.readResourceFile;
+import static backtraceio.coroner.utils.StringUtils.compareJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import backtraceio.coroner.response.CoronerApiResponse;
 import backtraceio.coroner.response.CoronerResponseGroup;
@@ -37,7 +39,9 @@ public class GsonWrapperTest {
         CoronerResponseGroup responseGroup = result.getResponse().values.get(0);
         assertEquals(
                 "Invalid index of selected element!", getResponseGroupAttributeValue(responseGroup.getAttribute(0)));
-        assertEquals(expectedFrames, getResponseGroupAttributeValue(responseGroup.getAttribute(1)));
+        assertTrue(compareJson(
+                expectedFrames,
+                getResponseGroupAttributeValue(responseGroup.getAttribute(1)).toString()));
         assertEquals(
                 "e4c57699-0dc9-35e2-b4a0-2ffff1925ca7", getResponseGroupAttributeValue(responseGroup.getAttribute(2)));
         assertEquals(

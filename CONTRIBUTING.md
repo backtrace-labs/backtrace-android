@@ -28,14 +28,14 @@ Thank you for your interest in contributing to the Backtrace Android SDK. Please
 ## Coding Guidelines
 
 1. **Code Formatting**
-    - Make sure that your code is properly formatted using the default Android Studio formatter.
-        - In Android Studio, you can format your code by selecting `Code` > `Reformat Code` or by using the shortcut `Ctrl + Alt + L` (Windows/Linux) or `Cmd + Option + L` (macOS).
+    - Make sure that your code is properly formatted using the [**Spotless**](https://github.com/diffplug/spotless) formatter.
+        - From the command line, you can format the code by running:
+          ```bash
+          ./gradlew spotlessApply
+          ```
+        - In Android Studio, you can also use the **Spotless Gradle** plugin to run formatting directly from the IDE.
 
-2. **Optimize Imports**
-    - Run 'Optimize imports' to remove unused imports and reorder them.
-        - In Android Studio, you can optimize imports by selecting `Code` > `Optimize Imports`. You can also enable this option to run it automatically in `Settings` -> `Editor` -> `General` -> `Auto Import`
-
-3. **Write Tests**
+2. **Write Tests**
     - Ensure that you write tests for the new functionality or changes made. This helps maintain the integrity of the project.
 
 ## Commit and Push

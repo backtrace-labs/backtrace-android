@@ -53,27 +53,27 @@ subprojects {
             trimTrailingWhitespace()
             endWithNewline()
         }
-//        json {
-//            target fileTree(dir: projectDir, include: '**/*.json', exclude: spotlessExcludes)
-//            targetExclude spotlessExcludes
-//            simple()
-//        }
-//
-//        format 'gradle', {
-//            target '**/*.gradle'
-//            targetExclude spotlessExcludes
-//            leadingTabsToSpaces(4)
-//            trimTrailingWhitespace()
-//            endWithNewline()
-//        }
-//
-//
-//        format 'misc', {
-//            target '*.md', '.gitignore'
-//            targetExclude spotlessExcludes
-//            trimTrailingWhitespace()
-//            endWithNewline()
-//        }
+        json {
+            target fileTree(dir: projectDir, include: '**/*.json', exclude: spotlessExcludes)
+            targetExclude spotlessExcludes
+            simple()
+        }
+
+        format 'gradle', {
+            target '**/*.gradle'
+            targetExclude spotlessExcludes
+            leadingTabsToSpaces(4)
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+
+
+        format 'misc', {
+            target '*.md', '.gitignore'
+            targetExclude spotlessExcludes
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
     }
 }
 
