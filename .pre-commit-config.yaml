@@ -7,16 +7,15 @@ repos:
         language: system
         stages: [pre-commit]
         pass_filenames: false
-## TODO: before merge - remove above and uncomment below
-#      - id: spotless-apply
-#        name: Spotless Apply
-#        entry: ./gradlew spotlessApply
-#        language: system
-#        stages: [pre-commit]
-#        pass_filenames: false
-#      - id: spotless-check
-#        name: Spotless Check
-#        entry: ./gradlew spotlessCheck
-#        language: system
-#        stages: [pre-commit]
-#        pass_filenames: false
+      - id: spotless-apply
+        name: Spotless Apply
+        entry: ./gradlew spotlessApply
+        language: system
+        stages: [pre-commit]
+        pass_filenames: false
+      - id: spotless-check
+        name: Spotless Check
+        entry: ./gradlew spotlessCheck
+        language: system
+        stages: [pre-commit]
+        pass_filenames: false
