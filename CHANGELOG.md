@@ -1,10 +1,10 @@
 # Backtrace Android Release Notes
 
 ## Version 3.11.0
-- Shadow the `google/gson` dependency, removing enforced GSON versioning. Client applications can now use a different GSON version or an alternative serialization library.
-- Introduce a static device report attributes API for the Backtrace SDK. Static attributes are initialized at startup and reused to speed up report creation.
-- Fix the retry mechanism in the Backtrace Database Context.
-- Add support for dynamic attachments, allowing client applications to attach files to a report at any time.
+- Dependency isolation: Shadow the google/gson dependency to avoid version conflicts with host applications and allow use of alternative serialization libraries.
+- Static device attributes API: Introduce persistent device attributes initialized at startup to reduce redundant per-report processing.
+- Improve retry reliability: Update the Backtrace Database Context retry mechanism to ensure queued reports are retried predictably under intermittent or transient failures.
+- Dynamic attachments: Add runtime attachment support, enabling files to be attached to reports post SDK initialization.
 
 ## Version 3.10.6
 - Improve database Timer reliability
