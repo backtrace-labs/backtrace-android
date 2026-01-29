@@ -1,5 +1,11 @@
 # Backtrace Android Release Notes
 
+## Version 3.11.0
+- Shadow google/gson library
+- Introduce static device report attributes API for Backtrace SDK
+- Fix Backtrace Database Context retry mechanism
+- Feature/dynamic attachment support
+
 ## Version 3.10.6
 - Improve database Timer reliability
 - Update Crashpad native library
