@@ -1,6 +1,7 @@
 # Backtrace Android Release Notes
 
 ## Version 3.11.0
+Improvements
 - Dependency isolation: Shadow the google/gson dependency to avoid version conflicts with host applications and allow use of alternative serialization libraries.
 - Static device attributes API: Introduce persistent device attributes initialized at startup to reduce redundant per-report processing.
 - Improve retry reliability: Update the Backtrace Database Context retry mechanism to ensure queued reports are retried predictably under intermittent or transient failures.
