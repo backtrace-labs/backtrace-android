@@ -1,5 +1,11 @@
 # Backtrace Android Release Notes
 
+## Version 3.11.0
+- Dependency isolation: Shadow the google/gson dependency to avoid version conflicts with host applications and allow use of alternative serialization libraries.
+- Static device attributes API: Introduce persistent device attributes initialized at startup to reduce redundant per-report processing.
+- Improve retry reliability: Update the Backtrace Database Context retry mechanism to ensure queued reports are retried predictably under intermittent or transient failures.
+- Dynamic attachments: Add runtime attachment support, enabling files to be attached to reports post SDK initialization.
+
 ## Version 3.10.6
 - Improve database Timer reliability
 - Update Crashpad native library
