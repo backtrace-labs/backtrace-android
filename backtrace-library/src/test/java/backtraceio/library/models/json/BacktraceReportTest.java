@@ -5,45 +5,61 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.json.JSONException;
-import org.junit.Test;
-
+import backtraceio.library.TestUtils;
+import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.models.BacktraceStackFrame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.lang.StackTraceElement;
-import backtraceio.library.TestUtils;
-import backtraceio.library.common.BacktraceSerializeHelper;
-import backtraceio.library.models.BacktraceStackFrame;
+import org.json.JSONException;
+import org.junit.Test;
 
 public class BacktraceReportTest {
     private final String JSON_FILE = "backtraceReport.json";
+
     @Test
     public void serialize() throws JSONException {
         // GIVEN
         final List<BacktraceStackFrame> diagnosticStack = new ArrayList<>();
 
-        diagnosticStack.add(new BacktraceStackFrame("backtraceio.library.SettingAttributesTest.tmpGsonTest", null, 75, "c37b9ae3-eab1-4928-9533-f1c14b6149f5"));
-        diagnosticStack.add(new BacktraceStackFrame("java.lang.reflect.Method.invoke", null, null, "6f280747-feee-4f4b-9eff-dda0d8eaa535"));
+        diagnosticStack.add(new BacktraceStackFrame(
+                "backtraceio.library.SettingAttributesTest.tmpGsonTest",
+                null,
+                75,
+                "c37b9ae3-eab1-4928-9533-f1c14b6149f5"));
+        diagnosticStack.add(new BacktraceStackFrame(
+                "java.lang.reflect.Method.invoke", null, null, "6f280747-feee-4f4b-9eff-dda0d8eaa535"));
         final Exception exception = new IllegalAccessException();
         final StackTraceElement[] stackTraceElements = new StackTraceElement[1];
-        stackTraceElements[0] = new StackTraceElement("backtraceio.library.SettingAttributesTest", "tmpGsonTest", "SettingAttributesTest.java", 75);
+        stackTraceElements[0] = new StackTraceElement(
+                "backtraceio.library.SettingAttributesTest", "tmpGsonTest", "SettingAttributesTest.java", 75);
 
         exception.setStackTrace(stackTraceElements);
 
         final Map<String, Object> attributes = new HashMap<>();
         attributes.put("error.type", "Exception");
-        final BacktraceReport report = new BacktraceReport(UUID.fromString("a62a533a-a7b8-415c-9a99-253c51f00827"), 1709680251, true, "java.lang.IllegalAccessException", attributes, null, exception, new ArrayList<String>() {{ add("abc.txt"); }}, diagnosticStack);
+        final BacktraceReport report = new BacktraceReport(
+                UUID.fromString("a62a533a-a7b8-415c-9a99-253c51f00827"),
+                1709680251,
+                true,
+                "java.lang.IllegalAccessException",
+                attributes,
+                null,
+                exception,
+                new ArrayList<String>() {
+                    {
+                        add("abc.txt");
+                    }
+                },
+                diagnosticStack);
 
         // WHEN
         String json = BacktraceSerializeHelper.toJson(report);
 
         // THEN
-        String expectedJson = TestUtils.minifyJsonString(
-                TestUtils.readFileAsString(this, JSON_FILE)
-        );
+        String expectedJson = TestUtils.minifyJsonString(TestUtils.readFileAsString(this, JSON_FILE));
 
         assertTrue(TestUtils.compareJson(json, expectedJson));
     }
@@ -71,7 +87,6 @@ public class BacktraceReportTest {
         assertEquals(1, obj.attachmentPaths.size());
         assertEquals("abc.txt", obj.attachmentPaths.get(0));
 
-
         // THEN diagnostic stack
         assertNotNull(obj.diagnosticStack);
         assertEquals(2, obj.diagnosticStack.size());
@@ -92,17 +107,36 @@ public class BacktraceReportTest {
         // GIVEN
         final List<BacktraceStackFrame> diagnosticStack = new ArrayList<>();
 
-        diagnosticStack.add(new BacktraceStackFrame("backtraceio.library.SettingAttributesTest.tmpGsonTest", null, 75, "c37b9ae3-eab1-4928-9533-f1c14b6149f5"));
-        diagnosticStack.add(new BacktraceStackFrame("java.lang.reflect.Method.invoke", null, null, "6f280747-feee-4f4b-9eff-dda0d8eaa535"));
+        diagnosticStack.add(new BacktraceStackFrame(
+                "backtraceio.library.SettingAttributesTest.tmpGsonTest",
+                null,
+                75,
+                "c37b9ae3-eab1-4928-9533-f1c14b6149f5"));
+        diagnosticStack.add(new BacktraceStackFrame(
+                "java.lang.reflect.Method.invoke", null, null, "6f280747-feee-4f4b-9eff-dda0d8eaa535"));
         final Exception exception = new IllegalAccessException();
         final StackTraceElement[] stackTraceElements = new StackTraceElement[1];
-        stackTraceElements[0] = new StackTraceElement("backtraceio.library.SettingAttributesTest", "tmpGsonTest", "SettingAttributesTest.java", 75);
+        stackTraceElements[0] = new StackTraceElement(
+                "backtraceio.library.SettingAttributesTest", "tmpGsonTest", "SettingAttributesTest.java", 75);
 
         exception.setStackTrace(stackTraceElements);
 
         final Map<String, Object> attributes = new HashMap<>();
         attributes.put("error.type", "Exception");
-        final BacktraceReport report = new BacktraceReport(UUID.fromString("a62a533a-a7b8-415c-9a99-253c51f00827"), 1709680251, true, "java.lang.IllegalAccessException", attributes, null, exception, new ArrayList<String>() {{ add("abc.txt"); }}, diagnosticStack);
+        final BacktraceReport report = new BacktraceReport(
+                UUID.fromString("a62a533a-a7b8-415c-9a99-253c51f00827"),
+                1709680251,
+                true,
+                "java.lang.IllegalAccessException",
+                attributes,
+                null,
+                exception,
+                new ArrayList<String>() {
+                    {
+                        add("abc.txt");
+                    }
+                },
+                diagnosticStack);
 
         // WHEN
         String json = BacktraceSerializeHelper.toJson(report);
@@ -122,7 +156,6 @@ public class BacktraceReportTest {
         assertEquals(1, obj.exception.getStackTrace().length);
         assertEquals(1, obj.attachmentPaths.size());
         assertEquals("abc.txt", obj.attachmentPaths.get(0));
-
 
         // THEN diagnostic stack
         assertNotNull(obj.diagnosticStack);

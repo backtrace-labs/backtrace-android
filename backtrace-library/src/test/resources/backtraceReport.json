@@ -1,34 +1,28 @@
 {
-  "attachment-paths": [
-    "abc.txt"
-  ],
-  "attributes": {
-    "error.type": "Exception"
-  },
-  "classifier": "java.lang.IllegalAccessException",
-  "diagnostic-stack": [
-    {
-      "funcName": "backtraceio.library.SettingAttributesTest.tmpGsonTest",
-      "line": 75,
-      "sourceCode": "c37b9ae3-eab1-4928-9533-f1c14b6149f5"
+    "diagnostic-stack": [
+        {
+            "funcName": "backtraceio.library.SettingAttributesTest.tmpGsonTest",
+            "sourceCode": "c37b9ae3-eab1-4928-9533-f1c14b6149f5",
+            "line": 75
+        },
+        {
+            "funcName": "java.lang.reflect.Method.invoke",
+            "sourceCode": "6f280747-feee-4f4b-9eff-dda0d8eaa535"
+        }
+    ],
+    "exception": {
+        "stack-trace": [{
+            "declaring-class": "backtraceio.library.SettingAttributesTest",
+            "line-number": 75,
+            "file-name": "SettingAttributesTest.java",
+            "method-name": "tmpGsonTest"
+        }],
+        "class": "java.lang.IllegalAccessException"
     },
-    {
-      "funcName": "java.lang.reflect.Method.invoke",
-      "sourceCode": "6f280747-feee-4f4b-9eff-dda0d8eaa535"
-    }
-  ],
-  "exception": {
-    "class": "java.lang.IllegalAccessException",
-    "stack-trace": [
-      {
-        "declaring-class": "backtraceio.library.SettingAttributesTest",
-        "file-name": "SettingAttributesTest.java",
-        "line-number": 75,
-        "method-name": "tmpGsonTest"
-      }
-    ]
-  },
-  "exception-type-report": true,
-  "timestamp": 1709680251,
-  "uuid": "a62a533a-a7b8-415c-9a99-253c51f00827"
+    "attachment-paths": ["abc.txt"],
+    "classifier": "java.lang.IllegalAccessException",
+    "attributes": {"error.type": "Exception"},
+    "exception-type-report": true,
+    "uuid": "a62a533a-a7b8-415c-9a99-253c51f00827",
+    "timestamp": 1709680251
 }

@@ -5,20 +5,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import backtraceio.library.models.json.BacktraceReport;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import backtraceio.library.models.json.BacktraceReport;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDataTest {
@@ -40,12 +36,16 @@ public class BacktraceDataTest {
         clientAttributes.put("attr-2", true);
         clientAttributes.put("attr-3", "test");
         // WHEN
-        BacktraceData backtraceData = new BacktraceData.Builder(report).setAttributes(context, clientAttributes).build();
+        BacktraceData backtraceData = new BacktraceData.Builder(report)
+                .setAttributes(context, clientAttributes)
+                .build();
 
         // THEN
-        assertArrayEquals( new String[]{"java.lang.IllegalAccessException"} , backtraceData.getClassifiers());
+        assertArrayEquals(new String[] {"java.lang.IllegalAccessException"}, backtraceData.getClassifiers());
         assertEquals(report, backtraceData.getReport());
-        assertEquals("java.lang.IllegalAccessException", backtraceData.getAttributes().get("classifier"));
+        assertEquals(
+                "java.lang.IllegalAccessException",
+                backtraceData.getAttributes().get("classifier"));
         assertEquals("backtrace-android", backtraceData.getAgent());
         assertEquals(backtraceio.library.BuildConfig.VERSION_NAME, backtraceData.getAgentVersion());
         assertEquals("java", backtraceData.getLang());
@@ -63,6 +63,7 @@ public class BacktraceDataTest {
         assertEquals("true", backtraceData.getAttributes().get("attr-2"));
         assertEquals("test", backtraceData.getAttributes().get("attr-3"));
     }
+
     @Test
     public void testBacktraceDataConstructor() {
         // GIVEN
@@ -78,9 +79,11 @@ public class BacktraceDataTest {
         BacktraceData backtraceData = new BacktraceData(context, report, clientAttributes);
 
         // THEN
-        assertArrayEquals( new String[]{"java.lang.IllegalAccessException"}, backtraceData.getClassifiers());
+        assertArrayEquals(new String[] {"java.lang.IllegalAccessException"}, backtraceData.getClassifiers());
         assertEquals(report, backtraceData.getReport());
-        assertEquals("java.lang.IllegalAccessException", backtraceData.getAttributes().get("classifier"));
+        assertEquals(
+                "java.lang.IllegalAccessException",
+                backtraceData.getAttributes().get("classifier"));
         assertEquals("backtrace-android", backtraceData.getAgent());
         assertEquals(backtraceio.library.BuildConfig.VERSION_NAME, backtraceData.getAgentVersion());
         assertEquals("java", backtraceData.getLang());

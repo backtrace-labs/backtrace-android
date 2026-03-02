@@ -7,20 +7,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -32,6 +20,13 @@ import backtraceio.library.models.metrics.EventsPayload;
 import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceMetrics;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientSummedEventTest {
@@ -47,13 +42,13 @@ public class BacktraceClientSummedEventTest {
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
      * For best results run under low CPU load and low memory utilization conditions.
      */
-
     @Before
     public void setUp() {
         BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
-        BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        BacktraceDatabase database =
+                new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
     }
@@ -136,7 +131,8 @@ public class BacktraceClientSummedEventTest {
         final Waiter waiter = new Waiter();
 
         final int timeBetweenRetriesMillis = 1;
-        backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
+        backtraceClient.metrics.enable(
+                new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
         final MockRequestHandler mockSummedRequestHandler = new MockRequestHandler();
         mockSummedRequestHandler.statusCode = 503;
         backtraceClient.metrics.setSummedEventsRequestHandler(mockSummedRequestHandler);
@@ -144,7 +140,9 @@ public class BacktraceClientSummedEventTest {
         backtraceClient.metrics.setSummedEventsOnServerResponse(new EventsOnServerResponseEventListener() {
             @Override
             public void onEvent(EventsResult result) {
-                assertEquals(mockSummedRequestHandler.numAttempts - 1, result.getEventsPayload().getDroppedEvents());
+                assertEquals(
+                        mockSummedRequestHandler.numAttempts - 1,
+                        result.getEventsPayload().getDroppedEvents());
                 String eventsPayloadJson = BacktraceSerializeHelper.toJson(result.getEventsPayload());
                 assertFalse(eventsPayloadJson.isEmpty());
                 assertEquals(BacktraceResultStatus.ServerError, result.status);
@@ -178,7 +176,9 @@ public class BacktraceClientSummedEventTest {
         assertTrue(backtraceClient.metrics.addSummedEvent(summedEventName));
         assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
 
-        assertEquals(summedEventName, backtraceClient.metrics.getSummedEvents().getFirst().getName());
+        assertEquals(
+                summedEventName,
+                backtraceClient.metrics.getSummedEvents().getFirst().getName());
         assertNotEquals(0, backtraceClient.metrics.getSummedEvents().getFirst().getTimestamp());
     }
 
@@ -186,15 +186,26 @@ public class BacktraceClientSummedEventTest {
     public void addSummedEventWithAttributes() {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
-            put("foo", "bar");
-        }};
+        Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {
+            {
+                put("foo", "bar");
+            }
+        };
         assertTrue(backtraceClient.metrics.addSummedEvent(summedEventName, myCustomAttributes));
         assertEquals(1, backtraceClient.metrics.getSummedEvents().size());
 
-        assertEquals(summedEventName, backtraceClient.metrics.getSummedEvents().getFirst().getName());
+        assertEquals(
+                summedEventName,
+                backtraceClient.metrics.getSummedEvents().getFirst().getName());
         assertNotEquals(0, backtraceClient.metrics.getSummedEvents().getFirst().getTimestamp());
-        assertEquals("bar", backtraceClient.metrics.getSummedEvents().getFirst().getAttributes().get("foo"));
+        assertEquals(
+                "bar",
+                backtraceClient
+                        .metrics
+                        .getSummedEvents()
+                        .getFirst()
+                        .getAttributes()
+                        .get("foo"));
     }
 
     @Test

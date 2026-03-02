@@ -1,29 +1,16 @@
 package backtraceio.library;
 
+import static java.lang.Thread.sleep;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
-import static java.lang.Thread.sleep;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -38,6 +25,14 @@ import backtraceio.library.models.metrics.EventsResult;
 import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import backtraceio.library.services.BacktraceMetrics;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientUniqueEventTest {
@@ -45,7 +40,18 @@ public class BacktraceClientUniqueEventTest {
     public BacktraceClient backtraceClient;
     public BacktraceCredentials credentials;
     // existing attribute name in Backtrace
-    private final String[] uniqueAttributeName = {"uname.version", "cpu.boottime", "screen.orientation", "battery.state", "device.airplane_mode", "device.sdk", "device.brand", "system.memory.total", "uname.sysname", "application.package"};
+    private final String[] uniqueAttributeName = {
+        "uname.version",
+        "cpu.boottime",
+        "screen.orientation",
+        "battery.state",
+        "device.airplane_mode",
+        "device.sdk",
+        "device.brand",
+        "system.memory.total",
+        "uname.sysname",
+        "application.package"
+    };
 
     private final String defaultBaseUrl = BacktraceMetrics.defaultBaseUrl;
     private final String token = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
@@ -54,13 +60,13 @@ public class BacktraceClientUniqueEventTest {
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
      * For best results run under low CPU load and low memory utilization conditions.
      */
-
     @Before
     public void setUp() {
         BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
-        BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        BacktraceDatabase database =
+                new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
     }
@@ -205,7 +211,8 @@ public class BacktraceClientUniqueEventTest {
             backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[i]);
         }
 
-        assertEquals(maximumNumberOfEvents, backtraceClient.metrics.getUniqueEvents().size());
+        assertEquals(
+                maximumNumberOfEvents, backtraceClient.metrics.getUniqueEvents().size());
     }
 
     @Test
@@ -216,7 +223,9 @@ public class BacktraceClientUniqueEventTest {
         // Account for the startup unique event
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertEquals(
+                uniqueAttributeName[0],
+                backtraceClient.metrics.getUniqueEvents().getLast().getName());
         assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
 
         // See how we get all different kinds of attributes in backtraceio.library.models.BacktraceData.setAttributes
@@ -225,7 +234,14 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        assertEquals(expectedAttributes.size(), backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
+        assertEquals(
+                expectedAttributes.size(),
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .size());
     }
 
     @Test
@@ -236,7 +252,9 @@ public class BacktraceClientUniqueEventTest {
         // Account for the startup unique event
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertEquals(
+                uniqueAttributeName[0],
+                backtraceClient.metrics.getUniqueEvents().getLast().getName());
         assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
 
         // See how we get all different kinds of attributes in backtraceio.library.models.BacktraceData.setAttributes
@@ -245,23 +263,41 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        assertEquals(expectedAttributes.size(), backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
+        assertEquals(
+                expectedAttributes.size(),
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .size());
     }
 
     @Test
     public void addAndStoreUniqueEventWithAttributes() {
         backtraceClient.metrics.enable(new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0));
 
-        Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
-            put("foo", "bar");
-        }};
+        Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {
+            {
+                put("foo", "bar");
+            }
+        };
         assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0], myCustomAttributes));
         // Account for the startup unique event
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertEquals(
+                uniqueAttributeName[0],
+                backtraceClient.metrics.getUniqueEvents().getLast().getName());
         assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
-        assertEquals("bar", backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get("foo"));
+        assertEquals(
+                "bar",
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .get("foo"));
 
         // See how we get all different kinds of attributes in backtraceio.library.models.BacktraceData.setAttributes
         Map<String, Object> expectedAttributes = new HashMap<String, Object>();
@@ -269,7 +305,14 @@ public class BacktraceClientUniqueEventTest {
         BacktraceAttributes backtraceAttributes = new BacktraceAttributes(context, null, backtraceClient.attributes);
         expectedAttributes.putAll(backtraceAttributes.getAllAttributes());
 
-        assertEquals(expectedAttributes.size() + 1, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().size());
+        assertEquals(
+                expectedAttributes.size() + 1,
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .size());
     }
 
     @Test
@@ -287,16 +330,26 @@ public class BacktraceClientUniqueEventTest {
 
         final String expectedKey = "foo";
         final String expectedValue = "bar";
-        Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {{
-            put(expectedKey, expectedValue);
-        }};
+        Map<String, Object> myCustomAttributes = new HashMap<String, Object>() {
+            {
+                put(expectedKey, expectedValue);
+            }
+        };
         assertTrue(backtraceClient.metrics.addUniqueEvent(expectedKey, myCustomAttributes));
 
         // Account for the startup unique event
         assertEquals(2, backtraceClient.metrics.getUniqueEvents().size());
-        assertEquals(expectedKey, backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertEquals(
+                expectedKey, backtraceClient.metrics.getUniqueEvents().getLast().getName());
         assertNotEquals(0, backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp());
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(
+                expectedValue,
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .get(expectedKey));
     }
 
     @Test
@@ -350,8 +403,16 @@ public class BacktraceClientUniqueEventTest {
 
         backtraceClient.attributes.remove(expectedKey);
 
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
-        assertEquals(expectedKey, backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertEquals(
+                expectedValue,
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .get(expectedKey));
+        assertEquals(
+                expectedKey, backtraceClient.metrics.getUniqueEvents().getLast().getName());
     }
 
     @Test
@@ -360,8 +421,11 @@ public class BacktraceClientUniqueEventTest {
 
         assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        long previousTimestamp = backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
+        assertEquals(
+                uniqueAttributeName[0],
+                backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        long previousTimestamp =
+                backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
 
         // Wait 1 second so that the timestamp will update on the next send.
         // Timestamp granularity is 1 second
@@ -374,7 +438,8 @@ public class BacktraceClientUniqueEventTest {
         // Force update
         backtraceClient.metrics.send();
 
-        long updatedTimestamp = backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
+        long updatedTimestamp =
+                backtraceClient.metrics.getUniqueEvents().getLast().getTimestamp();
 
         assertTrue(updatedTimestamp > previousTimestamp);
     }
@@ -388,16 +453,35 @@ public class BacktraceClientUniqueEventTest {
 
         assertTrue(backtraceClient.metrics.addUniqueEvent(uniqueAttributeName[0]));
 
-        assertEquals(uniqueAttributeName[0], backtraceClient.metrics.getUniqueEvents().getLast().getName());
-        assertNull(backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(
+                uniqueAttributeName[0],
+                backtraceClient.metrics.getUniqueEvents().getLast().getName());
+        assertNull(backtraceClient
+                .metrics
+                .getUniqueEvents()
+                .getLast()
+                .getAttributes()
+                .get(expectedKey));
 
         backtraceClient.attributes.put(expectedKey, expectedValue);
         // It should not be added to the unique event yet
-        assertNull(backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertNull(backtraceClient
+                .metrics
+                .getUniqueEvents()
+                .getLast()
+                .getAttributes()
+                .get(expectedKey));
 
         // Force update
         backtraceClient.metrics.send();
 
-        assertEquals(expectedValue, backtraceClient.metrics.getUniqueEvents().getLast().getAttributes().get(expectedKey));
+        assertEquals(
+                expectedValue,
+                backtraceClient
+                        .metrics
+                        .getUniqueEvents()
+                        .getLast()
+                        .getAttributes()
+                        .get(expectedKey));
     }
 }

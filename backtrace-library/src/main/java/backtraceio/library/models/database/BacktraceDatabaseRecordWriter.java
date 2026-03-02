@@ -1,17 +1,16 @@
 package backtraceio.library.models.database;
 
+import backtraceio.library.common.BacktraceSerializeHelper;
+import backtraceio.library.interfaces.DatabaseRecordWriter;
+import backtraceio.library.logger.BacktraceLogger;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import backtraceio.library.common.BacktraceSerializeHelper;
-import backtraceio.library.interfaces.DatabaseRecordWriter;
-import backtraceio.library.logger.BacktraceLogger;
-
 public class BacktraceDatabaseRecordWriter implements DatabaseRecordWriter {
 
-    private static transient final String LOG_TAG = BacktraceDatabaseRecordWriter.class.getSimpleName();
+    private static final transient String LOG_TAG = BacktraceDatabaseRecordWriter.class.getSimpleName();
 
     /**
      * Path to destination directory
@@ -71,7 +70,8 @@ public class BacktraceDatabaseRecordWriter implements DatabaseRecordWriter {
         boolean renameResult = fromFile.renameTo(toFile);
         if (!renameResult) {
             BacktraceLogger.e(LOG_TAG, "Can not rename file");
-            throw new IOException(String.format("Can not rename file. Source path: %s, destination path: %s", sourcePath, destinationPath));
+            throw new IOException(String.format(
+                    "Can not rename file. Source path: %s, destination path: %s", sourcePath, destinationPath));
         }
     }
 

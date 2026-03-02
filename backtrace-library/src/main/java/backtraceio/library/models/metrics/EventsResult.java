@@ -50,10 +50,7 @@ public class EventsResult {
      * @return BacktraceResult with exception information
      */
     public static EventsResult OnError(EventsPayload payload, Exception exception, int statusCode) {
-        return new EventsResult(
-                payload, exception.getMessage(),
-                BacktraceResultStatus.ServerError,
-                statusCode);
+        return new EventsResult(payload, exception.getMessage(), BacktraceResultStatus.ServerError, statusCode);
     }
 
     public EventsPayload getEventsPayload() {

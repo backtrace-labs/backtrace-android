@@ -2,25 +2,26 @@ package backtraceio.library;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-
+import backtraceio.library.models.json.BacktraceReport;
 import java.util.HashMap;
 import java.util.Map;
-
-import backtraceio.library.models.json.BacktraceReport;
-
+import org.junit.Test;
 
 public class ConcatAttributesUnitTest {
 
-    private final Map<String, Object> attributesReport = new HashMap<String, Object>() {{
-        put("1", "1");
-        put("2", "2");
-    }};
+    private final Map<String, Object> attributesReport = new HashMap<String, Object>() {
+        {
+            put("1", "1");
+            put("2", "2");
+        }
+    };
 
-    private final Map<String, Object> attributes = new HashMap<String, Object>() {{
-        put("3", "3");
-        put("4", "4");
-    }};
+    private final Map<String, Object> attributes = new HashMap<String, Object>() {
+        {
+            put("3", "3");
+            put("4", "4");
+        }
+    };
 
     @Test
     public void concatAttributes_isCorrect() {

@@ -5,16 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-
-import org.jetbrains.annotations.NotNull;
-
+import backtraceio.library.enums.BacktraceBreadcrumbType;
+import backtraceio.library.logger.BacktraceLogger;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import backtraceio.library.enums.BacktraceBreadcrumbType;
-import backtraceio.library.logger.BacktraceLogger;
+import org.jetbrains.annotations.NotNull;
 
 public class BacktraceBroadcastReceiver extends BroadcastReceiver {
 

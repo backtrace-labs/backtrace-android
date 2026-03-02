@@ -3,7 +3,6 @@ package backtraceio.coroner.query;
 import static org.junit.Assert.assertEquals;
 
 import com.google.gson.JsonArray;
-
 import org.junit.Test;
 
 public class CoronerFieldFilterTest {
@@ -39,7 +38,8 @@ public class CoronerFieldFilterTest {
         final JsonArray result = coronerFieldFilter.getFilterValues();
 
         // THEN
-        final String expectedResult = "[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"],[\"at-least\",\"4f0a0000-4f0a-fd08-0000-999000999000\"]]";
+        final String expectedResult =
+                "[[\"equal\",\"03000000-4f0a-fd08-0000-000000000000\"],[\"at-least\",\"4f0a0000-4f0a-fd08-0000-999000999000\"]]";
         assertEquals(expectedResult, result.toString());
     }
 }

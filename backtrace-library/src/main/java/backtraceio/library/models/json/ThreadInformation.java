@@ -1,11 +1,9 @@
 package backtraceio.library.models.json;
 
 import backtraceio.gson.annotations.SerializedName;
-
+import backtraceio.library.models.BacktraceStackFrame;
 import java.util.ArrayList;
 import java.util.List;
-
-import backtraceio.library.models.BacktraceStackFrame;
 
 /**
  * Get an information about single thread passed in constructor
@@ -38,8 +36,7 @@ public class ThreadInformation {
      * @param fault      denotes whether a thread is a faulting thread - in most cases main thread
      * @param stack      exception stack information
      */
-    public ThreadInformation(String threadName, Boolean fault, List<BacktraceStackFrame>
-            stack) {
+    public ThreadInformation(String threadName, Boolean fault, List<BacktraceStackFrame> stack) {
         this.stack = stack == null ? new ArrayList<>() : stack;
         this.name = threadName;
         this.fault = fault;

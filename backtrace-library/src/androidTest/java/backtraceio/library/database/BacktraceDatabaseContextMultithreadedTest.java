@@ -3,21 +3,18 @@ package backtraceio.library.database;
 import static org.junit.Assert.assertEquals;
 
 import androidx.annotation.NonNull;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
 import backtraceio.library.models.database.BacktraceDatabaseSettings;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.services.BacktraceDatabaseContext;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import org.junit.Before;
+import org.junit.Test;
 
 public class BacktraceDatabaseContextMultithreadedTest {
     private static class TestConfig {
@@ -49,6 +46,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
             }
         }
     }
+
     private BacktraceDatabaseContext databaseContext;
 
     @Before
@@ -63,7 +61,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
         // GIVEN
         final TestConfig config = new TestConfig(500, 250, 150, 30000); // 30s
         final List<BacktraceDatabaseRecord> initialRecords = generateMockRecords(config.recordsState);
-        
+
         final CountDownLatch startLatch = new CountDownLatch(1);
         final ConcurrentTestState testState = new ConcurrentTestState();
 
@@ -84,8 +82,11 @@ public class BacktraceDatabaseContextMultithreadedTest {
         assertTestResults(config, testState);
     }
 
-    private Thread createDeleteThread(CountDownLatch latch, List<BacktraceDatabaseRecord> records, 
-            int recordsToDelete, ConcurrentTestState state) {
+    private Thread createDeleteThread(
+            CountDownLatch latch,
+            List<BacktraceDatabaseRecord> records,
+            int recordsToDelete,
+            ConcurrentTestState state) {
         return new Thread(() -> {
             try {
                 latch.await();
@@ -136,7 +137,7 @@ public class BacktraceDatabaseContextMultithreadedTest {
         }
     }
 
-    private void waitForThreads(Thread deleteThread, Thread addThread, Thread readThread, int waitTimeMs) 
+    private void waitForThreads(Thread deleteThread, Thread addThread, Thread readThread, int waitTimeMs)
             throws InterruptedException {
         deleteThread.join(waitTimeMs);
         addThread.join(waitTimeMs);
@@ -146,9 +147,8 @@ public class BacktraceDatabaseContextMultithreadedTest {
     private void assertTestResults(TestConfig config, ConcurrentTestState state) {
         assertEquals(0, state.caughtExceptions.size());
         assertEquals(
-            config.recordsState + config.recordsToAdd - config.recordsToDelete,
-            config.recordsState + state.addedRecords.size() - state.deletedRecords.size()
-        );
+                config.recordsState + config.recordsToAdd - config.recordsToDelete,
+                config.recordsState + state.addedRecords.size() - state.deletedRecords.size());
     }
 
     @NonNull
@@ -165,9 +165,11 @@ public class BacktraceDatabaseContextMultithreadedTest {
     private BacktraceData createMockBacktraceData() {
         final Exception testException = new Exception("Test exception");
 
-        final Map<String, Object> attributes = new HashMap<String, Object>() {{
-            put("test_attribute", "test_value");
-        }};
+        final Map<String, Object> attributes = new HashMap<String, Object>() {
+            {
+                put("test_attribute", "test_value");
+            }
+        };
 
         return new BacktraceData.Builder(new BacktraceReport(testException, attributes)).build();
     }

@@ -1,10 +1,8 @@
 package backtraceio.library.models;
 
 import android.content.Context;
-
-import java.util.List;
-
 import backtraceio.library.common.FileHelper;
+import java.util.List;
 
 public class BacktraceDataAttachmentsFileHelper {
 

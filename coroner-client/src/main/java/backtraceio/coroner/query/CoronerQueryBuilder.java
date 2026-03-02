@@ -3,7 +3,6 @@ package backtraceio.coroner.query;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import java.util.List;
 
 class CoronerQueryBuilder {
@@ -34,6 +33,7 @@ class CoronerQueryBuilder {
 
         return result;
     }
+
     private JsonObject joinHeadFolds(final List<String> folds) {
         final JsonObject result = new JsonObject();
 
@@ -43,6 +43,7 @@ class CoronerQueryBuilder {
 
         return result;
     }
+
     private JsonArray foldHead() {
         final JsonArray foldValue = new JsonArray();
         final JsonArray foldInnerValue = new JsonArray();

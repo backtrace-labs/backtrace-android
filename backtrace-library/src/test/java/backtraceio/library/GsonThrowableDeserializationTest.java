@@ -5,17 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import androidx.annotation.NonNull;
-
 import backtraceio.gson.JsonParseException;
-
-import org.junit.Test;
-
+import backtraceio.library.common.BacktraceSerializeHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import backtraceio.library.common.BacktraceSerializeHelper;
-
+import org.junit.Test;
 
 public class GsonThrowableDeserializationTest {
     @Test
@@ -24,7 +19,8 @@ public class GsonThrowableDeserializationTest {
         String json = TestUtils.readFileAsString(this, "serializedException.json");
 
         // WHEN
-        IllegalArgumentException deserializedException = BacktraceSerializeHelper.fromJson(json, IllegalArgumentException.class);
+        IllegalArgumentException deserializedException =
+                BacktraceSerializeHelper.fromJson(json, IllegalArgumentException.class);
 
         // THEN
         assertNotNull(deserializedException);
@@ -78,10 +74,12 @@ public class GsonThrowableDeserializationTest {
 
     @NonNull
     private static StackTraceElement[] generateStackTraceElements() {
-        List<StackTraceElement> elements = new ArrayList<StackTraceElement>() {{
-            add(new StackTraceElement("sample-class-1", "method-1", "file-name1", 100));
-            add(new StackTraceElement("sample-class-2", "method-2", "file-name2", 200));
-        }};
+        List<StackTraceElement> elements = new ArrayList<StackTraceElement>() {
+            {
+                add(new StackTraceElement("sample-class-1", "method-1", "file-name1", 100));
+                add(new StackTraceElement("sample-class-2", "method-2", "file-name2", 200));
+            }
+        };
         return elements.toArray(new StackTraceElement[0]);
     }
 
@@ -89,13 +87,13 @@ public class GsonThrowableDeserializationTest {
     public void testDeserializeThrowableNoCause() {
         // GIVEN
         // We reuse serializedThrowable.json but for this test, we are interested in a Throwable without a cause.
-        // The BacktraceSerializeHelper.fromJson for Throwable will create a generic Throwable if specific exception type is not known
+        // The BacktraceSerializeHelper.fromJson for Throwable will create a generic Throwable if specific exception
+        // type is not known
         // It might not reconstruct the exact original type (e.g. if it was an Exception originally)
         // For this test, let's create a JSON that represents a simple Throwable without a cause.
         Throwable originalThrowable = new Throwable("Simple throwable message");
         originalThrowable.setStackTrace(generateStackTraceElements());
         String json = BacktraceSerializeHelper.toJson(originalThrowable);
-
 
         // WHEN
         Throwable deserializedThrowable = BacktraceSerializeHelper.fromJson(json, Throwable.class);
@@ -108,7 +106,6 @@ public class GsonThrowableDeserializationTest {
         assertEquals("sample-class-2", deserializedThrowable.getStackTrace()[1].getClassName());
         assertEquals("method-2", deserializedThrowable.getStackTrace()[1].getMethodName());
     }
-
 
     @Test
     public void testDeserializeError() {
@@ -136,11 +133,15 @@ public class GsonThrowableDeserializationTest {
 
         // THEN
         assertNotNull(deserializedException);
-        assertEquals("test-msg", deserializedException.getMessage()); // Gson might serialize the cause's message into the main message
+        assertEquals(
+                "test-msg",
+                deserializedException.getMessage()); // Gson might serialize the cause's message into the main message
         assertNotNull(deserializedException.getCause());
         assertEquals("test-msg", deserializedException.getCause().getMessage());
         assertEquals(2, Objects.requireNonNull(deserializedException.getCause()).getStackTrace().length);
-        assertEquals("sample-class-1", deserializedException.getCause().getStackTrace()[0].getClassName());
+        assertEquals(
+                "sample-class-1",
+                deserializedException.getCause().getStackTrace()[0].getClassName());
     }
 
     @Test(expected = JsonParseException.class)

@@ -1,15 +1,15 @@
 package backtraceio.library.models;
 
+import static backtraceio.library.TestUtils.compareJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import org.junit.Test;
 
 import backtraceio.library.TestUtils;
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import org.junit.Test;
 
 public class BacktraceResultTest {
 
@@ -43,7 +43,7 @@ public class BacktraceResultTest {
         String result = BacktraceSerializeHelper.toJson(example);
         // THEN
         String expectedJson = TestUtils.readFileAsString(this, "backtraceResult.json");
-        assertEquals(expectedJson, result);
+        compareJson(expectedJson, result);
     }
 
     @Test

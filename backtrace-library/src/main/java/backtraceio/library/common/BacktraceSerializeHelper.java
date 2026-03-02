@@ -1,7 +1,6 @@
 package backtraceio.library.common;
 
 import backtraceio.gson.Gson;
-
 import backtraceio.library.common.serialization.BacktraceGsonBuilder;
 
 /**
@@ -30,5 +29,4 @@ public class BacktraceSerializeHelper {
     public static <T> T fromJson(Gson gson, String json, Class<T> type) {
         return gson.fromJson(json, type);
     }
-
 }

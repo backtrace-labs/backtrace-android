@@ -1,7 +1,6 @@
 package backtraceio.library.models.metrics;
 
 import backtraceio.gson.annotations.SerializedName;
-
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public abstract class EventsPayload<T extends Event> {

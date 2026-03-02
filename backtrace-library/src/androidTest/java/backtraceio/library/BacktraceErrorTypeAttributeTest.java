@@ -5,18 +5,8 @@ import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
 import backtraceio.library.models.BacktraceAttributeConsts;
@@ -24,6 +14,11 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceErrorTypeAttributeTest {
@@ -42,7 +37,9 @@ public class BacktraceErrorTypeAttributeTest {
         BacktraceReport report = new BacktraceReport(new Exception("test exception"));
 
         assertTrue(report.attributes.containsKey(BacktraceAttributeConsts.ErrorType));
-        assertEquals(report.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.HandledExceptionAttributeType);
+        assertEquals(
+                report.attributes.get(BacktraceAttributeConsts.ErrorType),
+                BacktraceAttributeConsts.HandledExceptionAttributeType);
     }
 
     @Test
@@ -50,7 +47,9 @@ public class BacktraceErrorTypeAttributeTest {
         BacktraceReport report = new BacktraceReport("test message");
 
         assertTrue(report.attributes.containsKey(BacktraceAttributeConsts.ErrorType));
-        assertEquals(report.attributes.get(BacktraceAttributeConsts.ErrorType), BacktraceAttributeConsts.MessageAttributeType);
+        assertEquals(
+                report.attributes.get(BacktraceAttributeConsts.ErrorType),
+                BacktraceAttributeConsts.MessageAttributeType);
     }
 
     @Test
@@ -62,27 +61,27 @@ public class BacktraceErrorTypeAttributeTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception("test exception"), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        String errorType = backtraceResult.getBacktraceReport().attributes.get(BacktraceAttributeConsts.ErrorType).toString();
-                        assertEquals(
-                                errorType,
-                                BacktraceAttributeConsts.HandledExceptionAttributeType);
+        backtraceClient.send(new Exception("test exception"), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                String errorType = backtraceResult
+                        .getBacktraceReport()
+                        .attributes
+                        .get(BacktraceAttributeConsts.ErrorType)
+                        .toString();
+                assertEquals(errorType, BacktraceAttributeConsts.HandledExceptionAttributeType);
 
-                        waiter.resume();
-                    }
-                }
-        );
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);

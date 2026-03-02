@@ -6,16 +6,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceAttributesTest {
@@ -42,19 +39,19 @@ public class BacktraceAttributesTest {
         // THEN
         Map<String, Object> allAttributes = attributes.getAllAttributes();
         assertNotNull(allAttributes);
-        
+
         // Static attributes
         assertTrue(allAttributes.containsKey("application.package"));
-        
+
         // Client attributes
         assertEquals("custom-value", allAttributes.get("custom-attr"));
-        
+
         // Report attributes
         assertEquals(message, allAttributes.get("error.message"));
-        
+
         // Session attribute
         assertTrue(allAttributes.containsKey("application.session"));
-        
+
         // Dynamic attributes
         assertTrue(allAttributes.containsKey("screen.orientation"));
         assertTrue(allAttributes.containsKey("screen.brightness"));
@@ -74,7 +71,7 @@ public class BacktraceAttributesTest {
         Map<String, Object> allAttributes = attributes.getAllAttributes();
         assertEquals(exceptionMessage, allAttributes.get("error.message"));
         assertEquals(ex.getClass().getCanonicalName(), allAttributes.get("classifier"));
-        
+
         // Complex attributes should contain the exception
         Map<String, Object> complexAttributes = attributes.getComplexAttributes();
         assertTrue(complexAttributes.containsKey("Exception properties"));
@@ -97,8 +94,8 @@ public class BacktraceAttributesTest {
         Map<String, Object> allAttributes = attributes.getAllAttributes();
         assertEquals("value", allAttributes.get("only-client"));
         assertTrue(allAttributes.containsKey("application.session"));
-        
-        // Dynamic attributes should NOT be included by default in this constructor 
+
+        // Dynamic attributes should NOT be included by default in this constructor
         // because it calls this(context, null, clientAttributes, false);
         assertFalse(allAttributes.containsKey("screen.orientation"));
         assertFalse(allAttributes.containsKey("screen.brightness"));
@@ -111,7 +108,7 @@ public class BacktraceAttributesTest {
 
         // WHEN - includeDynamicAttributes = true
         BacktraceAttributes attrWithDynamic = new BacktraceAttributes(context, null, clientAttributes, true);
-        
+
         // WHEN - includeDynamicAttributes = false
         BacktraceAttributes attrWithoutDynamic = new BacktraceAttributes(context, null, clientAttributes, false);
 

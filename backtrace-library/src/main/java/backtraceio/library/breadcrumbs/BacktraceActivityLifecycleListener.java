@@ -3,7 +3,6 @@ package backtraceio.library.breadcrumbs;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 
 public class BacktraceActivityLifecycleListener implements Application.ActivityLifecycleCallbacks {

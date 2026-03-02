@@ -1,17 +1,16 @@
 package backtraceio.library.models.json;
 
+import backtraceio.library.logger.BacktraceLogger;
+import backtraceio.library.models.BacktraceStackFrame;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.models.BacktraceStackFrame;
 
 /**
  * Collect all source data information about current program
  */
 public class SourceCodeData {
-    private static transient final String LOG_TAG = SourceCodeData.class.getSimpleName();
+    private static final transient String LOG_TAG = SourceCodeData.class.getSimpleName();
 
     /**
      * Source code information about current executed program

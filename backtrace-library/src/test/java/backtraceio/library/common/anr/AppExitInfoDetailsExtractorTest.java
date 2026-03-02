@@ -8,22 +8,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.ApplicationExitInfo;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
+import backtraceio.library.anr.AppExitInfoDetailsExtractor;
+import backtraceio.library.anr.ExitInfo;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
-
-import backtraceio.library.anr.AppExitInfoDetailsExtractor;
-import backtraceio.library.anr.ExitInfo;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AppExitInfoDetailsExtractorTest {
@@ -105,7 +102,8 @@ public class AppExitInfoDetailsExtractorTest {
     @Test
     public void testGetStackTraceInfoNullStream() {
         // WHEN
-        Object stackTrace = AppExitInfoDetailsExtractor.getANRAttributes(mockAppExitInfo).get("stackTrace");
+        Object stackTrace =
+                AppExitInfoDetailsExtractor.getANRAttributes(mockAppExitInfo).get("stackTrace");
 
         // THEN
         assertNull(stackTrace);

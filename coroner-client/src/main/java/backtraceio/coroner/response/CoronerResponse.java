@@ -1,7 +1,6 @@
 package backtraceio.coroner.response;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -18,8 +17,7 @@ public class CoronerResponse {
     public List<CoronerResponseGroup> values;
 
     @SuppressWarnings("unused")
-    public CoronerResponse() {
-    }
+    public CoronerResponse() {}
 
     @SuppressWarnings("unused")
     public CoronerResponse(final List<ColumnDescElement> columnsDesc, final List<CoronerResponseGroup> values) {
@@ -27,12 +25,14 @@ public class CoronerResponse {
         this.values = values;
     }
 
-    public <T> T getAttribute(final int elementIndex, final String name, final Class<T> clazz) throws CoronerResponseProcessingException {
+    public <T> T getAttribute(final int elementIndex, final String name, final Class<T> clazz)
+            throws CoronerResponseProcessingException {
         if (this.values == null) {
             throw new CoronerResponseProcessingException("Values property from response is null");
         }
         if (elementIndex < 0 || elementIndex > this.values.size()) {
-            throw new CoronerResponseProcessingException("Incorrect element index, value should be between 0 and " + this.values.size());
+            throw new CoronerResponseProcessingException(
+                    "Incorrect element index, value should be between 0 and " + this.values.size());
         }
         final CoronerResponseGroup responseGroup = values.get(elementIndex);
 
@@ -42,7 +42,8 @@ public class CoronerResponse {
             return clazz.cast(results.get(0));
         } catch (ClassCastException e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
-            throw new CoronerResponseProcessingException("Error on getting attribute from response group for attribute index: " + attributeIndex);
+            throw new CoronerResponseProcessingException(
+                    "Error on getting attribute from response group for attribute index: " + attributeIndex);
         }
     }
 
@@ -58,5 +59,4 @@ public class CoronerResponse {
         }
         throw new CoronerResponseProcessingException("Attribute not found for name " + attributeName);
     }
-
 }
