@@ -7,26 +7,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
-
 import backtraceio.library.common.BacktraceSerializeHelper;
 import backtraceio.library.events.OnServerResponseEventListener;
 import backtraceio.library.events.RequestHandler;
@@ -34,13 +16,28 @@ import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.types.BacktraceResultStatus;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import net.jodah.concurrentunit.Waiter;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientSendTest {
     private final String resultMessage = "From request handler";
-    private final Map<String, Object> attributes = new HashMap<String, Object>() {{
-        put("test", "value");
-    }};
+    private final Map<String, Object> attributes = new HashMap<String, Object>() {
+        {
+            put("test", "value");
+        }
+    };
     private Context context;
     private BacktraceCredentials credentials;
 
@@ -58,15 +55,14 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(null, data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.ServerError);
+                return new BacktraceResult(
+                        null, data.getReport().exception.getMessage(), BacktraceResultStatus.ServerError);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new Exception(this.resultMessage), new OnServerResponseEventListener
-                () {
+        backtraceClient.send(new Exception(this.resultMessage), new OnServerResponseEventListener() {
             @Override
             public void onEvent(BacktraceResult backtraceResult) {
                 // THEN
@@ -87,19 +83,23 @@ public class BacktraceClientSendTest {
     public void sendExceptionWithManyCause() {
         // GIVEN
         final String lastExceptionExpectedMessage = "New Exception";
-        final Exception causedException = new Exception(new IOException(new IllegalArgumentException(lastExceptionExpectedMessage)));
+        final Exception causedException =
+                new Exception(new IOException(new IllegalArgumentException(lastExceptionExpectedMessage)));
         final StackTraceElement[] stackTraceElements = new StackTraceElement[1];
-        stackTraceElements[0] = new StackTraceElement("BacktraceClientSendTest.class", "sendCausedException", "BacktraceClientSendTest.java", 1);
+        stackTraceElements[0] = new StackTraceElement(
+                "BacktraceClientSendTest.class", "sendCausedException", "BacktraceClientSendTest.java", 1);
         causedException.setStackTrace(stackTraceElements);
 
         final BacktraceClient backtraceClient = new BacktraceClient(context, credentials);
         final Waiter waiter = new Waiter();
 
-        final Stack<String> expectedExceptionMessages = new Stack<String>() {{
-            add("New Exception");
-            add("java.lang.IllegalArgumentException: New Exception");
-            add("java.io.IOException: java.lang.IllegalArgumentException: New Exception");
-        }};
+        final Stack<String> expectedExceptionMessages = new Stack<String>() {
+            {
+                add("New Exception");
+                add("java.lang.IllegalArgumentException: New Exception");
+                add("java.io.IOException: java.lang.IllegalArgumentException: New Exception");
+            }
+        };
 
         RequestHandler rh = data -> {
             String jsonString = BacktraceSerializeHelper.toJson(data);
@@ -107,8 +107,12 @@ public class BacktraceClientSendTest {
             try {
                 // THEN
                 final JSONObject jsonObject = new JSONObject(jsonString);
-                final JSONObject exceptionProperties = jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
-                final String mainExceptionMessage = jsonObject.getJSONObject("annotations").getJSONObject("Exception").getString("message");
+                final JSONObject exceptionProperties =
+                        jsonObject.getJSONObject("annotations").getJSONObject("Exception properties");
+                final String mainExceptionMessage = jsonObject
+                        .getJSONObject("annotations")
+                        .getJSONObject("Exception")
+                        .getString("message");
                 final String mainExceptionExpectedMessage = expectedExceptionMessages.pop();
                 assertEquals(mainExceptionExpectedMessage, mainExceptionMessage);
                 assertTrue(exceptionProperties.getJSONArray("stack-trace").length() > 0);
@@ -119,8 +123,7 @@ public class BacktraceClientSendTest {
                 fail(e.getMessage());
             }
 
-            return new BacktraceResult(data.getReport(), data.getReport().message,
-                    BacktraceResultStatus.Ok);
+            return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
         };
         backtraceClient.setOnRequestHandler(rh);
 
@@ -145,25 +148,23 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().message,
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage), new
-                OnServerResponseEventListener() {
-                    @Override
-                    public void onEvent(BacktraceResult backtraceResult) {
-                        // THEN
-                        assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertNotNull(backtraceResult.getBacktraceReport());
-                        assertNull(backtraceResult.getBacktraceReport().exception);
-                        waiter.resume();
-                    }
-                });
+        backtraceClient.send(new BacktraceReport(this.resultMessage), new OnServerResponseEventListener() {
+            @Override
+            public void onEvent(BacktraceResult backtraceResult) {
+                // THEN
+                assertEquals(resultMessage, backtraceResult.message);
+                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                assertNotNull(backtraceResult.getBacktraceReport());
+                assertNull(backtraceResult.getBacktraceReport().exception);
+                waiter.resume();
+            }
+        });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -180,22 +181,21 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().message,
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(data.getReport(), data.getReport().message, BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(this.resultMessage, this.attributes),
-                new OnServerResponseEventListener() {
+        backtraceClient.send(
+                new BacktraceReport(this.resultMessage, this.attributes), new OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
                         // THEN
                         assertEquals(resultMessage, backtraceResult.message);
-                        assertEquals(attributes.get("test"),
-                                backtraceResult.getBacktraceReport().attributes.get("test")
-                        );
+                        assertEquals(
+                                attributes.get("test"),
+                                backtraceResult.getBacktraceReport().attributes.get("test"));
                         assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
                         assertNotNull(backtraceResult.getBacktraceReport());
                         assertNull(backtraceResult.getBacktraceReport().exception);
@@ -218,25 +218,25 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(new Exception(this
-                .resultMessage)), new OnServerResponseEventListener() {
-            @Override
-            public void onEvent(BacktraceResult backtraceResult) {
-                // THEN
-                assertEquals(resultMessage, backtraceResult.message);
-                assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                assertNotNull(backtraceResult.getBacktraceReport());
-                assertNotNull(backtraceResult.getBacktraceReport().exception);
-                waiter.resume();
-            }
-        });
+        backtraceClient.send(
+                new BacktraceReport(new Exception(this.resultMessage)), new OnServerResponseEventListener() {
+                    @Override
+                    public void onEvent(BacktraceResult backtraceResult) {
+                        // THEN
+                        assertEquals(resultMessage, backtraceResult.message);
+                        assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
+                        assertNotNull(backtraceResult.getBacktraceReport());
+                        assertNotNull(backtraceResult.getBacktraceReport().exception);
+                        waiter.resume();
+                    }
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -253,31 +253,30 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
         // WHEN
-        backtraceClient.send(new BacktraceReport(
-                new Exception(this.resultMessage), this.attributes), new
-                OnServerResponseEventListener() {
+        backtraceClient.send(
+                new BacktraceReport(new Exception(this.resultMessage), this.attributes),
+                new OnServerResponseEventListener() {
                     @Override
                     public void onEvent(BacktraceResult backtraceResult) {
 
                         // THEN
                         assertEquals(resultMessage, backtraceResult.message);
                         assertEquals(BacktraceResultStatus.Ok, backtraceResult.status);
-                        assertEquals(attributes.get("test"),
-                                backtraceResult.getBacktraceReport().attributes.get("test")
-                        );
+                        assertEquals(
+                                attributes.get("test"),
+                                backtraceResult.getBacktraceReport().attributes.get("test"));
                         assertNotNull(backtraceResult.getBacktraceReport());
                         assertNotNull(backtraceResult.getBacktraceReport().exception);
                         waiter.resume();
                     }
-                }
-        );
+                });
         // WAIT FOR THE RESULT FROM ANOTHER THREAD
         try {
             waiter.await(5, TimeUnit.SECONDS);
@@ -300,7 +299,6 @@ public class BacktraceClientSendTest {
         backtraceClient.sendSuppressedExceptions(true);
         final Waiter waiter = new Waiter();
 
-
         backtraceClient.setOnRequestHandler(new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
@@ -308,8 +306,8 @@ public class BacktraceClientSendTest {
                 if (reportData.size() == expectedNumberOfReports) {
                     waiter.resume();
                 }
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         });
         backtraceClient.send(outerException);
@@ -336,13 +334,13 @@ public class BacktraceClientSendTest {
         RequestHandler rh = new RequestHandler() {
             @Override
             public BacktraceResult onRequest(BacktraceData data) {
-                return new BacktraceResult(data.getReport(), data.getReport().exception.getMessage(),
-                        BacktraceResultStatus.Ok);
+                return new BacktraceResult(
+                        data.getReport(), data.getReport().exception.getMessage(), BacktraceResultStatus.Ok);
             }
         };
         backtraceClient.setOnRequestHandler(rh);
 
-        //WHEN
+        // WHEN
         for (final String message : messages) {
             backtraceClient.send(new Exception(message), new OnServerResponseEventListener() {
                 @Override

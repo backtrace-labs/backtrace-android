@@ -1,32 +1,38 @@
 package backtraceio.library;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import static org.junit.Assert.assertEquals;
 
 import backtraceio.library.models.attributes.ReportDataAttributes;
 import backtraceio.library.models.attributes.ReportDataBuilder;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ReportDataAnnotationBuilderTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {new HashMap<String, String>() {{
-                    put("add", "value");
-                }}},
-                {new HashSet<String>() {{
-                    add("value");
-                }}},
-                {new Object()},
+        return Arrays.asList(new Object[][] {
+            {
+                new HashMap<String, String>() {
+                    {
+                        put("add", "value");
+                    }
+                }
+            },
+            {
+                new HashSet<String>() {
+                    {
+                        add("value");
+                    }
+                }
+            },
+            {new Object()},
         });
     }
 

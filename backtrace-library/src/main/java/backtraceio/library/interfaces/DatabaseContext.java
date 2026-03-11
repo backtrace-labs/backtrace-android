@@ -49,7 +49,6 @@ public interface DatabaseContext {
      */
     boolean delete(BacktraceDatabaseRecord record);
 
-
     /**
      * Check if any similar record exists
      *

@@ -1,12 +1,11 @@
 package backtraceio.library.common;
 
+import backtraceio.library.logger.BacktraceLogger;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.List;
-
-import backtraceio.library.logger.BacktraceLogger;
 
 /***
  * Helper class for building multipart/form-data request
@@ -40,8 +39,11 @@ public class MultiFormRequestHelper {
             return;
         }
 
-        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
-                MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.CRLF).getBytes());
+        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS
+                        + MultiFormRequestHelper.BOUNDARY
+                        + MultiFormRequestHelper.TWO_HYPHENS
+                        + MultiFormRequestHelper.CRLF)
+                .getBytes());
     }
 
     /**
@@ -62,8 +64,9 @@ public class MultiFormRequestHelper {
             return;
         }
 
-        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
-                MultiFormRequestHelper.CRLF).getBytes());
+        outputStream.write(
+                (MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY + MultiFormRequestHelper.CRLF)
+                        .getBytes());
         outputStream.write((MultiFormRequestHelper.getFileInfo("upload_file")).getBytes());
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
 
@@ -78,8 +81,7 @@ public class MultiFormRequestHelper {
      * @param attachments list of paths to files
      * @throws IOException
      */
-    public static void addFiles(OutputStream outputStream, List<String> attachments) throws
-            IOException {
+    public static void addFiles(OutputStream outputStream, List<String> attachments) throws IOException {
         if (attachments == null || outputStream == null) {
             BacktraceLogger.w(LOG_TAG, "Attachments or output stream is null");
             return;
@@ -102,22 +104,18 @@ public class MultiFormRequestHelper {
             return;
         }
 
-        String fileContentType = URLConnection.guessContentTypeFromName(FileHelper
-                .getFileNameFromPath
-                        (absolutePath));
+        String fileContentType = URLConnection.guessContentTypeFromName(FileHelper.getFileNameFromPath(absolutePath));
 
-        outputStream.write((MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY +
-                MultiFormRequestHelper.CRLF).getBytes());
-        outputStream.write((MultiFormRequestHelper.getFileInfo("attachment_" + FileHelper
-                .getFileNameFromPath
-                        (absolutePath))).getBytes());
-        outputStream.write(("Content-Type: " + fileContentType + MultiFormRequestHelper.CRLF)
-                .getBytes
-                        ());
+        outputStream.write(
+                (MultiFormRequestHelper.TWO_HYPHENS + MultiFormRequestHelper.BOUNDARY + MultiFormRequestHelper.CRLF)
+                        .getBytes());
+        outputStream.write(
+                (MultiFormRequestHelper.getFileInfo("attachment_" + FileHelper.getFileNameFromPath(absolutePath)))
+                        .getBytes());
+        outputStream.write(("Content-Type: " + fileContentType + MultiFormRequestHelper.CRLF).getBytes());
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
         streamFile(outputStream, absolutePath);
         outputStream.write((MultiFormRequestHelper.CRLF).getBytes());
-
     }
 
     /***
@@ -126,8 +124,7 @@ public class MultiFormRequestHelper {
      * @param absolutePath absolute path to file
      * @throws IOException
      */
-    public static void streamFile(OutputStream outputStream, String absolutePath) throws
-            IOException {
+    public static void streamFile(OutputStream outputStream, String absolutePath) throws IOException {
         if (outputStream == null || absolutePath == null) {
             BacktraceLogger.w(LOG_TAG, "Absolute path or output stream is null");
             return;
@@ -140,15 +137,14 @@ public class MultiFormRequestHelper {
         }
     }
 
-
     /***
      * Get string with information about file like content-disposition, name and filename
      * @param fileName filename with extension
      * @return string with file information for multiform data
      */
     private static String getFileInfo(String fileName) {
-        return "Content-Disposition: form-data; name=\"" +
-                fileName + "\";filename=\"" +
-                fileName + "\"" + MultiFormRequestHelper.CRLF;
+        return "Content-Disposition: form-data; name=\"" + fileName
+                + "\";filename=\"" + fileName
+                + "\"" + MultiFormRequestHelper.CRLF;
     }
 }

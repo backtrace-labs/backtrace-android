@@ -1,7 +1,6 @@
 package backtraceio.library.anr;
 
 import android.os.Build;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 

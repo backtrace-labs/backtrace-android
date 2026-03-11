@@ -4,5 +4,4 @@ public class SystemLoader {
     public void loadLibrary(String path) {
         System.load(path);
     }
-
 }

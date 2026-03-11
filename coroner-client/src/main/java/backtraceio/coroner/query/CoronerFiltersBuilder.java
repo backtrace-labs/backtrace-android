@@ -2,7 +2,6 @@ package backtraceio.coroner.query;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,5 +42,4 @@ public class CoronerFiltersBuilder {
 
         return result;
     }
-
 }

@@ -5,26 +5,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import net.jodah.concurrentunit.Waiter;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import backtraceio.library.models.BacktraceData;
+import backtraceio.library.models.BacktraceResult;
+import backtraceio.library.models.json.BacktraceReport;
+import backtraceio.library.models.types.BacktraceResultStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import backtraceio.library.models.BacktraceData;
-import backtraceio.library.models.BacktraceResult;
-import backtraceio.library.models.json.BacktraceReport;
-import backtraceio.library.models.types.BacktraceResultStatus;
+import net.jodah.concurrentunit.Waiter;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceClientTest {
@@ -86,11 +81,11 @@ public class BacktraceClientTest {
     private void assertAttachmentsContain(BacktraceData data, List<String> expectedAttachments) {
         List<String> actualAttachments = data.getAttachmentPaths();
         for (String expected : expectedAttachments) {
-            assertTrue("Expected attachment '" + expected + "' not found in " + actualAttachments,
+            assertTrue(
+                    "Expected attachment '" + expected + "' not found in " + actualAttachments,
                     actualAttachments.contains(expected));
         }
     }
-
 
     @Test
     public void sendBacktraceReportWithoutAttachments() {
@@ -103,36 +98,26 @@ public class BacktraceClientTest {
 
     @Test
     public void sendBacktraceReportWithInitAttachments() {
-        sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE),
-                initAttachments,
-                new ArrayList<>(),
-                data -> {
-                    assertEquals(initAttachments.size(), data.getAttachmentPaths().size());
-                    assertAttachmentsContain(data, initAttachments);
-                });
+        sendAndAssert(new BacktraceReport(RESULT_MESSAGE), initAttachments, new ArrayList<>(), data -> {
+            assertEquals(initAttachments.size(), data.getAttachmentPaths().size());
+            assertAttachmentsContain(data, initAttachments);
+        });
     }
 
     @Test
     public void sendBacktraceReportWithDynamicAttachments() {
-        sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE),
-                new ArrayList<>(),
-                dynamicAttachments,
-                data -> {
-                    assertEquals(dynamicAttachments.size(), data.getAttachmentPaths().size());
-                    assertAttachmentsContain(data, dynamicAttachments);
-                });
+        sendAndAssert(new BacktraceReport(RESULT_MESSAGE), new ArrayList<>(), dynamicAttachments, data -> {
+            assertEquals(dynamicAttachments.size(), data.getAttachmentPaths().size());
+            assertAttachmentsContain(data, dynamicAttachments);
+        });
     }
 
     @Test
     public void sendBacktraceReportWithReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                data -> {
-                    assertEquals(reportAttachments.size(), data.getAttachmentPaths().size());
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments), new ArrayList<>(), new ArrayList<>(), data -> {
+                    assertEquals(
+                            reportAttachments.size(), data.getAttachmentPaths().size());
                     assertAttachmentsContain(data, reportAttachments);
                 });
     }
@@ -140,11 +125,9 @@ public class BacktraceClientTest {
     @Test
     public void sendBacktraceReportWithInitAndReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
-                initAttachments,
-                new ArrayList<>(),
-                data -> {
-                    assertEquals(reportAttachments.size() + initAttachments.size(),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments), initAttachments, new ArrayList<>(), data -> {
+                    assertEquals(
+                            reportAttachments.size() + initAttachments.size(),
                             data.getAttachmentPaths().size());
                     assertAttachmentsContain(data, reportAttachments);
                     assertAttachmentsContain(data, initAttachments);
@@ -154,11 +137,9 @@ public class BacktraceClientTest {
     @Test
     public void sendBacktraceReportWithDynamicAndReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
-                new ArrayList<>(),
-                dynamicAttachments,
-                data -> {
-                    assertEquals(reportAttachments.size() + dynamicAttachments.size(),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments), new ArrayList<>(), dynamicAttachments, data -> {
+                    assertEquals(
+                            reportAttachments.size() + dynamicAttachments.size(),
                             data.getAttachmentPaths().size());
                     assertAttachmentsContain(data, reportAttachments);
                     assertAttachmentsContain(data, dynamicAttachments);
@@ -167,26 +148,21 @@ public class BacktraceClientTest {
 
     @Test
     public void sendBacktraceReportWithInitAndDynamicAttachments() {
-        sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE),
-                initAttachments,
-                dynamicAttachments,
-                data -> {
-                    assertEquals(initAttachments.size() + dynamicAttachments.size(),
-                            data.getAttachmentPaths().size());
-                    assertAttachmentsContain(data, initAttachments);
-                    assertAttachmentsContain(data, dynamicAttachments);
-                });
+        sendAndAssert(new BacktraceReport(RESULT_MESSAGE), initAttachments, dynamicAttachments, data -> {
+            assertEquals(
+                    initAttachments.size() + dynamicAttachments.size(),
+                    data.getAttachmentPaths().size());
+            assertAttachmentsContain(data, initAttachments);
+            assertAttachmentsContain(data, dynamicAttachments);
+        });
     }
 
     @Test
     public void sendBacktraceReportWithInitDynamicAndReportAttachments() {
         sendAndAssert(
-                new BacktraceReport(RESULT_MESSAGE, reportAttachments),
-                initAttachments,
-                dynamicAttachments,
-                data -> {
-                    assertEquals(reportAttachments.size() + initAttachments.size() + dynamicAttachments.size(),
+                new BacktraceReport(RESULT_MESSAGE, reportAttachments), initAttachments, dynamicAttachments, data -> {
+                    assertEquals(
+                            reportAttachments.size() + initAttachments.size() + dynamicAttachments.size(),
                             data.getAttachmentPaths().size());
                     assertAttachmentsContain(data, reportAttachments);
                     assertAttachmentsContain(data, initAttachments);
@@ -208,7 +184,8 @@ public class BacktraceClientTest {
         client.addAttachment(attachment);
         sendReportAndWait(client, new BacktraceReport(RESULT_MESSAGE), data -> {
             assertEquals(1, data.getAttachmentPaths().size());
-            assertTrue("Expected attachment '" + attachment + "' not found",
+            assertTrue(
+                    "Expected attachment '" + attachment + "' not found",
                     data.getAttachmentPaths().contains(attachment));
         });
     }
@@ -224,9 +201,11 @@ public class BacktraceClientTest {
         // Send first report with two attachments
         sendReportAndWait(client, new BacktraceReport(RESULT_MESSAGE), data -> {
             assertEquals(2, data.getAttachmentPaths().size());
-            assertTrue("Expected attachment '" + file1 + "' not found",
+            assertTrue(
+                    "Expected attachment '" + file1 + "' not found",
                     data.getAttachmentPaths().contains(file1));
-            assertTrue("Expected attachment '" + file2 + "' not found",
+            assertTrue(
+                    "Expected attachment '" + file2 + "' not found",
                     data.getAttachmentPaths().contains(file2));
         });
 

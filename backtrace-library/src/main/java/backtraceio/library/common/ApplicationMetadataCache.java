@@ -3,7 +3,6 @@ package backtraceio.library.common;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
 import backtraceio.library.logger.BacktraceLogger;
 
 public class ApplicationMetadataCache {
@@ -61,7 +60,9 @@ public class ApplicationMetadataCache {
             return applicationName;
         }
 
-        applicationName = context.getApplicationInfo().loadLabel(context.getPackageManager()).toString();
+        applicationName = context.getApplicationInfo()
+                .loadLabel(context.getPackageManager())
+                .toString();
         return applicationName;
     }
 
@@ -75,9 +76,10 @@ public class ApplicationMetadataCache {
             return applicationVersion;
         }
         try {
-            PackageInfo info = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            applicationVersion = BacktraceStringHelper.isNullOrEmpty(info.versionName) ? String.valueOf(info.versionCode) : info.versionName;
+            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            applicationVersion = BacktraceStringHelper.isNullOrEmpty(info.versionName)
+                    ? String.valueOf(info.versionCode)
+                    : info.versionName;
 
             return applicationVersion;
         } catch (PackageManager.NameNotFoundException e) {

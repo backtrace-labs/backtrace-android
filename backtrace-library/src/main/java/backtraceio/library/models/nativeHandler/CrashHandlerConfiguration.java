@@ -2,7 +2,8 @@ package backtraceio.library.models.nativeHandler;
 
 import android.content.pm.ApplicationInfo;
 import android.text.TextUtils;
-
+import backtraceio.library.common.AbiHelper;
+import backtraceio.library.services.BacktraceCrashHandlerRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,17 +15,13 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import backtraceio.library.common.AbiHelper;
-import backtraceio.library.services.BacktraceCrashHandlerRunner;
-
 public class CrashHandlerConfiguration {
 
     public static final String BACKTRACE_CRASH_HANDLER = "BACKTRACE_CRASH_HANDLER";
-    public static final Set<String> UNSUPPORTED_ABIS = new HashSet<String>(Arrays.asList(new String[]{"x86"}));
+    public static final Set<String> UNSUPPORTED_ABIS = new HashSet<String>(Arrays.asList(new String[] {"x86"}));
     private static final String CRASHPAD_DIRECTORY_PATH = "/crashpad";
 
     private static final String BACKTRACE_NATIVE_LIBRARY_NAME = "libbacktrace-native.so";
-
 
     public Boolean isSupportedAbi() {
         return isSupportedAbi(AbiHelper.getCurrentAbi());
@@ -53,11 +50,11 @@ public class CrashHandlerConfiguration {
         // LD_LIBRARY_PATH
         File nativeLibraryDirectory = new File(nativeLibraryDirPath);
         File allNativeLibrariesDirectory = nativeLibraryDirectory.getParentFile();
-        String allPossibleLibrarySearchPaths = TextUtils.join(File.pathSeparator, new String[]{
-                nativeLibraryDirPath,
-                allNativeLibrariesDirectory.getPath(),
-                System.getProperty("java.library.path"),
-                "/data/local"
+        String allPossibleLibrarySearchPaths = TextUtils.join(File.pathSeparator, new String[] {
+            nativeLibraryDirPath,
+            allNativeLibrariesDirectory.getPath(),
+            System.getProperty("java.library.path"),
+            "/data/local"
         });
 
         final String backtraceNativeLibraryPath = resolveBacktraceNativeLibraryPath(applicationInfo, arch);
@@ -79,8 +76,7 @@ public class CrashHandlerConfiguration {
         final List<String> environmentVariables = new ArrayList<>();
 
         // convert available in the system environment variables
-        for (Map.Entry<String, String> variable :
-                System.getenv().entrySet()) {
+        for (Map.Entry<String, String> variable : System.getenv().entrySet()) {
             environmentVariables.add(String.format("%s=%s", variable.getKey(), variable.getValue()));
         }
         // extend system-specific environment variables, with variables needed to properly run app_process via crashpad
@@ -88,11 +84,12 @@ public class CrashHandlerConfiguration {
 
         String backtraceNativeLibraryPath = getBacktraceNativeLibraryPath(nativeLibraryDirPath, apkPath, arch);
         File allNativeLibrariesDirectory = nativeLibraryDirectory.getParentFile();
-        String allPossibleLibrarySearchPaths = TextUtils.join(File.pathSeparator, new String[]{
-                nativeLibraryDirPath,
-                allNativeLibrariesDirectory.getPath(),
-                System.getProperty("java.library.path"),
-                "/data/local"});
+        String allPossibleLibrarySearchPaths = TextUtils.join(File.pathSeparator, new String[] {
+            nativeLibraryDirPath,
+            allNativeLibrariesDirectory.getPath(),
+            System.getProperty("java.library.path"),
+            "/data/local"
+        });
 
         environmentVariables.add(String.format("CLASSPATH=%s", apkPath));
         environmentVariables.add(String.format("%s=%s", BACKTRACE_CRASH_HANDLER, backtraceNativeLibraryPath));
@@ -168,5 +165,4 @@ public class CrashHandlerConfiguration {
             return false;
         }
     }
-
 }

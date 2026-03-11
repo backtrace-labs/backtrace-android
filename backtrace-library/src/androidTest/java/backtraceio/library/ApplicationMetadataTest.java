@@ -5,15 +5,12 @@ import static org.junit.Assert.assertEquals;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
+import backtraceio.library.common.ApplicationMetadataCache;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import backtraceio.library.common.ApplicationMetadataCache;
 
 @RunWith(AndroidJUnit4.class)
 public class ApplicationMetadataTest {
@@ -44,5 +41,4 @@ public class ApplicationMetadataTest {
         PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getOpPackageName(), 0);
         assertEquals(cache.getApplicationVersion(), String.valueOf(packageInfo.versionCode));
     }
-
 }

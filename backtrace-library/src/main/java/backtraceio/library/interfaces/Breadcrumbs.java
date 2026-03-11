@@ -1,14 +1,12 @@
 package backtraceio.library.interfaces;
 
 import android.content.Context;
-
-import java.util.EnumSet;
-import java.util.Map;
-
 import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.events.OnSuccessfulBreadcrumbAddEventListener;
 import backtraceio.library.models.json.BacktraceReport;
+import java.util.EnumSet;
+import java.util.Map;
 
 public interface Breadcrumbs {
     /**
@@ -28,8 +26,7 @@ public interface Breadcrumbs {
      * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled
      */
-    boolean enableBreadcrumbs(Context context,
-                              EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable);
+    boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable);
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
@@ -50,9 +47,8 @@ public interface Breadcrumbs {
      * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled
      */
-    boolean enableBreadcrumbs(Context context,
-                              EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
-                              int maxBreadcrumbLogSizeBytes);
+    boolean enableBreadcrumbs(
+            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes);
 
     /**
      * Gets the enabled breadcrumb types
@@ -142,7 +138,11 @@ public interface Breadcrumbs {
      * @param level      the severity level of this breadcrumb
      * @return true if the breadcrumb was successfully added
      */
-    boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level);
+    boolean addBreadcrumb(
+            String message,
+            Map<String, Object> attributes,
+            BacktraceBreadcrumbType type,
+            BacktraceBreadcrumbLevel level);
 
     /**
      * Process a Backtrace Report to add breadcrumbs, if breadcrumbs is enabled
@@ -181,7 +181,7 @@ public interface Breadcrumbs {
      * @return true if breadcrumbs are enabled.
      */
     boolean isEnabled();
-    
+
     /**
      * Set event executed after adding a breadcrumb to the breadcrumb storage.
      *

@@ -4,9 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-
 import backtraceio.library.models.BacktraceStackTrace;
+import org.junit.Test;
 
 public class BacktraceStackTraceTest {
 
@@ -15,8 +14,7 @@ public class BacktraceStackTraceTest {
         // GIVEN
         Exception e = new Exception();
         StackTraceElement[] stackTraceElements = new StackTraceElement[2];
-        stackTraceElements[0] = new StackTraceElement("BacktraceExampleClass", "exampleMethod",
-                "exampleFile", 1);
+        stackTraceElements[0] = new StackTraceElement("BacktraceExampleClass", "exampleMethod", "exampleFile", 1);
         stackTraceElements[1] = new StackTraceElement("ExampleClass", "", "", 2);
         e.setStackTrace(stackTraceElements);
 
@@ -32,10 +30,8 @@ public class BacktraceStackTraceTest {
         // GIVEN
         Exception e = new Exception();
         StackTraceElement[] stackTraceElements = new StackTraceElement[2];
-        stackTraceElements[0] = new StackTraceElement("BacktraceExampleClass", "exampleMethod",
-                "BacktraceFile", 1);
-        stackTraceElements[1] = new StackTraceElement("ExampleClass", "exampleMethod",
-                "exampleFile", 2);
+        stackTraceElements[0] = new StackTraceElement("BacktraceExampleClass", "exampleMethod", "BacktraceFile", 1);
+        stackTraceElements[1] = new StackTraceElement("ExampleClass", "exampleMethod", "exampleFile", 2);
         e.setStackTrace(stackTraceElements);
 
         // WHEN

@@ -4,15 +4,14 @@ import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.Context;
 import android.os.Build;
-
 import androidx.annotation.RequiresApi;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class ActivityManagerExitInfoProvider implements ProcessExitInfoProvider {
     private final ActivityManager activityManager;
+
     public ActivityManagerExitInfoProvider(Context context) {
         this.activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     }

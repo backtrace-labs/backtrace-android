@@ -1,7 +1,6 @@
 package backtraceio.library.services;
 
 import android.content.Context;
-
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.events.EventsOnServerResponseEventListener;
 import backtraceio.library.events.EventsRequestHandler;
@@ -19,8 +18,7 @@ import backtraceio.library.models.metrics.UniqueEventsPayload;
  */
 public class BacktraceApi implements Api {
 
-    private final static transient String LOG_TAG = BacktraceApi.class.getSimpleName();
-
+    private static final transient String LOG_TAG = BacktraceApi.class.getSimpleName();
 
     private final transient BacktraceHandlerThread threadSender;
 
@@ -66,14 +64,14 @@ public class BacktraceApi implements Api {
      */
     public BacktraceApi(Context context, BacktraceCredentials credentials) {
         if (credentials == null) {
-            BacktraceLogger.e(LOG_TAG, "BacktraceCredentials parameter passed to BacktraceApi " +
-                    "constructor is null");
+            BacktraceLogger.e(
+                    LOG_TAG, "BacktraceCredentials parameter passed to BacktraceApi " + "constructor is null");
             throw new IllegalArgumentException("BacktraceCredentials cannot be null");
         }
         this.reportSubmissionUrl = credentials.getSubmissionUrl().toString();
 
-        threadSender = new BacktraceHandlerThread(context, BacktraceHandlerThread.class.getSimpleName(),
-                this.reportSubmissionUrl);
+        threadSender = new BacktraceHandlerThread(
+                context, BacktraceHandlerThread.class.getSimpleName(), this.reportSubmissionUrl);
     }
 
     @Override
@@ -118,22 +116,22 @@ public class BacktraceApi implements Api {
      */
     @Override
     public void send(BacktraceData data, OnServerResponseEventListener callback) {
-        BacktraceHandlerInputReport input = new BacktraceHandlerInputReport(data, callback,
-                this.onServerError, this.requestHandler);
+        BacktraceHandlerInputReport input =
+                new BacktraceHandlerInputReport(data, callback, this.onServerError, this.requestHandler);
         threadSender.sendReport(input);
     }
 
     @Override
     public void sendEventsPayload(UniqueEventsPayload payload) {
-        BacktraceHandlerInputEvents input = new BacktraceHandlerInputEvents(payload, this.uniqueEventsServerResponse,
-                this.onServerError, this.uniqueEventsRequestHandler);
+        BacktraceHandlerInputEvents input = new BacktraceHandlerInputEvents(
+                payload, this.uniqueEventsServerResponse, this.onServerError, this.uniqueEventsRequestHandler);
         threadSender.sendUniqueEvents(input);
     }
 
     @Override
     public void sendEventsPayload(SummedEventsPayload payload) {
-        BacktraceHandlerInputEvents input = new BacktraceHandlerInputEvents(payload, this.summedEventsServerResponse,
-                this.onServerError, this.summedEventsRequestHandler);
+        BacktraceHandlerInputEvents input = new BacktraceHandlerInputEvents(
+                payload, this.summedEventsServerResponse, this.onServerError, this.summedEventsRequestHandler);
         threadSender.sendSummedEvents(input);
     }
 }

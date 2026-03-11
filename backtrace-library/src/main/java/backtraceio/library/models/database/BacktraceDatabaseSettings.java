@@ -56,7 +56,6 @@ public class BacktraceDatabaseSettings {
     /**
      * Maximum database size in MB. If value is equal to zero, then size is unlimited
      */
-
     public long getMaxDatabaseSize() {
         return _maxDatabaseSize * 1000 * 1000;
     }
@@ -126,6 +125,4 @@ public class BacktraceDatabaseSettings {
     public void setRetryOrder(RetryOrder retryOrder) {
         this.retryOrder = retryOrder;
     }
-
-
 }

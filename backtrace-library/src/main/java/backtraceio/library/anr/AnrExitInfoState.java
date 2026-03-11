@@ -1,7 +1,6 @@
 package backtraceio.library.anr;
 
 import android.content.Context;
-
 import backtraceio.library.common.SharedPreferencesManager;
 
 public class AnrExitInfoState {
@@ -25,5 +24,4 @@ public class AnrExitInfoState {
         return this.sharedPreferencesManager.readLongFromSharedPreferences(
                 PREFS_NAME, TIMESTAMP_PREF_KEY, TIMESTAMP_DEFAULT);
     }
-
 }

@@ -1,60 +1,72 @@
 {
-  "message" : "4",
-  "class" : "java.lang.AssertionError",
-  "stack-trace" : [ {
-    "declaring-class" : "sample-class-1",
-    "method-name" : "method-1",
-    "file-name" : "file-name1",
-    "line-number" : 100
-  }, {
-    "declaring-class" : "sample-class-2",
-    "method-name" : "method-2",
-    "file-name" : "file-name2",
-    "line-number" : 200
-  } ],
-  "cause" : {
-    "message" : "3",
-    "class" : "java.lang.RuntimeException",
-    "stack-trace" : [ {
-      "declaring-class" : "sample-class-1",
-      "method-name" : "method-1",
-      "file-name" : "file-name1",
-      "line-number" : 100
-    }, {
-      "declaring-class" : "sample-class-2",
-      "method-name" : "method-2",
-      "file-name" : "file-name2",
-      "line-number" : 200
-    } ],
-    "cause" : {
-      "message" : "2",
-      "class" : "org.json.JSONException",
-      "stack-trace" : [ {
-        "declaring-class" : "sample-class-1",
-        "method-name" : "method-1",
-        "file-name" : "file-name1",
-        "line-number" : 100
-      }, {
-        "declaring-class" : "sample-class-2",
-        "method-name" : "method-2",
-        "file-name" : "file-name2",
-        "line-number" : 200
-      } ],
-      "cause" : {
-        "message" : "1",
-        "class" : "java.lang.IllegalArgumentException",
-        "stack-trace" : [ {
-          "declaring-class" : "sample-class-1",
-          "method-name" : "method-1",
-          "file-name" : "file-name1",
-          "line-number" : 100
-        }, {
-          "declaring-class" : "sample-class-2",
-          "method-name" : "method-2",
-          "file-name" : "file-name2",
-          "line-number" : 200
-        } ]
-      }
-    }
-  }
+    "stack-trace": [
+        {
+            "declaring-class": "sample-class-1",
+            "line-number": 100,
+            "method-name": "method-1",
+            "file-name": "file-name1"
+        },
+        {
+            "declaring-class": "sample-class-2",
+            "line-number": 200,
+            "method-name": "method-2",
+            "file-name": "file-name2"
+        }
+    ],
+    "cause": {
+        "stack-trace": [
+            {
+                "declaring-class": "sample-class-1",
+                "line-number": 100,
+                "method-name": "method-1",
+                "file-name": "file-name1"
+            },
+            {
+                "declaring-class": "sample-class-2",
+                "line-number": 200,
+                "method-name": "method-2",
+                "file-name": "file-name2"
+            }
+        ],
+        "cause": {
+            "stack-trace": [
+                {
+                    "declaring-class": "sample-class-1",
+                    "line-number": 100,
+                    "method-name": "method-1",
+                    "file-name": "file-name1"
+                },
+                {
+                    "declaring-class": "sample-class-2",
+                    "line-number": 200,
+                    "method-name": "method-2",
+                    "file-name": "file-name2"
+                }
+            ],
+            "cause": {
+                "stack-trace": [
+                    {
+                        "declaring-class": "sample-class-1",
+                        "line-number": 100,
+                        "method-name": "method-1",
+                        "file-name": "file-name1"
+                    },
+                    {
+                        "declaring-class": "sample-class-2",
+                        "line-number": 200,
+                        "method-name": "method-2",
+                        "file-name": "file-name2"
+                    }
+                ],
+                "message": "1",
+                "class": "java.lang.IllegalArgumentException"
+            },
+            "message": "2",
+            "class": "org.json.JSONException"
+        },
+        "message": "3",
+        "class": "java.lang.RuntimeException"
+    },
+    "message": "4",
+    "class": "java.lang.AssertionError"
 }

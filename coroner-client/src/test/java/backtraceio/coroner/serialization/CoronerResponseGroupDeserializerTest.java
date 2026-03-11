@@ -2,12 +2,10 @@ package backtraceio.coroner.serialization;
 
 import static org.junit.Assert.assertNull;
 
+import backtraceio.coroner.response.CoronerResponseGroup;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
 import org.junit.Test;
-
-import backtraceio.coroner.response.CoronerResponseGroup;
 
 public class CoronerResponseGroupDeserializerTest {
 

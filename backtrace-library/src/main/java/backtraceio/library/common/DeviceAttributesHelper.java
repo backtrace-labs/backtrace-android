@@ -16,14 +16,6 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.text.TextUtils;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.UUID;
-
-import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.enums.BatteryState;
 import backtraceio.library.enums.BluetoothStatus;
 import backtraceio.library.enums.GpsStatus;
@@ -31,13 +23,16 @@ import backtraceio.library.enums.LocationStatus;
 import backtraceio.library.enums.NfcStatus;
 import backtraceio.library.enums.WifiStatus;
 import backtraceio.library.logger.BacktraceLogger;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashMap;
 
 /**
  * Helper class for extract a device attributes
  */
 public class DeviceAttributesHelper {
     private final Context context;
-    private transient final String LOG_TAG = DeviceAttributesHelper.class.getSimpleName();
+    private final transient String LOG_TAG = DeviceAttributesHelper.class.getSimpleName();
 
     public DeviceAttributesHelper(Context context) {
         this.context = context;
@@ -64,9 +59,9 @@ public class DeviceAttributesHelper {
         result.put("app.storage_used", getAppUsedStorageSize());
         result.put("battery.level", String.valueOf(getBatteryLevel()));
         result.put("battery.state", getBatteryState().toString());
-        result.put("cpu.boottime", String.valueOf(java.lang.System.currentTimeMillis() - android.os.SystemClock
-                .elapsedRealtime()));
-
+        result.put(
+                "cpu.boottime",
+                String.valueOf(java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime()));
 
         ActivityManager.MemoryInfo memoryInfo = getMemoryInformation();
         result.put("system.memory.total", Long.toString(memoryInfo.totalMem));
@@ -81,8 +76,7 @@ public class DeviceAttributesHelper {
      * @return true if enabled.
      */
     private boolean isAirplaneModeOn() {
-        return Settings.Global.getInt(context.getContentResolver(),
-                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+        return Settings.Global.getInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     }
 
     /**
@@ -91,9 +85,8 @@ public class DeviceAttributesHelper {
      * @return location status (enabled/disabled)
      */
     private LocationStatus getLocationServiceStatus() {
-        int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure
-                        .LOCATION_MODE,
-                Settings.Secure.LOCATION_MODE_OFF);
+        int mode = Settings.Secure.getInt(
+                context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
         if (mode != android.provider.Settings.Secure.LOCATION_MODE_OFF) {
             return LocationStatus.ENABLED;
         }
@@ -128,7 +121,8 @@ public class DeviceAttributesHelper {
         if (!PermissionHelper.isPermissionForBluetoothGranted(this.context)) {
             return BluetoothStatus.NOT_PERMITTED;
         }
-        BluetoothManager mBluetoothManager = (BluetoothManager) this.context.getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothManager mBluetoothManager =
+                (BluetoothManager) this.context.getSystemService(Context.BLUETOOTH_SERVICE);
         if (mBluetoothManager != null) {
             BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
             if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
@@ -164,10 +158,8 @@ public class DeviceAttributesHelper {
      * @return GPS status (enabled/disabled)
      */
     private GpsStatus getGpsStatus() {
-        LocationManager manager = (LocationManager) this.context.getSystemService(Context
-                .LOCATION_SERVICE);
-        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ? GpsStatus.ENABLED :
-                GpsStatus.DISABLED;
+        LocationManager manager = (LocationManager) this.context.getSystemService(Context.LOCATION_SERVICE);
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ? GpsStatus.ENABLED : GpsStatus.DISABLED;
     }
 
     /**
@@ -181,8 +173,7 @@ public class DeviceAttributesHelper {
             return WifiStatus.NOT_PERMITTED;
         }
 
-        WifiManager mng = (WifiManager) context.getApplicationContext().getSystemService(Context
-                .WIFI_SERVICE);
+        WifiManager mng = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (mng.isWifiEnabled()) {
             return WifiStatus.ENABLED;
         }
@@ -198,8 +189,7 @@ public class DeviceAttributesHelper {
         if (Build.VERSION.SDK_INT < 21) {
             return false;
         }
-        PowerManager powerManager = (PowerManager) this.context.getSystemService(Context
-                .POWER_SERVICE);
+        PowerManager powerManager = (PowerManager) this.context.getSystemService(Context.POWER_SERVICE);
         return powerManager.isPowerSaveMode();
     }
 
@@ -250,8 +240,7 @@ public class DeviceAttributesHelper {
 
     private ActivityManager.MemoryInfo getMemoryInformation() {
         ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager = (ActivityManager) this.context.getSystemService
-                (ACTIVITY_SERVICE);
+        ActivityManager activityManager = (ActivityManager) this.context.getSystemService(ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(memInfo);
         return memInfo;
     }

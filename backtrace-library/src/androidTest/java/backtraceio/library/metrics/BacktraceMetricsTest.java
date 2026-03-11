@@ -3,19 +3,8 @@ package backtraceio.library.metrics;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import junit.framework.TestCase;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
@@ -27,6 +16,12 @@ import backtraceio.library.models.BacktraceMetricsSettings;
 import backtraceio.library.models.metrics.SummedEvent;
 import backtraceio.library.models.metrics.UniqueEvent;
 import backtraceio.library.services.BacktraceMetrics;
+import java.util.HashMap;
+import java.util.Map;
+import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class BacktraceMetricsTest {
@@ -35,7 +30,18 @@ public class BacktraceMetricsTest {
     public BacktraceCredentials credentials;
     private final String summedEventName = "activity-changed";
     // existing attribute name in Backtrace
-    private final String[] uniqueAttributeName = {"uname.version", "cpu.boottime", "screen.orientation", "battery.state", "device.airplane_mode", "device.sdk", "device.brand", "system.memory.total", "uname.sysname", "application.package"};
+    private final String[] uniqueAttributeName = {
+        "uname.version",
+        "cpu.boottime",
+        "screen.orientation",
+        "battery.state",
+        "device.airplane_mode",
+        "device.sdk",
+        "device.brand",
+        "system.memory.total",
+        "uname.sysname",
+        "application.package"
+    };
 
     private final String token = "aaaaabbbbbccccf82668682e69f59b38e0a853bed941e08e85f4bf5eb2c5458";
 
@@ -43,13 +49,13 @@ public class BacktraceMetricsTest {
      * NOTE: Some of these tests are very time-sensitive so you may occasionally get false negative results.
      * For best results run under low CPU load and low memory utilization conditions.
      */
-
     @Before
     public void setUp() {
         BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.DEBUG));
         context = InstrumentationRegistry.getInstrumentation().getContext();
         credentials = new BacktraceCredentials("https://universe.sp.backtrace.io:6098", token);
-        BacktraceDatabase database = new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
+        BacktraceDatabase database =
+                new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
     }
@@ -57,9 +63,11 @@ public class BacktraceMetricsTest {
     @Test
     public void addAttributesSummedEvent() {
         SummedEvent summedEvent = new SummedEvent(summedEventName, null);
-        Map<String, String> attributes = new HashMap<String, String>() {{
-            put("foo", "bar");
-        }};
+        Map<String, String> attributes = new HashMap<String, String>() {
+            {
+                put("foo", "bar");
+            }
+        };
         summedEvent.addAttributes(attributes);
         assertEquals("bar", summedEvent.getAttributes().get("foo"));
     }
@@ -67,9 +75,11 @@ public class BacktraceMetricsTest {
     @Test
     public void addAttributesUniqueEvent() {
         UniqueEvent uniqueEvent = new UniqueEvent(uniqueAttributeName[0], null);
-        Map<String, String> attributes = new HashMap<String, String>() {{
-            put("foo", "bar");
-        }};
+        Map<String, String> attributes = new HashMap<String, String>() {
+            {
+                put("foo", "bar");
+            }
+        };
         uniqueEvent.update(BacktraceTimeHelper.getTimestampSeconds(), attributes);
         assertEquals("bar", uniqueEvent.getAttributes().get("foo"));
     }
@@ -100,7 +110,8 @@ public class BacktraceMetricsTest {
     @Test(expected = IllegalArgumentException.class)
     public void tryToEnableMetricsOnCustomServer() {
         // GIVEN
-        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceCredentials customCredentials =
+                new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
 
         // WHEN
@@ -110,7 +121,8 @@ public class BacktraceMetricsTest {
     @Test(expected = IllegalArgumentException.class)
     public void tryToAddSummedEventOnCustomServer() {
         // GIVEN
-        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceCredentials customCredentials =
+                new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
 
         // WHEN
@@ -120,7 +132,8 @@ public class BacktraceMetricsTest {
     @Test(expected = IllegalArgumentException.class)
     public void tryToAddUniqueEventOnCustomServer() {
         // GIVEN
-        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceCredentials customCredentials =
+                new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
 
         // WHEN
@@ -130,7 +143,8 @@ public class BacktraceMetricsTest {
     @Test(expected = IllegalArgumentException.class)
     public void tryToSendOnCustomServer() {
         // GIVEN
-        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceCredentials customCredentials =
+                new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
 
         // WHEN
@@ -140,11 +154,11 @@ public class BacktraceMetricsTest {
     @Test(expected = IllegalArgumentException.class)
     public void tryToSendStartupEventOnCustomServer() {
         // GIVEN
-        BacktraceCredentials customCredentials = new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
+        BacktraceCredentials customCredentials =
+                new BacktraceCredentials("https://custom.on.premise.server.io:6098", token);
         BacktraceMetrics metrics = new BacktraceMetrics(context, new HashMap<>(), null, customCredentials);
 
         // WHEN
         metrics.sendStartupEvent();
     }
-
 }

@@ -2,16 +2,13 @@ package backtraceio.library.common;
 
 import android.content.Context;
 import android.util.Log;
-
+import backtraceio.library.logger.BacktraceLogger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-
-import backtraceio.library.logger.BacktraceLogger;
-
 
 /**
  * Helper class for access to files
@@ -68,9 +65,13 @@ public class FileHelper {
      */
     public static String getFileExtension(File file) {
 
-        String name = file.getName().substring(Math.max(file.getName().lastIndexOf('/'),
-                file.getName().lastIndexOf('\\')) < 0 ? 0 : Math.max(file.getName().lastIndexOf('/'),
-                file.getName().lastIndexOf('\\')));
+        String name = file.getName()
+                .substring(
+                        Math.max(file.getName().lastIndexOf('/'), file.getName().lastIndexOf('\\')) < 0
+                                ? 0
+                                : Math.max(
+                                        file.getName().lastIndexOf('/'),
+                                        file.getName().lastIndexOf('\\')));
         int lastIndexOf = name.lastIndexOf(".");
         if (lastIndexOf == -1) {
             return ""; // empty extension
@@ -110,7 +111,8 @@ public class FileHelper {
         String dataDir = context.getApplicationInfo().dataDir;
         String cacheDir = context.getCacheDir().getAbsolutePath();
         String filesDir = context.getFilesDir().getPath();
-        BacktraceLogger.d(LOG_TAG, String.format("Passed path %s, Internal paths %s, %s, %s", path, dataDir, cacheDir, filesDir));
+        BacktraceLogger.d(
+                LOG_TAG, String.format("Passed path %s, Internal paths %s, %s, %s", path, dataDir, cacheDir, filesDir));
 
         return path.startsWith(dataDir) || path.startsWith(cacheDir) || path.startsWith(filesDir);
     }
