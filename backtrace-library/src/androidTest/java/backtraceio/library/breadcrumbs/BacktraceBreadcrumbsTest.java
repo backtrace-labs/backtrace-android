@@ -129,14 +129,14 @@ public class BacktraceBreadcrumbsTest {
             backtraceBreadcrumbs.enableBreadcrumbs(context, EnumSet.of(BacktraceBreadcrumbType.MANUAL));
 
             assertTrue(backtraceBreadcrumbs.addBreadcrumb("test-manual", BacktraceBreadcrumbType.MANUAL));
-            assertTrue(backtraceBreadcrumbs.addBreadcrumb("test-system", BacktraceBreadcrumbType.SYSTEM));
-            assertTrue(backtraceBreadcrumbs.addBreadcrumb("test-http", BacktraceBreadcrumbType.HTTP));
+            assertFalse(backtraceBreadcrumbs.addBreadcrumb("test-system", BacktraceBreadcrumbType.SYSTEM));
+            assertFalse(backtraceBreadcrumbs.addBreadcrumb("test-http", BacktraceBreadcrumbType.HTTP));
 
             List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
                     context.getFilesDir().getAbsolutePath());
 
             // Configuration breadcrumb, plus breadcrumb added above.
-            assertEquals(4, breadcrumbLogFileData.size());
+            assertEquals(2, breadcrumbLogFileData.size());
 
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
             assertEquals("test-manual", parsedBreadcrumb.get("message"));
