@@ -9,8 +9,10 @@ import static junit.framework.TestCase.fail;
 import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import backtraceio.library.enums.BacktraceBreadcrumbType;
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -112,6 +114,32 @@ public class BacktraceBreadcrumbsTest {
 
             assertEquals("Test", parsedBreadcrumb.get("message"));
 
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddBreadcrumbRejectsDisabledType() {
+        try {
+            cleanUp();
+
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(context, EnumSet.of(BacktraceBreadcrumbType.MANUAL));
+
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb("test-manual", BacktraceBreadcrumbType.MANUAL));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb("test-system", BacktraceBreadcrumbType.SYSTEM));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb("test-http", BacktraceBreadcrumbType.HTTP));
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            // Configuration breadcrumb, plus breadcrumb added above.
+            assertEquals(4, breadcrumbLogFileData.size());
+
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
+            assertEquals("test-manual", parsedBreadcrumb.get("message"));
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
