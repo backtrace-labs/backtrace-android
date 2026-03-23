@@ -320,6 +320,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         if (!this.isEnabled() || backtraceBreadcrumbsLogManager == null) {
             return false;
         }
+        if (!enabledBreadcrumbTypes.contains(type)) {
+            return false;
+        }
         boolean addResult = backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
         if (addResult && this.onSuccessfulBreadcrumbAddEventListener != null) {
             this.onSuccessfulBreadcrumbAddEventListener.onSuccessfulAdd(this.getCurrentBreadcrumbId());
