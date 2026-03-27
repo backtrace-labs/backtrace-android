@@ -390,6 +390,29 @@ void AddAttributeCrashpad(jstring key, jstring value) {
     env->ReleaseStringUTFChars(value, crashpadValue);
 }
 
+void AddAttachmentCrashpad(jstring jattachment) {
+    if (initialized == false || client == nullptr) {
+        __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android",
+                "Crashpad integration isn't available. Please initialize the Crashpad integration first.");
+        return;
+    }
+    JNIEnv *env = GetJniEnv();
+    if (env == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Unable to obtain JNI environment.");
+        return;
+    }
+
+    if (jattachment) {
+       jboolean isCopy;
+       const char *attachment = env->GetStringUTFChars(jattachment, &isCopy);
+
+       if (attachment != nullptr) {
+          client->AddAttachment(attachment);
+          env->ReleaseStringUTFChars(jattachment, attachment);
+       }
+    }
+}
+
 void DisableCrashpad() {
     if (database == nullptr) {
         __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
