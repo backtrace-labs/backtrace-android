@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.12.0
+Improvements
+- Add support for dynamic attachments with native crashes.
+
 ## Version 3.11.0
 Improvements
 - Dependency isolation: Shadow the google/gson dependency to avoid version conflicts with host applications and allow use of alternative serialization libraries.
