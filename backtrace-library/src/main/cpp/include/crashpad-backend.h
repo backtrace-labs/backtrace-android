@@ -33,6 +33,7 @@ bool CaptureCrashCrashpad(jobjectArray args);
 void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_faulting_thread);
 
 void AddAttributeCrashpad(jstring key, jstring value);
+void AddAttachmentCrashpad(jstring jattachment);
 
 void DisableCrashpad();
 

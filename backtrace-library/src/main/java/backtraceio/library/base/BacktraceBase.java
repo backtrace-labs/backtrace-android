@@ -102,8 +102,6 @@ public class BacktraceBase implements Client {
      * @param context     context of current state of the application
      * @param credentials Backtrace credentials to access Backtrace API
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be
-     *       changed during runtime
      */
     public BacktraceBase(Context context, BacktraceCredentials credentials, List<String> attachments) {
         this(context, credentials, (Database) null, attachments);
@@ -127,8 +125,6 @@ public class BacktraceBase implements Client {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param attributes  additional information about current application
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be
-     *       changed during runtime
      */
     public BacktraceBase(
             Context context,
@@ -157,8 +153,6 @@ public class BacktraceBase implements Client {
      * @param credentials      Backtrace credentials to access Backtrace API
      * @param databaseSettings Backtrace database settings
      * @param attachments      File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be
-     *       changed during runtime
      */
     public BacktraceBase(
             Context context,
@@ -192,8 +186,6 @@ public class BacktraceBase implements Client {
      * @param databaseSettings Backtrace database settings
      * @param attributes       additional information about current application
      * @param attachments      File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be
-     *       changed during runtime
      */
     public BacktraceBase(
             Context context,
@@ -222,8 +214,6 @@ public class BacktraceBase implements Client {
      * @param credentials Backtrace credentials to access Backtrace API
      * @param database    Backtrace database
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be
-     *       changed during runtime
      */
     public BacktraceBase(
             Context context, BacktraceCredentials credentials, Database database, List<String> attachments) {
@@ -251,8 +241,6 @@ public class BacktraceBase implements Client {
      * @param database    Backtrace database
      * @param attributes  additional information about current application
      * @param attachments File attachment paths to consider for reports
-     * @note Attachments for native crashes must be specified here, and cannot be
-     *       changed during runtime
      */
     public BacktraceBase(
             Context context,
@@ -336,6 +324,10 @@ public class BacktraceBase implements Client {
      */
     public void addAttachment(String attachmentPath) {
         this.attachments.add(attachmentPath);
+
+        if (database != null) {
+            database.addNativeAttachment(attachmentPath);
+        }
     }
 
     /**

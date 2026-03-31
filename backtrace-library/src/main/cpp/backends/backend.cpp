@@ -108,6 +108,15 @@ void AddAttribute(jstring key, jstring value) {
 #endif
 }
 
+void AddAttachment(jstring attachment) {
+#ifdef CRASHPAD_BACKEND
+    AddAttachmentCrashpad(attachment);
+#else
+    __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                        "AddAttachment not supported on this backend");
+#endif
+}
+
 void Disable() {
 #ifdef CRASHPAD_BACKEND
     DisableCrashpad();

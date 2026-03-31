@@ -65,6 +65,13 @@ public class BacktraceDatabase implements Database {
     public native void addAttribute(String name, String value);
 
     /**
+     * Add a file attachment to native reports.
+     *
+     * @param attachmentPath the file path to attach to native reports
+     */
+    public native void addAttachment(String attachmentPath);
+
+    /**
      * Disable Backtrace-native integration
      */
     private native void disable();
@@ -252,6 +259,14 @@ public class BacktraceDatabase implements Database {
             return false;
         }
         addAttribute(key, value.toString());
+        return true;
+    }
+
+    public Boolean addNativeAttachment(String attachmentPath) {
+        if (!_enabledNativeIntegration || attachmentPath == null) {
+            return false;
+        }
+        addAttachment(attachmentPath);
         return true;
     }
 

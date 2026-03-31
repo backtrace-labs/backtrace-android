@@ -27,6 +27,7 @@ bool CaptureCrash(jobjectArray args);
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread);
 
 void AddAttribute(jstring key, jstring value);
+void AddAttachment(jstring jattachment);
 
 void Disable();
 }

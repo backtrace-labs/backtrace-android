@@ -162,6 +162,12 @@ Java_backtraceio_library_BacktraceDatabase_addAttribute(JNIEnv *env, jobject thi
 }
 
 JNIEXPORT void JNICALL
+Java_backtraceio_library_BacktraceDatabase_addAttachment(JNIEnv *env, jobject thiz,
+                                                         jstring jattachment) {
+    AddAttachment(jattachment);
+}
+
+JNIEXPORT void JNICALL
 Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2(JNIEnv *env,
                                                                                   jobject thiz,
                                                                                   jstring message) {

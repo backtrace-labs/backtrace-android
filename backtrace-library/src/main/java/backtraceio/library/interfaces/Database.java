@@ -132,4 +132,12 @@ public interface Database {
      * @return true, if attribute was added to the native report. Otherwise false.
      */
     Boolean addNativeAttribute(String key, Object value);
+
+    /**
+     * If the native integration is enabled then adds a file attachment to be included
+     * with native crash reports.
+     * @param attachmentPath  the file path to attach to native reports.
+     * @return whether the attachment was added to the native report or not.
+     */
+    Boolean addNativeAttachment(String attachmentPath);
 }
