@@ -25,7 +25,6 @@ jobs:
         with:
           java-version: 17.0.10
           distribution: "adopt"
-          cache: gradle
 
       - name: Write to local.properties
         run: |
