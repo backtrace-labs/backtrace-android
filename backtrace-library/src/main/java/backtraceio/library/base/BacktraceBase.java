@@ -436,9 +436,8 @@ public class BacktraceBase implements Client {
      * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should
      *                                  be a power of 2
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers.
-     *       User created
-     *       breadcrumbs will always be enabled
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers.
+     *       User created breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context, int maxBreadcrumbLogSizeBytes) {
         if (!isBreadcrumbsAvailable()) {
@@ -454,9 +453,8 @@ public class BacktraceBase implements Client {
      * @param breadcrumbTypesToEnable a set containing which breadcrumb types to
      *                                enable
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers.
-     *       User created
-     *       breadcrumbs will always be enabled
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers.
+     *       User created breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable) {
         if (!isBreadcrumbsAvailable()) {
@@ -474,9 +472,8 @@ public class BacktraceBase implements Client {
      * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should
      *                                  be a power of 2
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers.
-     *       User created
-     *       breadcrumbs will always be enabled
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers.
+     *       User created breadcrumbs will always be enabled
      */
     public boolean enableBreadcrumbs(
             Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
@@ -484,6 +481,106 @@ public class BacktraceBase implements Client {
             return false;
         }
         return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context            context of current state of the application
+     * @param minBreadcrumbLevel the minimum severity level a breadcrumb must
+     *                           have to be recorded. Breadcrumbs with a level
+     *                           below this threshold will be dropped.
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(Context context, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        if (!isBreadcrumbsAvailable()) {
+            return false;
+        }
+        return database.getBreadcrumbs().enableBreadcrumbs(context, minBreadcrumbLevel);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                 context of current state of the application
+     * @param breadcrumbTypesToEnable a set containing which breadcrumb types to
+     *                                enable
+     * @param minBreadcrumbLevel      the minimum severity level a breadcrumb
+     *                                must have to be recorded. Breadcrumbs with
+     *                                a level below this threshold will be
+     *                                dropped.
+     * @return true if we successfully enabled breadcrumbs
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers.
+     *       User created breadcrumbs will always be enabled (subject to the minBreadcrumbLevel
+     *       threshold)
+     */
+    public boolean enableBreadcrumbs(
+            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        if (!isBreadcrumbsAvailable()) {
+            return false;
+        }
+        return database.getBreadcrumbs().enableBreadcrumbs(context, breadcrumbTypesToEnable, minBreadcrumbLevel);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                   context of current state of the application
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should
+     *                                  be a power of 2
+     * @param minBreadcrumbLevel        the minimum severity level a breadcrumb
+     *                                  must have to be recorded. Breadcrumbs
+     *                                  with a level below this threshold will be
+     *                                  dropped.
+     * @return true if we successfully enabled breadcrumbs
+     */
+    public boolean enableBreadcrumbs(
+            Context context, int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        if (!isBreadcrumbsAvailable()) {
+            return false;
+        }
+        return database.getBreadcrumbs().enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to
+     *                                  enable
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should
+     *                                  be a power of 2
+     * @param minBreadcrumbLevel        the minimum severity level a breadcrumb
+     *                                  must have to be recorded. Breadcrumbs
+     *                                  with a level below this threshold will be
+     *                                  dropped.
+     * @return true if we successfully enabled breadcrumbs
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers.
+     *       User created breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel}
+     *       threshold)
+     */
+    public boolean enableBreadcrumbs(
+            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        if (!isBreadcrumbsAvailable()) {
+            return false;
+        }
+        return database.getBreadcrumbs().enableBreadcrumbs(
+                context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
+    }
+
+    /**
+     * Gets the current minimum breadcrumb level threshold. Breadcrumbs with a
+     * level below this value are dropped when the breadcrumb is added.
+     *
+     * @return the current minimum breadcrumb level, or null if breadcrumbs are
+     *         not available
+     */
+    public BacktraceBreadcrumbLevel getMinBreadcrumbLevel() {
+        if (!isBreadcrumbsAvailable()) {
+            return null;
+        }
+        return database.getBreadcrumbs().getMinBreadcrumbLevel();
     }
 
     /**

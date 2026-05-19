@@ -11,6 +11,7 @@ import backtraceio.library.BacktraceClient;
 import backtraceio.library.BacktraceCredentials;
 import backtraceio.library.BacktraceDatabase;
 import backtraceio.library.base.BacktraceBase;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import backtraceio.library.enums.database.RetryBehavior;
 import backtraceio.library.enums.database.RetryOrder;
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
             throw new Exception("App context is null");
         }
 
-        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext());
+        backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), BacktraceBreadcrumbLevel.INFO);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
 
@@ -205,6 +206,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
+        backtraceClient.addBreadcrumb("sending dbg bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.DEBUG);
+        backtraceClient.addBreadcrumb("sending info bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.INFO);
+        backtraceClient.addBreadcrumb("sending warn bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.WARNING);
+        backtraceClient.addBreadcrumb("sending err bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.ERROR);
+        backtraceClient.addBreadcrumb("sending fatal bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.FATAL);
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");

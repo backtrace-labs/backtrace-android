@@ -23,7 +23,7 @@ public interface Breadcrumbs {
      * @param context                 context of current state of the application
      * @param breadcrumbTypesToEnable a set containing which breadcrumb types to enable
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled
      */
     boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable);
@@ -44,11 +44,67 @@ public interface Breadcrumbs {
      * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
      * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled
      */
     boolean enableBreadcrumbs(
             Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes);
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context            context of current state of the application
+     * @param minBreadcrumbLevel the minimum severity level a breadcrumb must have to be recorded.
+     *                           Breadcrumbs with a level below this threshold will be dropped.
+     *                           Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     * @return true if we successfully enabled breadcrumbs
+     */
+    boolean enableBreadcrumbs(Context context, BacktraceBreadcrumbLevel minBreadcrumbLevel);
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                 context of current state of the application
+     * @param breadcrumbTypesToEnable a set containing which breadcrumb types to enable
+     * @param minBreadcrumbLevel      the minimum severity level a breadcrumb must have to be recorded.
+     *                                Breadcrumbs with a level below this threshold will be dropped.
+     *                                Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     * @return true if we successfully enabled breadcrumbs
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
+     */
+    boolean enableBreadcrumbs(
+            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, BacktraceBreadcrumbLevel minBreadcrumbLevel);
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                   context of current state of the application
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
+     * @param minBreadcrumbLevel        the minimum severity level a breadcrumb must have to be recorded.
+     *                                  Breadcrumbs with a level below this threshold will be dropped.
+     *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     * @return true if we successfully enabled breadcrumbs
+     */
+    boolean enableBreadcrumbs(
+            Context context, int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel);
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
+     * @param minBreadcrumbLevel        the minimum severity level a breadcrumb must have to be recorded.
+     *                                  Breadcrumbs with a level below this threshold will be dropped.
+     *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     * @return true if we successfully enabled breadcrumbs
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
+     */
+    boolean enableBreadcrumbs(
+            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel);
 
     /**
      * Gets the enabled breadcrumb types
@@ -56,6 +112,14 @@ public interface Breadcrumbs {
      * @return enabled breadcrumb types
      */
     EnumSet<BacktraceBreadcrumbType> getEnabledBreadcrumbTypes();
+
+    /**
+     * Gets the current minimum breadcrumb level threshold. Breadcrumbs with a level below this
+     * value are dropped when the breadcrumb is added.
+     *
+     * @return the current minimum breadcrumb level
+     */
+    BacktraceBreadcrumbLevel getMinBreadcrumbLevel();
 
     /**
      * Clear breadcrumb logs
