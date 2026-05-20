@@ -371,7 +371,6 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         if (level.ordinal() < minBreadcrumbLevel.ordinal()) {
             return false;
         }
-        System.out.println("adding bc:" + message);
         boolean addResult = backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
         if (addResult && this.onSuccessfulBreadcrumbAddEventListener != null) {
             this.onSuccessfulBreadcrumbAddEventListener.onSuccessfulAdd(this.getCurrentBreadcrumbId());
