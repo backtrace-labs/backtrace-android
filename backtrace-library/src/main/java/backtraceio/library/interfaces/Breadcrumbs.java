@@ -74,7 +74,9 @@ public interface Breadcrumbs {
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
      */
     boolean enableBreadcrumbs(
-            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, BacktraceBreadcrumbLevel minBreadcrumbLevel);
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel);
 
     /**
      * Enable logging of breadcrumbs and submission with crash reports
@@ -103,8 +105,10 @@ public interface Breadcrumbs {
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
      */
     boolean enableBreadcrumbs(
-            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
-            int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel);
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel);
 
     /**
      * Gets the enabled breadcrumb types

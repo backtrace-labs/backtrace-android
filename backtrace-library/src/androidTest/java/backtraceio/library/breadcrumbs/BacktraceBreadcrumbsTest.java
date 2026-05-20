@@ -151,10 +151,13 @@ public class BacktraceBreadcrumbsTest {
         try {
             cleanUp();
 
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
             backtraceBreadcrumbs.enableBreadcrumbs(
-                    context, BacktraceBreadcrumbType.ALL,
-                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES, BacktraceBreadcrumbLevel.WARNING);
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.WARNING);
 
             // Below threshold, dropped
             assertFalse(backtraceBreadcrumbs.addBreadcrumb(
@@ -177,10 +180,13 @@ public class BacktraceBreadcrumbsTest {
         try {
             cleanUp();
 
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
             backtraceBreadcrumbs.enableBreadcrumbs(
-                    context, BacktraceBreadcrumbType.ALL,
-                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES, BacktraceBreadcrumbLevel.WARNING);
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.WARNING);
 
             // At threshold, retain
             assertTrue(backtraceBreadcrumbs.addBreadcrumb(
@@ -237,10 +243,13 @@ public class BacktraceBreadcrumbsTest {
         try {
             cleanUp();
 
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
             backtraceBreadcrumbs.enableBreadcrumbs(
-                    context, BacktraceBreadcrumbType.ALL,
-                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES, BacktraceBreadcrumbLevel.DEBUG);
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.DEBUG);
             assertEquals(BacktraceBreadcrumbLevel.DEBUG, backtraceBreadcrumbs.getMinBreadcrumbLevel());
 
             // Initial threshold lets DEBUG through.
@@ -249,8 +258,10 @@ public class BacktraceBreadcrumbsTest {
 
             // Tighten threshold by re-enabling.
             backtraceBreadcrumbs.enableBreadcrumbs(
-                    context, BacktraceBreadcrumbType.ALL,
-                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES, BacktraceBreadcrumbLevel.ERROR);
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.ERROR);
             assertEquals(BacktraceBreadcrumbLevel.ERROR, backtraceBreadcrumbs.getMinBreadcrumbLevel());
 
             // Now DEBUG is dropped; ERROR still goes through.
@@ -268,19 +279,20 @@ public class BacktraceBreadcrumbsTest {
         try {
             cleanUp();
 
-            backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
             backtraceBreadcrumbs.enableBreadcrumbs(
-                    context, BacktraceBreadcrumbType.ALL,
-                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES, BacktraceBreadcrumbLevel.WARNING);
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.WARNING);
 
             List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
                     context.getFilesDir().getAbsolutePath());
 
             JSONObject configBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
             assertEquals("Breadcrumbs configuration", configBreadcrumb.get("message"));
-            assertEquals(
-                    "warning",
-                    configBreadcrumb.getJSONObject("attributes").get("breadcrumb.level"));
+            assertEquals("warning", configBreadcrumb.getJSONObject("attributes").get("breadcrumb.level"));
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

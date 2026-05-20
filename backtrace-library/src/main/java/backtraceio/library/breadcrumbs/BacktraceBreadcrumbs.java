@@ -152,7 +152,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     @Override
     public boolean enableBreadcrumbs(
             Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
-        return enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel.DEBUG);
+        return enableBreadcrumbs(
+                context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel.DEBUG);
     }
 
     @Override
@@ -162,7 +163,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     @Override
     public boolean enableBreadcrumbs(
-            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         return enableBreadcrumbs(context, breadcrumbTypesToEnable, DEFAULT_MAX_LOG_SIZE_BYTES, minBreadcrumbLevel);
     }
 
@@ -174,13 +177,16 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
     @Override
     public boolean enableBreadcrumbs(
-            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
-            int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         this.context = context;
 
         final long startEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
 
-        final boolean enabled = enableBreadcrumbs(breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
+        final boolean enabled =
+                enableBreadcrumbs(breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
 
         final long endEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
 
@@ -192,7 +198,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     }
 
     private boolean enableBreadcrumbs(
-            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         if (backtraceBreadcrumbsLogManager == null) {
             try {
                 backtraceBreadcrumbsLogManager = new BacktraceBreadcrumbsLogManager(

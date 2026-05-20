@@ -515,7 +515,9 @@ public class BacktraceBase implements Client {
      *       threshold)
      */
     public boolean enableBreadcrumbs(
-            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         if (!isBreadcrumbsAvailable()) {
             return false;
         }
@@ -560,13 +562,15 @@ public class BacktraceBase implements Client {
      *       threshold)
      */
     public boolean enableBreadcrumbs(
-            Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
-            int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         if (!isBreadcrumbsAvailable()) {
             return false;
         }
-        return database.getBreadcrumbs().enableBreadcrumbs(
-                context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
+        return database.getBreadcrumbs()
+                .enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
     }
 
     /**

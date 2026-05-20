@@ -207,11 +207,22 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
-        backtraceClient.addBreadcrumb("Debug breadcrumb (< INFO, filtered)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.DEBUG);
-        backtraceClient.addBreadcrumb("Info breadcrumb (== INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.INFO);
-        backtraceClient.addBreadcrumb("Warning breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.WARNING);
-        backtraceClient.addBreadcrumb("Error breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.ERROR);
-        backtraceClient.addBreadcrumb("Fatal breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.FATAL);
+        backtraceClient.addBreadcrumb(
+                "Debug breadcrumb (< INFO, filtered)",
+                attributes,
+                BacktraceBreadcrumbType.LOG,
+                BacktraceBreadcrumbLevel.DEBUG);
+        backtraceClient.addBreadcrumb(
+                "Info breadcrumb (== INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.INFO);
+        backtraceClient.addBreadcrumb(
+                "Warning breadcrumb (> INFO)",
+                attributes,
+                BacktraceBreadcrumbType.LOG,
+                BacktraceBreadcrumbLevel.WARNING);
+        backtraceClient.addBreadcrumb(
+                "Error breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.ERROR);
+        backtraceClient.addBreadcrumb(
+                "Fatal breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.FATAL);
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");
