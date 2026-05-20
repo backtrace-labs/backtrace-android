@@ -280,7 +280,7 @@ public class BacktraceBreadcrumbsTest {
             assertEquals("Breadcrumbs configuration", configBreadcrumb.get("message"));
             assertEquals(
                     "warning",
-                    configBreadcrumb.getJSONObject("attributes").get("min_breadcrumb_level"));
+                    configBreadcrumb.getJSONObject("attributes").get("breadcrumb.level"));
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

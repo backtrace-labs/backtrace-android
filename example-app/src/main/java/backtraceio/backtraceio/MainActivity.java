@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
             throw new Exception("App context is null");
         }
 
+        // NOTE: Minimum breadcrumb level set to INFO (DEBUG breadcrumbs will be filtered out)
         backtraceClient.enableBreadcrumbs(view.getContext().getApplicationContext(), BacktraceBreadcrumbLevel.INFO);
         registerNativeBreadcrumbs(backtraceClient); // Order should not matter
     }
@@ -206,11 +207,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         backtraceClient.addBreadcrumb("About to send Backtrace report", attributes, BacktraceBreadcrumbType.LOG);
-        backtraceClient.addBreadcrumb("sending dbg bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.DEBUG);
-        backtraceClient.addBreadcrumb("sending info bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.INFO);
-        backtraceClient.addBreadcrumb("sending warn bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.WARNING);
-        backtraceClient.addBreadcrumb("sending err bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.ERROR);
-        backtraceClient.addBreadcrumb("sending fatal bc", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.FATAL);
+        backtraceClient.addBreadcrumb("Debug breadcrumb (< INFO, filtered)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.DEBUG);
+        backtraceClient.addBreadcrumb("Info breadcrumb (== INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.INFO);
+        backtraceClient.addBreadcrumb("Warning breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.WARNING);
+        backtraceClient.addBreadcrumb("Error breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.ERROR);
+        backtraceClient.addBreadcrumb("Fatal breadcrumb (> INFO)", attributes, BacktraceBreadcrumbType.LOG, BacktraceBreadcrumbLevel.FATAL);
         addNativeBreadcrumb();
         addNativeBreadcrumbUserError();
         BacktraceReport report = new BacktraceReport("Test");

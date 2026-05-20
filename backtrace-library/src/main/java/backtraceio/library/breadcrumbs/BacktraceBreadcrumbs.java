@@ -414,7 +414,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
             attributes.put(enabledType.toString(), state);
         }
 
-        attributes.put("min_breadcrumb_level", minBreadcrumbLevel.toString());
+        attributes.put("breadcrumb.level", minBreadcrumbLevel.toString());
 
         return backtraceBreadcrumbsLogManager.addBreadcrumb(
                 "Breadcrumbs configuration",
