@@ -16,7 +16,7 @@ android {
         minSdkVersion 21
         compileSdk 36
         targetSdkVersion 36
-        ndkVersion "27.0.11718014-beta1"
+        ndkVersion '27.3.13750724'
         versionName androidGitVersion.name()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
 

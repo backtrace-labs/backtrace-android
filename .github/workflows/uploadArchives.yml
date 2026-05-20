@@ -30,7 +30,6 @@ jobs:
      with:
        java-version: 17.0.10
        distribution: "adopt"
-       cache: gradle
 
    - name: Add Maven Central Repository credentials and keys to gradle.properties
      run: |
