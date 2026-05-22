@@ -273,7 +273,49 @@ public class BacktraceBreadcrumbsTest {
             fail(ex.getMessage());
         }
     }
+@Test
+public void testNullMinBreadcrumbLevelDefaultsToDebug() {
+    try {
+        cleanUp();
 
+        backtraceBreadcrumbs = new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+
+        assertTrue(backtraceBreadcrumbs.enableBreadcrumbs(context, (BacktraceBreadcrumbLevel) null));
+        assertEquals(BacktraceBreadcrumbLevel.DEBUG, backtraceBreadcrumbs.getMinBreadcrumbLevel());
+
+        assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                "debug-after-null-min-level", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.DEBUG));
+
+        List<String> breadcrumbLogFileData =
+                BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+
+        JSONObject configBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
+        assertEquals("Breadcrumbs configuration", configBreadcrumb.get("message"));
+        assertEquals("debug", configBreadcrumb.getJSONObject("attributes").get("breadcrumb.level"));
+
+        JSONObject debugBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
+        assertEquals("debug-after-null-min-level", debugBreadcrumb.get("message"));
+        assertEquals("debug", debugBreadcrumb.get("level"));
+    } catch (Exception ex) {
+        fail(ex.getMessage());
+    }
+}
+
+@Test
+public void testNullBreadcrumbLevelDefaultsToInfo() {
+    try {
+        assertTrue(backtraceBreadcrumbs.addBreadcrumb("null-level", BacktraceBreadcrumbType.MANUAL, null));
+
+        List<String> breadcrumbLogFileData =
+                BreadcrumbsReader.readBreadcrumbLogFile(context.getFilesDir().getAbsolutePath());
+
+        JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
+        assertEquals("null-level", parsedBreadcrumb.get("message"));
+        assertEquals("info", parsedBreadcrumb.get("level"));
+    } catch (Exception ex) {
+        fail(ex.getMessage());
+    }
+}
     @Test
     public void testConfigurationBreadcrumbIncludesMinLevel() {
         try {
