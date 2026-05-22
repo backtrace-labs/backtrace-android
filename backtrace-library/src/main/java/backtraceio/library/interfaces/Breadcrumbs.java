@@ -59,9 +59,6 @@ public interface Breadcrumbs {
      *                           Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
      *                           A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
-     * @implNote The default implementation ignores {@code minBreadcrumbLevel} and delegates to
-     * {@link #enableBreadcrumbs(Context)} to preserve backward compatibility for downstream
-     * implementers. Override to apply the level threshold.
      */
     default boolean enableBreadcrumbs(Context context, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         return enableBreadcrumbs(context);
@@ -79,9 +76,6 @@ public interface Breadcrumbs {
      * @return true if we successfully enabled breadcrumbs
      * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
-     * @implNote The default implementation ignores {@code minBreadcrumbLevel} and delegates to
-     * {@link #enableBreadcrumbs(Context, EnumSet)} to preserve backward compatibility for downstream
-     * implementers. Override to apply the level threshold.
      */
     default boolean enableBreadcrumbs(
             Context context,
@@ -100,9 +94,6 @@ public interface Breadcrumbs {
      *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
      *                                  A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
-     * @implNote The default implementation ignores {@code minBreadcrumbLevel} and delegates to
-     * {@link #enableBreadcrumbs(Context, int)} to preserve backward compatibility for downstream
-     * implementers. Override to apply the level threshold.
      */
     default boolean enableBreadcrumbs(
             Context context, int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
@@ -122,9 +113,6 @@ public interface Breadcrumbs {
      * @return true if we successfully enabled breadcrumbs
      * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
-     * @implNote The default implementation ignores {@code minBreadcrumbLevel} and delegates to
-     * {@link #enableBreadcrumbs(Context, EnumSet, int)} to preserve backward compatibility for
-     * downstream implementers. Override to apply the level threshold.
      */
     default boolean enableBreadcrumbs(
             Context context,
@@ -146,9 +134,6 @@ public interface Breadcrumbs {
      * value are dropped when the breadcrumb is added.
      *
      * @return the current minimum breadcrumb level
-     * @implNote The default implementation returns {@link BacktraceBreadcrumbLevel#DEBUG} (record
-     * all levels) to preserve the pre-threshold behavior for downstream implementers. Override to
-     * report the configured threshold.
      */
     default BacktraceBreadcrumbLevel getMinBreadcrumbLevel() {
         return BacktraceBreadcrumbLevel.DEBUG;
