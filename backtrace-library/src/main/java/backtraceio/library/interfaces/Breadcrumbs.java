@@ -120,6 +120,11 @@ public interface Breadcrumbs {
      * @return true if we successfully enabled breadcrumbs
      * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
+     *
+     * <p><strong>Default implementation:</strong> delegates to
+     * {@link #enableBreadcrumbs(Context, EnumSet, int)} to preserve compatibility with existing implementations. 
+     * Implementations must override this method to apply
+     * {@code minBreadcrumbLevel} filtering.</p>
      */
     default boolean enableBreadcrumbs(
             Context context,
