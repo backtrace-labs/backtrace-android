@@ -9,6 +9,7 @@ import static junit.framework.TestCase.fail;
 import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import backtraceio.library.enums.BacktraceBreadcrumbLevel;
 import backtraceio.library.enums.BacktraceBreadcrumbType;
 import java.io.File;
 import java.io.IOException;
@@ -140,6 +141,203 @@ public class BacktraceBreadcrumbsTest {
 
             JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
             assertEquals("test-manual", parsedBreadcrumb.get("message"));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddBreadcrumbRejectsLevelBelowMinimum() {
+        try {
+            cleanUp();
+
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.WARNING);
+
+            // Below threshold, dropped
+            assertFalse(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-debug", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.DEBUG));
+            assertFalse(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-info", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO));
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            // Only the configuration breadcrumb should be present.
+            assertEquals(1, breadcrumbLogFileData.size());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddBreadcrumbAcceptsLevelAtOrAboveMinimum() {
+        try {
+            cleanUp();
+
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.WARNING);
+
+            // At threshold, retain
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-warning", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.WARNING));
+            // Above threshold, retain
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-error", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.ERROR));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-fatal", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.FATAL));
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            // Configuration breadcrumb + three added.
+            assertEquals(4, breadcrumbLogFileData.size());
+
+            assertEquals("test-warning", new JSONObject(breadcrumbLogFileData.get(1)).get("message"));
+            assertEquals("test-error", new JSONObject(breadcrumbLogFileData.get(2)).get("message"));
+            assertEquals("test-fatal", new JSONObject(breadcrumbLogFileData.get(3)).get("message"));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddBreadcrumbDefaultMinLevelAcceptsAllLevels() {
+        try {
+            // default min level should be DEBUG on setUp()
+            assertEquals(BacktraceBreadcrumbLevel.DEBUG, backtraceBreadcrumbs.getMinBreadcrumbLevel());
+
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-debug", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.DEBUG));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-info", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.INFO));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-warning", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.WARNING));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-error", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.ERROR));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "test-fatal", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.FATAL));
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            // Configuration breadcrumb + five added.
+            assertEquals(6, breadcrumbLogFileData.size());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testReEnableBreadcrumbsUpdatesMinLevel() {
+        try {
+            cleanUp();
+
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.DEBUG);
+            assertEquals(BacktraceBreadcrumbLevel.DEBUG, backtraceBreadcrumbs.getMinBreadcrumbLevel());
+
+            // Initial threshold lets DEBUG through.
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "pre-change", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.DEBUG));
+
+            // Tighten threshold by re-enabling.
+            backtraceBreadcrumbs.enableBreadcrumbs(
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.ERROR);
+            assertEquals(BacktraceBreadcrumbLevel.ERROR, backtraceBreadcrumbs.getMinBreadcrumbLevel());
+
+            // Now DEBUG is dropped; ERROR still goes through.
+            assertFalse(backtraceBreadcrumbs.addBreadcrumb(
+                    "post-change-debug", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.DEBUG));
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "post-change-error", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.ERROR));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testNullMinBreadcrumbLevelDefaultsToDebug() {
+        try {
+            cleanUp();
+
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+
+            assertTrue(backtraceBreadcrumbs.enableBreadcrumbs(context, (BacktraceBreadcrumbLevel) null));
+            assertEquals(BacktraceBreadcrumbLevel.DEBUG, backtraceBreadcrumbs.getMinBreadcrumbLevel());
+
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb(
+                    "debug-after-null-min-level", BacktraceBreadcrumbType.MANUAL, BacktraceBreadcrumbLevel.DEBUG));
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            JSONObject configBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
+            assertEquals("Breadcrumbs configuration", configBreadcrumb.get("message"));
+            assertEquals("debug", configBreadcrumb.getJSONObject("attributes").get("breadcrumb.level"));
+
+            JSONObject debugBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
+            assertEquals("debug-after-null-min-level", debugBreadcrumb.get("message"));
+            assertEquals("debug", debugBreadcrumb.get("level"));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testNullBreadcrumbLevelDefaultsToInfo() {
+        try {
+            assertTrue(backtraceBreadcrumbs.addBreadcrumb("null-level", BacktraceBreadcrumbType.MANUAL, null));
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            JSONObject parsedBreadcrumb = new JSONObject(breadcrumbLogFileData.get(1));
+            assertEquals("null-level", parsedBreadcrumb.get("message"));
+            assertEquals("info", parsedBreadcrumb.get("level"));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testConfigurationBreadcrumbIncludesMinLevel() {
+        try {
+            cleanUp();
+
+            backtraceBreadcrumbs =
+                    new BacktraceBreadcrumbs(context.getFilesDir().getAbsolutePath());
+            backtraceBreadcrumbs.enableBreadcrumbs(
+                    context,
+                    BacktraceBreadcrumbType.ALL,
+                    BacktraceBreadcrumbs.DEFAULT_MAX_LOG_SIZE_BYTES,
+                    BacktraceBreadcrumbLevel.WARNING);
+
+            List<String> breadcrumbLogFileData = BreadcrumbsReader.readBreadcrumbLogFile(
+                    context.getFilesDir().getAbsolutePath());
+
+            JSONObject configBreadcrumb = new JSONObject(breadcrumbLogFileData.get(0));
+            assertEquals("Breadcrumbs configuration", configBreadcrumb.get("message"));
+            assertEquals("warning", configBreadcrumb.getJSONObject("attributes").get("breadcrumb.level"));
         } catch (Exception ex) {
             fail(ex.getMessage());
         }

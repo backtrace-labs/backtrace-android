@@ -31,6 +31,13 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     private EnumSet<BacktraceBreadcrumbType> enabledBreadcrumbTypes;
 
     /**
+     * Minimum severity level a breadcrumb must have to be recorded. Breadcrumbs with a level
+     * below this threshold are dropped when the breadcrumb is added. Defaults to
+     * {@link BacktraceBreadcrumbLevel#DEBUG} (records all levels).
+     */
+    private BacktraceBreadcrumbLevel minBreadcrumbLevel = BacktraceBreadcrumbLevel.DEBUG;
+
+    /**
      * The Backtrace BroadcastReceiver instance
      */
     private BacktraceBroadcastReceiver backtraceBroadcastReceiver;
@@ -145,11 +152,41 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     @Override
     public boolean enableBreadcrumbs(
             Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
+        return enableBreadcrumbs(
+                context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel.DEBUG);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(Context context, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context, BacktraceBreadcrumbType.ALL, DEFAULT_MAX_LOG_SIZE_BYTES, minBreadcrumbLevel);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context, breadcrumbTypesToEnable, DEFAULT_MAX_LOG_SIZE_BYTES, minBreadcrumbLevel);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(
+            Context context, int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context, BacktraceBreadcrumbType.ALL, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
+    }
+
+    @Override
+    public boolean enableBreadcrumbs(
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         this.context = context;
 
         final long startEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
 
-        final boolean enabled = enableBreadcrumbs(breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+        final boolean enabled =
+                enableBreadcrumbs(breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes, minBreadcrumbLevel);
 
         final long endEnablingReportsTime = DebugHelper.getCurrentTimeMillis();
 
@@ -161,7 +198,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     }
 
     private boolean enableBreadcrumbs(
-            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes) {
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         if (backtraceBreadcrumbsLogManager == null) {
             try {
                 backtraceBreadcrumbsLogManager = new BacktraceBreadcrumbsLogManager(
@@ -173,6 +212,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
 
         this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
+        this.minBreadcrumbLevel = minBreadcrumbLevel != null ? minBreadcrumbLevel : BacktraceBreadcrumbLevel.DEBUG;
         registerAutomaticBreadcrumbReceivers();
 
         // We should log all breadcrumb configuration changes in the breadcrumbs
@@ -183,6 +223,11 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
     @Override
     public EnumSet<BacktraceBreadcrumbType> getEnabledBreadcrumbTypes() {
         return this.enabledBreadcrumbTypes;
+    }
+
+    @Override
+    public BacktraceBreadcrumbLevel getMinBreadcrumbLevel() {
+        return this.minBreadcrumbLevel;
     }
 
     @Override
@@ -323,6 +368,12 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         if (!enabledBreadcrumbTypes.contains(type)) {
             return false;
         }
+        if (level == null) {
+            level = BacktraceBreadcrumbLevel.INFO;
+        }
+        if (level.ordinal() < minBreadcrumbLevel.ordinal()) {
+            return false;
+        }
         boolean addResult = backtraceBreadcrumbsLogManager.addBreadcrumb(message, attributes, type, level);
         if (addResult && this.onSuccessfulBreadcrumbAddEventListener != null) {
             this.onSuccessfulBreadcrumbAddEventListener.onSuccessfulAdd(this.getCurrentBreadcrumbId());
@@ -372,6 +423,8 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
 
             attributes.put(enabledType.toString(), state);
         }
+
+        attributes.put("breadcrumb.level", minBreadcrumbLevel.toString());
 
         return backtraceBreadcrumbsLogManager.addBreadcrumb(
                 "Breadcrumbs configuration",

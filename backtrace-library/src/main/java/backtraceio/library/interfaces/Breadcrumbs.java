@@ -23,7 +23,7 @@ public interface Breadcrumbs {
      * @param context                 context of current state of the application
      * @param breadcrumbTypesToEnable a set containing which breadcrumb types to enable
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled
      */
     boolean enableBreadcrumbs(Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable);
@@ -44,11 +44,100 @@ public interface Breadcrumbs {
      * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
      * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
      * @return true if we successfully enabled breadcrumbs
-     * @note breadcrumbTypesToEnable only affects automatic breadcrumb receivers. User created
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled
      */
     boolean enableBreadcrumbs(
             Context context, EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable, int maxBreadcrumbLogSizeBytes);
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context            context of current state of the application
+     * @param minBreadcrumbLevel the minimum severity level a breadcrumb must have to be recorded.
+     *                           Breadcrumbs with a level below this threshold will be dropped.
+     *                           Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                           A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
+     * @return true if we successfully enabled breadcrumbs
+     *
+     * <p><strong>Default implementation:</strong> delegates to {@link #enableBreadcrumbs(Context)}
+     * to preserve compatibility with existing implementations. Implementations must override this method to apply {@code minBreadcrumbLevel} filtering.</p>
+     */
+    default boolean enableBreadcrumbs(Context context, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                 context of current state of the application
+     * @param breadcrumbTypesToEnable a set containing which breadcrumb types to enable
+     * @param minBreadcrumbLevel      the minimum severity level a breadcrumb must have to be recorded.
+     *                                Breadcrumbs with a level below this threshold will be dropped.
+     *                                Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                                A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
+     * @return true if we successfully enabled breadcrumbs
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
+     *
+     * <p><strong>Default implementation:</strong> delegates to
+     * {@link #enableBreadcrumbs(Context, EnumSet)} to preserve compatibility with existing implementations.
+     * Implementations must override this method to apply {@code minBreadcrumbLevel} filtering.</p>
+     */
+    default boolean enableBreadcrumbs(
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context, breadcrumbTypesToEnable);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                   context of current state of the application
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
+     * @param minBreadcrumbLevel        the minimum severity level a breadcrumb must have to be recorded.
+     *                                  Breadcrumbs with a level below this threshold will be dropped.
+     *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                                  A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
+     * @return true if we successfully enabled breadcrumbs
+     *
+     * <p><strong>Default implementation:</strong> delegates to
+     * {@link #enableBreadcrumbs(Context, int)} to preserve compatibility with existing implementations.
+     * Implementations must override this method to apply
+     * {@code minBreadcrumbLevel} filtering.</p>
+     */
+    default boolean enableBreadcrumbs(
+            Context context, int maxBreadcrumbLogSizeBytes, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context, maxBreadcrumbLogSizeBytes);
+    }
+
+    /**
+     * Enable logging of breadcrumbs and submission with crash reports
+     *
+     * @param context                   context of current state of the application
+     * @param breadcrumbTypesToEnable   a set containing which breadcrumb types to enable
+     * @param maxBreadcrumbLogSizeBytes breadcrumb log size limit in bytes, should be a power of 2
+     * @param minBreadcrumbLevel        the minimum severity level a breadcrumb must have to be recorded.
+     *                                  Breadcrumbs with a level below this threshold will be dropped.
+     *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                                  A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
+     * @return true if we successfully enabled breadcrumbs
+     * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
+     * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
+     *
+     * <p><strong>Default implementation:</strong> delegates to
+     * {@link #enableBreadcrumbs(Context, EnumSet, int)} to preserve compatibility with existing implementations.
+     * Implementations must override this method to apply
+     * {@code minBreadcrumbLevel} filtering.</p>
+     */
+    default boolean enableBreadcrumbs(
+            Context context,
+            EnumSet<BacktraceBreadcrumbType> breadcrumbTypesToEnable,
+            int maxBreadcrumbLogSizeBytes,
+            BacktraceBreadcrumbLevel minBreadcrumbLevel) {
+        return enableBreadcrumbs(context, breadcrumbTypesToEnable, maxBreadcrumbLogSizeBytes);
+    }
 
     /**
      * Gets the enabled breadcrumb types
@@ -56,6 +145,19 @@ public interface Breadcrumbs {
      * @return enabled breadcrumb types
      */
     EnumSet<BacktraceBreadcrumbType> getEnabledBreadcrumbTypes();
+
+    /**
+     * Gets the current minimum breadcrumb level threshold. Breadcrumbs with a level below this
+     * value are dropped when the breadcrumb is added.
+     *
+     * @return the current minimum breadcrumb level
+     *
+     * <p><strong>Default implementation:</strong> returns {@link BacktraceBreadcrumbLevel#DEBUG},
+     * which preserves the existing behavior of recording all breadcrumb levels.</p>
+     */
+    default BacktraceBreadcrumbLevel getMinBreadcrumbLevel() {
+        return BacktraceBreadcrumbLevel.DEBUG;
+    }
 
     /**
      * Clear breadcrumb logs
@@ -76,7 +178,7 @@ public interface Breadcrumbs {
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
      *
      * @param message a message which describes this breadcrumb (1KB max)
-     * @param level   the severity level of this breadcrumb
+     * @param level   the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level);
@@ -95,7 +197,7 @@ public interface Breadcrumbs {
      *
      * @param message    a message which describes this breadcrumb (1KB max)
      * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
-     * @param level      the severity level of this breadcrumb
+     * @param level      the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level);
@@ -114,7 +216,7 @@ public interface Breadcrumbs {
      *
      * @param message a message which describes this breadcrumb (1KB max)
      * @param type    broadly describes the category of this breadcrumb
-     * @param level   the severity level of this breadcrumb
+     * @param level   the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level);
@@ -135,7 +237,7 @@ public interface Breadcrumbs {
      * @param message    a message which describes this breadcrumb (1KB max)
      * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
      * @param type       broadly describes the category of this breadcrumb
-     * @param level      the severity level of this breadcrumb
+     * @param level      the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(
