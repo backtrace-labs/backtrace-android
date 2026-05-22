@@ -28,6 +28,47 @@ public class BreadcrumbsReader {
         File breadcrumbLogFile = new File(breadcrumbs.getBreadcrumbLogPath());
 
         List<String> breadcrumbLogFileData = new ArrayList<String>();
+
+        try (FileInputStream inputStream = new FileInputStream(breadcrumbLogFile.getAbsolutePath())) {
+            StringBuilder stringBuilder = new StringBuilder();
+            int readByte;
+
+            while ((readByte = inputStream.read()) != -1) {
+                char c = (char) readByte;
+                if (c == '\n') {
+                    addBreadcrumbJsonRecordIfValid(breadcrumbLogFileData, stringBuilder.toString());
+                    stringBuilder.setLength(0);
+                    continue;
+                }
+
+                stringBuilder.append(c);
+            }
+
+            if (stringBuilder.length() > 0) {
+                addBreadcrumbJsonRecordIfValid(breadcrumbLogFileData, stringBuilder.toString());
+            }
+        }
+
+        return breadcrumbLogFileData;
+    }
+
+    private static void addBreadcrumbJsonRecordIfValid(List<String> breadcrumbLogFileData, String line) {
+        int braceStart = line.indexOf('{');
+        if (braceStart < 0) {
+            return;
+        }
+
+        String candidate = line.substring(braceStart);
+        try {
+            JSONObject parsed = new JSONObject(candidate);
+            if (parsed.has("timestamp")) {
+                breadcrumbLogFileData.add(candidate);
+            }
+        } catch (JSONException ignored) {
+            // Ignore QueueFile framing bytes and partial rollover fragments.
+        }
+    }
+}
         FileInputStream inputStream = new FileInputStream(breadcrumbLogFile.getAbsolutePath());
 
         StringBuilder stringBuilder = new StringBuilder();
