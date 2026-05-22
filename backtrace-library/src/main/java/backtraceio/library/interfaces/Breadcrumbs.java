@@ -158,7 +158,7 @@ public interface Breadcrumbs {
      * Add a breadcrumb of type "Manual" and the desired level with the provided message string
      *
      * @param message a message which describes this breadcrumb (1KB max)
-     * @param level   the severity level of this breadcrumb
+     * @param level   the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(String message, BacktraceBreadcrumbLevel level);
@@ -177,7 +177,7 @@ public interface Breadcrumbs {
      *
      * @param message    a message which describes this breadcrumb (1KB max)
      * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
-     * @param level      the severity level of this breadcrumb
+     * @param level      the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(String message, Map<String, Object> attributes, BacktraceBreadcrumbLevel level);
@@ -196,7 +196,7 @@ public interface Breadcrumbs {
      *
      * @param message a message which describes this breadcrumb (1KB max)
      * @param type    broadly describes the category of this breadcrumb
-     * @param level   the severity level of this breadcrumb
+     * @param level   the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(String message, BacktraceBreadcrumbType type, BacktraceBreadcrumbLevel level);
@@ -217,7 +217,7 @@ public interface Breadcrumbs {
      * @param message    a message which describes this breadcrumb (1KB max)
      * @param attributes key-value pairs to provide additional information about this breadcrumb (1KB max, including some overhead per key-value pair)
      * @param type       broadly describes the category of this breadcrumb
-     * @param level      the severity level of this breadcrumb
+     * @param level      the severity level of this breadcrumb ({@code null} is treated as {@link BacktraceBreadcrumbLevel#INFO})
      * @return true if the breadcrumb was successfully added
      */
     boolean addBreadcrumb(
