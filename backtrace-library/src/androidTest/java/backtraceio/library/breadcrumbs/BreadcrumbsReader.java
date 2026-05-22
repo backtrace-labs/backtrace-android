@@ -69,30 +69,3 @@ public class BreadcrumbsReader {
         }
     }
 }
-        FileInputStream inputStream = new FileInputStream(breadcrumbLogFile.getAbsolutePath());
-
-        StringBuilder stringBuilder = new StringBuilder();
-        while (inputStream.available() > 0) {
-            char c = (char) inputStream.read();
-            if (c == '\n') {
-                String line = stringBuilder.toString();
-                int braceStart = line.indexOf('{');
-                if (braceStart >= 0) {
-                    String candidate = line.substring(braceStart);
-                    try {
-                        JSONObject parsed = new JSONObject(candidate);
-                        if (parsed.has("timestamp")) {
-                            breadcrumbLogFileData.add(candidate);
-                        }
-                    } catch (JSONException ignored) {
-                    }
-                }
-                stringBuilder = new StringBuilder();
-                continue;
-            }
-            stringBuilder.append(c);
-        }
-
-        return breadcrumbLogFileData;
-    }
-}
