@@ -134,6 +134,9 @@ public interface Breadcrumbs {
      * value are dropped when the breadcrumb is added.
      *
      * @return the current minimum breadcrumb level
+     *
+     * <p><strong>Default implementation:</strong> returns {@link BacktraceBreadcrumbLevel#DEBUG},
+     * which preserves the existing behavior of recording all breadcrumb levels.</p>
      */
     default BacktraceBreadcrumbLevel getMinBreadcrumbLevel() {
         return BacktraceBreadcrumbLevel.DEBUG;
