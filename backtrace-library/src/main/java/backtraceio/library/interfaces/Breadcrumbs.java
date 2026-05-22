@@ -59,7 +59,10 @@ public interface Breadcrumbs {
      *                           Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
      *                           A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
-     */
+     *
+     * <p><strong>Default implementation:</strong> delegates to {@link #enableBreadcrumbs(Context)}
+     * to preserve compatibility with existing implementations. Implementations must override this method to apply {@code minBreadcrumbLevel} filtering.</p>
+     */ 
     default boolean enableBreadcrumbs(Context context, BacktraceBreadcrumbLevel minBreadcrumbLevel) {
         return enableBreadcrumbs(context);
     }
