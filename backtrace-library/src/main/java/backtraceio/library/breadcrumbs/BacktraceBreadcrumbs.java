@@ -212,7 +212,7 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
 
         this.enabledBreadcrumbTypes = breadcrumbTypesToEnable;
-        this.minBreadcrumbLevel = minBreadcrumbLevel;
+        this.minBreadcrumbLevel = minBreadcrumbLevel != null ? minBreadcrumbLevel : BacktraceBreadcrumbLevel.DEBUG;
         registerAutomaticBreadcrumbReceivers();
 
         // We should log all breadcrumb configuration changes in the breadcrumbs
@@ -367,6 +367,9 @@ public class BacktraceBreadcrumbs implements Breadcrumbs {
         }
         if (!enabledBreadcrumbTypes.contains(type)) {
             return false;
+        }
+        if (level == null) {
+            level = BacktraceBreadcrumbLevel.INFO;
         }
         if (level.ordinal() < minBreadcrumbLevel.ordinal()) {
             return false;

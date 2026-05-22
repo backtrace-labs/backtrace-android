@@ -57,6 +57,7 @@ public interface Breadcrumbs {
      * @param minBreadcrumbLevel the minimum severity level a breadcrumb must have to be recorded.
      *                           Breadcrumbs with a level below this threshold will be dropped.
      *                           Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                           A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
      * @implNote The default implementation ignores {@code minBreadcrumbLevel} and delegates to
      * {@link #enableBreadcrumbs(Context)} to preserve backward compatibility for downstream
@@ -74,6 +75,7 @@ public interface Breadcrumbs {
      * @param minBreadcrumbLevel      the minimum severity level a breadcrumb must have to be recorded.
      *                                Breadcrumbs with a level below this threshold will be dropped.
      *                                Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                                A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
      * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
@@ -96,6 +98,7 @@ public interface Breadcrumbs {
      * @param minBreadcrumbLevel        the minimum severity level a breadcrumb must have to be recorded.
      *                                  Breadcrumbs with a level below this threshold will be dropped.
      *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                                  A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
      * @implNote The default implementation ignores {@code minBreadcrumbLevel} and delegates to
      * {@link #enableBreadcrumbs(Context, int)} to preserve backward compatibility for downstream
@@ -115,6 +118,7 @@ public interface Breadcrumbs {
      * @param minBreadcrumbLevel        the minimum severity level a breadcrumb must have to be recorded.
      *                                  Breadcrumbs with a level below this threshold will be dropped.
      *                                  Use {@link BacktraceBreadcrumbLevel#DEBUG} to record all levels.
+     *                                  A {@code null} value is treated as {@link BacktraceBreadcrumbLevel#DEBUG}.
      * @return true if we successfully enabled breadcrumbs
      * @note {@code breadcrumbTypesToEnable} only affects automatic breadcrumb receivers. User created
      * breadcrumbs will always be enabled (subject to the {@code minBreadcrumbLevel} threshold)
