@@ -357,6 +357,9 @@ public class BacktraceBase implements Client {
      * - is not an object (the attribute value is primitive type like String, or
      * Int)
      *
+     * Note: native crash reports omit attributes with an empty-string value
+     * (managed/JVM reports are unaffected).
+     *
      * @param key   attribute name
      * @param value attribute value.
      */

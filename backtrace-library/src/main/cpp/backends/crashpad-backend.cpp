@@ -3,6 +3,7 @@
 #include "handler/crash_report_upload_thread.h"
 #include "backtrace-native.h"
 #include "client/annotation.h"
+#include "snapshot/snapshot_constants.h"
 #include <jni.h>
 #include <libgen.h>
 #include <cstring>
@@ -59,11 +60,11 @@ namespace {
                 "Started Crashpad upload thread for offline native reports");
     }
 
-    // Stores each attribute as a crashpad StringAnnotation in the global
-    // AnnotationList (unbounded), replacing the legacy simple_annotations
-    // dictionary that was limited to 64 entries. Once set, an annotation is
-    // permanently referenced by crashpad's global list, so annotations and
-    // their name buffers are allocated once and never freed.
+    // Stores attributes as crashpad StringAnnotations, replacing the 64-entry
+    // simple_annotations dictionary. The snapshot reader reads at most
+    // crashpad::kMaxNumberOfAnnotations per module, so SetAnnotation drops new
+    // keys past that. Annotations and name buffers are allocated once and never
+    // freed (the global list references them for the process lifetime).
     constexpr crashpad::Annotation::ValueSizeType kAnnotationValueMaxSize = 4096;
     using DynamicAnnotation = crashpad::StringAnnotation<kAnnotationValueMaxSize>;
 
@@ -87,7 +88,18 @@ namespace {
             return;
         }
         const std::lock_guard<std::mutex> lock(attribute_synchronization);
-        DynamicAnnotation* annotation = GetOrCreateAnnotation(std::string(rawKey));
+        std::string key(rawKey);
+        // Drop new keys past the read limit; updates to existing keys are fine.
+        if (g_annotations.find(key) == g_annotations.end()
+                && g_annotations.size() >= crashpad::kMaxNumberOfAnnotations) {
+            __android_log_print(
+                    ANDROID_LOG_WARN,
+                    "Backtrace-Android",
+                    "Dropping native attribute '%s': reached crashpad's annotation read limit",
+                    rawKey);
+            return;
+        }
+        DynamicAnnotation* annotation = GetOrCreateAnnotation(key);
         // Set(const char*) uses strncpy; the StringPiece overload uses std::copy.
         annotation->Set(base::StringPiece(rawValue != nullptr ? rawValue : ""));
     }
