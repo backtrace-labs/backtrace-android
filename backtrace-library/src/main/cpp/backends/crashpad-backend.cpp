@@ -2,8 +2,12 @@
 #include "handler/handler_main.h"
 #include "handler/crash_report_upload_thread.h"
 #include "backtrace-native.h"
+#include "client/annotation.h"
+#include "snapshot/snapshot_constants.h"
 #include <jni.h>
 #include <libgen.h>
+#include <cstring>
+#include <unordered_map>
 
 extern std::string thread_id;
 extern std::atomic_bool initialized;
@@ -54,6 +58,78 @@ namespace {
                 ANDROID_LOG_INFO,
                 "Backtrace-Android",
                 "Started Crashpad upload thread for offline native reports");
+    }
+
+    // Stores attributes as crashpad StringAnnotations, replacing the 64-entry
+    // simple_annotations dictionary. The crashpad snapshot reader reads at most
+    // crashpad::kMaxNumberOfAnnotations annotation objects per module, so
+    // SetAnnotation drops new user keys past that limit (internal keys keep
+    // reserved slots). Annotations and name buffers are allocated once and never
+    // freed (the global list references them for the process lifetime).
+    constexpr crashpad::Annotation::ValueSizeType kAnnotationValueMaxSize = 4096;
+    using DynamicAnnotation = crashpad::StringAnnotation<kAnnotationValueMaxSize>;
+
+    // Reserve slots for internal, per-report annotations so they are never
+    // crowded out by user attributes near the read limit.
+    constexpr size_t kReservedAnnotationSlots = 2; // error.message, _mod_faulting_tid
+
+    bool IsValidAnnotationKey(const char* rawKey) {
+        return rawKey != nullptr && rawKey[0] != '\0';
+    }
+
+    bool IsReservedAnnotationKey(const std::string& key) {
+        return key == "error.message" || key == "_mod_faulting_tid";
+    }
+
+    std::unordered_map<std::string, DynamicAnnotation*> g_annotations;
+
+    // Caller must hold attribute_synchronization.
+    DynamicAnnotation* GetOrCreateAnnotation(const std::string& key) {
+        auto it = g_annotations.find(key);
+        if (it != g_annotations.end()) {
+            return it->second;
+        }
+        char* nameCopy = new char[key.size() + 1];
+        std::memcpy(nameCopy, key.c_str(), key.size() + 1);
+        DynamicAnnotation* annotation = new DynamicAnnotation(nameCopy);
+        g_annotations.emplace(key, annotation);
+        return annotation;
+    }
+
+    void SetAnnotation(const char* rawKey, const char* rawValue) {
+        if (!IsValidAnnotationKey(rawKey)) {
+            return;
+        }
+        const std::lock_guard<std::mutex> lock(attribute_synchronization);
+        std::string key(rawKey);
+        const bool isNewKey = g_annotations.find(key) == g_annotations.end();
+        // Cap user keys below the read limit so the reserved internal keys can
+        // always be registered; updates to existing keys are always allowed.
+        const size_t userAnnotationLimit =
+                crashpad::kMaxNumberOfAnnotations - kReservedAnnotationSlots;
+        if (isNewKey && !IsReservedAnnotationKey(key)
+                && g_annotations.size() >= userAnnotationLimit) {
+            __android_log_print(
+                    ANDROID_LOG_WARN,
+                    "Backtrace-Android",
+                    "Dropping native attribute '%s': reached crashpad's annotation read limit",
+                    rawKey);
+            return;
+        }
+        DynamicAnnotation* annotation = GetOrCreateAnnotation(key);
+        // Set(const char*) uses strncpy; the StringPiece overload uses std::copy.
+        annotation->Set(base::StringPiece(rawValue != nullptr ? rawValue : ""));
+    }
+
+    void ClearAnnotation(const char* rawKey) {
+        if (rawKey == nullptr || rawKey[0] == '\0') {
+            return;
+        }
+        const std::lock_guard<std::mutex> lock(attribute_synchronization);
+        auto it = g_annotations.find(std::string(rawKey));
+        if (it != g_annotations.end()) {
+            it->second->Clear();
+        }
     }
 
 } // namespace
@@ -325,23 +401,14 @@ void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_fault
     crashpad::CaptureContext(&context);
 
     // set dump message for single report
-    crashpad::SimpleStringDictionary *annotations = NULL;
-
     if (message != NULL || set_main_thread_as_faulting_thread == true) {
         JNIEnv *env = GetJniEnv();
         if (env == nullptr) {
             __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android", "Cannot initialize JNIEnv");
             return;
         }
-        const std::lock_guard<std::mutex> lock(attribute_synchronization);
-        crashpad::CrashpadInfo *info = crashpad::CrashpadInfo::GetCrashpadInfo();
-        annotations = info->simple_annotations();
-        if (!annotations) {
-            annotations = new crashpad::SimpleStringDictionary();
-            info->set_simple_annotations(annotations);
-        }
         if (set_main_thread_as_faulting_thread == true) {
-            annotations->SetKeyValue("_mod_faulting_tid", thread_id);
+            SetAnnotation("_mod_faulting_tid", thread_id.c_str());
         }
         if (message != NULL) {
             // user can't override error.message - exception message that Crashpad/crash-reporting tool
@@ -349,14 +416,14 @@ void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_fault
             // report and after creating a dump, method will clean up this attribute.
             jboolean isCopy;
             const char *rawMessage = env->GetStringUTFChars(message, &isCopy);
-            annotations->SetKeyValue("error.message", rawMessage);
+            SetAnnotation("error.message", rawMessage);
             env->ReleaseStringUTFChars(message, rawMessage);
         }
     }
     client->DumpWithoutCrash(&context);
 
-    if (annotations != NULL) {
-        annotations->RemoveKey("error.message");
+    if (message != NULL) {
+        ClearAnnotation("error.message");
     }
 }
 
@@ -372,22 +439,13 @@ void AddAttributeCrashpad(jstring key, jstring value) {
         return;
     }
 
-    const std::lock_guard<std::mutex> lock(attribute_synchronization);
-    crashpad::CrashpadInfo *info = crashpad::CrashpadInfo::GetCrashpadInfo();
-    crashpad::SimpleStringDictionary *annotations = info->simple_annotations();
-    if (!annotations) {
-        annotations = new crashpad::SimpleStringDictionary();
-        info->set_simple_annotations(annotations);
-    }
-
     jboolean isCopy;
     const char *crashpadKey = env->GetStringUTFChars(key, &isCopy);
     const char *crashpadValue = env->GetStringUTFChars(value, &isCopy);
-    if (crashpadKey && crashpadValue)
-        annotations->SetKeyValue(crashpadKey, crashpadValue);
+    SetAnnotation(crashpadKey, crashpadValue);
 
-    env->ReleaseStringUTFChars(key, crashpadKey);
-    env->ReleaseStringUTFChars(value, crashpadValue);
+    if (crashpadKey) env->ReleaseStringUTFChars(key, crashpadKey);
+    if (crashpadValue) env->ReleaseStringUTFChars(value, crashpadValue);
 }
 
 void AddAttachmentCrashpad(jstring jattachment) {
