@@ -358,7 +358,7 @@ public class BacktraceBase implements Client {
      * Int)
      *
      * Note: native crash reports omit attributes with an empty-string value
-     * (managed/JVM reports are unaffected).
+     * (managed reports are unaffected).
      *
      * @param key   attribute name
      * @param value attribute value.

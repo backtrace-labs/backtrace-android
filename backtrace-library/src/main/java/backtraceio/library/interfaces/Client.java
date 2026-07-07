@@ -23,6 +23,8 @@ public interface Client {
      * Adds new attributes to the client.
      * If the native integration is available and attributes are primitive type,
      * they will be added to the native reports.
+     * Note: native crash reports omit attributes with an empty-string value
+     * (managed reports are unaffected).
      * @param attributes client Attributes
      */
     void addAttribute(Map<String, Object> attributes);
@@ -31,6 +33,8 @@ public interface Client {
      * Adds new attribute to the client.
      * If the native integration is available and attributes are primitive type,
      * they will be added to the native reports.
+     * Note: native crash reports omit attributes with an empty-string value
+     * (managed reports are unaffected).
      * @param key attribute key
      * @param value attribute value
      */

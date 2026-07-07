@@ -61,12 +61,25 @@ namespace {
     }
 
     // Stores attributes as crashpad StringAnnotations, replacing the 64-entry
-    // simple_annotations dictionary. The snapshot reader reads at most
-    // crashpad::kMaxNumberOfAnnotations per module, so SetAnnotation drops new
-    // keys past that. Annotations and name buffers are allocated once and never
+    // simple_annotations dictionary. The crashpad snapshot reader reads at most
+    // crashpad::kMaxNumberOfAnnotations annotation objects per module, so
+    // SetAnnotation drops new user keys past that limit (internal keys keep
+    // reserved slots). Annotations and name buffers are allocated once and never
     // freed (the global list references them for the process lifetime).
     constexpr crashpad::Annotation::ValueSizeType kAnnotationValueMaxSize = 4096;
     using DynamicAnnotation = crashpad::StringAnnotation<kAnnotationValueMaxSize>;
+
+    // Reserve slots for internal, per-report annotations so they are never
+    // crowded out by user attributes near the read limit.
+    constexpr size_t kReservedAnnotationSlots = 2; // error.message, _mod_faulting_tid
+
+    bool IsValidAnnotationKey(const char* rawKey) {
+        return rawKey != nullptr && rawKey[0] != '\0';
+    }
+
+    bool IsReservedAnnotationKey(const std::string& key) {
+        return key == "error.message" || key == "_mod_faulting_tid";
+    }
 
     std::unordered_map<std::string, DynamicAnnotation*> g_annotations;
 
@@ -84,14 +97,18 @@ namespace {
     }
 
     void SetAnnotation(const char* rawKey, const char* rawValue) {
-        if (rawKey == nullptr || rawKey[0] == '\0') {
+        if (!IsValidAnnotationKey(rawKey)) {
             return;
         }
         const std::lock_guard<std::mutex> lock(attribute_synchronization);
         std::string key(rawKey);
-        // Drop new keys past the read limit; updates to existing keys are fine.
-        if (g_annotations.find(key) == g_annotations.end()
-                && g_annotations.size() >= crashpad::kMaxNumberOfAnnotations) {
+        const bool isNewKey = g_annotations.find(key) == g_annotations.end();
+        // Cap user keys below the read limit so the reserved internal keys can
+        // always be registered; updates to existing keys are always allowed.
+        const size_t userAnnotationLimit =
+                crashpad::kMaxNumberOfAnnotations - kReservedAnnotationSlots;
+        if (isNewKey && !IsReservedAnnotationKey(key)
+                && g_annotations.size() >= userAnnotationLimit) {
             __android_log_print(
                     ANDROID_LOG_WARN,
                     "Backtrace-Android",
