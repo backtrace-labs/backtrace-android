@@ -1,12 +1,12 @@
 # Backtrace Android Release Notes
 
 ## Version 3.13.0
-
 Improvements
-- Attributes: Native crash reports are no longer limited to 64 attributes. Previously, only the first 64 attributes were included in a native crash report and any additional attributes were discarded. (#213)
-- Attributes: Empty-string values are no longer included in native crash reports. Managed reports are unchanged. (#213)
-- Breadcrumbs: `enableBreadcrumbs` now accepts an optional minimum breadcrumb level. Breadcrumbs below the configured level are not recorded. The default level records all breadcrumbs, so existing behavior is unchanged. (#211)
-- Maintenance: Updated the NDK to the stable 27.3.13750724 release. (#212)
+- Native attributes: 
+  - Remove the 64-attribute limit from native crash report attributes. Crashpad now enforces its internal annotation limit. (#213)
+  - Omit attributes with empty-string values from native crash reports. Managed/JVM reports are unchanged. (#213)
+- Breadcrumbs: Add optional minimum-level filtering to enableBreadcrumbs, allowing breadcrumbs below the configured level to be dropped. The default level preserves existing behavior. (#211)
+- NDK: Update from 27.0.11718014-beta1 to 27.3.13750724. (#212)
 
 ## Version 3.12.0
 Improvements
