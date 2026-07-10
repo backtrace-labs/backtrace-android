@@ -3,10 +3,10 @@
 ## Version 3.13.0
 Improvements
 - Native attributes: 
-  - Remove the 64-attribute limit from native crash report attributes. Crashpad now enforces its internal annotation limit. (#213)
-  - Omit attributes with empty-string values from native crash reports. Managed/JVM reports are unchanged. (#213)
-- Breadcrumbs: Add optional minimum-level filtering to enableBreadcrumbs, allowing breadcrumbs below the configured level to be dropped. The default level preserves existing behavior. (#211)
-- NDK: Update from 27.0.11718014-beta1 to 27.3.13750724. (#212)
+  - Removed the 64-attribute limit from native crash report attributes. Crashpad now enforces its internal annotation limit. (#213)
+  - Omitted attributes with empty-string values from native crash reports. Managed/JVM reports are unchanged. (#213)
+- Breadcrumbs: Added optional minimum-level filtering to enableBreadcrumbs, allowing breadcrumbs below the configured level to be dropped. The default level preserves existing behavior. (#211)
+- NDK: Updated from 27.0.11718014-beta1 to 27.3.13750724. (#212)
 
 ## Version 3.12.0
 Improvements
