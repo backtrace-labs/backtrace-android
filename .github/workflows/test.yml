@@ -38,11 +38,8 @@ jobs:
       - name: Bugfix libunwindstack-ndk .clang-format symbolic link issue
         run: rm ./backtrace-library/src/main/cpp/libbun/external/libunwindstack-ndk/.clang-format
 
-      - name: Check Code Style
-        run: ./gradlew spotlessCheck
-
       - name: Build and check
-        run: ./gradlew assembleDebug assembleDebugAndroidTest build check
+        run: ./gradlew assembleDebugAndroidTest build
 
       - name: Alignment script executable
         run: chmod +x scripts/check_elf_alignment.sh
@@ -106,9 +103,6 @@ jobs:
         with:
           name: ${{ matrix.test-apk }}
 
-      - name: Get Saucectl
-        run: curl -L https://saucelabs.github.io/saucectl/install | bash
-
       - name: Install saucectl
         uses: saucelabs/saucectl-run-action@v4
         env:
@@ -117,19 +111,17 @@ jobs:
           skip-run: true
 
       - name: Run Saucectl
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          TEST_APP: ${{ matrix.test-apk }}
         run: |
-          saucectl configure --username ${{ secrets.SAUCE_USERNAME }} --accessKey ${{ secrets.SAUCE_ACCESS_KEY }}
-          # recent real device
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=14" --region us-west-1 --retries 2
-          # newest Android version
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=15.0" --region us-west-1 --retries 2
-          # oldest Android version
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --emulator name="Android GoogleApi Emulator,platformVersion=9.0" --region us-west-1 --retries 2
-          # oldest real device (aiming for armv7 / 32bit)
-          saucectl run espresso -c "" --name "From Github Actions" --app example-app-debug.apk --testApp ${{ matrix.test-apk }}  --device name=".*,platformVersion=9" --region us-west-1 --retries 2
-          # --device name=".*,platformVersion=6.0.1"
-          # --device name="Samsung_Galaxy_S20_FE_5G_backtrace_us"
-          # --device name="Samsung_Galaxy_S22_Ultra_5G_backtrace_us"
+          saucectl configure --username "$SAUCE_USERNAME" --accessKey "$SAUCE_ACCESS_KEY"
+          conc=$(curl -s -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" "https://api.us-west-1.saucelabs.com/rest/v1.2/users/$SAUCE_USERNAME/concurrency")
+          ccy=$(printf '%s' "$conc" | jq -r '[.concurrency.organization.allowed.rds, .concurrency.organization.allowed.vms] | map(select(type=="number")) | min // 1' 2>/dev/null)
+          case "$ccy" in ''|*[!0-9]*) ccy=1 ;; esac
+          echo "Using --ccy $ccy"
+          saucectl run --ccy "$ccy" --retries 2
 
       - name: Run morgue
         run: |
