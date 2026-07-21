@@ -124,7 +124,7 @@ jobs:
         with:
           skip-run: true
 
-      - name: Run Saucectl
+      - name: Run saucectl
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
