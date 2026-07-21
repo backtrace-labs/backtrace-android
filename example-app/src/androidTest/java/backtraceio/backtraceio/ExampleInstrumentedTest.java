@@ -6,6 +6,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
+import androidx.lifecycle.Lifecycle;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -38,6 +39,8 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     @Before
     public void enableMetricsAndBreadcrumbs() {
         BacktraceLogger.setLevel(LogLevel.DEBUG);
+        // Re-assert RESUMED: some old real devices background the activity right after launch.
+        mActivityRule.getScenario().moveToState(Lifecycle.State.RESUMED);
         onView(withId(R.id.enableBreadcrumbs)).perform(click());
     }
 

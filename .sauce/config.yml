@@ -1,0 +1,26 @@
+apiVersion: v1alpha
+kind: espresso
+sauce:
+  region: eu-central-1
+espresso:
+  app: example-app-debug.apk
+  testApp: $TEST_APP
+suites:
+  - name: "Android 14 - real device"
+    devices:
+      - name: ".*"
+        platformVersion: "14"
+  - name: "Android 15 - emulator"
+    emulators:
+      - name: "Android GoogleApi Emulator"
+        platformVersions:
+          - "15.0"
+  - name: "Android 9 - emulator"
+    emulators:
+      - name: "Android GoogleApi Emulator"
+        platformVersions:
+          - "9.0"
+  - name: "Android 9 - real device"
+    devices:
+      - name: ".*"
+        platformVersion: "9"
