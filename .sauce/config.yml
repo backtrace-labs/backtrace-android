@@ -1,7 +1,7 @@
 apiVersion: v1alpha
 kind: espresso
 sauce:
-  region: us-west-1
+  region: eu-central-1
 espresso:
   app: example-app-debug.apk
   testApp: $TEST_APP
