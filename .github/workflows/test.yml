@@ -133,7 +133,7 @@ jobs:
           TEST_APP: ${{ matrix.test-apk }}
         run: |
           saucectl configure --username "$SAUCE_USERNAME" --accessKey "$SAUCE_ACCESS_KEY"
-          conc=$(curl -s -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" "https://api.us-west-1.saucelabs.com/rest/v1.2/users/$SAUCE_USERNAME/concurrency")
+          conc=$(curl -s -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" "https://api.eu-central-1.saucelabs.com/rest/v1.2/users/$SAUCE_USERNAME/concurrency")
           ccy=$(printf '%s' "$conc" | jq -r '[.concurrency.organization.allowed.rds, .concurrency.organization.allowed.vms] | map(select(type=="number")) | min // 1' 2>/dev/null)
           case "$ccy" in ''|*[!0-9]*) ccy=1 ;; esac
           echo "Using --ccy $ccy"
