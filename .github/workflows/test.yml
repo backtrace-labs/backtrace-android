@@ -39,7 +39,15 @@ jobs:
         run: rm ./backtrace-library/src/main/cpp/libbun/external/libunwindstack-ndk/.clang-format
 
       - name: Build and check
-        run: ./gradlew assembleDebugAndroidTest build
+        run: ./gradlew assembleDebugAndroidTest build --profile
+
+      - name: Upload build profile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-profile
+          path: build/reports/profile/
+          if-no-files-found: ignore
 
       - name: Alignment script executable
         run: chmod +x scripts/check_elf_alignment.sh
