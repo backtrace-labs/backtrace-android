@@ -28,6 +28,8 @@ jobs:
 
       - name: Set up Gradle (caching)
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false   # TODO: revert before merge
 
       - name: Write to local.properties
         run: |
