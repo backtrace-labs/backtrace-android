@@ -19,7 +19,6 @@ android {
         ndkVersion '27.3.13750724'
         versionName androidGitVersion.name()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
-
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -66,9 +65,7 @@ android {
         }
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
-
-    // Needed until we migrate to AndroidX
-    lintOptions {
+    lint {
         abortOnError false
     }
 }
