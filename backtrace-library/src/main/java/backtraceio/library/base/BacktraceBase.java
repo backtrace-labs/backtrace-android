@@ -278,7 +278,7 @@ public class BacktraceBase implements Client {
 
     /**
      * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
-     * 
+     *
      * <p>Configure initial native attributes, attachments, and breadcrumbs before calling this method.
      * Native crashes that occur before this method completes cannot be captured.
      *
