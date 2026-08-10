@@ -277,16 +277,26 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is
-     * required to enable this feature).
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     * 
+     * <p>Configure initial native attributes, attachments, and breadcrumbs before calling this method.
+     * Native crashes that occur before this method completes cannot be captured.
+     *
+     * <p>Call this method from exactly one application-controlled thread.
+     * It may be invoked on a background thread, but doing so delays native crash coverage until initialization completes.
+     * Do not call it concurrently with
+     * {@link #disableNativeIntegration()}.
+     *
+     * <p>The handler library is located using the path already selected by Android's native linker, the host APK is never opened or parsed.
      */
     public void enableNativeIntegration() {
         this.database.setupNativeIntegration(this, this.credentials);
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is
-     * required to enable this feature).
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     *
+     * <p>See {@link #enableNativeIntegration()} for threading and coverage requirements.
      *
      * @param enableClientSideUnwinding Enable client side unwinding
      */
@@ -295,8 +305,9 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is
-     * required to enable this feature).
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     *
+     * <p>See {@link #enableNativeIntegration()} for threading and coverage requirements.
      *
      * @param enableClientSideUnwinding Enable client side unwinding
      * @param unwindingMode             Unwinding mode to use for client side

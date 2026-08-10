@@ -4,10 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import backtraceio.library.base.NativeLibraryLoader;
 import backtraceio.library.common.AbiHelper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -94,7 +97,7 @@ public class CrashHandlerConfigurationTest {
 
         ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
         applicationInfo.splitSourceDirs = new String[] {genericSplit.getAbsolutePath()};
-        applicationInfo.splitNames = new String[] {"config.arm64_v8a"};
+        setSplitNames(applicationInfo, new String[] {"config.arm64_v8a"});
 
         CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
         assertEquals(
@@ -133,21 +136,172 @@ public class CrashHandlerConfigurationTest {
                 configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "x86_64", null));
     }
 
+    /**
+     * Android has already resolved which module this process loaded, so the linker path wins even
+     * when the device-preferred ABI disagrees — the 32-bit-process-on-64-bit-device case.
+     */
     @Test
-    public void rejectsLoadedApkPathForDifferentAbi() throws Exception {
-        File root = createTemporaryDirectory("wrong-loaded-abi");
+    public void loadedLinkerPathIsAuthoritativeWhenDevicePreferredAbiDiffers() throws Exception {
+        File root = createTemporaryDirectory("process-abi-mismatch");
         File baseApk = createPlainFile(root, "base.apk");
-        File armSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
-        File x86Split = createPlainFile(root, "split_config.x86_64.apk");
-        String wrongLoadedPath = x86Split.getAbsolutePath() + "!/lib/x86_64/" + LIBRARY_NAME;
+        File arm32Split = createPlainFile(root, "split_config.armeabi_v7a.apk");
+        String loadedPath = arm32Split.getAbsolutePath() + "!/lib/armeabi-v7a/" + LIBRARY_NAME;
 
         ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
-        applicationInfo.splitSourceDirs = new String[] {armSplit.getAbsolutePath()};
 
-        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> wrongLoadedPath);
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> loadedPath);
         assertEquals(
-                armSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
-                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", wrongLoadedPath));
+                loadedPath,
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo,
+                        "arm64-v8a", // Simulates the device-preferred ABI disagreeing.
+                        loadedPath));
+    }
+
+    @Test
+    public void rejectsRelativeOrWrongLibraryLoadedPath() throws Exception {
+        File root = createTemporaryDirectory("invalid-loaded-path");
+        File baseApk = createPlainFile(root, "base.apk");
+        File otherLibrary = createPlainFile(root, "libsomething-else.so");
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        String baseFallback = baseApk.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME;
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+
+        // Relative path.
+        assertEquals(
+                baseFallback,
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo, "arm64-v8a", "lib/arm64-v8a/" + LIBRARY_NAME));
+        // Absolute path to a different library.
+        assertEquals(
+                baseFallback,
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo, "arm64-v8a", otherLibrary.getAbsolutePath()));
+        // Absolute path that does not exist.
+        assertEquals(
+                baseFallback,
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo, "arm64-v8a", new File(root, LIBRARY_NAME).getAbsolutePath()));
+        // APK-backed path whose entry is not the Backtrace library.
+        assertEquals(
+                baseFallback,
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo, "arm64-v8a", baseApk.getAbsolutePath() + "!/lib/arm64-v8a/libother.so"));
+        // APK-backed path whose container does not exist.
+        assertEquals(
+                baseFallback,
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo,
+                        "arm64-v8a",
+                        new File(root, "absent.apk").getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME));
+    }
+
+    @Test
+    public void linkerPathProviderFailureUsesMetadataFallback() throws Exception {
+        File root = createTemporaryDirectory("provider-failure");
+        File baseApk = createPlainFile(root, "base.apk");
+        File nativeLibraryDirectory = new File(root, "lib");
+        assertTrue(nativeLibraryDirectory.mkdirs());
+        File extractedLibrary = createPlainFile(nativeLibraryDirectory, LIBRARY_NAME);
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, nativeLibraryDirectory);
+
+        // Mirrors an UnsatisfiedLinkError from the JNI helper.
+        CrashHandlerConfiguration linkageErrorConfiguration = new CrashHandlerConfiguration(() -> {
+            throw new UnsatisfiedLinkError("no resolveLoadedLibraryPath");
+        });
+        String resolvedPath = getEnvironmentValue(
+                linkageErrorConfiguration.getCrashHandlerEnvironmentVariables(applicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+        assertEquals(extractedLibrary.getAbsolutePath(), resolvedPath);
+
+        // Mirrors an unexpected runtime failure inside the provider.
+        CrashHandlerConfiguration runtimeErrorConfiguration = new CrashHandlerConfiguration(() -> {
+            throw new IllegalStateException("provider exploded");
+        });
+        String runtimeResolvedPath = getEnvironmentValue(
+                runtimeErrorConfiguration.getCrashHandlerEnvironmentVariables(applicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+        assertEquals(extractedLibrary.getAbsolutePath(), runtimeResolvedPath);
+    }
+
+    @Test
+    public void ignoresNullSplitPathEvenWhenSplitNameMatchesAbi() throws Exception {
+        File root = createTemporaryDirectory("null-split-path");
+        File baseApk = createPlainFile(root, "base.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {null};
+        setSplitNames(applicationInfo, new String[] {"config.arm64_v8a"});
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                baseApk.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /** The base {@code config.<abi>} split must outrank a dynamic-feature ABI split. */
+    @Test
+    public void baseConfigAbiSplitIsPreferred() throws Exception {
+        File root = createTemporaryDirectory("base-config-preferred");
+        File baseApk = createPlainFile(root, "base.apk");
+        File featureSplit = createPlainFile(root, "split_feature_video.config.arm64_v8a.apk");
+        File baseConfigSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        // Feature split deliberately listed first so ordering alone would pick the wrong one.
+        applicationInfo.splitSourceDirs =
+                new String[] {featureSplit.getAbsolutePath(), baseConfigSplit.getAbsolutePath()};
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                baseConfigSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /**
+     * Reproduces the pre-API-26 code path, where {@code splitNames} is unavailable and matching must
+     * fall back to the ABI token carried by the split filename.
+     */
+    @Test
+    public void resolvesSplitByFilenameWhenSplitNamesAreUnavailable() throws Exception {
+        File root = createTemporaryDirectory("no-split-names");
+        File baseApk = createPlainFile(root, "base.apk");
+        File abiSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {abiSplit.getAbsolutePath()};
+        // splitNames intentionally left unset, as it is on API 21-25.
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                abiSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /**
+     * Exercises the real default wiring end to end: the production constructor, the live JNI
+     * lookup, and this process's own {@link ApplicationInfo}. The resolved handler path must name a
+     * container that actually exists on disk.
+     */
+    @Test
+    public void defaultWiringResolvesRealLoadedLibraryPath() {
+        NativeLibraryLoader.load();
+
+        ApplicationInfo applicationInfo =
+                InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationInfo();
+
+        String resolvedPath = getEnvironmentValue(
+                new CrashHandlerConfiguration().getCrashHandlerEnvironmentVariables(applicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+
+        assertNotNull(resolvedPath);
+        assertTrue(resolvedPath, resolvedPath.endsWith(LIBRARY_NAME));
+
+        int separatorIndex = resolvedPath.indexOf("!/");
+        File container = new File(separatorIndex >= 0 ? resolvedPath.substring(0, separatorIndex) : resolvedPath);
+        assertTrue("resolved container does not exist: " + resolvedPath, container.isFile());
     }
 
     @Test
@@ -179,6 +333,15 @@ public class CrashHandlerConfigurationTest {
         String librarySearchPath = getEnvironmentValue(environment, "LD_LIBRARY_PATH");
         assertNotNull(librarySearchPath);
         assertFalse(librarySearchPath.contains("null"));
+    }
+
+    /**
+     * {@link ApplicationInfo#splitNames} exists only from API 26, so tests that need it are skipped
+     * below that level rather than failing on a field that is genuinely absent.
+     */
+    private static void setSplitNames(ApplicationInfo applicationInfo, String[] splitNames) {
+        assumeTrue("ApplicationInfo.splitNames requires API 26", Build.VERSION.SDK_INT >= Build.VERSION_CODES.O);
+        applicationInfo.splitNames = splitNames;
     }
 
     private static ApplicationInfo createApplicationInfo(File baseApk, File nativeLibraryDirectory) {

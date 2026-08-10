@@ -3,7 +3,7 @@ package backtraceio.library.models.nativeHandler;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.text.TextUtils;
-import backtraceio.library.base.NativeLibraryLoader;
+import androidx.annotation.RequiresApi;
 import backtraceio.library.common.AbiHelper;
 import backtraceio.library.services.BacktraceCrashHandlerRunner;
 import java.io.File;
@@ -31,7 +31,7 @@ public class CrashHandlerConfiguration {
     private final NativeLibraryPathProvider nativeLibraryPathProvider;
 
     public CrashHandlerConfiguration() {
-        this(NativeLibraryLoader::getLoadedLibraryPath);
+        this(CrashHandlerConfiguration::safelyResolveLoadedLibraryPath);
     }
 
     CrashHandlerConfiguration(NativeLibraryPathProvider nativeLibraryPathProvider) {
@@ -123,12 +123,12 @@ public class CrashHandlerConfiguration {
             throw new IllegalArgumentException("ABI cannot be null or empty");
         }
 
-        final String entry = getApkLibraryEntry(arch);
-        final String validatedLoadedPath = validateLoadedLibraryPath(loadedLibraryPath, entry);
+        final String validatedLoadedPath = validateLoadedLibraryPath(loadedLibraryPath);
         if (validatedLoadedPath != null) {
             return validatedLoadedPath;
         }
 
+        final String entry = getApkLibraryEntry(arch);
         final String extractedLibraryPath = getExtractedLibraryPath(appInfo.nativeLibraryDir);
         if (extractedLibraryPath != null) {
             return extractedLibraryPath;
@@ -158,7 +158,14 @@ public class CrashHandlerConfiguration {
         }
     }
 
-    private static String validateLoadedLibraryPath(String loadedLibraryPath, String expectedEntry) {
+    /**
+     * Validates the linker-reported module path structurally.
+     *
+     * <p>The path is deliberately <em>not</em> compared against an ABI inferred in Java.
+     * Android has already resolved which module this process loaded, so the linker's answer is authoritative;
+     * comparing it against a guessed ABI would reject correct paths in 32-bit processes on 64-bit devices and under native-bridge translation.
+     */
+    private static String validateLoadedLibraryPath(String loadedLibraryPath) {
         if (isNullOrEmpty(loadedLibraryPath)) {
             return null;
         }
@@ -166,14 +173,14 @@ public class CrashHandlerConfiguration {
         final String path = loadedLibraryPath.trim();
         final int apkSeparatorIndex = path.indexOf(APK_LIBRARY_SEPARATOR);
         if (apkSeparatorIndex >= 0) {
-            final String apkPath = path.substring(0, apkSeparatorIndex);
+            final String containerPath = path.substring(0, apkSeparatorIndex);
             final String entry = path.substring(apkSeparatorIndex + APK_LIBRARY_SEPARATOR.length());
-            if (!expectedEntry.equals(entry)) {
+            if (!isBacktraceApkLibraryEntry(entry)) {
                 return null;
             }
 
-            File apkFile = new File(apkPath);
-            return apkFile.isAbsolute() && apkFile.isFile() ? path : null;
+            File containerFile = new File(containerPath);
+            return containerFile.isAbsolute() && containerFile.isFile() ? path : null;
         }
 
         File libraryFile = new File(path);
@@ -184,6 +191,39 @@ public class CrashHandlerConfiguration {
         }
         return libraryFile.getAbsolutePath();
     }
+
+    /**
+     * Accepts {@code lib/<abi>/libbacktrace-native.so} for any single-segment ABI directory.
+     */
+    private static boolean isBacktraceApkLibraryEntry(String entry) {
+        final String prefix = "lib/";
+        final String suffix = "/" + BACKTRACE_NATIVE_LIBRARY_NAME;
+        if (entry == null || !entry.startsWith(prefix) || !entry.endsWith(suffix)) {
+            return false;
+        }
+
+        final int abiEnd = entry.length() - suffix.length();
+        if (abiEnd <= prefix.length()) {
+            return false;
+        }
+
+        final String abi = entry.substring(prefix.length(), abiEnd);
+        return abi.indexOf('/') < 0;
+    }
+
+    private static String safelyResolveLoadedLibraryPath() {
+        try {
+            return resolveLoadedLibraryPath();
+        } catch (LinkageError | SecurityException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the filesystem or APK-backed path of the loaded Backtrace native library as reported by the platform linker,
+     * or {@code null} when module metadata is unavailable.
+     */
+    private static native String resolveLoadedLibraryPath();
 
     private static String getExtractedLibraryPath(String nativeLibraryDirPath) {
         if (isNullOrEmpty(nativeLibraryDirPath)) {
@@ -205,40 +245,78 @@ public class CrashHandlerConfiguration {
     }
 
     /**
-     * Reads {@link ApplicationInfo#splitNames}, which only exists from API 26. The field access is
-     * isolated in this method so that it is never executed on older platforms, where resolving it
-     * would throw {@link NoSuchFieldError}.
+     * Reads {@link ApplicationInfo#splitNames}, which only exists from API 26.
+     * The field access itself lives in {@link Api26Impl} so the reference is confined to a class that is never loaded or verified on older platforms,
+     * where resolving it would throw {@link NoSuchFieldError}.
      */
     private static String[] getSplitNames(ApplicationInfo appInfo) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return null;
         }
-        return appInfo.splitNames;
+        return Api26Impl.getSplitNames(appInfo);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static final class Api26Impl {
+        private Api26Impl() {}
+
+        static String[] getSplitNames(ApplicationInfo appInfo) {
+            return appInfo.splitNames;
+        }
+    }
+
+    /**
+     * Selects the best ABI-matching split, preferring an exact base configuration split over a loose token match
+     * so that dynamic-feature ABI splits cannot win on array ordering alone.
+     */
     private static String findAbiSplitPath(String[] splitPaths, String[] splitNames, String arch) {
         if (splitPaths == null) {
             return null;
         }
 
+        String bestSplitPath = null;
+        int bestScore = 0;
+
         for (int index = 0; index < splitPaths.length; index++) {
             String splitPath = splitPaths[index];
+            if (isNullOrEmpty(splitPath)) {
+                continue;
+            }
+
             String splitName = splitNames != null && index < splitNames.length ? splitNames[index] : null;
-            if (!matchesAbi(splitPath, splitName, arch)) {
+            int score = getAbiMatchScore(splitPath, splitName, arch);
+            if (score <= bestScore) {
                 continue;
             }
 
             File splitFile = new File(splitPath);
             if (splitFile.isAbsolute() && splitFile.isFile()) {
-                return splitFile.getAbsolutePath();
+                bestSplitPath = splitFile.getAbsolutePath();
+                bestScore = score;
             }
         }
-        return null;
+        return bestSplitPath;
     }
 
-    private static boolean matchesAbi(String splitPath, String splitName, String arch) {
-        String splitFileName = isNullOrEmpty(splitPath) ? null : new File(splitPath).getName();
-        return containsAbiToken(splitFileName, arch) || containsAbiToken(splitName, arch);
+    private static int getAbiMatchScore(String splitPath, String splitName, String arch) {
+        if (isNullOrEmpty(arch)) {
+            return 0;
+        }
+
+        String normalizedArch = normalizeAbiToken(arch);
+        String normalizedSplitName = isNullOrEmpty(splitName) ? null : normalizeAbiToken(splitName);
+        String normalizedFileName = normalizeAbiToken(new File(splitPath).getName());
+
+        if (("config." + normalizedArch).equals(normalizedSplitName)) {
+            return 3;
+        }
+        if (("split_config." + normalizedArch + ".apk").equals(normalizedFileName)) {
+            return 2;
+        }
+        if (containsAbiToken(splitName, arch) || containsAbiToken(new File(splitPath).getName(), arch)) {
+            return 1;
+        }
+        return 0;
     }
 
     private static boolean containsAbiToken(String value, String arch) {

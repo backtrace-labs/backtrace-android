@@ -81,7 +81,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
 
 extern "C" {
 JNIEXPORT jstring JNICALL
-Java_backtraceio_library_base_NativeLibraryLoader_resolveLoadedLibraryPath(
+Java_backtraceio_library_models_nativeHandler_CrashHandlerConfiguration_resolveLoadedLibraryPath(
         JNIEnv *env, jclass /* clazz */) {
     Dl_info libraryInfo{};
     if (dladdr(static_cast<void *>(&backtraceLibraryAnchor), &libraryInfo) == 0
