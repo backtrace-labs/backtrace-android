@@ -1,5 +1,10 @@
 # Backtrace Android Release Notes
 
+## Next version
+Bugfixes
+- Fixed cold-start ANRs during native crash-handler initialization in large Android applications. The SDK no longer opens or parses the base APK or split APK ZIP central directories to locate `libbacktrace-native.so`. Native library resolution now uses the path selected by Android's native linker, with extracted-library and split-metadata fallbacks.
+- Fixed ABI detection for 32-bit application processes on 64-bit devices. `AbiHelper` now reports the ABI of the running process instead of the device's preferred ABI, so native library paths resolve to the architecture actually loaded.
+
 ## Version 3.13.0
 Improvements
 - Native attributes: 
