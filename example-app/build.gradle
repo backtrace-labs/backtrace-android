@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     namespace = "backtraceio.backtraceio"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "backtraceio.backtraceio"
         minSdk = 21
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
@@ -60,7 +60,7 @@ String getProperty(String name, String defaultValue) {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
