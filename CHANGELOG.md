@@ -2,8 +2,9 @@
 
 ## Next version
 Bugfixes
-- Fixed the root cause of cold-start ANRs reported during native crash-handler initialization in large Android applications (`ZipFile$Source.initCEN`). The SDK no longer opens or parses the base APK or split APK ZIP central directories to locate `libbacktrace-native.so`. Native library resolution now uses the path selected by Android's native linker, with extracted-library and split-metadata fallbacks.
-- Fixed ABI detection for 32-bit application processes on 64-bit devices. `AbiHelper` now reports the ABI of the running process instead of the device's preferred ABI, so native library paths resolve to the architecture actually loaded.
+- Removed synchronous base- and split-APK ZIP central-directory inspection from native crash-handler library resolution. That scan was the identified cause of customer-reported cold-start ANRs showing `ZipFile$Source.initCEN`. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks. Production qualification for fatal crash capture and legacy or mixed-bitness devices is tracked separately.
+- Native-integration path-resolution and JNI-bridge failures now disable native integration and return `false` rather than propagating those failures to the host application.
+- Corrected process-ABI selection by preferring the ABI reported for the running process. On API 23 and later, malformed primary ABI metadata falls back to process-bitness-specific ABI lists. API 21-22 retain the device-ordered fallback when primary process ABI metadata is unavailable.
 
 ## Version 3.13.0
 Improvements

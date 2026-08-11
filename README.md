@@ -70,3 +70,27 @@ backtraceClient.metrics.enable()
 ## Documentation
 
 For more information about the Android SDK, including installation, usage, and configuration options, see the [Android Integration guide](https://docs.saucelabs.com/error-reporting/platform-integrations/android/setup/) in the Sauce Labs documentation.
+
+## Native crash integration startup
+
+Native crash capture requires a writable `BacktraceDatabase`. Configure initial attributes,
+attachments, and breadcrumbs before enabling the integration, then call
+`enableNativeIntegration()` as early as practical:
+
+```java
+BacktraceDatabase database = new BacktraceDatabase(context, databaseSettings);
+BacktraceClient client = new BacktraceClient(context, credentials, database, attributes, attachments);
+
+BacktraceExceptionHandler.enable(client);
+client.enableNativeIntegration();
+```
+
+`enableNativeIntegration()` is synchronous. Keeping it in the normal startup sequence provides the
+earliest native-crash coverage. It can be invoked from one background thread, but native crashes
+that occur before initialization completes cannot be captured.
+
+The SDK resolves its native crash-handler library from the path already selected by Android's
+linker. Backtrace does not open or parse the host application's base or split APK while resolving
+the crash-handler library.
+See [Native integration startup and threading](docs/native-integration-startup.md) for operational
+guidance and failure modes.
