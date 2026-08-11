@@ -289,6 +289,11 @@ public class BacktraceBase implements Client {
      *
      * <p>The handler library is located using the path already selected by Android's native linker;
      * Backtrace does not open or parse the host APK while resolving the crash-handler library.
+     * Native integration is optional: a path-resolution or bridge failure disables it and returns
+     * control normally, leaving managed crash reporting operational.
+     *
+     * <p>See {@code docs/native-integration-startup.md} for resolution precedence, failure
+     * semantics, threading, and release qualification boundaries.
      */
     public void enableNativeIntegration() {
         this.database.setupNativeIntegration(this, this.credentials);

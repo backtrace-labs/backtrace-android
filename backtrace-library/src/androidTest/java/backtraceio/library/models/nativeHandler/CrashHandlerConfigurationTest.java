@@ -361,6 +361,84 @@ public class CrashHandlerConfigurationTest {
     }
 
     /**
+     * Loose filename-token matching represents missing split-name metadata, which is a global
+     * property of the install: when any split names exist, a loose candidate must not win.
+     */
+    @Test
+    public void looseTokenIsRejectedWhenGlobalSplitNameMetadataExists() throws Exception {
+        File root = createTemporaryDirectory("loose-rejected-global-names");
+        File baseApk = createPlainFile(root, "base.apk");
+        File languageSplit = createPlainFile(root, "split_config.en.apk");
+        File looseSplit = createPlainFile(root, "feature_video.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {languageSplit.getAbsolutePath(), looseSplit.getAbsolutePath()};
+        setSplitNames(applicationInfo, new String[] {"config.en", "feature_video"});
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                baseApk.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /**
+     * A candidate beyond the end of a truncated {@code splitNames} array has no aligned name; that
+     * must not re-enable the low-confidence token score that named candidates correctly lose.
+     */
+    @Test
+    public void truncatedSplitNamesDoesNotEnableLooseDynamicFeatureMatch() throws Exception {
+        File root = createTemporaryDirectory("truncated-split-names");
+        File baseApk = createPlainFile(root, "base.apk");
+        File languageSplit = createPlainFile(root, "split_config.en.apk");
+        File featureAbiSplit = createPlainFile(root, "feature_video.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs =
+                new String[] {languageSplit.getAbsolutePath(), featureAbiSplit.getAbsolutePath()};
+        setSplitNames(applicationInfo, new String[] {"config.en"});
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                baseApk.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /** The exact standard filename stays valid even when the splitNames array is short. */
+    @Test
+    public void exactFilenameStillMatchesWhenSplitNamesArrayIsShort() throws Exception {
+        File root = createTemporaryDirectory("short-split-names-exact");
+        File baseApk = createPlainFile(root, "base.apk");
+        File languageSplit = createPlainFile(root, "split_config.en.apk");
+        File abiSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {languageSplit.getAbsolutePath(), abiSplit.getAbsolutePath()};
+        setSplitNames(applicationInfo, new String[] {"config.en"});
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                abiSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /** Without any split-name metadata, a unique loose filename match is still accepted. */
+    @Test
+    public void uniqueLooseFilenameMatchesWhenSplitNamesAreGloballyUnavailable() throws Exception {
+        File root = createTemporaryDirectory("loose-unique-no-names");
+        File baseApk = createPlainFile(root, "base.apk");
+        File looseSplit = createPlainFile(root, "feature_video.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {looseSplit.getAbsolutePath()};
+        // splitNames intentionally left unset, as it is on API 21-25.
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                looseSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /**
      * Reproduces the pre-API-26 code path, where {@code splitNames} is unavailable and matching must
      * fall back to the ABI token carried by the split filename.
      */

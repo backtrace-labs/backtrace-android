@@ -3,6 +3,7 @@ package backtraceio.library;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -11,10 +12,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import backtraceio.library.enums.UnwindingMode;
 import backtraceio.library.interfaces.NativeCommunication;
+import backtraceio.library.models.database.BacktraceDatabaseRecord;
+import backtraceio.library.models.json.BacktraceReport;
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import backtraceio.library.models.nativeHandler.CrashHandlerConfigurationTestFactory;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Collections;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -34,11 +38,14 @@ public class BacktraceDatabaseNativeSetupTest {
     private BacktraceCredentials credentials;
     private RecordingNativeCommunication nativeCommunication;
 
+    private File databaseDirectory;
+
     @Before
     public void setUp() {
-        this.context = InstrumentationRegistry.getInstrumentation().getContext();
-        this.database =
-                new BacktraceDatabase(this.context, this.context.getFilesDir().getAbsolutePath());
+        this.context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        this.databaseDirectory = new File(this.context.getFilesDir(), "native-setup-test-" + System.nanoTime());
+        assertTrue(this.databaseDirectory.mkdirs());
+        this.database = new BacktraceDatabase(this.context, this.databaseDirectory.getAbsolutePath());
         this.credentials = new BacktraceCredentials("https://test.sp.backtrace.io", "1231231231231");
         this.client = new BacktraceClient(this.context, this.credentials);
         this.nativeCommunication = new RecordingNativeCommunication();
@@ -65,9 +72,12 @@ public class BacktraceDatabaseNativeSetupTest {
         Boolean enabled = this.database.setupNativeIntegration(this.client, this.credentials);
 
         assertEquals(false, enabled);
-        // Managed database behavior stays available and native integration stays disabled.
+        // Managed persistence stays operational and native integration stays disabled.
         assertFalse(this.database.addNativeAttribute("key", "value"));
-        assertEquals(0, this.database.count());
+        BacktraceDatabaseRecord managedRecord =
+                this.database.add(new BacktraceReport("managed-after-native-setup-failure"), Collections.emptyMap());
+        assertNotNull(managedRecord);
+        assertEquals(1, this.database.count());
     }
 
     @Test
@@ -120,6 +130,77 @@ public class BacktraceDatabaseNativeSetupTest {
 
         assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
         assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    /**
+     * A platform API reference that does not resolve on the running OS surfaces as a LinkageError,
+     * not a RuntimeException; it must be contained the same way.
+     */
+    @Test
+    public void setupNativeIntegrationReturnsFalseWhenAbiProviderThrowsLinkageError() {
+        this.database.useCrashHandlerConfiguration(
+                CrashHandlerConfigurationTestFactory.withLinkageErrorAbiProvider(null));
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void setupNativeIntegrationUsesValidLinkerPathWhenAbiProviderThrowsLinkageError() throws Exception {
+        File loadedLibrary = new File(this.databaseDirectory, "libbacktrace-native.so");
+        try (FileOutputStream output = new FileOutputStream(loadedLibrary)) {
+            output.write(new byte[] {1, 2, 3, 4});
+        }
+        this.database.useCrashHandlerConfiguration(
+                CrashHandlerConfigurationTestFactory.withLinkageErrorAbiProvider(loadedLibrary.getAbsolutePath()));
+
+        assertEquals(true, this.database.setupNativeIntegration(this.client, this.credentials));
+        assertEquals(1, this.nativeCommunication.javaCrashHandlerCalls);
+        assertTrue(hasEnvironmentValue(
+                this.nativeCommunication.lastEnvironmentVariables,
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER,
+                loadedLibrary.getAbsolutePath()));
+    }
+
+    @Test
+    public void setupNativeIntegrationReturnsFalseForNullClient() {
+        assertEquals(false, this.database.setupNativeIntegration(null, this.credentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    @Test
+    public void setupNativeIntegrationReturnsFalseForNullCredentials() {
+        assertEquals(false, this.database.setupNativeIntegration(this.client, null));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    /** A submission URL without a JSON marker yields a null minidump URL. */
+    @Test
+    public void setupNativeIntegrationReturnsFalseForMissingSubmissionUrl() {
+        BacktraceCredentials credentialsWithoutMinidumpUrl =
+                new BacktraceCredentials("https://submit.backtrace.io/universe/token/dump");
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, credentialsWithoutMinidumpUrl));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    @Test
+    public void setupNativeIntegrationReturnsFalseWhenCrashpadPathCannotBeCreated() throws Exception {
+        // A regular file where the crashpad directory belongs makes directory creation impossible.
+        File crashpadObstruction = new File(this.databaseDirectory, "crashpad");
+        try (FileOutputStream output = new FileOutputStream(crashpadObstruction)) {
+            output.write(new byte[] {1});
+        }
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void nativeCommunicationSeamRejectsNull() {
+        assertThrows(IllegalArgumentException.class, () -> this.database.useNativeCommunication(null));
     }
 
     private static boolean hasEnvironmentValue(String[] environmentVariables, String key, String value) {

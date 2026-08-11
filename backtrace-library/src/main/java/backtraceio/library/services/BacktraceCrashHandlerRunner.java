@@ -13,7 +13,11 @@ public class BacktraceCrashHandlerRunner {
 
     public static void main(String[] args) {
         BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner();
-        runner.run(args, System.getenv());
+        // A handler process that could not capture the dump must exit nonzero so the failure is
+        // visible to Crashpad and in process diagnostics instead of looking like a success.
+        if (!runner.run(args, System.getenv())) {
+            System.exit(1);
+        }
     }
 
     public BacktraceCrashHandlerRunner() {
@@ -32,7 +36,7 @@ public class BacktraceCrashHandlerRunner {
         }
 
         String crashHandlerLibrary = environmentVariables.get(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
-        if (crashHandlerLibrary == null) {
+        if (crashHandlerLibrary == null || crashHandlerLibrary.trim().isEmpty()) {
             Log.e(
                     LOG_TAG,
                     String.format(
@@ -41,13 +45,21 @@ public class BacktraceCrashHandlerRunner {
             return false;
         }
 
-        loader.loadLibrary(crashHandlerLibrary);
+        // The library path was resolved in the application process; loading it here can still fail
+        // (for example an APK-backed path the linker of this process cannot use). Contain the
+        // failure so the handler exits with a diagnosable error instead of an uncaught throw.
+        try {
+            loader.loadLibrary(crashHandlerLibrary);
 
-        boolean result = crashHandler.handleCrash(args);
-        if (!result) {
-            Log.e(
-                    LOG_TAG,
-                    String.format("Cannot capture crash dump. Invocation parameters: %s", String.join(" ", args)));
+            boolean result = crashHandler.handleCrash(args);
+            if (!result) {
+                Log.e(
+                        LOG_TAG,
+                        String.format("Cannot capture crash dump. Invocation parameters: %s", String.join(" ", args)));
+                return false;
+            }
+        } catch (LinkageError | SecurityException failure) {
+            Log.e(LOG_TAG, "Cannot load the native crash-handler library: " + crashHandlerLibrary, failure);
             return false;
         }
 

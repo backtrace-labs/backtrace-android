@@ -53,7 +53,19 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Android lint
-        run: ./gradlew :backtrace-library:lintDebug :example-app:lintDebug
+        run: |
+          ./gradlew \
+            :backtrace-library:lintDebug \
+            :backtrace-library:lintRelease \
+            :example-app:lintDebug \
+            :example-app:lintRelease
+
+      # On pull_request the checkout is the refs/pull/N/merge commit, so HEAD^1 is exactly the
+      # base tip the merge was computed against (the payload's base.sha goes stale) and the
+      # existing fetch-depth: 2 already makes it available.
+      - name: Lint baseline scope
+        if: github.event_name == 'pull_request'
+        run: scripts/check_lint_baseline_scope.sh HEAD^1
 
       - name: Build and check
         run: ./gradlew assembleDebugAndroidTest build --profile
@@ -200,6 +212,18 @@ jobs:
       - name: Set up Gradle (caching)
         uses: gradle/actions/setup-gradle@v4
 
+      # Write only non-empty values: an unset secret must leave the BuildConfig field null so the
+      # integration test's credentials-not-configured skip stays reachable on secret-less forks.
+      - name: Write test credentials
+        env:
+          SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
+          CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
+          CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
+        run: |
+          if [ -n "$SUBMISSION_URL" ]; then echo BACKTRACE_SUBMISSION_URL=\"$SUBMISSION_URL\" >> ./local.properties; fi
+          if [ -n "$CORONER_URL" ]; then echo BACKTRACE_CORONER_URL=\"$CORONER_URL\" >> ./local.properties; fi
+          if [ -n "$CORONER_TOKEN" ]; then echo BACKTRACE_CORONER_TOKEN=\"$CORONER_TOKEN\" >> ./local.properties; fi
+
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
@@ -232,10 +256,22 @@ jobs:
 
       # NOTE: android-emulator-runner executes each script line as an independent `sh -c`, so the
       # whole flow lives in one committed script invoked as a single line.
-      - name: Split-install resolver test
+      - name: Split-install resolver and handler tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
           arch: x86_64
           target: google_apis
           script: ./scripts/run_split_install_test.sh
+
+      - name: Upload split-install diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aab-split-install-diagnostics
+          path: |
+            installed-package-paths.txt
+            split-resolver-output.txt
+            split-native-output.txt
+            split-install-logcat.txt
+          if-no-files-found: ignore

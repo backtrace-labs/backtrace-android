@@ -23,4 +23,15 @@ public final class CrashHandlerConfigurationTestFactory {
     public static CrashHandlerConfiguration withoutLinkerPathAndThrowingAbiProvider() {
         return withThrowingAbiProvider(null);
     }
+
+    /**
+     * Configuration whose linker lookup returns {@code loadedLibraryPath} and whose ABI provider
+     * throws a {@link LinkageError}, as an unresolvable platform API reference would on an old
+     * runtime.
+     */
+    public static CrashHandlerConfiguration withLinkageErrorAbiProvider(final String loadedLibraryPath) {
+        return new CrashHandlerConfiguration(() -> loadedLibraryPath, () -> {
+            throw new NoSuchMethodError("android.os.Process.is64Bit");
+        });
+    }
 }

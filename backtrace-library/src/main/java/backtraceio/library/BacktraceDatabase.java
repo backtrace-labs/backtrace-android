@@ -157,6 +157,9 @@ public class BacktraceDatabase implements Database {
      * Overrides default native communication bridge
      */
     public void useNativeCommunication(NativeCommunication nativeCommunication) {
+        if (nativeCommunication == null) {
+            throw new IllegalArgumentException("NativeCommunication cannot be null");
+        }
         this.nativeCommunication = nativeCommunication;
     }
 
@@ -165,6 +168,9 @@ public class BacktraceDatabase implements Database {
      * {@link #setupNativeIntegration(BacktraceBase, BacktraceCredentials, boolean, UnwindingMode)}.
      */
     void useCrashHandlerConfiguration(CrashHandlerConfiguration crashHandlerConfiguration) {
+        if (crashHandlerConfiguration == null) {
+            throw new IllegalArgumentException("CrashHandlerConfiguration cannot be null");
+        }
         this.crashHandlerConfiguration = crashHandlerConfiguration;
     }
 
@@ -186,49 +192,66 @@ public class BacktraceDatabase implements Database {
             return false;
         }
 
+        // Validate public inputs before performing any side effects; enabling the optional native
+        // integration must never terminate the host application.
+        if (client == null) {
+            BacktraceLogger.e(LOG_TAG, "Native integration requires a Backtrace client.");
+            this._enabledNativeIntegration = false;
+            return false;
+        }
+        if (credentials == null || credentials.getMinidumpSubmissionUrl() == null) {
+            BacktraceLogger.e(LOG_TAG, "Native integration requires a minidump submission URL.");
+            this._enabledNativeIntegration = false;
+            return false;
+        }
+        if (nativeCommunication == null || crashHandlerConfiguration == null) {
+            BacktraceLogger.e(LOG_TAG, "Native integration dependencies are unavailable.");
+            this._enabledNativeIntegration = false;
+            return false;
+        }
+
         if (!this.crashHandlerConfiguration.isSupportedAbi()) {
             return false;
         }
 
         final long startSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
-        String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
-        if (minidumpSubmissionUrl == null) {
-            return false;
-        }
+        final String minidumpSubmissionUrl =
+                credentials.getMinidumpSubmissionUrl().toString();
 
-        // Create the crashpad directory if it doesn't exist
-        String crashpadDatabaseDirectory = this.crashHandlerConfiguration.useCrashpadDirectory(
-                getSettings().getDatabasePath());
-
-        // setup default native attributes
-        BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
-        crashpadAttributes.attributes.put(
-                BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.CrashAttributeType);
-        String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
-        String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
-
-        // Leave room for breadcrumbs attachment path too
-        List<String> attachmentList = new ArrayList<>(client.getAttachments());
-        attachmentList.add(this.breadcrumbs.getBreadcrumbLogPath());
-        String[] attachmentPaths = attachmentList.toArray(new String[0]);
-
-        ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
-
-        // Enabling the optional native integration must never terminate the host application:
-        // resolution and bridge failures disable native crash capture only, and managed crash
-        // reporting stays operational.
+        // Preparation failures (crashpad directory, attributes, attachments, path resolution)
+        // disable native crash capture only; managed crash reporting stays operational.
+        final String crashpadDatabaseDirectory;
+        final String[] keys;
+        final String[] values;
+        final String[] attachmentPaths;
         final String[] environmentVariables;
         try {
+            crashpadDatabaseDirectory = this.crashHandlerConfiguration.useCrashpadDirectory(
+                    getSettings().getDatabasePath());
+
+            // setup default native attributes
+            BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
+            crashpadAttributes.attributes.put(
+                    BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.CrashAttributeType);
+            keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
+            values = crashpadAttributes.attributes.values().toArray(new String[0]);
+
+            // Leave room for breadcrumbs attachment path too
+            List<String> attachmentList = new ArrayList<>(client.getAttachments());
+            attachmentList.add(this.breadcrumbs.getBreadcrumbLogPath());
+            attachmentPaths = attachmentList.toArray(new String[0]);
+
+            ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
             environmentVariables = this.crashHandlerConfiguration
                     .getCrashHandlerEnvironmentVariables(applicationInfo)
                     .toArray(new String[0]);
-        } catch (RuntimeException exception) {
+        } catch (RuntimeException | LinkageError failure) {
             this._enabledNativeIntegration = false;
             BacktraceLogger.e(
                     LOG_TAG,
-                    "Native integration was not enabled because the crash-handler library path"
-                            + " could not be resolved.",
-                    exception);
+                    "Native integration was not enabled because the crash-handler environment"
+                            + " could not be prepared.",
+                    failure);
             return false;
         }
 
@@ -248,6 +271,10 @@ public class BacktraceDatabase implements Database {
                     "Native integration was not enabled because the native initialization bridge" + " is unavailable.",
                     error);
             return false;
+        }
+
+        if (!_enabledNativeIntegration) {
+            BacktraceLogger.e(LOG_TAG, "Native integration was not enabled by the native initialization bridge.");
         }
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {

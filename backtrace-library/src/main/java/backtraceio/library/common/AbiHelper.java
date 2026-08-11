@@ -2,6 +2,7 @@ package backtraceio.library.common;
 
 import android.os.Build;
 import android.os.Process;
+import androidx.annotation.RequiresApi;
 
 public class AbiHelper {
     /**
@@ -33,11 +34,25 @@ public class AbiHelper {
         throw new IllegalStateException("Unable to determine the current process ABI");
     }
 
+    /**
+     * {@link Process#is64Bit()} exists only from API 23. The call lives in {@link Api23Impl} so
+     * the method reference is confined to a class that is never loaded or verified on API 21-22,
+     * mirroring the {@code ApplicationInfo.splitNames} isolation.
+     */
     private static String[] getProcessBitnessAbis() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return null;
         }
-        return Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
+        return Api23Impl.getProcessBitnessAbis();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private static final class Api23Impl {
+        private Api23Impl() {}
+
+        static String[] getProcessBitnessAbis() {
+            return Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
+        }
     }
 
     private static String firstValidAbi(String[] abis) {

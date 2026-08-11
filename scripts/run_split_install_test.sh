@@ -20,6 +20,10 @@ for artifact in "$bundletool_jar" "$bundle" "$test_apk"; do
     fi
 done
 
+# The emulator dies with the CI step, so capture logcat here while it is still reachable; a child
+# crash-handler System.load failure is only diagnosable from this log.
+trap 'adb logcat -d > split-install-logcat.txt 2>/dev/null || true' EXIT
+
 # Device-specific APKs must be signed or the install fails with INSTALL_PARSE_FAILED_NO_CERTIFICATES,
 # and the certificate must match the instrumentation APK's, so sign with the same Android debug
 # keystore Gradle uses, creating it first on fresh CI runners where it does not exist yet.
@@ -58,16 +62,43 @@ cp "$test_apk" "$signed_test_apk"
 
 adb install -r "$signed_test_apk"
 
-adb shell am instrument -w -r \
-    -e class backtraceio.backtraceio.SplitInstallNativeResolutionTest \
-    backtraceio.backtraceio.test/androidx.test.runner.AndroidJUnitRunner | tee instrument-output.txt
+# Each test must PASS (status code 0), not be skipped by its assumptions (-4) or fail (-1/-2);
+# am instrument itself always exits 0, so gate on the raw status stream and the test count.
+run_instrumentation_test() {
+    local selector="$1"
+    local output="$2"
+    local expected_tests="$3"
 
-# The test must PASS (status code 0), not be skipped by its split-install assumptions (-4) or
-# fail (-1/-2); am instrument itself always exits 0, so gate on the raw status stream.
-grep -q "INSTRUMENTATION_STATUS_CODE: 0" instrument-output.txt
-if grep -qE "INSTRUMENTATION_STATUS_CODE: -[0-9]" instrument-output.txt; then
-    echo "Split-install resolver test failed or was skipped; see instrument-output.txt" >&2
-    exit 1
+    adb shell am instrument -w -r \
+        -e class "$selector" \
+        backtraceio.backtraceio.test/androidx.test.runner.AndroidJUnitRunner | tee "$output"
+
+    grep -q "INSTRUMENTATION_STATUS_CODE: 0" "$output"
+    if grep -qE "INSTRUMENTATION_STATUS_CODE: -[0-9]" "$output"; then
+        echo "Instrumentation failed or was skipped: $selector (see $output)" >&2
+        return 1
+    fi
+    grep -q "OK (${expected_tests} test" "$output"
+}
+
+run_instrumentation_test \
+    "backtraceio.backtraceio.SplitInstallNativeResolutionTest" \
+    "split-resolver-output.txt" \
+    1
+
+# The handler-ingestion test needs working Backtrace test credentials in BuildConfig. CI provides
+# them and must gate on the result. Local runs may carry stale or absent credentials, so with
+# REQUIRE_INGESTION=0 the handler test runs informationally only and the resolver test remains the
+# hard gate.
+if [ "${REQUIRE_INGESTION:-1}" = "1" ]; then
+    run_instrumentation_test \
+        "backtraceio.backtraceio.SplitInstallNativeIntegrationTest" \
+        "split-native-output.txt" \
+        1
+    echo "Split-install qualification passed: resolver, handler load, and report ingestion verified."
+else
+    adb shell am instrument -w -r \
+        -e class backtraceio.backtraceio.SplitInstallNativeIntegrationTest \
+        backtraceio.backtraceio.test/androidx.test.runner.AndroidJUnitRunner | tee split-native-output.txt || true
+    echo "Split-install resolver qualification passed (handler ingestion not gated in this run)."
 fi
-
-echo "Split-install qualification passed: resolver returned the installed ABI configuration split."

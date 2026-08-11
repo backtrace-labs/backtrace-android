@@ -21,7 +21,7 @@ public class CrashHandlerConfiguration {
 
     public static final String BACKTRACE_CRASH_HANDLER = "BACKTRACE_CRASH_HANDLER";
     public static final Set<String> UNSUPPORTED_ABIS = new HashSet<String>(Arrays.asList(new String[] {"x86"}));
-    private static final String CRASHPAD_DIRECTORY_PATH = "/crashpad";
+    private static final String CRASHPAD_DIRECTORY_NAME = "crashpad";
     private static final String APK_LIBRARY_SEPARATOR = "!/";
     private static final String BACKTRACE_NATIVE_LIBRARY_NAME = "libbacktrace-native.so";
 
@@ -53,10 +53,11 @@ public class CrashHandlerConfiguration {
         final String abi;
         try {
             abi = abiProvider.getCurrentAbi();
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException | LinkageError ignored) {
             // The unsupported-ABI policy is separate from path resolution: an undeterminable
             // process ABI must not block a module the linker has already loaded, so an ABI that
-            // cannot be determined is treated as not known-unsupported.
+            // cannot be determined is treated as not known-unsupported. LinkageError covers
+            // platform API references that do not resolve on old runtimes.
             return true;
         }
         return isSupportedAbi(abi);
@@ -116,14 +117,25 @@ public class CrashHandlerConfiguration {
         return environmentVariables;
     }
 
+    /**
+     * Returns the Crashpad database directory under {@code databaseDirectory}, creating it when
+     * necessary. Fails deterministically instead of returning a path that Crashpad cannot use:
+     * callers contain the failure and disable native integration only.
+     */
     public String useCrashpadDirectory(String databaseDirectory) {
-        String databasePath = databaseDirectory + CRASHPAD_DIRECTORY_PATH;
-        File crashHandlerDir = new File(databasePath);
-        // Create the crashpad directory if it doesn't exist
-        if (!crashHandlerDir.exists()) {
-            crashHandlerDir.mkdir();
+        if (isNullOrEmpty(databaseDirectory)) {
+            throw new IllegalArgumentException("Database directory cannot be null or empty");
         }
-        return databasePath;
+
+        File crashpadDirectory = new File(databaseDirectory, CRASHPAD_DIRECTORY_NAME);
+        if (crashpadDirectory.exists()) {
+            if (!crashpadDirectory.isDirectory()) {
+                throw new IllegalStateException("Crashpad path is not a directory: " + crashpadDirectory);
+            }
+        } else if (!crashpadDirectory.mkdirs() && !crashpadDirectory.isDirectory()) {
+            throw new IllegalStateException("Unable to create Crashpad directory: " + crashpadDirectory);
+        }
+        return crashpadDirectory.getAbsolutePath();
     }
 
     /**
@@ -286,10 +298,16 @@ public class CrashHandlerConfiguration {
      */
     private static String findAbiSplitPath(ApplicationInfo appInfo, String arch) {
         final String[] splitNames = getSplitNames(appInfo);
+        // Loose filename-token matching represents installs without split-name metadata
+        // (pre-API-26). It is decided globally: when any split-name metadata exists, a candidate
+        // without an aligned name (for example one beyond a truncated splitNames array) must not
+        // regain the low-confidence score that named candidates correctly lose.
+        final boolean allowLooseFilenameMatching = splitNames == null;
 
         final Map<String, Integer> candidates = new LinkedHashMap<>();
-        collectAbiSplitCandidates(candidates, appInfo.splitSourceDirs, splitNames, arch);
-        collectAbiSplitCandidates(candidates, appInfo.splitPublicSourceDirs, splitNames, arch);
+        collectAbiSplitCandidates(candidates, appInfo.splitSourceDirs, splitNames, arch, allowLooseFilenameMatching);
+        collectAbiSplitCandidates(
+                candidates, appInfo.splitPublicSourceDirs, splitNames, arch, allowLooseFilenameMatching);
 
         String bestPath = null;
         int bestScore = 0;
@@ -308,7 +326,11 @@ public class CrashHandlerConfiguration {
     }
 
     private static void collectAbiSplitCandidates(
-            Map<String, Integer> candidates, String[] splitPaths, String[] splitNames, String arch) {
+            Map<String, Integer> candidates,
+            String[] splitPaths,
+            String[] splitNames,
+            String arch,
+            boolean allowLooseFilenameMatching) {
         if (splitPaths == null) {
             return;
         }
@@ -320,7 +342,7 @@ public class CrashHandlerConfiguration {
             }
 
             String splitName = splitNames != null && index < splitNames.length ? splitNames[index] : null;
-            int score = getAbiMatchScore(splitPath, splitName, arch);
+            int score = getAbiMatchScore(splitPath, splitName, arch, allowLooseFilenameMatching);
             if (score <= 0) {
                 continue;
             }
@@ -362,11 +384,12 @@ public class CrashHandlerConfiguration {
     /**
      * Match confidence for one split candidate. An exact {@code config.<abi>} split name is the
      * strongest evidence, then the standard {@code split_config.<abi>.apk} filename. A loose ABI
-     * token in the filename is accepted only when the install carries no split name for the
-     * candidate (pre-API-26 metadata): a candidate that has a split name must match exactly or not
-     * at all, so a dynamic-feature ABI split is never mistaken for the base configuration split.
+     * token in the filename is accepted only when split-name metadata is globally unavailable
+     * (pre-API-26 installs): a candidate that has a split name must match exactly or not at all,
+     * so a dynamic-feature ABI split is never mistaken for the base configuration split.
      */
-    private static int getAbiMatchScore(String splitPath, String splitName, String arch) {
+    private static int getAbiMatchScore(
+            String splitPath, String splitName, String arch, boolean allowLooseFilenameMatching) {
         if (isNullOrEmpty(arch)) {
             return 0;
         }
@@ -381,7 +404,7 @@ public class CrashHandlerConfiguration {
         if (("split_config." + normalizedArch + ".apk").equals(normalizedFileName)) {
             return 200;
         }
-        if (normalizedSplitName == null && containsAbiToken(normalizedFileName, arch)) {
+        if (allowLooseFilenameMatching && normalizedSplitName == null && containsAbiToken(normalizedFileName, arch)) {
             return 100;
         }
         return 0;
