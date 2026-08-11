@@ -287,7 +287,8 @@ public class BacktraceBase implements Client {
      * Do not call it concurrently with
      * {@link #disableNativeIntegration()}.
      *
-     * <p>The handler library is located using the path already selected by Android's native linker, the host APK is never opened or parsed.
+     * <p>The handler library is located using the path already selected by Android's native linker;
+     * Backtrace does not open or parse the host APK while resolving the crash-handler library.
      */
     public void enableNativeIntegration() {
         this.database.setupNativeIntegration(this, this.credentials);

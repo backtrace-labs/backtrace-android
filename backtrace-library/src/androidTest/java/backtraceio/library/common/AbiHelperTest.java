@@ -27,7 +27,8 @@ public class AbiHelperTest {
 
     /**
      * The resolved ABI must describe the bitness of <em>this process</em>, not the device's preferred ABI.
-     * On a 64-bit-capable device running a 32-bit process, {@code Build.SUPPORTED_ABIS[0]} is 64-bit while the loaded native libraries are 32-bit.
+     * {@code Build.SUPPORTED_ABIS} is ordered by device preference and does not necessarily identify the current process,
+     * so in a 32-bit process on a 64-bit-capable device its first entry can name an ABI the process cannot load.
      */
     @Test
     public void currentAbiMatchesProcessBitnessRatherThanDevicePreferredAbi() {

@@ -1,12 +1,13 @@
 package backtraceio.library.common;
 
 import android.os.Build;
+import android.os.Process;
 
 public class AbiHelper {
     /**
      * Returns the primary ABI of the current application process.
      *
-     * <p>{@link Build#SUPPORTED_ABIS} is ordered for the <em>device</em> and its first entry is 64-bit on any 64-bit-capable device, even when the current process is 32-bit.
+     * <p>{@link Build#SUPPORTED_ABIS} is ordered by device preference and does not necessarily identify the ABI of the current process.
      * {@link Build#CPU_ABI} is adjusted by Android for the bitness of the running process, so it is the correct source for a value used to locate this process's native libraries.
      */
     @SuppressWarnings("deprecation")
@@ -16,17 +17,39 @@ public class AbiHelper {
             return processAbi;
         }
 
-        // Defensive fallback for malformed vendor builds that leave CPU_ABI empty.
-        if (Build.SUPPORTED_ABIS != null) {
-            for (String supportedAbi : Build.SUPPORTED_ABIS) {
-                String normalizedAbi = normalize(supportedAbi);
-                if (normalizedAbi != null) {
-                    return normalizedAbi;
-                }
-            }
+        // Defensive fallbacks for malformed vendor builds that leave CPU_ABI empty.
+        // Prefer the ABI list matching the current process bitness so the fallback cannot reintroduce a device-versus-process mismatch, then fall back to the device-ordered list.
+        String bitnessAbi = firstValidAbi(getProcessBitnessAbis());
+        if (bitnessAbi != null) {
+            return bitnessAbi;
+        }
+
+        String supportedAbi = firstValidAbi(Build.SUPPORTED_ABIS);
+        if (supportedAbi != null) {
+            return supportedAbi;
         }
 
         throw new IllegalStateException("Unable to determine the current process ABI");
+    }
+
+    private static String[] getProcessBitnessAbis() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return null;
+        }
+        return Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
+    }
+
+    private static String firstValidAbi(String[] abis) {
+        if (abis == null) {
+            return null;
+        }
+        for (String abi : abis) {
+            String normalizedAbi = normalize(abi);
+            if (normalizedAbi != null) {
+                return normalizedAbi;
+            }
+        }
+        return null;
     }
 
     private static String normalize(String abi) {
@@ -34,6 +57,9 @@ public class AbiHelper {
             return null;
         }
         String normalizedAbi = abi.trim();
-        return normalizedAbi.isEmpty() ? null : normalizedAbi;
+        if (normalizedAbi.isEmpty() || Build.UNKNOWN.equals(normalizedAbi)) {
+            return null;
+        }
+        return normalizedAbi;
     }
 }

@@ -22,7 +22,7 @@ if [ "$missing" -ne 0 ]; then
     exit 1
 fi
 
-forbidden='java\.util\.zip\.(ZipFile|ZipEntry)|new[[:space:]]+(java\.util\.zip\.)?ZipFile|apkContains'
+forbidden='java\.util\.zip\.(ZipFile|ZipEntry|ZipInputStream)|java\.util\.jar\.(JarFile|JarInputStream)|new[[:space:]]+(java\.util\.zip\.)?(ZipFile|ZipInputStream)|new[[:space:]]+(java\.util\.jar\.)?(JarFile|JarInputStream)|apkContains'
 
 set +e
 matches=$(grep -RInE --include='*.java' "$forbidden" "${roots[@]}")

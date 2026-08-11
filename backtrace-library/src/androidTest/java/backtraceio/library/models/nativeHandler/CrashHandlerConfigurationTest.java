@@ -2,12 +2,14 @@ package backtraceio.library.models.nativeHandler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import androidx.annotation.RequiresApi;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import backtraceio.library.base.NativeLibraryLoader;
@@ -304,6 +306,40 @@ public class CrashHandlerConfigurationTest {
         assertTrue("resolved container does not exist: " + resolvedPath, container.isFile());
     }
 
+    /**
+     * Proves the production provider obtained the path from {@code dladdr()} rather than a metadata fallback.
+     * Every piece of application metadata is deliberately fake, so the only way the resolver can return an existing container is through the live JNI lookup.
+     * A missing JNI symbol or a null {@code dli_fname} would fall through to the fabricated base-APK path and fail the inequality assertion.
+     */
+    @Test
+    public void productionProviderUsesTheLoadedModulePath() throws Exception {
+        NativeLibraryLoader.load();
+
+        File root = createTemporaryDirectory("jni-path-proof");
+        File fakeBaseApk = createPlainFile(root, "fake-base.apk");
+
+        ApplicationInfo fakeApplicationInfo = new ApplicationInfo();
+        fakeApplicationInfo.sourceDir = fakeBaseApk.getAbsolutePath();
+        fakeApplicationInfo.publicSourceDir = fakeBaseApk.getAbsolutePath();
+        fakeApplicationInfo.nativeLibraryDir = null;
+        fakeApplicationInfo.splitSourceDirs = null;
+        fakeApplicationInfo.splitPublicSourceDirs = null;
+
+        String resolvedPath = getEnvironmentValue(
+                new CrashHandlerConfiguration().getCrashHandlerEnvironmentVariables(fakeApplicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+
+        String fallbackPath = fakeBaseApk.getAbsolutePath() + "!/lib/" + AbiHelper.getCurrentAbi() + "/" + LIBRARY_NAME;
+        assertNotEquals("Resolver used metadata fallback instead of dladdr", fallbackPath, resolvedPath);
+
+        assertNotNull(resolvedPath);
+        assertTrue(resolvedPath, resolvedPath.endsWith(LIBRARY_NAME));
+
+        int separatorIndex = resolvedPath.indexOf("!/");
+        File container = new File(separatorIndex >= 0 ? resolvedPath.substring(0, separatorIndex) : resolvedPath);
+        assertTrue("Loaded module container does not exist: " + resolvedPath, container.isFile());
+    }
+
     @Test
     public void ignoresLanguageAndDensitySplitsAndFallsBackToBase() throws Exception {
         File root = createTemporaryDirectory("base-fallback");
@@ -336,12 +372,21 @@ public class CrashHandlerConfigurationTest {
     }
 
     /**
-     * {@link ApplicationInfo#splitNames} exists only from API 26, so tests that need it are skipped
-     * below that level rather than failing on a field that is genuinely absent.
+     * {@link ApplicationInfo#splitNames} exists only from API 26, so tests that need it are skipped below that level rather than failing on a field that is genuinely absent.
+     * The field write itself lives in {@link Api26TestImpl}, mirroring the production isolation, so this test class carries no direct {@code splitNames} reference in its bytecode and can load on API 21-25.
      */
     private static void setSplitNames(ApplicationInfo applicationInfo, String[] splitNames) {
         assumeTrue("ApplicationInfo.splitNames requires API 26", Build.VERSION.SDK_INT >= Build.VERSION_CODES.O);
-        applicationInfo.splitNames = splitNames;
+        Api26TestImpl.setSplitNames(applicationInfo, splitNames);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static final class Api26TestImpl {
+        private Api26TestImpl() {}
+
+        static void setSplitNames(ApplicationInfo applicationInfo, String[] splitNames) {
+            applicationInfo.splitNames = splitNames;
+        }
     }
 
     private static ApplicationInfo createApplicationInfo(File baseApk, File nativeLibraryDirectory) {
