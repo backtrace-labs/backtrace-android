@@ -28,10 +28,11 @@ android {
         }
     }
 
-    // Needed until we migrate to AndroidX
     android {
-        lintOptions {
-            abortOnError false
+        lint {
+            abortOnError = true
+            checkReleaseBuilds = true
+            baseline = file('lint-baseline.xml')
         }
         defaultConfig {
             buildConfigField ("String", "BACKTRACE_SUBMISSION_URL", getProperty("BACKTRACE_SUBMISSION_URL", "null"))

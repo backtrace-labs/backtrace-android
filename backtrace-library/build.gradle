@@ -67,9 +67,10 @@ android {
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
 
-    // Needed until we migrate to AndroidX
-    lintOptions {
-        abortOnError false
+    lint {
+        abortOnError = true
+        checkReleaseBuilds = true
+        baseline = file('lint-baseline.xml')
     }
 }
 

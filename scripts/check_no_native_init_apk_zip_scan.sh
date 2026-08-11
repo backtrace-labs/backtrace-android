@@ -8,6 +8,7 @@ roots=(
     "backtrace-library/src/main/java/backtraceio/library/base"
     "backtrace-library/src/main/java/backtraceio/library/common/AbiHelper.java"
     "backtrace-library/src/main/java/backtraceio/library/models/nativeHandler"
+    "backtrace-library/src/main/java/backtraceio/library/nativeCalls"
     "backtrace-library/src/main/java/backtraceio/library/services/BacktraceCrashHandlerRunner.java"
 )
 
