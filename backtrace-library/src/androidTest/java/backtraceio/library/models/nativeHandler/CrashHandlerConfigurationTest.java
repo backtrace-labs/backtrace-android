@@ -263,6 +263,103 @@ public class CrashHandlerConfigurationTest {
                 configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
     }
 
+    /** A loose private-array match must never outrank an exact match in the public array. */
+    @Test
+    public void exactPublicSplitOutranksLoosePrivateSplit() throws Exception {
+        File root = createTemporaryDirectory("public-exact-wins");
+        File baseApk = createPlainFile(root, "base.apk");
+        File looseSplit = createPlainFile(root, "feature_video.arm64_v8a.apk");
+        File exactSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {looseSplit.getAbsolutePath()};
+        applicationInfo.splitPublicSourceDirs = new String[] {exactSplit.getAbsolutePath()};
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                exactSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /** The same split listed in both metadata arrays is one candidate, not an ambiguous pair. */
+    @Test
+    public void duplicatePrivateAndPublicSplitIsDeduplicated() throws Exception {
+        File root = createTemporaryDirectory("duplicate-split");
+        File baseApk = createPlainFile(root, "base.apk");
+        File abiSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {abiSplit.getAbsolutePath()};
+        applicationInfo.splitPublicSourceDirs = new String[] {abiSplit.getAbsolutePath()};
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                abiSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /**
+     * Two distinct loose candidates cannot be told apart without opening the archives, so neither
+     * is guessed by array order; resolution falls back to the base APK.
+     */
+    @Test
+    public void ambiguousLooseAbiSplitsAreRejected() throws Exception {
+        File root = createTemporaryDirectory("ambiguous-loose-splits");
+        File baseApk = createPlainFile(root, "base.apk");
+        File firstLooseSplit = createPlainFile(root, "feature_video.arm64_v8a.apk");
+        File secondLooseSplit = createPlainFile(root, "feature_audio.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs =
+                new String[] {firstLooseSplit.getAbsolutePath(), secondLooseSplit.getAbsolutePath()};
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                baseApk.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /**
+     * A candidate that carries a split name must match exactly or not at all: a dynamic-feature ABI
+     * split is never treated as the base configuration split, even though its name and filename
+     * contain the ABI token.
+     */
+    @Test
+    public void dynamicFeatureAbiSplitIsNotSelectedAsBaseConfig() throws Exception {
+        File root = createTemporaryDirectory("feature-split-rejected");
+        File baseApk = createPlainFile(root, "base.apk");
+        File featureSplit = createPlainFile(root, "split_feature_video.config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {featureSplit.getAbsolutePath()};
+        setSplitNames(applicationInfo, new String[] {"feature_video.config.arm64_v8a"});
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                baseApk.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
+    /** The exact base configuration split wins regardless of which metadata array carries it. */
+    @Test
+    public void exactBaseConfigWinsAcrossBothMetadataArrays() throws Exception {
+        File root = createTemporaryDirectory("exact-across-arrays");
+        File baseApk = createPlainFile(root, "base.apk");
+        File privateLooseSplit = createPlainFile(root, "feature_ui.arm64_v8a.apk");
+        File publicLooseSplit = createPlainFile(root, "feature_net.arm64_v8a.apk");
+        File exactSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs =
+                new String[] {privateLooseSplit.getAbsolutePath(), exactSplit.getAbsolutePath()};
+        applicationInfo.splitPublicSourceDirs = new String[] {publicLooseSplit.getAbsolutePath()};
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertEquals(
+                exactSplit.getAbsolutePath() + "!/lib/arm64-v8a/" + LIBRARY_NAME,
+                configuration.resolveBacktraceNativeLibraryPath(applicationInfo, "arm64-v8a", null));
+    }
+
     /**
      * Reproduces the pre-API-26 code path, where {@code splitNames} is unavailable and matching must
      * fall back to the ABI token carried by the split filename.

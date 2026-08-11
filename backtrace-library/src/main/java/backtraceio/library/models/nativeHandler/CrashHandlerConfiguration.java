@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -275,14 +276,66 @@ public class CrashHandlerConfiguration {
         return extractedLibrary.isFile() ? extractedLibrary.getAbsolutePath() : null;
     }
 
+    /**
+     * Selects the ABI split across {@code splitSourceDirs} and {@code splitPublicSourceDirs}
+     * together, deduplicated by path and compared globally by match confidence, so a loose match in
+     * one array can never outrank an exact base configuration split in the other. Two distinct
+     * candidates of equal confidence cannot be told apart without opening the archives, so an
+     * ambiguous result returns {@code null} and resolution falls through to the historical base-APK
+     * fallback instead of picking by array order.
+     */
     private static String findAbiSplitPath(ApplicationInfo appInfo, String arch) {
         final String[] splitNames = getSplitNames(appInfo);
 
-        String privateSplit = findAbiSplitPath(appInfo.splitSourceDirs, splitNames, arch);
-        if (privateSplit != null) {
-            return privateSplit;
+        final Map<String, Integer> candidates = new LinkedHashMap<>();
+        collectAbiSplitCandidates(candidates, appInfo.splitSourceDirs, splitNames, arch);
+        collectAbiSplitCandidates(candidates, appInfo.splitPublicSourceDirs, splitNames, arch);
+
+        String bestPath = null;
+        int bestScore = 0;
+        boolean ambiguous = false;
+        for (Map.Entry<String, Integer> candidate : candidates.entrySet()) {
+            int score = candidate.getValue();
+            if (score > bestScore) {
+                bestPath = candidate.getKey();
+                bestScore = score;
+                ambiguous = false;
+            } else if (score == bestScore && score > 0) {
+                ambiguous = true;
+            }
         }
-        return findAbiSplitPath(appInfo.splitPublicSourceDirs, splitNames, arch);
+        return ambiguous ? null : bestPath;
+    }
+
+    private static void collectAbiSplitCandidates(
+            Map<String, Integer> candidates, String[] splitPaths, String[] splitNames, String arch) {
+        if (splitPaths == null) {
+            return;
+        }
+
+        for (int index = 0; index < splitPaths.length; index++) {
+            String splitPath = splitPaths[index];
+            if (isNullOrEmpty(splitPath)) {
+                continue;
+            }
+
+            String splitName = splitNames != null && index < splitNames.length ? splitNames[index] : null;
+            int score = getAbiMatchScore(splitPath, splitName, arch);
+            if (score <= 0) {
+                continue;
+            }
+
+            File splitFile = new File(splitPath);
+            if (!splitFile.isAbsolute() || !splitFile.isFile()) {
+                continue;
+            }
+
+            String candidatePath = splitFile.getAbsolutePath();
+            Integer existingScore = candidates.get(candidatePath);
+            if (existingScore == null || existingScore < score) {
+                candidates.put(candidatePath, score);
+            }
+        }
     }
 
     /**
@@ -307,38 +360,12 @@ public class CrashHandlerConfiguration {
     }
 
     /**
-     * Selects the best ABI-matching split, preferring an exact base configuration split over a loose token match
-     * so that dynamic-feature ABI splits cannot win on array ordering alone.
+     * Match confidence for one split candidate. An exact {@code config.<abi>} split name is the
+     * strongest evidence, then the standard {@code split_config.<abi>.apk} filename. A loose ABI
+     * token in the filename is accepted only when the install carries no split name for the
+     * candidate (pre-API-26 metadata): a candidate that has a split name must match exactly or not
+     * at all, so a dynamic-feature ABI split is never mistaken for the base configuration split.
      */
-    private static String findAbiSplitPath(String[] splitPaths, String[] splitNames, String arch) {
-        if (splitPaths == null) {
-            return null;
-        }
-
-        String bestSplitPath = null;
-        int bestScore = 0;
-
-        for (int index = 0; index < splitPaths.length; index++) {
-            String splitPath = splitPaths[index];
-            if (isNullOrEmpty(splitPath)) {
-                continue;
-            }
-
-            String splitName = splitNames != null && index < splitNames.length ? splitNames[index] : null;
-            int score = getAbiMatchScore(splitPath, splitName, arch);
-            if (score <= bestScore) {
-                continue;
-            }
-
-            File splitFile = new File(splitPath);
-            if (splitFile.isAbsolute() && splitFile.isFile()) {
-                bestSplitPath = splitFile.getAbsolutePath();
-                bestScore = score;
-            }
-        }
-        return bestSplitPath;
-    }
-
     private static int getAbiMatchScore(String splitPath, String splitName, String arch) {
         if (isNullOrEmpty(arch)) {
             return 0;
@@ -349,13 +376,13 @@ public class CrashHandlerConfiguration {
         String normalizedFileName = normalizeAbiToken(new File(splitPath).getName());
 
         if (("config." + normalizedArch).equals(normalizedSplitName)) {
-            return 3;
+            return 300;
         }
         if (("split_config." + normalizedArch + ".apk").equals(normalizedFileName)) {
-            return 2;
+            return 200;
         }
-        if (containsAbiToken(splitName, arch) || containsAbiToken(new File(splitPath).getName(), arch)) {
-            return 1;
+        if (normalizedSplitName == null && containsAbiToken(normalizedFileName, arch)) {
+            return 100;
         }
         return 0;
     }
