@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'com.gladed.androidgitversion' version '0.4.14'
-    id "com.vanniktech.maven.publish" version "0.34.0" apply true
+    id "com.vanniktech.maven.publish" version "0.37.0" apply true
 }
 
 androidGitVersion {
@@ -10,16 +10,16 @@ androidGitVersion {
     format '%tag%%-count%%-commit%%-branch%'
 }
 
+def libVersion = androidGitVersion.name()
+
 android {
-    namespace "backtraceio.library"
+    namespace = "backtraceio.library"
+    compileSdk = 36
     defaultConfig {
-        minSdkVersion 21
-        compileSdk 36
-        targetSdkVersion 36
-        ndkVersion '27.3.13750724'
-        versionName androidGitVersion.name()
+        minSdk = 21
+        ndkVersion = '27.3.13750724'
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
             cmake {
@@ -39,12 +39,13 @@ android {
     }
 
     buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
 
@@ -64,14 +65,18 @@ android {
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
     lint {
-        abortOnError false
+        abortOnError = false
+        targetSdk = 36
+    }
+    testOptions {
+        targetSdk = 36
     }
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentralPortal()
     signAllPublications()
-    coordinates(GROUP, POM_NAME, android.defaultConfig.versionName)
+    coordinates(GROUP, POM_NAME, libVersion)
 
     pom {
         name = POM_NAME

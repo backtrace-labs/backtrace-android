@@ -1,22 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "backtraceio.backtraceio"
+    namespace = "backtraceio.backtraceio"
+    compileSdk = 36
     defaultConfig {
-        compileSdk 36
-        applicationId "backtraceio.backtraceio"
-        minSdkVersion 21
-        targetSdkVersion 36
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        applicationId = "backtraceio.backtraceio"
+        minSdk = 21
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -29,18 +29,16 @@ android {
     }
 
     // Needed until we migrate to AndroidX
-    android {
-        lintOptions {
-            abortOnError false
-        }
-        defaultConfig {
-            buildConfigField ("String", "BACKTRACE_SUBMISSION_URL", getProperty("BACKTRACE_SUBMISSION_URL", "null"))
-            buildConfigField ("String", "BACKTRACE_CORONER_URL", getProperty("BACKTRACE_CORONER_URL", "null"))
-            buildConfigField ("String", "BACKTRACE_CORONER_TOKEN", getProperty("BACKTRACE_CORONER_TOKEN", "null"))
-        }
-        buildFeatures {
-            buildConfig = true
-        }
+    lint {
+        abortOnError = false
+    }
+    defaultConfig {
+        buildConfigField("String", "BACKTRACE_SUBMISSION_URL", getProperty("BACKTRACE_SUBMISSION_URL", "null"))
+        buildConfigField("String", "BACKTRACE_CORONER_URL", getProperty("BACKTRACE_CORONER_URL", "null"))
+        buildConfigField("String", "BACKTRACE_CORONER_TOKEN", getProperty("BACKTRACE_CORONER_TOKEN", "null"))
+    }
+    buildFeatures {
+        buildConfig = true
     }
     packagingOptions {
         jniLibs {
