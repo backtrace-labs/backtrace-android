@@ -45,7 +45,18 @@ java -jar "$bundletool_jar" install-apks --apks="$apks_output"
 adb shell pm path backtraceio.backtraceio | tee installed-package-paths.txt
 grep -E 'split_config\.(x86_64|arm64_v8a|armeabi_v7a)\.apk' installed-package-paths.txt
 
-adb install -r "$test_apk"
+# Instrumentation requires the test package's certificate to match the target's. Which keystore
+# Gradle resolved for the debug signing config is environment-dependent, so make the certificates
+# identical by construction: re-sign a copy of the instrumentation APK with the exact keystore the
+# split APKs were signed with.
+build_tools_version="$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+apksigner="$ANDROID_HOME/build-tools/$build_tools_version/apksigner"
+signed_test_apk="${TMPDIR:-/tmp}/example-app-debug-androidTest-resigned.apk"
+cp "$test_apk" "$signed_test_apk"
+"$apksigner" sign --ks "$debug_keystore" --ks-pass pass:android \
+    --ks-key-alias androiddebugkey --key-pass pass:android "$signed_test_apk"
+
+adb install -r "$signed_test_apk"
 
 adb shell am instrument -w -r \
     -e class backtraceio.backtraceio.SplitInstallNativeResolutionTest \
