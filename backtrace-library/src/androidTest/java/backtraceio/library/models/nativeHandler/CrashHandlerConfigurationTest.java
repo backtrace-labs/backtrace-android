@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -338,6 +339,60 @@ public class CrashHandlerConfigurationTest {
         int separatorIndex = resolvedPath.indexOf("!/");
         File container = new File(separatorIndex >= 0 ? resolvedPath.substring(0, separatorIndex) : resolvedPath);
         assertTrue("Loaded module container does not exist: " + resolvedPath, container.isFile());
+    }
+
+    /**
+     * The linker path is validated before any process-ABI requirement, so a valid loaded module
+     * resolves even when no ABI is available at all.
+     */
+    @Test
+    public void loadedLinkerPathSucceedsWithoutProcessAbi() throws Exception {
+        File root = createTemporaryDirectory("no-abi-linker-path");
+        File baseApk = createPlainFile(root, "base.apk");
+        File loadedLibrary = createPlainFile(root, LIBRARY_NAME);
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(loadedLibrary::getAbsolutePath);
+        assertEquals(
+                loadedLibrary.getAbsolutePath(),
+                configuration.resolveBacktraceNativeLibraryPath(
+                        applicationInfo, null, loadedLibrary.getAbsolutePath()));
+    }
+
+    /**
+     * End-to-end variant: environment construction must succeed on a valid linker path even when
+     * the process-ABI provider throws, as it can on malformed vendor builds.
+     */
+    @Test
+    public void loadedLinkerPathSucceedsWhenAbiProviderFails() throws Exception {
+        File root = createTemporaryDirectory("failing-abi-provider");
+        File baseApk = createPlainFile(root, "base.apk");
+        File loadedLibrary = createPlainFile(root, LIBRARY_NAME);
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(loadedLibrary::getAbsolutePath, () -> {
+            throw new IllegalStateException("Unable to determine the current process ABI");
+        });
+
+        String resolvedPath = getEnvironmentValue(
+                configuration.getCrashHandlerEnvironmentVariables(applicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+        assertEquals(loadedLibrary.getAbsolutePath(), resolvedPath);
+    }
+
+    /** Metadata fallbacks are the only place a process ABI is required. */
+    @Test
+    public void metadataFallbackStillRequiresProcessAbi() throws Exception {
+        File root = createTemporaryDirectory("metadata-requires-abi");
+        File baseApk = createPlainFile(root, "base.apk");
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> configuration.resolveBacktraceNativeLibraryPath(applicationInfo, null, null));
     }
 
     @Test

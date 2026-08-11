@@ -28,18 +28,37 @@ public class CrashHandlerConfiguration {
         String getLoadedLibraryPath();
     }
 
+    interface AbiProvider {
+        String getCurrentAbi();
+    }
+
     private final NativeLibraryPathProvider nativeLibraryPathProvider;
+    private final AbiProvider abiProvider;
 
     public CrashHandlerConfiguration() {
-        this(CrashHandlerConfiguration::safelyResolveLoadedLibraryPath);
+        this(CrashHandlerConfiguration::safelyResolveLoadedLibraryPath, AbiHelper::getCurrentAbi);
     }
 
     CrashHandlerConfiguration(NativeLibraryPathProvider nativeLibraryPathProvider) {
+        this(nativeLibraryPathProvider, AbiHelper::getCurrentAbi);
+    }
+
+    CrashHandlerConfiguration(NativeLibraryPathProvider nativeLibraryPathProvider, AbiProvider abiProvider) {
         this.nativeLibraryPathProvider = nativeLibraryPathProvider;
+        this.abiProvider = abiProvider;
     }
 
     public Boolean isSupportedAbi() {
-        return isSupportedAbi(AbiHelper.getCurrentAbi());
+        final String abi;
+        try {
+            abi = abiProvider.getCurrentAbi();
+        } catch (RuntimeException ignored) {
+            // The unsupported-ABI policy is separate from path resolution: an undeterminable
+            // process ABI must not block a module the linker has already loaded, so an ABI that
+            // cannot be determined is treated as not known-unsupported.
+            return true;
+        }
+        return isSupportedAbi(abi);
     }
 
     public Boolean isSupportedAbi(String abi) {
@@ -60,10 +79,8 @@ public class CrashHandlerConfiguration {
             throw new IllegalArgumentException("ApplicationInfo does not define an application APK path");
         }
 
-        final String arch = AbiHelper.getCurrentAbi();
         final String loadedLibraryPath = getLoadedLibraryPath();
-        final String backtraceNativeLibraryPath =
-                resolveBacktraceNativeLibraryPath(applicationInfo, arch, loadedLibraryPath);
+        final String backtraceNativeLibraryPath = resolveBacktraceNativeLibraryPath(applicationInfo, loadedLibraryPath);
 
         final List<String> environmentVariables = copySystemEnvironment();
         environmentVariables.add(String.format("CLASSPATH=%s", classPathApk));
@@ -111,21 +128,45 @@ public class CrashHandlerConfiguration {
     /**
      * Resolves the native library path without reading the base or split APK ZIP central directory.
      *
-     * <p>The exact path reported by Android's native linker is authoritative. If linker metadata is
-     * unavailable, the resolver uses extracted-library and ABI-split metadata before retaining the
-     * historical base APK fallback.
+     * <p>The exact path reported by Android's native linker is authoritative and is validated
+     * before any process-ABI requirement, so a valid loaded module initializes the handler even
+     * when ABI metadata is malformed or unavailable. If linker metadata is unavailable, the
+     * resolver uses extracted-library and ABI-split metadata before retaining the historical base
+     * APK fallback; only those metadata fallbacks require a process ABI.
      */
-    String resolveBacktraceNativeLibraryPath(ApplicationInfo appInfo, String arch, String loadedLibraryPath) {
+    String resolveBacktraceNativeLibraryPath(ApplicationInfo appInfo, String loadedLibraryPath) {
         if (appInfo == null) {
             throw new IllegalArgumentException("ApplicationInfo cannot be null");
-        }
-        if (isNullOrEmpty(arch)) {
-            throw new IllegalArgumentException("ABI cannot be null or empty");
         }
 
         final String validatedLoadedPath = validateLoadedLibraryPath(loadedLibraryPath);
         if (validatedLoadedPath != null) {
             return validatedLoadedPath;
+        }
+
+        return resolveFromApplicationMetadata(appInfo, abiProvider.getCurrentAbi());
+    }
+
+    /**
+     * Test seam kept for explicit-ABI scenarios, see:
+     * {@link #resolveBacktraceNativeLibraryPath(ApplicationInfo, String)} for ordering semantics.
+     */
+    String resolveBacktraceNativeLibraryPath(ApplicationInfo appInfo, String arch, String loadedLibraryPath) {
+        if (appInfo == null) {
+            throw new IllegalArgumentException("ApplicationInfo cannot be null");
+        }
+
+        final String validatedLoadedPath = validateLoadedLibraryPath(loadedLibraryPath);
+        if (validatedLoadedPath != null) {
+            return validatedLoadedPath;
+        }
+
+        return resolveFromApplicationMetadata(appInfo, arch);
+    }
+
+    private static String resolveFromApplicationMetadata(ApplicationInfo appInfo, String arch) {
+        if (isNullOrEmpty(arch)) {
+            throw new IllegalArgumentException("ABI cannot be null or empty");
         }
 
         final String entry = getApkLibraryEntry(arch);

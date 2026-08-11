@@ -18,8 +18,8 @@ public class AbiHelper {
         }
 
         // Defensive fallbacks for malformed vendor builds that leave CPU_ABI empty.
-        // Prefer the ABI list matching the current process bitness so the fallback cannot reintroduce a
-        // device-versus-process mismatch, then fall back to the device-ordered list.
+        // On API 23 and later the fallback preserves process bitness via Process.is64Bit(); 
+        // API 21-22 can only use the device-ordered list, which may not reflect the current process.
         String bitnessAbi = firstValidAbi(getProcessBitnessAbis());
         if (bitnessAbi != null) {
             return bitnessAbi;
