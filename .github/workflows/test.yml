@@ -209,6 +209,18 @@ jobs:
             "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
           echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
 
+      # Create the debug keystore before Gradle runs so the instrumentation APK and the
+      # bundletool-signed split APKs share one certificate; instrumentation requires the test and
+      # target packages to be signed identically.
+      - name: Ensure Android debug keystore
+        run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Build AAB and instrumentation APK
         run: ./gradlew :example-app:bundleDebug :example-app:assembleDebugAndroidTest
 

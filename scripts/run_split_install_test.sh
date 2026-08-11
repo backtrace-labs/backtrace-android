@@ -11,6 +11,7 @@ bundletool_jar="${BUNDLETOOL_JAR:-bundletool.jar}"
 bundle="example-app/build/outputs/bundle/debug/example-app-debug.aab"
 test_apk="example-app/build/outputs/apk/androidTest/debug/example-app-debug-androidTest.apk"
 apks_output="${APKS_OUTPUT:-example-app-debug.apks}"
+debug_keystore="${DEBUG_KEYSTORE:-$HOME/.android/debug.keystore}"
 
 for artifact in "$bundletool_jar" "$bundle" "$test_apk"; do
     if [ ! -f "$artifact" ]; then
@@ -19,11 +20,25 @@ for artifact in "$bundletool_jar" "$bundle" "$test_apk"; do
     fi
 done
 
+# Device-specific APKs must be signed or the install fails with INSTALL_PARSE_FAILED_NO_CERTIFICATES,
+# and the certificate must match the instrumentation APK's, so sign with the same Android debug
+# keystore Gradle uses, creating it first on fresh CI runners where it does not exist yet.
+if [ ! -f "$debug_keystore" ]; then
+    mkdir -p "$(dirname "$debug_keystore")"
+    keytool -genkeypair -keystore "$debug_keystore" -storepass android -alias androiddebugkey \
+        -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+        -dname "CN=Android Debug,O=Android,C=US"
+fi
+
 java -jar "$bundletool_jar" build-apks \
     --bundle="$bundle" \
     --output="$apks_output" \
     --connected-device \
-    --overwrite
+    --overwrite \
+    --ks="$debug_keystore" \
+    --ks-pass=pass:android \
+    --ks-key-alias=androiddebugkey \
+    --key-pass=pass:android
 
 java -jar "$bundletool_jar" install-apks --apks="$apks_output"
 
