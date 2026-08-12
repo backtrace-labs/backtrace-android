@@ -12,21 +12,21 @@ public class BacktraceCrashHandlerRunner {
     private final SystemLoader loader;
     private final RunnerLogger logger;
 
-    /** Logging seam so tests can prove no message carries handler arguments or credentials. */
+    /**
+     * Logging seam without a {@link Throwable} overload: exception messages commonly carry the
+     * rejected library path ({@code UnsatisfiedLinkError}) or credential-bearing URLs, and this
+     * process's Logcat is collected into CI artifacts. Tests use it to prove no message leaks.
+     */
     interface RunnerLogger {
-        void error(String message, Throwable throwable);
+        void error(String message);
 
         void info(String message);
     }
 
     private static final class LogcatRunnerLogger implements RunnerLogger {
         @Override
-        public void error(String message, Throwable throwable) {
-            if (throwable == null) {
-                Log.e(LOG_TAG, message);
-            } else {
-                Log.e(LOG_TAG, message, throwable);
-            }
+        public void error(String message) {
+            Log.e(LOG_TAG, message);
         }
 
         @Override
@@ -59,30 +59,28 @@ public class BacktraceCrashHandlerRunner {
     }
 
     /**
-     * Runs the crash handler. Diagnostics never include the handler arguments, the environment, or
-     * the resolved library path: Crashpad passes the submission URL (which can carry the minidump
-     * token) and every customer annotation on the argument vector, and this log ends up in Logcat
-     * and CI artifacts.
+     * Runs the crash handler. Diagnostics carry only a stable stage code and the failure class
+     * name — never the handler arguments, environment, resolved library path, exception message,
+     * or stack trace: Crashpad passes the submission URL (which can carry the minidump token) and
+     * every customer annotation on the argument vector, and exception messages embed paths.
      */
     public boolean run(String[] args, Map<String, String> environmentVariables) {
         if (environmentVariables == null) {
-            logger.error("Cannot capture crash dump. Environment is unavailable.", null);
+            logger.error("BT_HANDLER_ENV_UNAVAILABLE: Cannot capture crash dump. Environment is unavailable.");
             return false;
         }
 
         String crashHandlerLibrary = environmentVariables.get(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
         if (crashHandlerLibrary == null || crashHandlerLibrary.trim().isEmpty()) {
-            logger.error("Cannot capture crash dump. Crash-handler path is unavailable.", null);
+            logger.error("BT_HANDLER_PATH_UNAVAILABLE: Cannot capture crash dump. Crash-handler path is unavailable.");
             return false;
         }
 
-        // The library path was resolved in the application process; loading it here can still fail
-        // (for example an APK-backed path the linker of this process cannot use). Contain both the
-        // load and the dispatch separately so diagnostics distinguish the failure stages.
         try {
             loader.loadLibrary(crashHandlerLibrary);
         } catch (RuntimeException | LinkageError failure) {
-            logger.error("Cannot load the native crash-handler library.", failure);
+            logger.error("BT_HANDLER_LOAD_FAILURE: Cannot load the native crash-handler library. Failure type: "
+                    + failureType(failure));
             return false;
         }
 
@@ -90,16 +88,25 @@ public class BacktraceCrashHandlerRunner {
         try {
             result = crashHandler.handleCrash(args == null ? new String[0] : args);
         } catch (RuntimeException | LinkageError failure) {
-            logger.error("Cannot execute the native crash handler.", failure);
+            logger.error("BT_HANDLER_DISPATCH_FAILURE: Cannot execute the native crash handler. Failure type: "
+                    + failureType(failure));
             return false;
         }
 
         if (!result) {
-            logger.error("Native crash-handler invocation returned failure.", null);
+            logger.error("BT_HANDLER_RETURNED_FAILURE: Native crash-handler invocation returned failure.");
             return false;
         }
 
         logger.info("Successfully ran crash handler code.");
         return true;
+    }
+
+    private static String failureType(Throwable failure) {
+        if (failure == null) {
+            return "unknown";
+        }
+        String type = failure.getClass().getName();
+        return type == null || type.trim().isEmpty() ? "unknown" : type;
     }
 }

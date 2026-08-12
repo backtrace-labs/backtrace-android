@@ -132,6 +132,19 @@ public class BacktraceDatabase implements Database {
     }
 
     /**
+     * Sanitized failure description for optional-native-integration diagnostics: exception
+     * messages can carry submission URLs, tokens, or filesystem paths (for example from a custom
+     * credential implementation or an UnsatisfiedLinkError), so these paths log only the class.
+     */
+    private static String failureType(Throwable failure) {
+        if (failure == null) {
+            return "unknown";
+        }
+        String type = failure.getClass().getName();
+        return type == null || type.trim().isEmpty() ? "unknown" : type;
+    }
+
+    /**
      * Setup native crash handler
      *
      * @param client      Backtrace client
@@ -262,8 +275,9 @@ public class BacktraceDatabase implements Database {
             this._enabledNativeIntegration = false;
             BacktraceLogger.e(
                     LOG_TAG,
-                    "Native integration was not enabled because its configuration could not be" + " prepared.",
-                    failure);
+                    "BT_NATIVE_PREPARE_FAILURE: Native integration configuration could not be"
+                            + " prepared. Failure type: "
+                            + failureType(failure));
             return false;
         }
 
@@ -280,8 +294,9 @@ public class BacktraceDatabase implements Database {
             this._enabledNativeIntegration = false;
             BacktraceLogger.e(
                     LOG_TAG,
-                    "Native integration was not enabled because the native initialization bridge" + " failed.",
-                    failure);
+                    "BT_NATIVE_BRIDGE_FAILURE: Native integration was not enabled because the"
+                            + " native initialization bridge failed. Failure type: "
+                            + failureType(failure));
             return false;
         }
 
@@ -299,9 +314,10 @@ public class BacktraceDatabase implements Database {
             } catch (RuntimeException failure) {
                 BacktraceLogger.e(
                         LOG_TAG,
-                        "Native integration is enabled, but the breadcrumb synchronization hook"
-                                + " could not be installed.",
-                        failure);
+                        "BT_NATIVE_BREADCRUMB_HOOK_FAILURE: Native integration is enabled, but the"
+                                + " breadcrumb synchronization hook could not be installed."
+                                + " Failure type: "
+                                + failureType(failure));
             }
         }
 
@@ -335,7 +351,11 @@ public class BacktraceDatabase implements Database {
         try {
             nativeDisableAction.run();
         } catch (RuntimeException | LinkageError failure) {
-            BacktraceLogger.e(LOG_TAG, "Native integration could not be disabled through the native bridge.", failure);
+            BacktraceLogger.e(
+                    LOG_TAG,
+                    "BT_NATIVE_DISABLE_FAILURE: Native integration could not be disabled through"
+                            + " the native bridge. Failure type: "
+                            + failureType(failure));
         } finally {
             this._enabledNativeIntegration = false;
         }

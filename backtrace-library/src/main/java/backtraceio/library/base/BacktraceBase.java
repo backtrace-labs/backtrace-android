@@ -798,8 +798,19 @@ public class BacktraceBase implements Client {
             dumpWithoutCrashNative(message, setMainThreadAsFaultingThread);
         } catch (RuntimeException | LinkageError failure) {
             BacktraceLogger.e(
-                    LOG_TAG, "Cannot create a native dump because native integration is unavailable.", failure);
+                    LOG_TAG,
+                    "BT_NATIVE_DUMP_UNAVAILABLE: Cannot create a native dump because native"
+                            + " integration is unavailable. Failure type: "
+                            + failureType(failure));
         }
+    }
+
+    private static String failureType(Throwable failure) {
+        if (failure == null) {
+            return "unknown";
+        }
+        String type = failure.getClass().getName();
+        return type == null || type.trim().isEmpty() ? "unknown" : type;
     }
 
     private native void dumpWithoutCrashNative(String message, boolean setMainThreadAsFaultingThread);
