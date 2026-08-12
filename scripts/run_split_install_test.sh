@@ -21,8 +21,21 @@ for artifact in "$bundletool_jar" "$bundle" "$test_apk"; do
 done
 
 # The emulator dies with the CI step, so capture logcat here while it is still reachable; a child
-# crash-handler System.load failure is only diagnosable from this log.
-trap 'adb logcat -d > split-install-logcat.txt 2>/dev/null || true' EXIT
+# crash-handler System.load failure is only diagnosable from this log. Capture only the relevant
+# tags and redact URL/token-shaped values: handler diagnostics can otherwise carry the submission
+# token and customer attributes into an uploaded artifact.
+collect_logcat() {
+    adb logcat -d -s \
+        BacktraceCrashHandlerRunner:V \
+        Backtrace-Android:V \
+        TestRunner:I \
+        AndroidRuntime:E 2>/dev/null \
+        | sed -E \
+            -e 's#(token=)[A-Za-z0-9._-]+#\1[REDACTED]#g' \
+            -e 's#https?://[^[:space:]"]+#[REDACTED_URL]#g' \
+        > split-install-logcat.txt || true
+}
+trap collect_logcat EXIT
 
 # Device-specific APKs must be signed or the install fails with INSTALL_PARSE_FAILED_NO_CERTIFICATES,
 # and the certificate must match the instrumentation APK's, so sign with the same Android debug

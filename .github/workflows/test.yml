@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -63,6 +66,9 @@ jobs:
       # On pull_request the checkout is the refs/pull/N/merge commit, so HEAD^1 is exactly the
       # base tip the merge was computed against (the payload's base.sha goes stale) and the
       # existing fetch-depth: 2 already makes it available.
+      - name: Lint baseline scope self-test
+        run: scripts/check_lint_baseline_scope_selftest.sh
+
       - name: Lint baseline scope
         if: github.event_name == 'pull_request'
         run: scripts/check_lint_baseline_scope.sh HEAD^1
@@ -163,19 +169,9 @@ jobs:
           echo "Using --ccy $ccy"
           saucectl run --ccy "$ccy" --retries 2
 
-      - name: Run morgue
-        run: |
-          npm install backtrace-morgue --location=global
-          morgue --version || true
-          # Todo: currently just looks 15 minutes in the past and doesn't filter at all.
-          # --csv=crash.csv
-          morgue --token=${{ secrets.BACKTRACE_API_TOKEN }} --endpoint="https://yolo.sp.backtrace.io" list yolo/android-library --select timestamp --filter=timestamp,greater-than,`date +%s%3N -d "15 minutes ago"` || true
-
-#           if [ $(wc -l < crash.csv) -gt 0 ]; then
-#               echo "Success"
-#           else
-#               exit 1
-#           fi
+      # The legacy uncorrelated `morgue ... || true` step was removed: it could never fail the
+      # workflow, and ingestion is now gated by the UUID-correlated AAB handler test. Fatal-crash
+      # correlation is tracked as a separate release gate.
 
 #        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
 #     - name: Emulator test
@@ -193,6 +189,7 @@ jobs:
   # prove the production resolver returns the installed ABI configuration split.
   aab-split-install:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout submodules
@@ -212,17 +209,36 @@ jobs:
       - name: Set up Gradle (caching)
         uses: gradle/actions/setup-gradle@v4
 
-      # Write only non-empty values: an unset secret must leave the BuildConfig field null so the
-      # integration test's credentials-not-configured skip stays reachable on secret-less forks.
-      - name: Write test credentials
+      # Explicit trust policy: fork and Dependabot runs never receive secrets, so they run the
+      # resolver gate only (REQUIRE_INGESTION=0) and the test's credentials skip stays reachable.
+      # Trusted runs must have all three credentials and gate on ingestion; a trusted run with
+      # missing credentials fails immediately instead of silently weakening the gate.
+      - name: Determine AAB ingestion mode
+        id: aab-mode
         env:
+          IS_FORK: >-
+            ${{ github.event_name == 'pull_request' &&
+                github.event.pull_request.head.repo.full_name != github.repository }}
+          IS_DEPENDABOT: ${{ github.actor == 'dependabot[bot]' }}
           SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
           CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
           CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
         run: |
-          if [ -n "$SUBMISSION_URL" ]; then echo BACKTRACE_SUBMISSION_URL=\"$SUBMISSION_URL\" >> ./local.properties; fi
-          if [ -n "$CORONER_URL" ]; then echo BACKTRACE_CORONER_URL=\"$CORONER_URL\" >> ./local.properties; fi
-          if [ -n "$CORONER_TOKEN" ]; then echo BACKTRACE_CORONER_TOKEN=\"$CORONER_TOKEN\" >> ./local.properties; fi
+          set -euo pipefail
+          if [ "$IS_FORK" = "true" ] || [ "$IS_DEPENDABOT" = "true" ]; then
+            echo "require_ingestion=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$SUBMISSION_URL" ] || [ -z "$CORONER_URL" ] || [ -z "$CORONER_TOKEN" ]; then
+            echo "Trusted AAB ingestion run is missing credentials." >&2
+            exit 1
+          fi
+          printf '%s\n' \
+            "BACKTRACE_SUBMISSION_URL=\"$SUBMISSION_URL\"" \
+            "BACKTRACE_CORONER_URL=\"$CORONER_URL\"" \
+            "BACKTRACE_CORONER_TOKEN=\"$CORONER_TOKEN\"" \
+            >> ./local.properties
+          echo "require_ingestion=1" >> "$GITHUB_OUTPUT"
 
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
@@ -257,18 +273,19 @@ jobs:
       # NOTE: android-emulator-runner executes each script line as an independent `sh -c`, so the
       # whole flow lives in one committed script invoked as a single line.
       - name: Split-install resolver and handler tests
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 30
           arch: x86_64
           target: google_apis
-          script: ./scripts/run_split_install_test.sh
+          script: REQUIRE_INGESTION=${{ steps.aab-mode.outputs.require_ingestion }} ./scripts/run_split_install_test.sh
 
       - name: Upload split-install diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: aab-split-install-diagnostics
+          retention-days: 7
           path: |
             installed-package-paths.txt
             split-resolver-output.txt

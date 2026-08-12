@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 public class SplitInstallNativeIntegrationTest {
     private static final long INGESTION_TIMEOUT_MS = 90_000;
     private static final long POLL_INTERVAL_MS = 2_000;
+    private static final long STABILITY_WINDOW_MS = 5_000;
 
     @Test
     public void splitBackedHandlerLoadsAndSubmitsDumpWithoutCrash() throws Exception {
@@ -56,20 +57,6 @@ public class SplitInstallNativeIntegrationTest {
                         && hasText(BuildConfig.BACKTRACE_CORONER_URL)
                         && hasText(BuildConfig.BACKTRACE_CORONER_TOKEN));
 
-        String resolved = getEnvironmentValue(
-                new CrashHandlerConfiguration().getCrashHandlerEnvironmentVariables(applicationInfo),
-                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
-        assertNotNull(resolved);
-
-        int separator = resolved.indexOf("!/");
-        assumeTrue("Dedicated test requires an APK-backed native library: " + resolved, separator > 0);
-
-        String splitContainer = resolved.substring(0, separator);
-        assertTrue(
-                "Resolved container is not an installed split: " + resolved,
-                contains(applicationInfo.splitSourceDirs, splitContainer)
-                        || contains(applicationInfo.splitPublicSourceDirs, splitContainer));
-
         String correlationId = UUID.randomUUID().toString();
         String message = "SplitInstallDumpWithoutCrash-" + correlationId;
 
@@ -81,49 +68,60 @@ public class SplitInstallNativeIntegrationTest {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("test.native_correlation_id", correlationId);
 
+        // Constructing the client loads the native library, so the default resolver below observes
+        // the production dladdr() path rather than falling back to install metadata.
         BacktraceDatabase database = new BacktraceDatabase(context, settings);
         BacktraceClient client = new BacktraceClient(context, credentials, database, attributes, new ArrayList<>());
 
-        assertTrue(
-                "Native integration failed for split-backed path: " + resolved,
-                database.setupNativeIntegration(client, credentials));
+        try {
+            String resolved = getEnvironmentValue(
+                    new CrashHandlerConfiguration().getCrashHandlerEnvironmentVariables(applicationInfo),
+                    CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+            assertNotNull(resolved);
 
-        long timestampStart = System.currentTimeMillis() / 1000L;
-        client.dumpWithoutCrash(message);
+            int separator = resolved.indexOf("!/");
+            assumeTrue("Dedicated test requires an APK-backed native library: " + resolved, separator > 0);
 
-        CoronerClient coroner =
-                new CoronerClient(BuildConfig.BACKTRACE_CORONER_URL, BuildConfig.BACKTRACE_CORONER_TOKEN);
-        awaitExactlyOneReport(coroner, timestampStart, message);
+            String splitContainer = resolved.substring(0, separator);
+            assertTrue(
+                    "Resolved container is not an installed split: " + resolved,
+                    contains(applicationInfo.splitSourceDirs, splitContainer)
+                            || contains(applicationInfo.splitPublicSourceDirs, splitContainer));
 
-        client.disableNativeIntegration();
+            assertTrue(
+                    "Native integration failed for split-backed path: " + resolved,
+                    database.setupNativeIntegration(client, credentials));
+
+            // Small tolerance for device/backend clock boundaries.
+            long timestampStart = System.currentTimeMillis() / 1000L - 5;
+            client.dumpWithoutCrash(message);
+
+            CoronerClient coroner =
+                    new CoronerClient(BuildConfig.BACKTRACE_CORONER_URL, BuildConfig.BACKTRACE_CORONER_TOKEN);
+            awaitExactlyOneReport(coroner, timestampStart, message, correlationId);
+        } finally {
+            client.disableNativeIntegration();
+        }
     }
 
-    private static void awaitExactlyOneReport(CoronerClient coroner, long timestampStart, String expectedMessage) {
+    private static void awaitExactlyOneReport(
+            CoronerClient coroner, long timestampStart, String expectedMessage, String correlationId) {
         long deadline = SystemClock.elapsedRealtime() + INGESTION_TIMEOUT_MS;
         Exception lastPollFailure = null;
         while (SystemClock.elapsedRealtime() < deadline) {
             // A single malformed or transient error response must not abort the poll; retry until
             // the deadline and report the last failure only when no report ever arrived.
             try {
-                CoronerResponse response = coroner.errorTypeTimestampFilter(
-                        "Crash",
-                        Long.toString(timestampStart),
-                        Long.toString(System.currentTimeMillis() / 1000L),
-                        Arrays.asList("error.message"));
-
-                int matchingReports = 0;
-                for (int index = 0; index < response.getResultsNumber(); index++) {
-                    String message = response.getAttribute(index, "error.message", String.class);
-                    if (expectedMessage.equals(message)) {
-                        matchingReports++;
+                if (countMatchingReports(coroner, timestampStart, expectedMessage, correlationId) == 1) {
+                    // Stability window: a delayed duplicate must not slip in right after the first
+                    // match and silently violate the exactly-one requirement.
+                    SystemClock.sleep(STABILITY_WINDOW_MS);
+                    int stableCount = countMatchingReports(coroner, timestampStart, expectedMessage, correlationId);
+                    if (stableCount == 1) {
+                        return;
                     }
-                }
-
-                if (matchingReports == 1) {
-                    return;
-                }
-                if (matchingReports > 1) {
-                    fail("Expected exactly one report for " + expectedMessage + ", found " + matchingReports);
+                    fail("Expected exactly one report for " + expectedMessage + ", found " + stableCount
+                            + " after the stability window");
                 }
                 lastPollFailure = null;
             } catch (Exception pollFailure) {
@@ -133,6 +131,33 @@ public class SplitInstallNativeIntegrationTest {
         }
         fail("No split-backed native dump was ingested for " + expectedMessage
                 + (lastPollFailure == null ? "" : "; last Coroner failure: " + lastPollFailure));
+    }
+
+    /** Counts reports matching the unique message; a match must also carry the correlation attribute. */
+    private static int countMatchingReports(
+            CoronerClient coroner, long timestampStart, String expectedMessage, String correlationId) throws Exception {
+        CoronerResponse response = coroner.errorTypeTimestampFilter(
+                "Crash",
+                Long.toString(timestampStart),
+                Long.toString(System.currentTimeMillis() / 1000L),
+                Arrays.asList("error.message", "test.native_correlation_id"));
+
+        int matchingReports = 0;
+        for (int index = 0; index < response.getResultsNumber(); index++) {
+            String message = response.getAttribute(index, "error.message", String.class);
+            if (!expectedMessage.equals(message)) {
+                continue;
+            }
+            String reportCorrelationId = response.getAttribute(index, "test.native_correlation_id", String.class);
+            assertTrue(
+                    "Report is missing the correlation attribute: " + reportCorrelationId,
+                    correlationId.equals(reportCorrelationId));
+            matchingReports++;
+        }
+        if (matchingReports > 1) {
+            fail("Expected exactly one report for " + expectedMessage + ", found " + matchingReports);
+        }
+        return matchingReports;
     }
 
     private static boolean hasText(String value) {

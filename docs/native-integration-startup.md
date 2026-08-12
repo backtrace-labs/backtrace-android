@@ -45,9 +45,9 @@ library.
 It obtains the exact `libbacktrace-native.so` path from Android's already-loaded module metadata and
 uses path-only application metadata as a fallback.
 
-The resolver performs only a small number of filesystem metadata checks — at most one per installed
-split, and none that scale with APK ZIP central-directory size — and does not open or parse APK ZIP
-contents. The remaining work consists of Crashpad database setup, native
+The resolver performs O(number of split metadata entries) filesystem metadata checks — private and
+public split arrays are scanned before deduplication, and none of the work scales with APK ZIP
+central-directory size — and it does not open or parse APK ZIP contents. The remaining work consists of Crashpad database setup, native
 attribute/attachment transfer, and Crashpad handler registration.
 
 ## Background-thread use
@@ -74,9 +74,9 @@ compared against an ABI inferred in Java. Android has already resolved which mod
 loaded, so rejecting it on an ABI guess would break 32-bit processes on 64-bit devices and
 native-bridge translation.
 
-An inferred ABI is used only to construct steps 2 through 4, and it is not required until the
-linker path has failed validation — a valid loaded module initializes the handler even when process
-ABI metadata is malformed or unavailable. That inferred value comes from `Build.CPU_ABI`, which
+An inferred ABI is used only to construct steps 3 and 4 — the linker path and an existing extracted
+library are both directly loadable without ABI inference, so the handler initializes from either
+even when process ABI metadata is malformed or unavailable. That inferred value comes from `Build.CPU_ABI`, which
 Android adjusts for the current process bitness, rather than `Build.SUPPORTED_ABIS[0]`, which
 describes the device. On API 23 and later the defensive fallback for an empty `CPU_ABI` preserves
 process bitness via `Process.is64Bit()`; API 21-22 can only fall back to the device-ordered list.
@@ -90,14 +90,18 @@ matching treats `x86` and `x86_64` as distinct tokens and ignores language and d
 
 ## Failure behavior
 
-- Native integration is optional. A path-resolution or JNI-bridge failure during
-  `enableNativeIntegration()` disables native integration, logs the cause, and returns `false`;
-  managed crash reporting stays operational.
+- Crash-handler registration is optional and failure-contained. The packaged Backtrace native
+  library is currently loaded when `BacktraceBase` is initialized.
+- `BacktraceClient.enableNativeIntegration()` returns normally and logs a contained failure; use
+  `tryEnableNativeIntegration()` to observe the result, or
+  `BacktraceDatabase.setupNativeIntegration()`, which returns `false`. Managed crash reporting
+  stays operational either way.
+- `dumpWithoutCrash()` is a safe no-op while native integration is uninitialized or disabled.
 - The known-unsupported `x86` native backend remains skipped.
 - An ABI that cannot be determined is not treated as known-unsupported, because a valid
-  linker-reported path does not require ABI inference.
+  linker-reported path and an extracted library do not require ABI inference.
 - In the crash-handler process, a library-load failure exits nonzero with a logged cause instead of
-  appearing successful.
+  appearing successful; that exit status is diagnostic and is not currently consumed by Crashpad.
 
 ## Validation
 
