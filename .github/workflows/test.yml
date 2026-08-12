@@ -6,39 +6,69 @@ on:
   pull_request:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
+    inputs:
+      hardware_abi:
+        description: "ABI for the self-hosted hardware release gate"
+        required: false
+        default: "arm64-v8a"
+      hardware_page_size:
+        description: "Expected device page size (4096 or 16384); empty skips the check"
+        required: false
+        default: ""
 
 permissions:
   contents: read
 
+# Trust model: fork and Dependabot pull_request runs never receive repository secrets, so they run
+# the secretless lanes only (source quality, legacy API 21/22, AAB resolver + fresh-process
+# safety). Credentialed lanes (Sauce, AAB ingestion, 16 KB runtime) run only for trusted commits
+# and fail fast when credentials are missing. PR code is never executed with secrets via
+# pull_request_target.
 jobs:
-  build:
+  policy:
     runs-on: ubuntu-latest
+    outputs:
+      trusted: ${{ steps.classify.outputs.trusted }}
+    steps:
+      - id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          REPOSITORY: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          trusted=false
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            trusted=true
+          elif [ "$HEAD_REPOSITORY" = "$REPOSITORY" ] && [ "$ACTOR" != "dependabot[bot]" ]; then
+            trusted=true
+          fi
+          echo "trusted=$trusted" >> "$GITHUB_OUTPUT"
 
+  # Secretless: guard suite, formatting, lint, baseline scope, CI policy, build, ELF alignment.
+  source-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout submodules
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
         with:
           fetch-depth: 2
           submodules: recursive
-          token: ${{ secrets.ACCESS_TOKEN }}
           persist-credentials: false
 
       - name: set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v5
         with:
-          java-version: 17.0.10
-          distribution: "adopt"
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Set up Gradle (caching)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
         with:
           cache-read-only: true
-
-      - name: Write to local.properties
-        run: |
-          echo BACKTRACE_SUBMISSION_URL=\"${{ secrets.BACKTRACE_SUBMISSION_URL }}\" >> ./local.properties
-          echo BACKTRACE_CORONER_URL=\"${{ secrets.BACKTRACE_CORONER_URL }}\" >> ./local.properties
-          echo BACKTRACE_CORONER_TOKEN=\"${{ secrets.BACKTRACE_CORONER_TOKEN }}\" >> ./local.properties
 
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
@@ -51,6 +81,12 @@ jobs:
 
       - name: Verify the APK ZIP guard rejects every forbidden archive-reader form
         run: scripts/check_no_native_init_apk_zip_scan_selftest.sh
+
+      - name: CI policy self-test
+        run: scripts/check_native_ci_policy_selftest.sh
+
+      - name: CI policy
+        run: scripts/check_native_ci_policy.sh .github/workflows/test.yml
 
       - name: Formatting
         run: ./gradlew spotlessCheck
@@ -76,14 +112,6 @@ jobs:
       - name: Build and check
         run: ./gradlew assembleDebugAndroidTest build --profile
 
-      - name: Upload build profile
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-profile
-          path: build/reports/profile/
-          if-no-files-found: ignore
-
       - name: Alignment script executable
         run: chmod +x scripts/check_elf_alignment.sh
 
@@ -92,153 +120,94 @@ jobs:
           scripts/check_elf_alignment.sh \
             example-app/build/outputs/apk/debug/example-app-debug.apk
 
-      - name: Upload symbols.zip
-        uses: actions/upload-artifact@v4
+      - name: Upload build and test reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: native-debug-symbols.zip
-          path: example-app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
+          name: source-quality-reports
+          retention-days: 7
+          path: |
+            build/reports/profile/
+            **/build/test-results/**/*.xml
+            **/build/reports/lint-results-*.xml
+          if-no-files-found: ignore
 
-      - name: Upload example-app APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: example-app-debug.apk
-          path: example-app/build/outputs/apk/debug/example-app-debug.apk
-
-      - name: Upload example-app Test APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: example-app-debug-androidTest.apk
-          path: example-app/build/outputs/apk/androidTest/debug/example-app-debug-androidTest.apk
-
-      - name: Upload backtrace-library AAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: backtrace-library-debug.aar
-          path: backtrace-library/build/outputs/aar/backtrace-library-debug.aar
-
-      - name: Upload backtrace-library Test APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: backtrace-library-debug-androidTest.apk
-          path: backtrace-library/build/outputs/apk/androidTest/debug/backtrace-library-debug-androidTest.apk
-
-  test:
+  # Secretless: API 21/22 verifier, resolver, and clean-process safety on the oldest supported
+  # runtimes.
+  legacy-api:
     runs-on: ubuntu-latest
-    needs: build
-
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        test-apk:
-          [
-            example-app-debug-androidTest.apk,
-            backtrace-library-debug-androidTest.apk,
-          ]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: example-app-debug.apk
-
-      - name: Download Test APK
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ matrix.test-apk }}
-
-      - name: Install saucectl
-        uses: saucelabs/saucectl-run-action@v4
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          skip-run: true
-
-      - name: Run saucectl
-        env:
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          TEST_APP: ${{ matrix.test-apk }}
-        run: |
-          saucectl configure --username "$SAUCE_USERNAME" --accessKey "$SAUCE_ACCESS_KEY"
-          conc=$(curl -s -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" "https://api.eu-central-1.saucelabs.com/rest/v1.2/users/$SAUCE_USERNAME/concurrency")
-          ccy=$(printf '%s' "$conc" | jq -r '[.concurrency.organization.allowed.rds, .concurrency.organization.allowed.vms] | map(select(type=="number")) | min // 1' 2>/dev/null)
-          case "$ccy" in ''|*[!0-9]*) ccy=1 ;; esac
-          echo "Using --ccy $ccy"
-          saucectl run --ccy "$ccy" --retries 2
-
-      # The legacy uncorrelated `morgue ... || true` step was removed: it could never fail the
-      # workflow, and ingestion is now gated by the UUID-correlated AAB handler test. Fatal-crash
-      # correlation is tracked as a separate release gate.
-
-#        runs-on: macos-latest # necessary for reactivecircus/android-emulator-runner@v2
-#     - name: Emulator test
-#       uses: reactivecircus/android-emulator-runner@v2
-#       with:
-#         target: google_apis
-#         api-level: ${{ matrix.api-level }}
-#         arch: x86_64
-#         script: ./gradlew connectedCheck
-
-#     - name: Code coverage
-#       run: bash <(curl -s https://codecov.io/bash)
-
-  # Play-style AAB qualification: install a device-specific APK set generated by bundletool and
-  # prove the production resolver returns the installed ABI configuration split.
-  aab-split-install:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-
+        api-level: [21, 22]
     steps:
       - name: Checkout submodules
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
         with:
-          fetch-depth: 2
           submodules: recursive
-          token: ${{ secrets.ACCESS_TOKEN }}
           persist-credentials: false
 
       - name: set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v5
         with:
-          java-version: 17.0.10
-          distribution: "adopt"
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Set up Gradle (caching)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
 
-      # Explicit trust policy: fork and Dependabot runs never receive secrets, so they run the
-      # resolver gate only (REQUIRE_INGESTION=0) and the test's credentials skip stays reachable.
-      # Trusted runs must have all three credentials and gate on ingestion; a trusted run with
-      # missing credentials fails immediately instead of silently weakening the gate.
-      - name: Determine AAB ingestion mode
-        id: aab-mode
-        env:
-          IS_FORK: >-
-            ${{ github.event_name == 'pull_request' &&
-                github.event.pull_request.head.repo.full_name != github.repository }}
-          IS_DEPENDABOT: ${{ github.actor == 'dependabot[bot]' }}
-          SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
-          CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
-          CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
+      - name: Accept Android SDK licences
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Build app and instrumentation APKs
+        run: ./gradlew :example-app:assembleDebug :example-app:assembleDebugAndroidTest
+
+      - name: Enable KVM group permissions
         run: |
-          set -euo pipefail
-          if [ "$IS_FORK" = "true" ] || [ "$IS_DEPENDABOT" = "true" ]; then
-            echo "require_ingestion=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [ -z "$SUBMISSION_URL" ] || [ -z "$CORONER_URL" ] || [ -z "$CORONER_TOKEN" ]; then
-            echo "Trusted AAB ingestion run is missing credentials." >&2
-            exit 1
-          fi
-          printf '%s\n' \
-            "BACKTRACE_SUBMISSION_URL=\"$SUBMISSION_URL\"" \
-            "BACKTRACE_CORONER_URL=\"$CORONER_URL\"" \
-            "BACKTRACE_CORONER_TOKEN=\"$CORONER_TOKEN\"" \
-            >> ./local.properties
-          echo "require_ingestion=1" >> "$GITHUB_OUTPUT"
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Legacy compatibility tests (API ${{ matrix.api-level }})
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          script: ./scripts/run_legacy_native_compatibility_test.sh
+
+      - name: Upload legacy lane results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: legacy-api-${{ matrix.api-level }}-results
+          retention-days: 7
+          path: |
+            **/build/outputs/androidTest-results/**
+            **/build/reports/androidTests/**
+          if-no-files-found: ignore
+
+  # Secretless: real split install, production resolver, and fresh-process failure safety. Runs
+  # for every PR, including forks; ingestion is excluded by policy, not by a silent failure.
+  aab-resolver-and-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout submodules
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: set up JDK 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v5
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
 
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
@@ -249,9 +218,6 @@ jobs:
             "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
           echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
 
-      # Create the debug keystore before Gradle runs so the instrumentation APK and the
-      # bundletool-signed split APKs share one certificate; instrumentation requires the test and
-      # target packages to be signed identically.
       - name: Ensure Android debug keystore
         run: |
           mkdir -p "$HOME/.android"
@@ -270,25 +236,425 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # NOTE: android-emulator-runner executes each script line as an independent `sh -c`, so the
-      # whole flow lives in one committed script invoked as a single line.
-      - name: Split-install resolver and handler tests
+      - name: Split resolver and fresh-process safety tests
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 30
           arch: x86_64
           target: google_apis
-          script: REQUIRE_INGESTION=${{ steps.aab-mode.outputs.require_ingestion }} ./scripts/run_split_install_test.sh
+          script: REQUIRE_INGESTION=0 RUN_FATAL=0 ./scripts/run_split_install_test.sh
 
-      - name: Upload split-install diagnostics
+      - name: Upload resolver and safety diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: aab-split-install-diagnostics
+          name: aab-resolver-safety-diagnostics
           retention-days: 7
           path: |
             installed-package-paths.txt
+            device-facts.txt
             split-resolver-output.txt
-            split-native-output.txt
+            fresh-process-safety-output.txt
+            native-report-evidence.json
+            split-install-logcat.txt
+          if-no-files-found: ignore
+
+  # Trusted only: builds the Sauce artifacts with validated credentials baked into BuildConfig.
+  trusted-device-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: policy
+    if: needs.policy.outputs.trusted == 'true'
+    steps:
+      - name: Checkout submodules
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: set up JDK 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v5
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+
+      - name: Validate and write trusted credentials
+        env:
+          BACKTRACE_SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
+          BACKTRACE_CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
+          BACKTRACE_CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          keys = (
+              "BACKTRACE_SUBMISSION_URL",
+              "BACKTRACE_CORONER_URL",
+              "BACKTRACE_CORONER_TOKEN",
+          )
+          missing = [key for key in keys if not os.environ.get(key)]
+          if missing:
+              raise SystemExit("Missing trusted CI credentials: " + ", ".join(missing))
+
+          Path("local.properties").write_text(
+              "".join(f"{key}={json.dumps(os.environ[key])}\n" for key in keys),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Accept Android SDK licences
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Build device-test artifacts
+        run: ./gradlew assembleDebugAndroidTest assembleDebug
+
+      - name: Upload symbols.zip
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: native-debug-symbols.zip
+          path: example-app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
+          if-no-files-found: ignore
+
+      - name: Upload example-app APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: example-app-debug.apk
+          path: example-app/build/outputs/apk/debug/example-app-debug.apk
+
+      - name: Upload example-app Test APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: example-app-debug-androidTest.apk
+          path: example-app/build/outputs/apk/androidTest/debug/example-app-debug-androidTest.apk
+
+      - name: Upload backtrace-library AAR
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backtrace-library-debug.aar
+          path: backtrace-library/build/outputs/aar/backtrace-library-debug.aar
+
+      - name: Upload backtrace-library Test APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backtrace-library-debug-androidTest.apk
+          path: backtrace-library/build/outputs/apk/androidTest/debug/backtrace-library-debug-androidTest.apk
+
+  sauce-instrumentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [policy, trusted-device-build]
+    if: needs.policy.outputs.trusted == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        test-apk:
+          [
+            example-app-debug-androidTest.apk,
+            backtrace-library-debug-androidTest.apk,
+          ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
+        with:
+          persist-credentials: false
+
+      - name: Download APK
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v5
+        with:
+          name: example-app-debug.apk
+
+      - name: Download Test APK
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v5
+        with:
+          name: ${{ matrix.test-apk }}
+
+      - name: Install saucectl
+        uses: saucelabs/saucectl-run-action@bc81720eb01738d9c664b07fe42621bd0014283f # v4
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          skip-run: true
+          saucectl-version: 0.213.0
+
+      - name: Run saucectl
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          TEST_APP: ${{ matrix.test-apk }}
+        run: |
+          saucectl configure --username "$SAUCE_USERNAME" --accessKey "$SAUCE_ACCESS_KEY"
+          conc=$(curl -s -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" "https://api.eu-central-1.saucelabs.com/rest/v1.2/users/$SAUCE_USERNAME/concurrency")
+          ccy=$(printf '%s' "$conc" | jq -r '[.concurrency.organization.allowed.rds, .concurrency.organization.allowed.vms] | map(select(type=="number")) | min // 1' 2>/dev/null)
+          case "$ccy" in ''|*[!0-9]*) ccy=1 ;; esac
+          echo "Using --ccy $ccy"
+          saucectl run --ccy "$ccy" --retries 2
+
+  # Trusted only: full split-install qualification — resolver, fresh-process safety, nonfatal,
+  # fatal + restart-assisted recovery, and disable/re-enable lifecycle, all GUID-correlated.
+  aab-native-full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: policy
+    if: needs.policy.outputs.trusted == 'true'
+    steps:
+      - name: Checkout submodules
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: set up JDK 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v5
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+
+      - name: Validate and write trusted credentials
+        env:
+          BACKTRACE_SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
+          BACKTRACE_CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
+          BACKTRACE_CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          keys = (
+              "BACKTRACE_SUBMISSION_URL",
+              "BACKTRACE_CORONER_URL",
+              "BACKTRACE_CORONER_TOKEN",
+          )
+          missing = [key for key in keys if not os.environ.get(key)]
+          if missing:
+              raise SystemExit("Missing trusted CI credentials: " + ", ".join(missing))
+
+          Path("local.properties").write_text(
+              "".join(f"{key}={json.dumps(os.environ[key])}\n" for key in keys),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Accept Android SDK licences
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Download bundletool (pinned)
+        run: |
+          curl -sL -o bundletool.jar \
+            "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
+          echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
+
+      - name: Ensure Android debug keystore
+        run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build AAB and instrumentation APK
+        run: ./gradlew :example-app:bundleDebug :example-app:assembleDebugAndroidTest
+
+      - name: Enable KVM group permissions
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Full split-install qualification
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          script: REQUIRE_INGESTION=1 RUN_FATAL=1 ./scripts/run_split_install_test.sh
+
+      - name: Upload full qualification diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: aab-native-full-diagnostics
+          retention-days: 7
+          path: |
+            installed-package-paths.txt
+            device-facts.txt
+            split-resolver-output.txt
+            fresh-process-safety-output.txt
+            split-nonfatal-output.txt
+            split-fatal-output.txt
+            split-lifecycle-output.txt
+            native-report-evidence.json
+            split-install-logcat.txt
+          if-no-files-found: ignore
+
+  # Trusted only: the same full qualification on an official 16 KB-page-size emulator image. ELF
+  # alignment (checked in source-quality) is necessary but not a runtime test; this is.
+  aab-native-16kb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: policy
+    if: needs.policy.outputs.trusted == 'true'
+    steps:
+      - name: Checkout submodules
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: set up JDK 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v5
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+
+      - name: Validate and write trusted credentials
+        env:
+          BACKTRACE_SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
+          BACKTRACE_CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
+          BACKTRACE_CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          keys = (
+              "BACKTRACE_SUBMISSION_URL",
+              "BACKTRACE_CORONER_URL",
+              "BACKTRACE_CORONER_TOKEN",
+          )
+          missing = [key for key in keys if not os.environ.get(key)]
+          if missing:
+              raise SystemExit("Missing trusted CI credentials: " + ", ".join(missing))
+
+          Path("local.properties").write_text(
+              "".join(f"{key}={json.dumps(os.environ[key])}\n" for key in keys),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Accept Android SDK licences
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Download bundletool (pinned)
+        run: |
+          curl -sL -o bundletool.jar \
+            "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
+          echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
+
+      - name: Ensure Android debug keystore
+        run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build AAB, debug APK, and instrumentation APK
+        run: ./gradlew :example-app:bundleDebug :example-app:assembleDebug :example-app:assembleDebugAndroidTest
+
+      - name: Enable KVM group permissions
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: 16 KB runtime qualification
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis_ps16k
+          script: ./scripts/run_16kb_native_qualification.sh
+
+      - name: Upload 16 KB qualification diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: aab-native-16kb-diagnostics
+          retention-days: 7
+          path: |
+            installed-package-paths.txt
+            device-facts.txt
+            split-resolver-output.txt
+            fresh-process-safety-output.txt
+            split-nonfatal-output.txt
+            split-fatal-output.txt
+            split-lifecycle-output.txt
+            native-report-evidence.json
+            split-install-logcat.txt
+          if-no-files-found: ignore
+
+  # Manual hardware gate: allocated arm64 / mixed-bitness devices on a self-hosted runner. Fails
+  # clearly when no device is attached; never silently passes.
+  hardware-release-gate:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, android-device, arm64]
+    timeout-minutes: 90
+    steps:
+      - name: Checkout submodules
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Validate and write trusted credentials
+        env:
+          BACKTRACE_SUBMISSION_URL: ${{ secrets.BACKTRACE_SUBMISSION_URL }}
+          BACKTRACE_CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
+          BACKTRACE_CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          keys = (
+              "BACKTRACE_SUBMISSION_URL",
+              "BACKTRACE_CORONER_URL",
+              "BACKTRACE_CORONER_TOKEN",
+          )
+          missing = [key for key in keys if not os.environ.get(key)]
+          if missing:
+              raise SystemExit("Missing trusted CI credentials: " + ", ".join(missing))
+
+          Path("local.properties").write_text(
+              "".join(f"{key}={json.dumps(os.environ[key])}\n" for key in keys),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Hardware release gate
+        run: |
+          ./scripts/run_native_release_device_gate.sh \
+            --abi "${{ github.event.inputs.hardware_abi }}" \
+            --require-device-64-bit true \
+            --require-process-64-bit true \
+            --require-page-size "${{ github.event.inputs.hardware_page_size }}" \
+            --require-ingestion true
+
+      - name: Upload hardware gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: hardware-release-gate-evidence
+          retention-days: 30
+          path: |
+            native-report-evidence.json
+            device-facts.txt
+            installed-package-paths.txt
             split-install-logcat.txt
           if-no-files-found: ignore
