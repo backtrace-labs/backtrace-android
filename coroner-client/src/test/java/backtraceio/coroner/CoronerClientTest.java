@@ -1,8 +1,10 @@
 package backtraceio.coroner;
 
+import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_GUID_TIMESTAMP;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123_ATTR_ERR_MSG;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_TIMESTAMP_ERR_TYPE;
+import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_GUID_TWO_RESULTS_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_OPERATION_ERROR_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_TIMESTAMP_ERR_TYPE_CORONER_JSON;
@@ -131,5 +133,45 @@ public class CoronerClientTest {
             assertEquals(errorMessage, exception.getCoronerError().getMessage());
             assertEquals(32769, exception.getCoronerError().getCode());
         }
+    }
+
+    /**
+     * A bounded GUID query can return more than one report; the historical hard-coded limit of one
+     * made duplicate detection impossible because a response could never carry two results.
+     */
+    @Test
+    public void guidTimestampFilterReturnsMultipleResults()
+            throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
+        // GIVEN
+        final String guid = "11111111-2222-3333-4444-555555555555";
+        final String expectedJsonQuery = readResourceFile(QUERY_CORONER_GUID_TIMESTAMP);
+        final String jsonResponse = readResourceFile(RESPONSE_GUID_TWO_RESULTS_JSON);
+        final CoronerApiResponse expectedResponse = GsonWrapper.fromJson(jsonResponse, CoronerApiResponse.class);
+
+        // MOCK
+        when(mockHttpClient.get(argThat(JsonMatchers.jsonEquals(expectedJsonQuery))))
+                .thenReturn(expectedResponse);
+
+        // WHEN
+        final CoronerResponse result = client.guidTimestampFilter(
+                guid, "1680000000", "1680000600", Arrays.asList("error.type", "error.message"), 10);
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(2, result.getResultsNumber());
+        assertEquals(guid, result.getAttribute(0, "guid", String.class));
+        assertEquals(guid, result.getAttribute(1, "guid", String.class));
+        assertEquals("duplicate-report", result.getAttribute(1, "error.message", String.class));
+    }
+
+    @Test
+    public void guidTimestampFilterRejectsInvalidLimit() {
+        Mockito.verifyNoInteractions(mockHttpClient);
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> client.guidTimestampFilter("guid", "1", "2", Arrays.asList("error.type"), 0));
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> client.guidTimestampFilter("guid", "1", "2", Arrays.asList("error.type"), 101));
     }
 }

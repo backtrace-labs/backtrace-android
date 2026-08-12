@@ -16,6 +16,8 @@ public class ResourceUtils {
             MAIN_PATH + "/responses/timestamp-err-type-filter.json";
 
     public static final String RESPONSE_OPERATION_ERROR_JSON = MAIN_PATH + "/responses/operation-error.json";
+    public static final String QUERY_CORONER_GUID_TIMESTAMP = MAIN_PATH + "/queries/guid-timestamp-filter.json";
+    public static final String RESPONSE_GUID_TWO_RESULTS_JSON = MAIN_PATH + "/responses/guid-two-results.json";
 
     public static String readResourceFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));

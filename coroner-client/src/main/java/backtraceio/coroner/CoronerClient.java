@@ -56,6 +56,26 @@ public class CoronerClient {
         return makeRequest(coronerQuery);
     }
 
+    /**
+     * GUID-correlated query returning up to {@code limit} reports. Use a limit larger than the
+     * expected report count (qualification tests use 10); otherwise duplicate detection is
+     * impossible.
+     */
+    public CoronerResponse guidTimestampFilter(
+            final String guid,
+            final String timestampLeast,
+            final String timestampMost,
+            final List<String> customAttributes,
+            final int limit)
+            throws CoronerResponseException, IOException, CoronerHttpException {
+        final List<String> attributes = concatAttributes(customAttributes);
+
+        final JsonObject coronerQuery =
+                this.coronerQueries.filterByGuidAndTimestamp(guid, timestampLeast, timestampMost, attributes, limit);
+
+        return makeRequest(coronerQuery);
+    }
+
     private List<String> concatAttributes(final List<String> customAttributes) {
         final List<String> result = new ArrayList<>(customAttributes);
         result.addAll(DEFAULT_ATTRIBUTES);
