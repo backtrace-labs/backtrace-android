@@ -135,15 +135,21 @@ final class RemoteNativeServiceSession implements AutoCloseable {
             }
             Event event;
             try {
-                event = events.poll(remaining, TimeUnit.MILLISECONDS);
+                // Short poll slices so a remote-process death surfaces immediately instead of
+                // burning the whole deadline; already-queued events are always drained first, so
+                // the fatal-crash flow still observes EVENT_WILL_CRASH before the death.
+                event = events.poll(Math.min(remaining, 250), TimeUnit.MILLISECONDS);
             } catch (InterruptedException interrupted) {
                 Thread.currentThread().interrupt();
                 fail("Interrupted waiting for event " + expectedEvent);
                 return null;
             }
             if (event == null) {
-                fail("Timed out waiting for event " + expectedEvent);
-                return null;
+                if (binderDeath.getCount() == 0 && events.isEmpty()) {
+                    fail("Remote service process died (pid " + remotePid.get() + ") while waiting for event "
+                            + expectedEvent);
+                }
+                continue;
             }
             if (event.what == NativeTestProtocol.EVENT_FAILED) {
                 fail("Remote service reported failure: "

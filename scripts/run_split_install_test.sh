@@ -40,12 +40,17 @@ done
 
 # --- diagnostics (the only || true zone) --------------------------------------------------------
 collect_logcat() {
+    # DEBUG (native tombstones), libc (fatal signals), and ActivityManager (process deaths) are
+    # required to tell a native crash from a system kill in a remote test process.
     adb logcat -d -s \
         BacktraceCrashHandlerRunner:V \
         Backtrace-Android:V \
         NativeQualEvidence:I \
         TestRunner:I \
-        AndroidRuntime:E 2>/dev/null \
+        AndroidRuntime:E \
+        DEBUG:V \
+        libc:F \
+        ActivityManager:I 2>/dev/null \
         | sed -E \
             -e 's#(token=)[A-Za-z0-9._-]+#\1[REDACTED]#g' \
             -e 's#https?://[^[:space:]"]+#[REDACTED_URL]#g' \
