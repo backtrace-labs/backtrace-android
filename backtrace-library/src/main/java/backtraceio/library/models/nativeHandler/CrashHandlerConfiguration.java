@@ -72,6 +72,15 @@ public class CrashHandlerConfiguration {
     }
 
     public List<String> getCrashHandlerEnvironmentVariables(ApplicationInfo applicationInfo) {
+        return getCrashHandlerEnvironmentVariables(applicationInfo, System.getenv());
+    }
+
+    /**
+     * Test seam: same as {@link #getCrashHandlerEnvironmentVariables(ApplicationInfo)} against a
+     * synthetic base environment.
+     */
+    List<String> getCrashHandlerEnvironmentVariables(
+            ApplicationInfo applicationInfo, Map<String, String> baseEnvironment) {
         if (applicationInfo == null) {
             throw new IllegalArgumentException("ApplicationInfo cannot be null");
         }
@@ -84,14 +93,11 @@ public class CrashHandlerConfiguration {
         final String loadedLibraryPath = getLoadedLibraryPath();
         final String backtraceNativeLibraryPath = resolveBacktraceNativeLibraryPath(applicationInfo, loadedLibraryPath);
 
-        final List<String> environmentVariables = copySystemEnvironment();
-        environmentVariables.add(String.format("CLASSPATH=%s", classPathApk));
-        environmentVariables.add(String.format("%s=%s", BACKTRACE_CRASH_HANDLER, backtraceNativeLibraryPath));
-        environmentVariables.add(
-                String.format("LD_LIBRARY_PATH=%s", buildNativeLibrarySearchPath(applicationInfo.nativeLibraryDir)));
-        environmentVariables.add("ANDROID_DATA=/data");
-
-        return environmentVariables;
+        return buildCrashHandlerEnvironment(
+                baseEnvironment,
+                classPathApk,
+                backtraceNativeLibraryPath,
+                buildNativeLibrarySearchPath(applicationInfo.nativeLibraryDir));
     }
 
     /**
@@ -101,20 +107,43 @@ public class CrashHandlerConfiguration {
      */
     @Deprecated
     public List<String> getCrashHandlerEnvironmentVariables(String apkPath, String nativeLibraryDirPath, String arch) {
-        final List<String> environmentVariables = copySystemEnvironment();
         final String backtraceNativeLibraryPath = getBacktraceNativeLibraryPath(nativeLibraryDirPath, apkPath, arch);
+        return buildCrashHandlerEnvironment(
+                System.getenv(),
+                isNullOrEmpty(apkPath) ? null : apkPath,
+                isNullOrEmpty(backtraceNativeLibraryPath) ? null : backtraceNativeLibraryPath,
+                buildNativeLibrarySearchPath(nativeLibraryDirPath));
+    }
 
-        if (!isNullOrEmpty(apkPath)) {
-            environmentVariables.add(String.format("CLASSPATH=%s", apkPath));
+    /**
+     * Serializes the child environment with each reserved variable appearing exactly once: the SDK
+     * value replaces any parent-process value of the same name, so the effective value does not
+     * depend on how the child's libc resolves duplicate names. A null value skips the variable.
+     */
+    private static List<String> buildCrashHandlerEnvironment(
+            Map<String, String> baseEnvironment, String classPath, String handlerPath, String librarySearchPath) {
+        LinkedHashMap<String, String> environment = new LinkedHashMap<>();
+        if (baseEnvironment != null) {
+            environment.putAll(baseEnvironment);
         }
-        if (!isNullOrEmpty(backtraceNativeLibraryPath)) {
-            environmentVariables.add(String.format("%s=%s", BACKTRACE_CRASH_HANDLER, backtraceNativeLibraryPath));
-        }
-        environmentVariables.add(
-                String.format("LD_LIBRARY_PATH=%s", buildNativeLibrarySearchPath(nativeLibraryDirPath)));
-        environmentVariables.add("ANDROID_DATA=/data");
+        putOrRemove(environment, "CLASSPATH", classPath);
+        putOrRemove(environment, BACKTRACE_CRASH_HANDLER, handlerPath);
+        putOrRemove(environment, "LD_LIBRARY_PATH", librarySearchPath);
+        putOrRemove(environment, "ANDROID_DATA", "/data");
 
-        return environmentVariables;
+        List<String> serialized = new ArrayList<>(environment.size());
+        for (Map.Entry<String, String> entry : environment.entrySet()) {
+            serialized.add(entry.getKey() + "=" + entry.getValue());
+        }
+        return serialized;
+    }
+
+    private static void putOrRemove(Map<String, String> environment, String key, String value) {
+        if (value == null) {
+            environment.remove(key);
+        } else {
+            environment.put(key, value);
+        }
     }
 
     /**
@@ -142,10 +171,10 @@ public class CrashHandlerConfiguration {
      * Resolves the native library path without reading the base or split APK ZIP central directory.
      *
      * <p>The exact path reported by Android's native linker is authoritative and is validated
-     * before any process-ABI requirement, so a valid loaded module initializes the handler even
-     * when ABI metadata is malformed or unavailable. If linker metadata is unavailable, the
-     * resolver uses extracted-library and ABI-split metadata before retaining the historical base
-     * APK fallback; only those metadata fallbacks require a process ABI.
+     * before any process-ABI requirement. An existing extracted library is likewise directly
+     * loadable without ABI inference, so it is checked next. Only the split and base-APK path
+     * construction requires a process ABI: a failing ABI provider therefore cannot disable native
+     * capture when the linker path or an extracted library is available.
      */
     String resolveBacktraceNativeLibraryPath(ApplicationInfo appInfo, String loadedLibraryPath) {
         if (appInfo == null) {
@@ -157,7 +186,12 @@ public class CrashHandlerConfiguration {
             return validatedLoadedPath;
         }
 
-        return resolveFromApplicationMetadata(appInfo, abiProvider.getCurrentAbi());
+        final String extractedLibraryPath = getExtractedLibraryPath(appInfo.nativeLibraryDir);
+        if (extractedLibraryPath != null) {
+            return extractedLibraryPath;
+        }
+
+        return resolveFromApkMetadata(appInfo, abiProvider.getCurrentAbi());
     }
 
     /**
@@ -174,20 +208,21 @@ public class CrashHandlerConfiguration {
             return validatedLoadedPath;
         }
 
-        return resolveFromApplicationMetadata(appInfo, arch);
-    }
-
-    private static String resolveFromApplicationMetadata(ApplicationInfo appInfo, String arch) {
-        if (isNullOrEmpty(arch)) {
-            throw new IllegalArgumentException("ABI cannot be null or empty");
-        }
-
-        final String entry = getApkLibraryEntry(arch);
         final String extractedLibraryPath = getExtractedLibraryPath(appInfo.nativeLibraryDir);
         if (extractedLibraryPath != null) {
             return extractedLibraryPath;
         }
 
+        return resolveFromApkMetadata(appInfo, arch);
+    }
+
+    /** Split and base-APK path construction; the only resolution stage that requires a process ABI. */
+    private static String resolveFromApkMetadata(ApplicationInfo appInfo, String arch) {
+        if (isNullOrEmpty(arch)) {
+            throw new IllegalArgumentException("ABI cannot be null or empty");
+        }
+
+        final String entry = getApkLibraryEntry(arch);
         final String splitApkPath = findAbiSplitPath(appInfo, arch);
         if (splitApkPath != null) {
             return splitApkPath + APK_LIBRARY_SEPARATOR + entry;
@@ -457,14 +492,6 @@ public class CrashHandlerConfiguration {
             return null;
         }
         return apkPath + APK_LIBRARY_SEPARATOR + getApkLibraryEntry(arch);
-    }
-
-    private static List<String> copySystemEnvironment() {
-        final List<String> environmentVariables = new ArrayList<>();
-        for (Map.Entry<String, String> variable : System.getenv().entrySet()) {
-            environmentVariables.add(String.format("%s=%s", variable.getKey(), variable.getValue()));
-        }
-        return environmentVariables;
     }
 
     private static String buildNativeLibrarySearchPath(String nativeLibraryDirPath) {

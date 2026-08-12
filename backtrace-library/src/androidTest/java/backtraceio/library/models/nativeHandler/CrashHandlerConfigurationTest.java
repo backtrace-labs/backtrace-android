@@ -570,6 +570,119 @@ public class CrashHandlerConfigurationTest {
                 () -> configuration.resolveBacktraceNativeLibraryPath(applicationInfo, null, null));
     }
 
+    /**
+     * An existing extracted library is directly loadable without ABI inference, so a failing ABI
+     * provider must not disable native capture when one is present.
+     */
+    @Test
+    public void extractedLibrarySucceedsWhenAbiProviderThrowsRuntimeException() throws Exception {
+        File root = createTemporaryDirectory("extracted-no-abi-runtime");
+        File baseApk = createPlainFile(root, "base.apk");
+        File nativeLibraryDirectory = new File(root, "lib");
+        assertTrue(nativeLibraryDirectory.mkdirs());
+        File extractedLibrary = createPlainFile(nativeLibraryDirectory, LIBRARY_NAME);
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, nativeLibraryDirectory);
+        CrashHandlerConfiguration configuration =
+                CrashHandlerConfigurationTestFactory.withoutLinkerPathAndThrowingAbiProvider();
+
+        String resolvedPath = getEnvironmentValue(
+                configuration.getCrashHandlerEnvironmentVariables(applicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+        assertEquals(extractedLibrary.getAbsolutePath(), resolvedPath);
+    }
+
+    @Test
+    public void extractedLibrarySucceedsWhenAbiProviderThrowsLinkageError() throws Exception {
+        File root = createTemporaryDirectory("extracted-no-abi-linkage");
+        File baseApk = createPlainFile(root, "base.apk");
+        File nativeLibraryDirectory = new File(root, "lib");
+        assertTrue(nativeLibraryDirectory.mkdirs());
+        File extractedLibrary = createPlainFile(nativeLibraryDirectory, LIBRARY_NAME);
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, nativeLibraryDirectory);
+        CrashHandlerConfiguration configuration =
+                CrashHandlerConfigurationTestFactory.withLinkageErrorAbiProvider(null);
+
+        String resolvedPath = getEnvironmentValue(
+                configuration.getCrashHandlerEnvironmentVariables(applicationInfo),
+                CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER);
+        assertEquals(extractedLibrary.getAbsolutePath(), resolvedPath);
+    }
+
+    @Test
+    public void splitFallbackStillRequiresAbi() throws Exception {
+        File root = createTemporaryDirectory("split-requires-abi");
+        File baseApk = createPlainFile(root, "base.apk");
+        File abiSplit = createPlainFile(root, "split_config.arm64_v8a.apk");
+
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+        applicationInfo.splitSourceDirs = new String[] {abiSplit.getAbsolutePath()};
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> configuration.resolveBacktraceNativeLibraryPath(applicationInfo, null, null));
+    }
+
+    @Test
+    public void baseFallbackStillRequiresAbi() throws Exception {
+        File root = createTemporaryDirectory("base-requires-abi");
+        File baseApk = createPlainFile(root, "base.apk");
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, null);
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> configuration.resolveBacktraceNativeLibraryPath(applicationInfo, null, null));
+    }
+
+    /**
+     * The child environment must carry each reserved variable exactly once, with the SDK value
+     * replacing any parent-process value, so the effective value does not depend on how the child's
+     * libc resolves duplicate names.
+     */
+    @Test
+    public void reservedEnvironmentVariablesAppearExactlyOnceAndAreReplaced() throws Exception {
+        File root = createTemporaryDirectory("env-dedup");
+        File baseApk = createPlainFile(root, "base.apk");
+        File nativeLibraryDirectory = new File(root, "lib");
+        assertTrue(nativeLibraryDirectory.mkdirs());
+        createPlainFile(nativeLibraryDirectory, LIBRARY_NAME);
+        ApplicationInfo applicationInfo = createApplicationInfo(baseApk, nativeLibraryDirectory);
+
+        java.util.LinkedHashMap<String, String> parentEnvironment = new java.util.LinkedHashMap<>();
+        parentEnvironment.put("CLASSPATH", "/parent/classpath.apk");
+        parentEnvironment.put(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, "/parent/stale-handler.so");
+        parentEnvironment.put("LD_LIBRARY_PATH", "/parent/lib");
+        parentEnvironment.put("ANDROID_DATA", "/parent/data");
+        parentEnvironment.put("UNRELATED", "kept");
+        parentEnvironment.put("WITH_EQUALS", "a=b=c");
+
+        CrashHandlerConfiguration configuration = new CrashHandlerConfiguration(() -> null);
+        List<String> environment =
+                configuration.getCrashHandlerEnvironmentVariables(applicationInfo, parentEnvironment);
+
+        for (String reserved : new String[] {
+            "CLASSPATH", CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, "LD_LIBRARY_PATH", "ANDROID_DATA"
+        }) {
+            int occurrences = 0;
+            for (String variable : environment) {
+                if (variable.startsWith(reserved + "=")) {
+                    occurrences++;
+                }
+            }
+            assertEquals("expected exactly one " + reserved, 1, occurrences);
+        }
+        assertEquals(baseApk.getAbsolutePath(), getEnvironmentValue(environment, "CLASSPATH"));
+        assertNotEquals(
+                "/parent/stale-handler.so",
+                getEnvironmentValue(environment, CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER));
+        assertEquals("/data", getEnvironmentValue(environment, "ANDROID_DATA"));
+        assertEquals("kept", getEnvironmentValue(environment, "UNRELATED"));
+        assertEquals("a=b=c", getEnvironmentValue(environment, "WITH_EQUALS"));
+    }
+
     @Test
     public void ignoresLanguageAndDensitySplitsAndFallsBackToBase() throws Exception {
         File root = createTemporaryDirectory("base-fallback");

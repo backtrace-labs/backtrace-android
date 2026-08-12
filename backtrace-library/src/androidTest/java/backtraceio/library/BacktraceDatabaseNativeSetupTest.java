@@ -134,12 +134,18 @@ public class BacktraceDatabaseNativeSetupTest {
 
     /**
      * A platform API reference that does not resolve on the running OS surfaces as a LinkageError,
-     * not a RuntimeException; it must be contained the same way.
+     * not a RuntimeException; the preparation block must contain it the same way. (A LinkageError
+     * from the ABI provider alone no longer reaches this path on a real install, because the
+     * linker path or extracted library resolves without ABI inference.)
      */
     @Test
-    public void setupNativeIntegrationReturnsFalseWhenAbiProviderThrowsLinkageError() {
-        this.database.useCrashHandlerConfiguration(
-                CrashHandlerConfigurationTestFactory.withLinkageErrorAbiProvider(null));
+    public void setupNativeIntegrationReturnsFalseWhenPreparationThrowsLinkageError() {
+        this.database.useCrashHandlerConfiguration(new CrashHandlerConfiguration() {
+            @Override
+            public List<String> getCrashHandlerEnvironmentVariables(ApplicationInfo applicationInfo) {
+                throw new NoSuchMethodError("android.os.Process.is64Bit");
+            }
+        });
 
         assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
         assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
@@ -203,6 +209,141 @@ public class BacktraceDatabaseNativeSetupTest {
         assertThrows(IllegalArgumentException.class, () -> this.database.useNativeCommunication(null));
     }
 
+    /** A two-argument credential with a null endpoint NPEs inside the URL getter; contain it. */
+    @Test
+    public void malformedCredentialEndpointReturnsFalse() {
+        BacktraceCredentials malformedCredentials = new BacktraceCredentials((String) null, "token");
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, malformedCredentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void credentialGetterRuntimeExceptionReturnsFalse() {
+        BacktraceCredentials throwingCredentials = new BacktraceCredentials("https://test.sp.backtrace.io", "token") {
+            @Override
+            public android.net.Uri getMinidumpSubmissionUrl() {
+                throw new IllegalStateException("credential resolution failed");
+            }
+        };
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, throwingCredentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    @Test
+    public void credentialGetterLinkageErrorReturnsFalse() {
+        BacktraceCredentials throwingCredentials = new BacktraceCredentials("https://test.sp.backtrace.io", "token") {
+            @Override
+            public android.net.Uri getMinidumpSubmissionUrl() {
+                throw new NoSuchMethodError("android.net.Uri.parse");
+            }
+        };
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, throwingCredentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    /** Credential implementations can be mutable; the URL must be resolved exactly once. */
+    @Test
+    public void credentialGetterIsInvokedExactlyOnce() {
+        final int[] getterCalls = {0};
+        BacktraceCredentials countingCredentials =
+                new BacktraceCredentials("https://test.sp.backtrace.io", "1231231231231") {
+                    @Override
+                    public android.net.Uri getMinidumpSubmissionUrl() {
+                        getterCalls[0]++;
+                        return super.getMinidumpSubmissionUrl();
+                    }
+                };
+
+        assertEquals(true, this.database.setupNativeIntegration(this.client, countingCredentials));
+        assertEquals(1, getterCalls[0]);
+    }
+
+    @Test
+    public void bridgeRuntimeExceptionReturnsFalse() {
+        this.nativeCommunication.runtimeExceptionToThrow = new IllegalStateException("bridge wrapper failed");
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
+        assertEquals(1, this.nativeCommunication.javaCrashHandlerCalls);
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+        // Managed persistence stays operational after the contained bridge failure.
+        BacktraceDatabaseRecord managedRecord =
+                this.database.add(new BacktraceReport("managed-after-bridge-runtime-failure"), Collections.emptyMap());
+        assertNotNull(managedRecord);
+    }
+
+    @Test
+    public void classPathRuntimeExceptionReturnsFalse() {
+        this.database.useCrashHandlerConfiguration(new CrashHandlerConfiguration() {
+            @Override
+            public String getClassPath() {
+                throw new IllegalStateException("class path resolution failed");
+            }
+        });
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    @Test
+    public void bridgeIsNeverCalledAfterCredentialFailure() {
+        BacktraceCredentials malformedCredentials = new BacktraceCredentials((String) null, "token");
+
+        this.database.setupNativeIntegration(this.client, malformedCredentials);
+
+        assertEquals(0, this.nativeCommunication.javaCrashHandlerCalls);
+    }
+
+    @Test
+    public void disableBeforeSuccessfulSetupDoesNotThrow() {
+        // No native integration was ever enabled; disable must be a safe no-op for Java state.
+        this.database.disableNativeIntegration();
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void disableContainsRuntimeException() {
+        this.database.useNativeDisableAction(() -> {
+            throw new IllegalStateException("native disable failed");
+        });
+
+        this.database.disableNativeIntegration();
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
+    @Test
+    public void disableContainsLinkageError() {
+        this.database.useNativeDisableAction(() -> {
+            throw new UnsatisfiedLinkError("no disable symbol");
+        });
+
+        this.database.disableNativeIntegration();
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
+    /** Even when the native bridge fails, the Java-side enabled state must always clear. */
+    @Test
+    public void disableAlwaysClearsJavaEnabledState() throws Exception {
+        File loadedLibrary = new File(this.databaseDirectory, "libbacktrace-native.so");
+        try (FileOutputStream output = new FileOutputStream(loadedLibrary)) {
+            output.write(new byte[] {1, 2, 3, 4});
+        }
+        this.database.useCrashHandlerConfiguration(
+                CrashHandlerConfigurationTestFactory.withThrowingAbiProvider(loadedLibrary.getAbsolutePath()));
+        assertEquals(true, this.database.setupNativeIntegration(this.client, this.credentials));
+        assertTrue(this.database.addNativeAttribute("key", "value"));
+
+        this.database.useNativeDisableAction(() -> {
+            throw new UnsatisfiedLinkError("no disable symbol");
+        });
+        this.database.disableNativeIntegration();
+
+        assertFalse(this.database.addNativeAttribute("key", "value"));
+    }
+
     private static boolean hasEnvironmentValue(String[] environmentVariables, String key, String value) {
         String expected = key + "=" + value;
         for (String variable : environmentVariables) {
@@ -217,6 +358,7 @@ public class BacktraceDatabaseNativeSetupTest {
         int javaCrashHandlerCalls;
         String[] lastEnvironmentVariables;
         LinkageError linkageErrorToThrow;
+        RuntimeException runtimeExceptionToThrow;
 
         @Override
         public boolean handleCrash(String[] args) {
@@ -236,6 +378,9 @@ public class BacktraceDatabaseNativeSetupTest {
             lastEnvironmentVariables = environmentVariables;
             if (linkageErrorToThrow != null) {
                 throw linkageErrorToThrow;
+            }
+            if (runtimeExceptionToThrow != null) {
+                throw runtimeExceptionToThrow;
             }
             return true;
         }
