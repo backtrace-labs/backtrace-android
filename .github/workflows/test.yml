@@ -578,6 +578,11 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis_ps16k
+          # The ps16k google_apis image thrashes under the default AVD RAM: 16 KB pages inflate
+          # every process, and system-wide mem-pressure kills reaped the test service process
+          # (alongside the launcher and GMS) seconds after boot.
+          ram-size: 6144M
+          heap-size: 576M
           script: ./scripts/run_16kb_native_qualification.sh
 
       - name: Upload 16 KB qualification diagnostics
