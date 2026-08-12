@@ -182,6 +182,16 @@ Java_backtraceio_library_BacktraceDatabase_addAttachment(JNIEnv *env, jobject th
 }
 
 JNIEXPORT void JNICALL
+Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrashNative(JNIEnv *env,
+                                                                   jobject thiz,
+                                                                   jstring message,
+                                                                   jboolean set_main_thread_as_faulting_thread) {
+    DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
+}
+
+// Compatibility aliases: older artifacts bound dumpWithoutCrash directly as a native method. Both
+// route through the same guarded backend entry point.
+JNIEXPORT void JNICALL
 Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2(JNIEnv *env,
                                                                                   jobject thiz,
                                                                                   jstring message) {

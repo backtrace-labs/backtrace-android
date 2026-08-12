@@ -397,6 +397,13 @@ bool CaptureCrashCrashpad(jobjectArray args) {
 }
 
 void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_faulting_thread) {
+    // Defense in depth behind the backend-level initialized/disabled guard.
+    if (client == nullptr) {
+        __android_log_print(ANDROID_LOG_ERROR, "Backtrace-Android",
+                            "Cannot create a native dump because the Crashpad client is unavailable.");
+        return;
+    }
+
     crashpad::NativeCPUContext context;
     crashpad::CaptureContext(&context);
 

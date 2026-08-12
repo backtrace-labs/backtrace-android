@@ -17,6 +17,7 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.Metrics;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -296,7 +297,29 @@ public class BacktraceBase implements Client {
      * semantics, threading, and release qualification boundaries.
      */
     public void enableNativeIntegration() {
-        this.database.setupNativeIntegration(this, this.credentials);
+        tryEnableNativeIntegration();
+    }
+
+    /**
+     * Same as {@link #enableNativeIntegration()}, but reports whether the native crash handler was
+     * actually installed, since the void API returns normally on a contained setup failure.
+     *
+     * @return {@code true} when native integration is enabled
+     */
+    public boolean tryEnableNativeIntegration() {
+        return Boolean.TRUE.equals(this.database.setupNativeIntegration(this, this.credentials));
+    }
+
+    /**
+     * Same as {@link #enableNativeIntegration(boolean)}, but reports whether the native crash
+     * handler was actually installed.
+     *
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @return {@code true} when native integration is enabled
+     */
+    public boolean tryEnableNativeIntegration(boolean enableClientSideUnwinding) {
+        return Boolean.TRUE.equals(
+                this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding));
     }
 
     /**
@@ -758,13 +781,28 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Force a native crash report and minidump submission
+     * Force a native crash report and minidump submission.
      *
-     * @param message
+     * <p>A safe no-op when native integration is not enabled: after a contained setup failure, or
+     * after {@link #disableNativeIntegration()}, the request is logged and dropped instead of
+     * reaching an uninitialized native backend.
+     *
+     * @param message error message attached to the report
      */
-    public native void dumpWithoutCrash(String message);
+    public void dumpWithoutCrash(String message) {
+        dumpWithoutCrash(message, false);
+    }
 
-    public native void dumpWithoutCrash(String message, boolean setMainThreadAsFaultingThread);
+    public void dumpWithoutCrash(String message, boolean setMainThreadAsFaultingThread) {
+        try {
+            dumpWithoutCrashNative(message, setMainThreadAsFaultingThread);
+        } catch (RuntimeException | LinkageError failure) {
+            BacktraceLogger.e(
+                    LOG_TAG, "Cannot create a native dump because native integration is unavailable.", failure);
+        }
+    }
+
+    private native void dumpWithoutCrashNative(String message, boolean setMainThreadAsFaultingThread);
 
     /**
      * Sending an exception to Backtrace API

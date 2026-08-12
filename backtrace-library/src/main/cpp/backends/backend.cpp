@@ -11,6 +11,7 @@
 #endif
 
 extern std::atomic_bool initialized;
+extern std::atomic_bool disabled;
 static std::once_flag initialize_flag;
 extern "C" {
 bool Initialize(jstring url,
@@ -71,6 +72,15 @@ bool InitializeJavaCrashHandler(jstring url,
                             "No support for Java Crash handler");
 #endif
     });
+
+    // Mirror the legacy Initialize() path: an enable after a disable must restart uploads, or a
+    // successful return value would hide a backend that stays disabled.
+#ifdef CRASHPAD_BACKEND
+    if (initialized) {
+        ReEnableCrashpad();
+    }
+#endif
+
     return initialized;
 }
 
@@ -87,6 +97,14 @@ bool CaptureCrash(jobjectArray args) {
 }
 
 void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thread) {
+    // A dump request on an uninitialized or disabled backend must be a safe no-op: after a
+    // contained setup failure the Crashpad client was never created, and dereferencing it would
+    // crash the host application that setup containment just protected.
+    if (!initialized.load(std::memory_order_acquire) || disabled.load(std::memory_order_acquire)) {
+        __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android",
+                            "Cannot create a native dump because native integration is not enabled.");
+        return;
+    }
 #ifdef CRASHPAD_BACKEND
     DumpWithoutCrashCrashpad(message, set_main_thread_as_faulting_thread);
 #elif BREAKPAD_BACKEND
