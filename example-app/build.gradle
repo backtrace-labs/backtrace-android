@@ -11,9 +11,29 @@ android {
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         ndk {
-            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+            // -PqualificationAbi=<abi> builds a single-ABI qualification app for the hardware
+            // release gate (for example a 32-bit-only install on a 64-bit device). The library's
+            // published ABI set is unaffected.
+            def qualificationAbi = project.findProperty("qualificationAbi")
+            if (qualificationAbi) {
+                abiFilters qualificationAbi.toString()
+            } else {
+                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+            }
         }
     }
+    // Debug-only startup-qualification fixture: -PnativeStartupFixtureAssets=<dir> adds a
+    // generated large-entry-count asset directory (never committed) to the debug APK so a trace
+    // can prove initialization cost does not scale with ZIP central-directory size.
+    def nativeStartupFixtureAssets = project.findProperty("nativeStartupFixtureAssets")
+    if (nativeStartupFixtureAssets) {
+        sourceSets {
+            debug {
+                assets.srcDirs += nativeStartupFixtureAssets.toString()
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
