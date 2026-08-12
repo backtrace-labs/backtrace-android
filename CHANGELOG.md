@@ -2,9 +2,11 @@
 
 ## Next version
 Bugfixes
-- Removed synchronous base- and split-APK ZIP central-directory inspection from native crash-handler library resolution. That scan was the identified cause of customer-reported cold-start ANRs showing `ZipFile$Source.initCEN`. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks. Production qualification for fatal crash capture and legacy or mixed-bitness devices is tracked separately.
-- Native-integration path-resolution and JNI-bridge failures now disable native integration and return `false` rather than propagating those failures to the host application.
-- Corrected process-ABI selection by preferring the ABI reported for the running process. On API 23 and later, malformed primary ABI metadata falls back to process-bitness-specific ABI lists. API 21-22 retain the device-ordered fallback when primary process ABI metadata is unavailable.
+- Fixed a native-integration cold-start ANR in large APK/AAB applications by removing SDK-owned APK ZIP central-directory parsing (`ZipFile$Source.initCEN`) from crash-handler path resolution. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks.
+- Hardened optional native setup, disable, and dump calls so failures remain nonfatal and managed reporting continues; `tryEnableNativeIntegration()` exposes the setup result while `enableNativeIntegration()` stays `void` for compatibility.
+- Prevented crash-handler/setup diagnostics from logging credentials, argument values, or resolved paths; failures log a stable stage code and exception class only.
+- Corrected process-ABI selection by preferring the ABI reported for the running process. On API 23 and later, malformed primary ABI metadata falls back to process-bitness-specific ABI lists; API 21-22 retain the device-ordered fallback.
+- Added Play-style split-install, fatal-process, disable/re-enable lifecycle, API 21/22, and 16 KB runtime qualification. Hardware and affected-customer validation are tracked in the release qualification document before full production sign-off.
 
 ## Version 3.13.0
 Improvements
