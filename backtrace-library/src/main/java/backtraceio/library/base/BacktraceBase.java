@@ -294,7 +294,7 @@ public class BacktraceBase implements Client {
      * control normally, leaving managed crash reporting operational.
      *
      * <p>See {@code docs/native-integration-startup.md} for resolution precedence, failure
-     * semantics, threading, and release qualification boundaries.
+     * semantics, threading, lifecycle, and compatibility details.
      */
     public void enableNativeIntegration() {
         tryEnableNativeIntegration();
@@ -320,6 +320,19 @@ public class BacktraceBase implements Client {
     public boolean tryEnableNativeIntegration(boolean enableClientSideUnwinding) {
         return Boolean.TRUE.equals(
                 this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding));
+    }
+
+    /**
+     * Same as {@link #enableNativeIntegration(boolean, UnwindingMode)}, but reports whether the
+     * native crash handler was actually installed.
+     *
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     * @return {@code true} when native integration is enabled
+     */
+    public boolean tryEnableNativeIntegration(boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+        return Boolean.TRUE.equals(
+                this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding, unwindingMode));
     }
 
     /**
