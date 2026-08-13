@@ -8,9 +8,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-import backtraceio.library.logger.BacktraceInternalLogger;
 import backtraceio.library.logger.BacktraceLogger;
-import backtraceio.library.logger.LogLevel;
 import backtraceio.library.logger.Logger;
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import java.io.File;
@@ -32,10 +30,10 @@ import org.junit.runner.RunWith;
 public class BacktraceDatabaseSanitizedLoggingTest {
 
     private static final String ALL_SENTINELS = "https://example.invalid/minidump?token=SECRET_URL_TOKEN_SENTINEL"
-            + " --annotation=private.customer.value=PRIVATE_CUSTOMER_SENTINEL"
-            + " /data/data/customer/files/crashpad"
+            + " --annotation=private.application.value=SENSITIVE_ATTRIBUTE_SENTINEL"
+            + " /data/user/0/example.application/files/crashpad"
             + " /data/app/~~opaque/split_config.arm64_v8a.apk!/lib/arm64-v8a/libbacktrace-native.so"
-            + " /customer/attachment/medical-record.txt";
+            + " /data/user/0/example.application/files/attachment.txt";
 
     private static final class RecordingGlobalLogger implements Logger {
         final List<String> messages = new ArrayList<>();
@@ -92,6 +90,7 @@ public class BacktraceDatabaseSanitizedLoggingTest {
     }
 
     private Context context;
+    private Logger previousLogger;
     private RecordingGlobalLogger recordingLogger;
     private BacktraceDatabase database;
     private BacktraceClient client;
@@ -99,6 +98,7 @@ public class BacktraceDatabaseSanitizedLoggingTest {
 
     @Before
     public void setUp() {
+        this.previousLogger = BacktraceLogger.getLogger();
         this.context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         File databaseDirectory = new File(this.context.getFilesDir(), "sanitized-logging-test-" + System.nanoTime());
         assertTrue(databaseDirectory.mkdirs());
@@ -114,7 +114,7 @@ public class BacktraceDatabaseSanitizedLoggingTest {
     @After
     public void tearDown() {
         // Restore the global logger even when an assertion failed mid-test.
-        BacktraceLogger.setLogger(new BacktraceInternalLogger(LogLevel.OFF));
+        BacktraceLogger.setLogger(this.previousLogger);
     }
 
     @Test
@@ -179,6 +179,44 @@ public class BacktraceDatabaseSanitizedLoggingTest {
 
         assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
         this.recordingLogger.assertSanitized("BT_NATIVE_BRIDGE_FAILURE", "java.lang.UnsatisfiedLinkError");
+    }
+
+    @Test
+    public void bridgeReturnedFalseUsesStableDiagnosticCode() {
+        this.database.useNativeCommunication(new backtraceio.library.interfaces.NativeCommunication() {
+            @Override
+            public boolean handleCrash(String[] args) {
+                return false;
+            }
+
+            @Override
+            public boolean initializeJavaCrashHandler(
+                    String url,
+                    String databasePath,
+                    String classPath,
+                    String[] attributeKeys,
+                    String[] attributeValues,
+                    String[] attachmentPaths,
+                    String[] environmentVariables) {
+                return false;
+            }
+
+            @Override
+            public boolean initializeCrashHandler(
+                    String url,
+                    String databasePath,
+                    String handlerPath,
+                    String[] attributeKeys,
+                    String[] attributeValues,
+                    String[] attachmentPaths,
+                    boolean enableClientSideUnwinding,
+                    backtraceio.library.enums.UnwindingMode unwindingMode) {
+                return false;
+            }
+        });
+
+        assertEquals(false, this.database.setupNativeIntegration(this.client, this.credentials));
+        this.recordingLogger.assertSanitized("BT_NATIVE_BRIDGE_FAILURE", null);
     }
 
     @Test

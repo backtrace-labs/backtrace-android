@@ -54,7 +54,7 @@ public class BacktraceDatabase implements Database {
     private boolean _enable = false;
     private Breadcrumbs breadcrumbs;
     private CrashHandlerConfiguration crashHandlerConfiguration;
-    private boolean _enabledNativeIntegration = false;
+    private volatile boolean _enabledNativeIntegration = false;
     private NativeCommunication nativeCommunication = new BacktraceCrashHandlerWrapper();
 
     /**
@@ -209,17 +209,17 @@ public class BacktraceDatabase implements Database {
         // Validate public inputs before performing any side effects; enabling the optional native
         // integration must never terminate the host application.
         if (client == null) {
-            BacktraceLogger.e(LOG_TAG, "Native integration requires a Backtrace client.");
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration requires a Backtrace client.");
             this._enabledNativeIntegration = false;
             return false;
         }
         if (credentials == null) {
-            BacktraceLogger.e(LOG_TAG, "Native integration requires Backtrace credentials.");
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration requires Backtrace credentials.");
             this._enabledNativeIntegration = false;
             return false;
         }
         if (nativeCommunication == null || crashHandlerConfiguration == null) {
-            BacktraceLogger.e(LOG_TAG, "Native integration dependencies are unavailable.");
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration dependencies are unavailable.");
             this._enabledNativeIntegration = false;
             return false;
         }
@@ -240,7 +240,8 @@ public class BacktraceDatabase implements Database {
         try {
             Uri minidumpUri = credentials.getMinidumpSubmissionUrl();
             if (minidumpUri == null || minidumpUri.toString().trim().isEmpty()) {
-                BacktraceLogger.e(LOG_TAG, "Native integration requires a minidump submission URL.");
+                BacktraceLogger.e(
+                        LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration requires a minidump submission URL.");
                 this._enabledNativeIntegration = false;
                 return false;
             }
@@ -301,7 +302,7 @@ public class BacktraceDatabase implements Database {
         }
 
         if (!_enabledNativeIntegration) {
-            BacktraceLogger.e(LOG_TAG, "Native integration was not enabled by the native initialization bridge.");
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_BRIDGE_FAILURE: The native initialization bridge returned false.");
         }
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
