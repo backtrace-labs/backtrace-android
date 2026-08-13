@@ -9,6 +9,7 @@ import backtraceio.coroner.query.CoronerQueryFields;
 import backtraceio.coroner.response.CoronerResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,35 +18,40 @@ import java.util.Set;
  * GUID-correlated ingestion assertions for native qualification. GUID is the primary correlation
  * key (fatal reports carry no controllable {@code error.message}); the query limit exceeds every
  * expected count, so duplicate reports are detectable — with the historical limit of one they were
- * not. The count policy is injectable so a sabotage test can prove the exactly-N assertion rejects
- * duplicates.
+ * not. The count policy sums group row counts because Coroner can collapse an {@code _rxid}-grouped
+ * query into a single {@code "*"} group whose row count carries the real match total. A collapsed
+ * group exposes only one head value per fold, so it can never prove an expected message set: when
+ * specific messages must be proven, callers use {@link #awaitExactlyOneWithMessage}, which filters
+ * on the message itself. The report source is injectable so sabotage tests can prove every policy
+ * rejects its failure case.
  */
 final class CoronerNativeReportAssertions {
 
+    static final String CRASH_ERROR_TYPE = "Crash";
     static final long POLL_DEADLINE_MS = 90_000;
     static final long POLL_INTERVAL_MS = 2_000;
     static final long STABILITY_WINDOW_MS = 10_000;
     static final int QUERY_LIMIT = 10;
 
     /**
-     * Immutable test-only view of one result group. Coroner can collapse an {@code _rxid}-grouped
-     * query into a single {@code "*"} group whose row count carries the real match total, so the
-     * count policy sums {@code rowCount} instead of counting groups.
+     * Immutable test-only view of one result group. {@code groupId} is the RXID when the backend
+     * returns per-report groups and the literal {@code "*"} when it collapses the grouping;
+     * {@code rowCount} is the number of underlying reports folded into the group.
      */
     static final class NativeReport {
         final String guid;
-        final String rxid;
+        final String groupId;
         final String errorType;
         final String errorMessage;
         final int rowCount;
 
-        NativeReport(String guid, String rxid, String errorType, String errorMessage) {
-            this(guid, rxid, errorType, errorMessage, 1);
+        NativeReport(String guid, String groupId, String errorType, String errorMessage) {
+            this(guid, groupId, errorType, errorMessage, 1);
         }
 
-        NativeReport(String guid, String rxid, String errorType, String errorMessage, int rowCount) {
+        NativeReport(String guid, String groupId, String errorType, String errorMessage, int rowCount) {
             this.guid = guid;
-            this.rxid = rxid;
+            this.groupId = groupId;
             this.errorType = errorType;
             this.errorMessage = errorMessage;
             this.rowCount = rowCount;
@@ -58,25 +64,36 @@ final class CoronerNativeReportAssertions {
     }
 
     static ReportSource coronerSource(final CoronerClient client) {
-        return (guid, timestampStartSeconds) -> {
-            CoronerResponse response = client.guidTimestampFilter(
-                    guid,
-                    Long.toString(timestampStartSeconds),
-                    Long.toString(System.currentTimeMillis() / 1000L),
-                    Arrays.asList(CoronerQueryFields.ERROR_TYPE, CoronerQueryFields.ERROR_MESSAGE),
-                    QUERY_LIMIT);
+        return (guid, timestampStartSeconds) -> toReports(client.guidTimestampFilter(
+                guid,
+                Long.toString(timestampStartSeconds),
+                Long.toString(System.currentTimeMillis() / 1000L),
+                Arrays.asList(CoronerQueryFields.ERROR_TYPE, CoronerQueryFields.ERROR_MESSAGE),
+                QUERY_LIMIT));
+    }
 
-            List<NativeReport> reports = new ArrayList<>();
-            for (int index = 0; index < response.getResultsNumber(); index++) {
-                reports.add(new NativeReport(
-                        response.getAttribute(index, CoronerQueryFields.GUID, String.class),
-                        response.values.get(index).getGroupIdentifier(),
-                        response.getAttribute(index, CoronerQueryFields.ERROR_TYPE, String.class),
-                        response.getAttribute(index, CoronerQueryFields.ERROR_MESSAGE, String.class),
-                        response.values.get(index).getGroupRowCount()));
-            }
-            return reports;
-        };
+    /** Source filtered on an exact {@code error.message}, immune to collapsed grouping. */
+    static ReportSource coronerMessageSource(final CoronerClient client, final String message) {
+        return (guid, timestampStartSeconds) -> toReports(client.guidMessageTimestampFilter(
+                guid,
+                message,
+                Long.toString(timestampStartSeconds),
+                Long.toString(System.currentTimeMillis() / 1000L),
+                Arrays.asList(CoronerQueryFields.ERROR_TYPE, CoronerQueryFields.ERROR_MESSAGE),
+                QUERY_LIMIT));
+    }
+
+    private static List<NativeReport> toReports(CoronerResponse response) throws Exception {
+        List<NativeReport> reports = new ArrayList<>();
+        for (int index = 0; index < response.getResultsNumber(); index++) {
+            reports.add(new NativeReport(
+                    response.getAttribute(index, CoronerQueryFields.GUID, String.class),
+                    response.values.get(index).getGroupIdentifier(),
+                    response.getAttribute(index, CoronerQueryFields.ERROR_TYPE, String.class),
+                    response.getAttribute(index, CoronerQueryFields.ERROR_MESSAGE, String.class),
+                    response.values.get(index).getGroupRowCount()));
+        }
+        return reports;
     }
 
     static List<NativeReport> awaitExactly(
@@ -84,8 +101,10 @@ final class CoronerNativeReportAssertions {
             String guid,
             long timestampStartSeconds,
             int expectedCount,
-            Set<String> expectedMessages) {
-        return awaitExactly(coronerSource(client), guid, timestampStartSeconds, expectedCount, expectedMessages);
+            Set<String> expectedMessages,
+            String expectedErrorType) {
+        return awaitExactly(
+                coronerSource(client), guid, timestampStartSeconds, expectedCount, expectedMessages, expectedErrorType);
     }
 
     static List<NativeReport> awaitExactly(
@@ -93,13 +112,15 @@ final class CoronerNativeReportAssertions {
             String guid,
             long timestampStartSeconds,
             int expectedCount,
-            Set<String> expectedMessages) {
+            Set<String> expectedMessages,
+            String expectedErrorType) {
         return awaitExactly(
                 source,
                 guid,
                 timestampStartSeconds,
                 expectedCount,
                 expectedMessages,
+                expectedErrorType,
                 POLL_DEADLINE_MS,
                 POLL_INTERVAL_MS,
                 STABILITY_WINDOW_MS);
@@ -112,6 +133,7 @@ final class CoronerNativeReportAssertions {
             long timestampStartSeconds,
             int expectedCount,
             Set<String> expectedMessages,
+            String expectedErrorType,
             long deadlineMs,
             long intervalMs,
             long stabilityMs) {
@@ -124,7 +146,7 @@ final class CoronerNativeReportAssertions {
 
                 if (totalRowCount(reports) == expectedCount) {
                     // Duplicate-stability window: a delayed duplicate arriving right after the
-                    // expected count must fail, and the RXID set must not change.
+                    // expected count must fail, and the group-identifier set must not change.
                     SystemClock.sleep(stabilityMs);
                     List<NativeReport> stableReports = source.fetch(guid, timestampStartSeconds);
                     validate(stableReports, guid, expectedCount);
@@ -133,24 +155,29 @@ final class CoronerNativeReportAssertions {
                                 + totalRowCount(stableReports));
                     }
                     assertEquals(
-                            "RXID set changed during the stability window", rxidSet(reports), rxidSet(stableReports));
+                            "Group-identifier set changed during the stability window",
+                            groupIdSet(reports),
+                            groupIdSet(stableReports));
+                    if (expectedErrorType != null) {
+                        for (NativeReport report : stableReports) {
+                            if (!expectedErrorType.equals(report.errorType)) {
+                                fail("Report must classify as " + expectedErrorType + ", found " + report.errorType);
+                            }
+                        }
+                    }
                     if (expectedMessages != null) {
+                        if (totalRowCount(stableReports) != stableReports.size()) {
+                            // A collapsed group exposes one head message for many rows; it can
+                            // never prove the full expected set, so relaxing here would let a
+                            // duplicate of one message pass for a missing other message.
+                            fail("Collapsed grouping cannot prove the expected message set; "
+                                    + "use per-message queries for guid " + guid);
+                        }
                         Set<String> messages = new HashSet<>();
                         for (NativeReport report : stableReports) {
                             messages.add(report.errorMessage);
                         }
-                        if (totalRowCount(stableReports) == stableReports.size()) {
-                            // Per-report identity available: require the exact message set.
-                            assertEquals("Unexpected report messages", expectedMessages, messages);
-                        } else {
-                            // Collapsed grouping exposes one head value per group; every observed
-                            // message must still be expected (the count assertion stays exact).
-                            for (String message : messages) {
-                                if (!expectedMessages.contains(message)) {
-                                    fail("Unexpected report message: " + message);
-                                }
-                            }
-                        }
+                        assertEquals("Unexpected report messages", expectedMessages, messages);
                     }
                     return stableReports;
                 }
@@ -169,6 +196,45 @@ final class CoronerNativeReportAssertions {
         return null;
     }
 
+    /**
+     * Proves one specific {@code error.message} was ingested exactly once for this GUID, through a
+     * message-filtered query: correct even when GUID-wide grouping collapses. The report must
+     * classify as {@code Crash}.
+     */
+    static NativeReport awaitExactlyOneWithMessage(
+            CoronerClient client, String guid, String message, long timestampStartSeconds) {
+        return awaitExactlyOneWithMessage(
+                coronerMessageSource(client, message),
+                guid,
+                message,
+                timestampStartSeconds,
+                POLL_DEADLINE_MS,
+                POLL_INTERVAL_MS,
+                STABILITY_WINDOW_MS);
+    }
+
+    /** Timing-injectable variant; {@code source} must already filter on the message. */
+    static NativeReport awaitExactlyOneWithMessage(
+            ReportSource source,
+            String guid,
+            String message,
+            long timestampStartSeconds,
+            long deadlineMs,
+            long intervalMs,
+            long stabilityMs) {
+        List<NativeReport> reports = awaitExactly(
+                source,
+                guid,
+                timestampStartSeconds,
+                1,
+                Collections.singleton(message),
+                CRASH_ERROR_TYPE,
+                deadlineMs,
+                intervalMs,
+                stabilityMs);
+        return reports.get(0);
+    }
+
     static NativeReport awaitExactlyOneFatal(ReportSource source, String guid, long timestampStartSeconds) {
         return awaitExactlyOneFatal(
                 source, guid, timestampStartSeconds, POLL_DEADLINE_MS, POLL_INTERVAL_MS, STABILITY_WINDOW_MS);
@@ -182,11 +248,9 @@ final class CoronerNativeReportAssertions {
             long deadlineMs,
             long intervalMs,
             long stabilityMs) {
-        List<NativeReport> reports =
-                awaitExactly(source, guid, timestampStartSeconds, 1, null, deadlineMs, intervalMs, stabilityMs);
-        NativeReport report = reports.get(0);
-        assertEquals("Fatal report must classify as Crash", "Crash", report.errorType);
-        return report;
+        List<NativeReport> reports = awaitExactly(
+                source, guid, timestampStartSeconds, 1, null, CRASH_ERROR_TYPE, deadlineMs, intervalMs, stabilityMs);
+        return reports.get(0);
     }
 
     static NativeReport awaitExactlyOneFatal(CoronerClient client, String guid, long timestampStartSeconds) {
@@ -205,7 +269,7 @@ final class CoronerNativeReportAssertions {
     }
 
     /** Reports are groups; Coroner may fold many rows into one group, so sum the row counts. */
-    private static int totalRowCount(List<NativeReport> reports) {
+    static int totalRowCount(List<NativeReport> reports) {
         int total = 0;
         for (NativeReport report : reports) {
             total += report.rowCount;
@@ -213,12 +277,12 @@ final class CoronerNativeReportAssertions {
         return total;
     }
 
-    private static Set<String> rxidSet(List<NativeReport> reports) {
-        Set<String> rxids = new HashSet<>();
+    private static Set<String> groupIdSet(List<NativeReport> reports) {
+        Set<String> groupIds = new HashSet<>();
         for (NativeReport report : reports) {
-            rxids.add(report.rxid);
+            groupIds.add(report.groupId);
         }
-        return rxids;
+        return groupIds;
     }
 
     private CoronerNativeReportAssertions() {}

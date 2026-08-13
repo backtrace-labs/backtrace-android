@@ -65,14 +65,22 @@ public class NativeSplitProcessIntegrationTest {
 
             java.util.List<CoronerNativeReportAssertions.NativeReport> reports =
                     CoronerNativeReportAssertions.awaitExactly(
-                            coroner, guid, timestampStart, 1, new HashSet<>(Arrays.asList(message)));
+                            coroner,
+                            guid,
+                            timestampStart,
+                            1,
+                            new HashSet<>(Arrays.asList(message)),
+                            CoronerNativeReportAssertions.CRASH_ERROR_TYPE);
             logEvidence(
                     "nonfatal",
                     guid,
                     reports,
+                    "\"" + escapeJson(message) + "\":1",
                     "\"process_abi\":\"" + ready.getString(NativeTestProtocol.KEY_PROCESS_ABI)
                             + "\",\"process_is_64_bit\":"
-                            + ready.getBoolean(NativeTestProtocol.KEY_IS_64_BIT));
+                            + ready.getBoolean(NativeTestProtocol.KEY_IS_64_BIT)
+                            + ",\"handler_path\":\"" + escapeJson(ready.getString(NativeTestProtocol.KEY_HANDLER_PATH))
+                            + "\"");
 
             // Cleanup only after ingestion is confirmed; the client must stay alive while
             // uploading.
@@ -112,11 +120,12 @@ public class NativeSplitProcessIntegrationTest {
 
             CoronerNativeReportAssertions.NativeReport fatalReport =
                     CoronerNativeReportAssertions.awaitExactlyOneFatal(coroner, guid, timestampStart);
-            assertNotNull(fatalReport.rxid);
+            assertNotNull(fatalReport.groupId);
             logEvidence(
                     "fatal",
                     guid,
                     java.util.Collections.singletonList(fatalReport),
+                    null,
                     "\"crashed_pid\":" + crashedPid + ",\"binder_died\":true");
 
             recoverySession.request(
@@ -138,8 +147,7 @@ public class NativeSplitProcessIntegrationTest {
             beforeData.putString(NativeTestProtocol.KEY_MESSAGE, beforeMessage);
             session.request(
                     NativeTestProtocol.CMD_DUMP, beforeData, NativeTestProtocol.EVENT_COMPLETED, COMMAND_TIMEOUT_MS);
-            CoronerNativeReportAssertions.awaitExactly(
-                    coroner, guid, timestampStart, 1, new HashSet<>(Arrays.asList(beforeMessage)));
+            CoronerNativeReportAssertions.awaitExactlyOneWithMessage(coroner, guid, beforeMessage, timestampStart);
 
             session.request(
                     NativeTestProtocol.CMD_DISABLE, null, NativeTestProtocol.EVENT_COMPLETED, COMMAND_TIMEOUT_MS);
@@ -152,16 +160,22 @@ public class NativeSplitProcessIntegrationTest {
             session.request(
                     NativeTestProtocol.CMD_DUMP, afterData, NativeTestProtocol.EVENT_COMPLETED, COMMAND_TIMEOUT_MS);
 
-            // Exactly two total reports with both distinct messages proves the upload thread
-            // actually restarted, not merely that Java state changed.
+            // Proving the upload thread actually restarted requires all three conditions, each
+            // with its own stability window: exactly two reports GUID-wide, and exactly one report
+            // per distinct message. Message-filtered queries stay correct when Coroner collapses
+            // the GUID-wide grouping into a single wildcard group; the GUID-wide query alone
+            // could then not distinguish a duplicate from the missing second message.
             java.util.List<CoronerNativeReportAssertions.NativeReport> lifecycleReports =
                     CoronerNativeReportAssertions.awaitExactly(
-                            coroner,
-                            guid,
-                            timestampStart,
-                            2,
-                            new HashSet<>(Arrays.asList(beforeMessage, afterMessage)));
-            logEvidence("lifecycle", guid, lifecycleReports, null);
+                            coroner, guid, timestampStart, 2, null, CoronerNativeReportAssertions.CRASH_ERROR_TYPE);
+            CoronerNativeReportAssertions.awaitExactlyOneWithMessage(coroner, guid, beforeMessage, timestampStart);
+            CoronerNativeReportAssertions.awaitExactlyOneWithMessage(coroner, guid, afterMessage, timestampStart);
+            logEvidence(
+                    "lifecycle",
+                    guid,
+                    lifecycleReports,
+                    "\"" + escapeJson(beforeMessage) + "\":1,\"" + escapeJson(afterMessage) + "\":1",
+                    null);
 
             session.request(
                     NativeTestProtocol.CMD_CLEANUP, null, NativeTestProtocol.EVENT_COMPLETED, COMMAND_TIMEOUT_MS);
@@ -217,25 +231,36 @@ public class NativeSplitProcessIntegrationTest {
 
     /**
      * Machine-readable evidence line collected by scripts/run_split_install_test.sh into
-     * native-report-evidence.json. Carries GUIDs and RXIDs only — never credentials.
+     * native-report-evidence.json. Carries GUIDs and group identifiers only — never credentials.
+     * {@code group_ids} are RXIDs when the backend returns per-report groups and the literal
+     * {@code "*"} when it collapses the grouping; {@code stable_count} is the summed report count,
+     * which is what the assertion actually verified. {@code messagesJson} lists each proven
+     * message with its individually verified count.
      */
     private static void logEvidence(
             String phase,
             String guid,
             java.util.List<CoronerNativeReportAssertions.NativeReport> reports,
+            String messagesJson,
             String extraJson) {
-        StringBuilder rxids = new StringBuilder("[");
+        StringBuilder groupIds = new StringBuilder("[");
         for (int i = 0; i < reports.size(); i++) {
             if (i > 0) {
-                rxids.append(',');
+                groupIds.append(',');
             }
-            rxids.append('"').append(reports.get(i).rxid).append('"');
+            groupIds.append('"').append(escapeJson(reports.get(i).groupId)).append('"');
         }
-        rxids.append(']');
+        groupIds.append(']');
         android.util.Log.i(
                 "NativeQualEvidence",
-                "{\"phase\":\"" + phase + "\",\"guid\":\"" + guid + "\",\"rxids\":" + rxids + ",\"stable_count\":"
-                        + reports.size() + (extraJson == null ? "" : "," + extraJson) + "}");
+                "{\"phase\":\"" + phase + "\",\"guid\":\"" + guid + "\",\"group_ids\":" + groupIds
+                        + ",\"stable_count\":" + CoronerNativeReportAssertions.totalRowCount(reports)
+                        + (messagesJson == null ? "" : ",\"messages\":{" + messagesJson + "}")
+                        + (extraJson == null ? "" : "," + extraJson) + "}");
+    }
+
+    private static String escapeJson(String value) {
+        return value == null ? "" : value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private static boolean hasText(String value) {
