@@ -117,6 +117,10 @@ if [ "${EXPECTED_DEVICE_SUPPORTS_64_BIT:-}" = "0" ] && [ -n "$device_abilist64" 
     exit 1
 fi
 
+# A persistent device may carry NativeQualEvidence lines from a previous run; stale evidence
+# must never satisfy this run's gates or contaminate its provenance.
+adb logcat -c 2>/dev/null || true
+
 # --- instrumentation APK, certificate-aligned ---------------------------------------------------
 build_tools_version="$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
 apksigner="$ANDROID_HOME/build-tools/$build_tools_version/apksigner"
@@ -160,6 +164,15 @@ run_instrumentation_test \
     "fresh-process-safety-output.txt" \
     1
 
+# --- phase 4b: assertion-policy sabotage suite (secretless) -------------------------------------
+# The duplicate/collapsed-group/message/error-type policies guard every ingestion gate; they must
+# execute on fork and Dependabot changes too, so they run here rather than only in trusted lanes.
+# The expected count is hard-gated: silently dropped sabotage tests must fail this phase.
+run_instrumentation_test \
+    "backtraceio.backtraceio.CoronerNativeReportAssertionsTest" \
+    "assertion-sabotage-output.txt" \
+    13
+
 # Sanitization gate: the safety scenarios deliberately throw sentinel-bearing failures in a real
 # process; a raw sentinel in UNfiltered logcat means the sanitized-diagnostics contract regressed.
 if adb logcat -d 2>/dev/null | grep -qE "SECRET_URL_TOKEN_SENTINEL|PRIVATE_CUSTOMER_SENTINEL"; then
@@ -190,15 +203,25 @@ else
 fi
 
 # --- evidence -----------------------------------------------------------------------------------
-head_sha="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
+# Provenance: a pull_request checkout is a synthetic merge commit, so HEAD is NOT the PR head.
+# Record both SHAs; PR_HEAD_SHA is provided by CI, and HEAD^2 of a merge checkout is the PR head.
+tested_merge_sha="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
+if [ -n "${PR_HEAD_SHA:-}" ]; then
+    pr_head_sha="$PR_HEAD_SHA"
+elif [ "${GITHUB_ACTIONS:-}" = "true" ] && git rev-parse -q --verify HEAD^2 > /dev/null 2>&1; then
+    pr_head_sha="$(git rev-parse HEAD^2)"
+else
+    pr_head_sha="$tested_merge_sha"
+fi
 adb logcat -d -s NativeQualEvidence:I 2>/dev/null > native-qual-evidence-lines.txt || true
-python3 - "$head_sha" <<'PY'
+python3 - "$pr_head_sha" "$tested_merge_sha" <<'PY'
 import json
 import re
 import sys
 
 evidence = {
-    "head_sha": sys.argv[1],
+    "pr_head_sha": sys.argv[1],
+    "tested_merge_sha": sys.argv[2],
     "device": {},
     "install": {"package_paths": []},
 }
@@ -238,12 +261,15 @@ try:
 except OSError:
     pass
 
-# The service READY facts carry the real process ABI/bitness; prefer them over device props.
+# The service READY facts carry the real process ABI/bitness and the resolved handler path;
+# prefer them over device props and surface the handler path at the top level.
 nonfatal = evidence.get("nonfatal", {})
 if isinstance(nonfatal, dict) and nonfatal.get("process_abi"):
     evidence["device"]["process_abi"] = nonfatal.pop("process_abi")
     if "process_is_64_bit" in nonfatal:
         evidence["device"]["is_64_bit"] = nonfatal.pop("process_is_64_bit")
+if isinstance(nonfatal, dict) and nonfatal.get("handler_path"):
+    evidence["handler_path"] = nonfatal.pop("handler_path")
 
 with open("native-report-evidence.json", "w") as output:
     json.dump(evidence, output, indent=2)
