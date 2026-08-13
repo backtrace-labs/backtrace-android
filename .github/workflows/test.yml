@@ -192,6 +192,8 @@ jobs:
   # for every PR, including forks; ingestion is excluded by policy, not by a silent failure.
   aab-resolver-and-safety:
     runs-on: ubuntu-latest
+    env:
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     timeout-minutes: 45
     steps:
       - name: Checkout submodules
@@ -255,6 +257,7 @@ jobs:
             device-facts.txt
             split-resolver-output.txt
             fresh-process-safety-output.txt
+            assertion-sabotage-output.txt
             native-report-evidence.json
             split-install-logcat.txt
           if-no-files-found: ignore
@@ -398,6 +401,8 @@ jobs:
   # fatal + restart-assisted recovery, and disable/re-enable lifecycle, all GUID-correlated.
   aab-native-full:
     runs-on: ubuntu-latest
+    env:
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     timeout-minutes: 60
     needs: policy
     if: needs.policy.outputs.trusted == 'true'
@@ -489,6 +494,7 @@ jobs:
             device-facts.txt
             split-resolver-output.txt
             fresh-process-safety-output.txt
+            assertion-sabotage-output.txt
             split-nonfatal-output.txt
             split-fatal-output.txt
             split-lifecycle-output.txt
@@ -500,6 +506,8 @@ jobs:
   # alignment (checked in source-quality) is necessary but not a runtime test; this is.
   aab-native-16kb:
     runs-on: ubuntu-latest
+    env:
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     timeout-minutes: 60
     needs: policy
     if: needs.policy.outputs.trusted == 'true'
@@ -596,6 +604,7 @@ jobs:
             device-facts.txt
             split-resolver-output.txt
             fresh-process-safety-output.txt
+            assertion-sabotage-output.txt
             split-nonfatal-output.txt
             split-fatal-output.txt
             split-lifecycle-output.txt
@@ -604,17 +613,36 @@ jobs:
           if-no-files-found: ignore
 
   # Manual hardware gate: allocated arm64 / mixed-bitness devices on a self-hosted runner. Fails
-  # clearly when no device is attached; never silently passes.
+  # clearly when no device is attached or a prerequisite is missing; never silently passes. The
+  # gate script derives process bitness from the ABI (arm64-v8a = 64-bit, armeabi-v7a = 32-bit),
+  # so the 32-bit-on-64-bit-hardware scenario is dispatched with hardware_abi=armeabi-v7a.
   hardware-release-gate:
     if: github.event_name == 'workflow_dispatch'
     runs-on: [self-hosted, android-device, arm64]
     timeout-minutes: 90
+    env:
+      PR_HEAD_SHA: ${{ github.sha }}
     steps:
       - name: Checkout submodules
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v5
         with:
           submodules: recursive
           persist-credentials: false
+
+      - name: Download bundletool (pinned)
+        run: |
+          curl -sL -o bundletool.jar \
+            "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
+          echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
+
+      - name: Ensure Android debug keystore
+        run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
 
       - name: Validate and write trusted credentials
         env:
@@ -647,7 +675,6 @@ jobs:
           ./scripts/run_native_release_device_gate.sh \
             --abi "${{ github.event.inputs.hardware_abi }}" \
             --require-device-64-bit true \
-            --require-process-64-bit true \
             --require-page-size "${{ github.event.inputs.hardware_page_size }}" \
             --require-ingestion true
 
@@ -661,5 +688,11 @@ jobs:
             native-report-evidence.json
             device-facts.txt
             installed-package-paths.txt
+            split-resolver-output.txt
+            fresh-process-safety-output.txt
+            assertion-sabotage-output.txt
+            split-nonfatal-output.txt
+            split-fatal-output.txt
+            split-lifecycle-output.txt
             split-install-logcat.txt
           if-no-files-found: ignore
