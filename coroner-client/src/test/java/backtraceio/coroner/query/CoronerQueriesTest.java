@@ -88,6 +88,40 @@ public class CoronerQueriesTest {
     }
 
     @Test
+    public void filterByGuidMessageAndTimestampTest() {
+        // GIVEN
+        final String guid = "1f4a2b3c-0000-4f0a-fd08-00000000dead";
+        final String message = "before-disable-1f4a2b3c";
+        final List<String> attributes = Arrays.asList("error.type", "error.message");
+
+        // WHEN
+        JsonObject result = coronerQueries.filterByGuidMessageAndTimestamp(
+                guid, message, "1680943692", "1681943692", attributes, 10);
+
+        // THEN
+        String expectedResult = "{\"fold\":{\"error.type\":[[\"head\"]],\"error.message\":[[\"head\"]]},"
+                + "\"group\":[[\"_rxid\"]],\"offset\":0,\"limit\":10,"
+                + "\"filter\":[{\"guid\":[[\"equal\",\"1f4a2b3c-0000-4f0a-fd08-00000000dead\"]],"
+                + "\"error.message\":[[\"equal\",\"before-disable-1f4a2b3c\"]],"
+                + "\"timestamp\":[[\"at-least\",\"1680943692.\"],[\"at-most\",\"1681943692.\"]]}]}";
+        assertEquals(expectedResult, StringUtils.normalizeSpace(result.toString()));
+    }
+
+    @Test
+    public void filterByGuidMessageRejectsBlankInputs() {
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidMessageAndTimestamp(
+                        "  ", "message", "1", "2", Arrays.asList("a"), 10));
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidMessageAndTimestamp("guid", null, "1", "2", Arrays.asList("a"), 10));
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidMessageAndTimestamp("guid", " ", "1", "2", Arrays.asList("a"), 10));
+    }
+
+    @Test
     public void filterByErrorTypeAndTimestampTest() {
         // GIVEN
         final List<String> attributes = Arrays.asList("error.message", "example-attribute");

@@ -76,6 +76,27 @@ public class CoronerClient {
         return makeRequest(coronerQuery);
     }
 
+    /**
+     * GUID plus exact {@code error.message} query returning up to {@code limit} reports. Use this
+     * to prove a specific message was ingested exactly once even when the backend collapses a
+     * GUID-wide grouped query into a single wildcard group.
+     */
+    public CoronerResponse guidMessageTimestampFilter(
+            final String guid,
+            final String errorMessage,
+            final String timestampLeast,
+            final String timestampMost,
+            final List<String> customAttributes,
+            final int limit)
+            throws CoronerResponseException, IOException, CoronerHttpException {
+        final List<String> attributes = concatAttributes(customAttributes);
+
+        final JsonObject coronerQuery = this.coronerQueries.filterByGuidMessageAndTimestamp(
+                guid, errorMessage, timestampLeast, timestampMost, attributes, limit);
+
+        return makeRequest(coronerQuery);
+    }
+
     private List<String> concatAttributes(final List<String> customAttributes) {
         final List<String> result = new ArrayList<>(customAttributes);
         result.addAll(DEFAULT_ATTRIBUTES);

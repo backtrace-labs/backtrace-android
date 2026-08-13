@@ -57,4 +57,33 @@ public class CoronerQueries {
 
         return this.builder.buildRxIdGroup(filtersBuilder.getJson(), attributes, limit);
     }
+
+    /**
+     * GUID plus exact {@code error.message} query. Grouped results can collapse into a single
+     * wildcard group exposing one head value per fold, so proving that a specific message was
+     * ingested exactly once requires filtering on the message itself rather than inspecting head
+     * values of a GUID-wide query.
+     */
+    public JsonObject filterByGuidMessageAndTimestamp(
+            final String guid,
+            final String errorMessage,
+            final String timestampLeast,
+            final String timestampMost,
+            final List<String> attributes,
+            final int limit) {
+        if (guid == null || guid.trim().isEmpty()) {
+            throw new IllegalArgumentException("guid cannot be null or blank");
+        }
+        if (errorMessage == null || errorMessage.trim().isEmpty()) {
+            throw new IllegalArgumentException("errorMessage cannot be null or blank");
+        }
+
+        final CoronerFiltersBuilder filtersBuilder = new CoronerFiltersBuilder();
+        filtersBuilder.addFilter(CoronerQueryFields.GUID, FilterOperator.EQUAL, guid);
+        filtersBuilder.addFilter(CoronerQueryFields.ERROR_MESSAGE, FilterOperator.EQUAL, errorMessage);
+        filtersBuilder.addFilter(CoronerQueryFields.TIMESTAMP, FilterOperator.AT_LEAST, timestampLeast + ".");
+        filtersBuilder.addFilter(CoronerQueryFields.TIMESTAMP, FilterOperator.AT_MOST, timestampMost + ".");
+
+        return this.builder.buildRxIdGroup(filtersBuilder.getJson(), attributes, limit);
+    }
 }

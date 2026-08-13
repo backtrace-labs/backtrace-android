@@ -1,9 +1,11 @@
 package backtraceio.coroner;
 
+import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_GUID_MESSAGE_TIMESTAMP;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_GUID_TIMESTAMP;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_RXID_123_ATTR_ERR_MSG;
 import static backtraceio.coroner.utils.ResourceUtils.QUERY_CORONER_TIMESTAMP_ERR_TYPE;
+import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_GUID_MESSAGE_ONE_RESULT_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_GUID_TWO_RESULTS_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_OPERATION_ERROR_JSON;
 import static backtraceio.coroner.utils.ResourceUtils.RESPONSE_RX_FILTER_CORONER_JSON;
@@ -162,6 +164,43 @@ public class CoronerClientTest {
         assertEquals(guid, result.getAttribute(0, "guid", String.class));
         assertEquals(guid, result.getAttribute(1, "guid", String.class));
         assertEquals("duplicate-report", result.getAttribute(1, "error.message", String.class));
+    }
+
+    /**
+     * The GUID+message query proves a specific message was ingested exactly once even when a
+     * GUID-wide grouped query collapses into a single wildcard group.
+     */
+    @Test
+    public void guidMessageTimestampFilterReturnsTheMatchingReport()
+            throws CoronerResponseException, IOException, CoronerHttpException, CoronerResponseProcessingException {
+        // GIVEN
+        final String guid = "11111111-2222-3333-4444-555555555555";
+        final String message = "before-disable-11111111";
+        final String expectedJsonQuery = readResourceFile(QUERY_CORONER_GUID_MESSAGE_TIMESTAMP);
+        final String jsonResponse = readResourceFile(RESPONSE_GUID_MESSAGE_ONE_RESULT_JSON);
+        final CoronerApiResponse expectedResponse = GsonWrapper.fromJson(jsonResponse, CoronerApiResponse.class);
+
+        // MOCK
+        when(mockHttpClient.get(argThat(JsonMatchers.jsonEquals(expectedJsonQuery))))
+                .thenReturn(expectedResponse);
+
+        // WHEN
+        final CoronerResponse result = client.guidMessageTimestampFilter(
+                guid, message, "1680000000", "1680000600", Arrays.asList("error.type", "error.message"), 10);
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(1, result.getResultsNumber());
+        assertEquals(guid, result.getAttribute(0, "guid", String.class));
+        assertEquals(message, result.getAttribute(0, "error.message", String.class));
+    }
+
+    @Test
+    public void guidMessageTimestampFilterRejectsBlankMessage() {
+        Mockito.verifyNoInteractions(mockHttpClient);
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> client.guidMessageTimestampFilter("guid", " ", "1", "2", Arrays.asList("error.type"), 10));
     }
 
     @Test
