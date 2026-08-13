@@ -1,12 +1,14 @@
 # Backtrace Android Release Notes
 
 ## Next version
-Bugfixes
-- Fixed a native-integration cold-start ANR in large APK/AAB applications by removing SDK-owned APK ZIP central-directory parsing (`ZipFile$Source.initCEN`) from crash-handler path resolution. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks.
-- Hardened optional native setup, disable, and dump calls so failures remain nonfatal and managed reporting continues; `tryEnableNativeIntegration()` exposes the setup result while `enableNativeIntegration()` stays `void` for compatibility.
-- Prevented crash-handler/setup diagnostics from logging credentials, argument values, or resolved paths; failures log a stable stage code and exception class only.
-- Corrected process-ABI selection by preferring the ABI reported for the running process. On API 23 and later, malformed primary ABI metadata falls back to process-bitness-specific ABI lists; API 21-22 retain the device-ordered fallback.
-- Added Play-style split-install, fatal-process, disable/re-enable lifecycle, API 21/22, and 16 KB runtime qualification. Hardware and affected-customer validation are tracked in the release qualification document before full production sign-off.
+
+### Bug fixes
+
+- Improved native-integration startup in large APK and Android App Bundle applications by removing synchronous SDK-owned APK ZIP central-directory parsing from crash-handler path resolution. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks.
+- Hardened optional native setup, disable, and dump operations so failures remain nonfatal and managed reporting continues.
+- Added `tryEnableNativeIntegration(...)` methods that report whether native crash-handler registration succeeded while preserving existing `void enableNativeIntegration(...)` APIs.
+- Corrected process-ABI selection for native-library fallback resolution.
+- Prevented native setup and crash-handler diagnostics from logging credentials, argument values, application-provided annotations, attachment paths, or resolved native-library paths.
 
 ## Version 3.13.0
 Improvements
