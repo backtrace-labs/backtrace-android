@@ -1,5 +1,6 @@
 package backtraceio.coroner.response;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CoronerResponseGroup {
@@ -23,10 +24,20 @@ public class CoronerResponseGroup {
     }
 
     private static int parseRowCount(final Object countElement) {
-        if (countElement instanceof Number) {
-            return Math.max(1, ((Number) countElement).intValue());
+        if (!(countElement instanceof Number)) {
+            throw new IllegalArgumentException("Coroner group row count is not numeric");
         }
-        return 1;
+
+        final int rowCount;
+        try {
+            rowCount = new BigDecimal(countElement.toString()).intValueExact();
+        } catch (NumberFormatException | ArithmeticException failure) {
+            throw new IllegalArgumentException("Coroner group row count must be an exact 32-bit integer", failure);
+        }
+        if (rowCount <= 0) {
+            throw new IllegalArgumentException("Coroner group row count must be positive");
+        }
+        return rowCount;
     }
 
     public Object getAttribute(final int index) {
