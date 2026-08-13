@@ -103,10 +103,31 @@ def main() -> int:
         default=None,
         help="require exactly this many trace-section samples per captured variant",
     )
+    parser.add_argument(
+        "--expected-baseline-traces",
+        type=int,
+        default=None,
+        help="require exactly this many baseline trace files",
+    )
+    parser.add_argument(
+        "--expected-fixture-traces",
+        type=int,
+        default=None,
+        help="require exactly this many fixture trace files (use zero when not captured)",
+    )
     arguments = parser.parse_args()
+
+    for flag, count in (
+        ("--expected-samples", arguments.expected_samples),
+        ("--expected-baseline-traces", arguments.expected_baseline_traces),
+        ("--expected-fixture-traces", arguments.expected_fixture_traces),
+    ):
+        if count is not None and count < 0:
+            parser.error(f"{flag} must be zero or greater")
 
     variants = {"baseline": [], "fixture": []}
     trace_counts = {"baseline": 0, "fixture": 0}
+    per_trace_section_counts = {}
     callstack_coverage = False
     matches = set()
     traces = sorted(glob.glob(arguments.traces + "/*.perfetto-trace"))
@@ -123,7 +144,9 @@ def main() -> int:
             print(f"Unrecognized trace name {basename}: expected baseline-*/fixture-*", file=sys.stderr)
             return 1
         trace_counts[variant] += 1
-        variants[variant].extend(section_durations_ms(arguments.trace_processor, trace))
+        trace_durations = section_durations_ms(arguments.trace_processor, trace)
+        per_trace_section_counts[basename] = len(trace_durations)
+        variants[variant].extend(trace_durations)
         covered, trace_matches = forbidden_matches(arguments.trace_processor, trace)
         callstack_coverage = callstack_coverage or covered
         matches.update(trace_matches)
@@ -139,6 +162,8 @@ def main() -> int:
         "baseline": baseline,
         "fixture": fixture,
         "median_delta_ms": delta,
+        "trace_file_counts": trace_counts,
+        "per_trace_section_counts": per_trace_section_counts,
         "forbidden_symbol_matches": sorted(matches),
         "callstack_coverage": callstack_coverage,
     }
@@ -146,25 +171,43 @@ def main() -> int:
         json.dump(summary, output, indent=2)
     print(json.dumps(summary, indent=2))
 
+    failed = False
     if matches:
         print("Forbidden symbols present in runtime callstacks", file=sys.stderr)
-        return 1
-    for variant, count in trace_counts.items():
-        if count > 0 and not variants[variant]:
+        failed = True
+
+    expected_trace_counts = {
+        "baseline": arguments.expected_baseline_traces,
+        "fixture": arguments.expected_fixture_traces,
+    }
+    for variant, expected_count in expected_trace_counts.items():
+        actual_count = trace_counts[variant]
+        if expected_count is not None and actual_count != expected_count:
             print(
-                f"{variant}: {count} trace(s) captured but zero {TRACE_SECTION} samples;"
-                " app atrace was probably not enabled for the package",
+                f"{variant}: expected exactly {expected_count} trace file(s), found {actual_count}",
                 file=sys.stderr,
             )
-            return 1
-        if count > 0 and arguments.expected_samples is not None and len(variants[variant]) != arguments.expected_samples:
+            failed = True
+
+    if arguments.expected_samples is not None:
+        for variant, trace_count in trace_counts.items():
+            if trace_count > 0 and len(variants[variant]) != arguments.expected_samples:
+                print(
+                    f"{variant}: expected exactly {arguments.expected_samples} {TRACE_SECTION} samples"
+                    f", found {len(variants[variant])}",
+                    file=sys.stderr,
+                )
+                failed = True
+
+    for trace, section_count in per_trace_section_counts.items():
+        if section_count != 1:
             print(
-                f"{variant}: expected exactly {arguments.expected_samples} {TRACE_SECTION} samples"
-                f" (one per cold-start iteration), found {len(variants[variant])}",
+                f"{trace}: expected exactly one {TRACE_SECTION} section, found {section_count};"
+                " app atrace may not be enabled, or the activity may have initialized more than once",
                 file=sys.stderr,
             )
-            return 1
-    return 0
+            failed = True
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

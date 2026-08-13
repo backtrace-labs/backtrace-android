@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Cold-start Perfetto capture around the Backtrace native-initialization trace section
-# (BacktraceQualification#tryEnableNativeIntegration). Captures a baseline package and, when
+# Example-app-only cold-start Perfetto capture around the Backtrace native-initialization trace
+# section (BacktraceQualification#tryEnableNativeIntegration). Captures a baseline build and, when
 # --with-fixture is set, a large-central-directory build of the example app, so the analyzer can
 # prove initialization cost does not scale with APK ZIP entry count.
 #
@@ -13,15 +13,21 @@ set -euo pipefail
 #
 # Usage:
 #   scripts/capture_native_startup_perfetto.sh \
-#     --package <package> --activity <activity> --iterations 10 --output <dir> \
+#     --iterations 10 --output <dir> \
 #     [--with-fixture] [--capture-only]
+#
+# The optional --package and --activity arguments are retained only for explicitness and must name
+# the repository's example-app qualification activity. This public harness does not operate on
+# arbitrary installed applications.
 #
 # Qualification requires a pinned trace_processor_shell via TRACE_PROCESSOR_SHELL (never
 # downloaded as "latest"). Without one, the run must be explicitly requested as --capture-only:
 # raw traces are retained but the run is NOT a completed qualification.
 
-package=""
-activity=".NativeStartupQualificationActivity"
+example_package="backtraceio.backtraceio"
+example_activity=".NativeStartupQualificationActivity"
+package="$example_package"
+activity="$example_activity"
 iterations=10
 output=""
 with_fixture=0
@@ -41,8 +47,12 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "$package" ] || [ -z "$output" ]; then
-    echo "--package and --output are required" >&2
+if [ -z "$output" ]; then
+    echo "--output is required" >&2
+    exit 2
+fi
+if [ "$package" != "$example_package" ] || [ "$activity" != "$example_activity" ]; then
+    echo "This harness only supports $example_package/$example_activity from example-app." >&2
     exit 2
 fi
 if [ "$iterations" -lt 10 ]; then
@@ -55,21 +65,54 @@ if [ "$capture_only" = "0" ] && { [ -z "${TRACE_PROCESSOR_SHELL:-}" ] || [ ! -x 
     exit 2
 fi
 
+if [ -L "$output" ] || { [ -e "$output" ] && [ ! -d "$output" ]; }; then
+    echo "Output path must be a directory and must not be a symbolic link: $output" >&2
+    exit 2
+fi
+fixture_root="example-app/build/native-startup-fixture"
+fixture_dir="$fixture_root/assets"
+if ! python3 - "$output" "$fixture_root" <<'PY'
+import os
+import sys
+
+output, fixture_root = (os.path.realpath(path) for path in sys.argv[1:])
+if os.path.commonpath((output, fixture_root)) == fixture_root:
+    raise SystemExit("Evidence output must be outside the generated fixture directory")
+PY
+then
+    exit 2
+fi
 mkdir -p "$output"
-# Stale traces from a previous run must never pass as this run's evidence: the analyzer globs the
-# whole directory, so a reused directory could satisfy --expected-samples with old captures.
-if ls "$output"/*.perfetto-trace > /dev/null 2>&1; then
-    echo "Output directory $output already contains traces; use a fresh directory per run." >&2
+# Every evidence item must belong to this run. Reusing even a trace-free directory could retain an
+# old result JSON, summary, or device-facts file and make the artifact internally inconsistent.
+if [ -n "$(find "$output" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+    echo "Output directory $output is not empty; use a fresh directory per run." >&2
     exit 2
 fi
 
 # Pin the baseline APK identity: baseline iterations must measure a known, freshly installed
 # build, not whatever happens to be on the device (for example a leftover fixture install).
+./gradlew :example-app:assembleDebug
 baseline_apk="example-app/build/outputs/apk/debug/example-app-debug.apk"
 test -f "$baseline_apk"
-baseline_apk_copy="$output/baseline.apk"
+baseline_apk_copy="$(mktemp "${TMPDIR:-/tmp}/backtrace-native-startup-baseline-apk.XXXXXX")"
+baseline_copy_ready=0
+
+cleanup_fixture() {
+    if [ "$baseline_copy_ready" = "1" ]; then
+        # A fixture build overwrites Gradle's normal debug output. Restore the exact baseline APK so
+        # a later baseline-only invocation cannot accidentally measure the large-entry fixture.
+        cp -- "$baseline_apk_copy" "$baseline_apk"
+    fi
+    rm -f -- "$baseline_apk_copy"
+    rm -rf -- "$fixture_root"
+}
+trap cleanup_fixture EXIT
+
 cp "$baseline_apk" "$baseline_apk_copy"
+baseline_copy_ready=1
 python3 - "$baseline_apk_copy" "$output" <<'PY'
+import hashlib
 import sys
 import zipfile
 
@@ -77,16 +120,17 @@ apk, output = sys.argv[1], sys.argv[2]
 count = len(zipfile.ZipFile(apk).namelist())
 with open(output + "/baseline-apk-entry-count.txt", "w") as record:
     record.write(str(count) + "\n")
+sha256 = hashlib.sha256()
+with open(apk, "rb") as apk_file:
+    for chunk in iter(lambda: apk_file.read(1024 * 1024), b""):
+        sha256.update(chunk)
+digest = sha256.hexdigest()
+with open(output + "/baseline-apk-sha256.txt", "w") as record:
+    record.write(digest + "\n")
 print("baseline APK entry count:", count)
+print("baseline APK sha256:", digest)
 PY
 adb install -r "$baseline_apk_copy" > /dev/null
-
-fixture_dir="example-app/build/native-startup-fixture/assets"
-
-cleanup_fixture() {
-    rm -rf "example-app/build/native-startup-fixture"
-}
-trap cleanup_fixture EXIT
 
 {
     echo "model=$(adb shell getprop ro.product.model | tr -d '\r')"
@@ -122,14 +166,40 @@ capture_variant() {
 
         # The activity result must prove the production init path ran and enabled native capture;
         # a missing submission URL or a false return must fail the iteration.
-        local result_json
-        if ! result_json="$(adb shell run-as "$package" cat "$result_file" 2>/dev/null)" \
-                || [ -z "$result_json" ]; then
+        local result_output="$output/$variant-$iteration-result.json"
+        if ! adb shell run-as "$package" cat "$result_file" > "$result_output" 2>/dev/null \
+                || [ ! -s "$result_output" ]; then
             echo "$variant iteration $iteration: app result JSON is missing" >&2
             exit 1
         fi
-        if ! echo "$result_json" | grep -q '"native_enabled":true'; then
-            echo "$variant iteration $iteration: native integration did not enable: $result_json" >&2
+        if ! python3 - "$result_output" "$variant" "$iteration" <<'PY'
+import json
+import sys
+
+path, variant, iteration = sys.argv[1:]
+try:
+    with open(path, encoding="utf-8") as result_file:
+        result = json.load(result_file)
+except (OSError, UnicodeError, json.JSONDecodeError) as error:
+    raise SystemExit(f"{variant} iteration {iteration}: invalid app result JSON: {error}")
+
+if not isinstance(result, dict):
+    raise SystemExit(f"{variant} iteration {iteration}: app result must be a JSON object")
+if result.get("trace_section") != "BacktraceQualification#tryEnableNativeIntegration":
+    raise SystemExit(f"{variant} iteration {iteration}: app result names the wrong trace section")
+if result.get("native_enabled") is not True:
+    raise SystemExit(f"{variant} iteration {iteration}: native integration did not enable")
+duration_nanos = result.get("duration_nanos")
+if not isinstance(duration_nanos, int) or isinstance(duration_nanos, bool) or duration_nanos <= 0:
+    raise SystemExit(f"{variant} iteration {iteration}: invalid duration_nanos")
+
+# Rewrite validated results in a consistent format so every iteration has reviewable evidence.
+with open(path, "w", encoding="utf-8") as result_file:
+    json.dump(result, result_file, indent=2, sort_keys=True)
+    result_file.write("\n")
+PY
+        then
+            echo "$variant iteration $iteration: app result validation failed" >&2
             exit 1
         fi
 
@@ -187,10 +257,17 @@ if [ "$capture_only" = "1" ]; then
     exit 0
 fi
 
+expected_fixture_traces=0
+if [ "$with_fixture" = "1" ]; then
+    expected_fixture_traces="$iterations"
+fi
+
 python3 scripts/analyze_native_startup_trace.py \
     --trace-processor "$TRACE_PROCESSOR_SHELL" \
     --traces "$output" \
     --expected-samples "$iterations" \
+    --expected-baseline-traces "$iterations" \
+    --expected-fixture-traces "$expected_fixture_traces" \
     --output "$output/native-startup-summary.json"
 
 echo "Perfetto startup qualification complete: $output"
