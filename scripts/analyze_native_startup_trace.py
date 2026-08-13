@@ -97,14 +97,31 @@ def main() -> int:
     parser.add_argument("--trace-processor", required=True)
     parser.add_argument("--traces", required=True, help="directory of .perfetto-trace files")
     parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--expected-samples",
+        type=int,
+        default=None,
+        help="require exactly this many trace-section samples per captured variant",
+    )
     arguments = parser.parse_args()
 
     variants = {"baseline": [], "fixture": []}
     trace_counts = {"baseline": 0, "fixture": 0}
     callstack_coverage = False
     matches = set()
-    for trace in sorted(glob.glob(arguments.traces + "/*.perfetto-trace")):
-        variant = "fixture" if "/fixture-" in trace or "fixture-" in trace.rsplit("/", 1)[-1] else "baseline"
+    traces = sorted(glob.glob(arguments.traces + "/*.perfetto-trace"))
+    if not traces:
+        print(f"No .perfetto-trace files found in {arguments.traces}; nothing was analyzed", file=sys.stderr)
+        return 1
+    for trace in traces:
+        basename = trace.rsplit("/", 1)[-1]
+        if basename.startswith("fixture-"):
+            variant = "fixture"
+        elif basename.startswith("baseline-"):
+            variant = "baseline"
+        else:
+            print(f"Unrecognized trace name {basename}: expected baseline-*/fixture-*", file=sys.stderr)
+            return 1
         trace_counts[variant] += 1
         variants[variant].extend(section_durations_ms(arguments.trace_processor, trace))
         covered, trace_matches = forbidden_matches(arguments.trace_processor, trace)
@@ -137,6 +154,13 @@ def main() -> int:
             print(
                 f"{variant}: {count} trace(s) captured but zero {TRACE_SECTION} samples;"
                 " app atrace was probably not enabled for the package",
+                file=sys.stderr,
+            )
+            return 1
+        if count > 0 and arguments.expected_samples is not None and len(variants[variant]) != arguments.expected_samples:
+            print(
+                f"{variant}: expected exactly {arguments.expected_samples} {TRACE_SECTION} samples"
+                f" (one per cold-start iteration), found {len(variants[variant])}",
                 file=sys.stderr,
             )
             return 1
