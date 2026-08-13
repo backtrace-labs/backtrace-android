@@ -47,6 +47,81 @@ public class CoronerQueriesTest {
     }
 
     @Test
+    public void filterByGuidAndTimestampTest() {
+        // GIVEN
+        final String guid = "1f4a2b3c-0000-4f0a-fd08-00000000dead";
+        final String timestampStart = "1680943692";
+        final String timestampEnd = "1681943692";
+        final List<String> attributes = Arrays.asList("error.type", "error.message");
+
+        // WHEN
+        JsonObject result = coronerQueries.filterByGuidAndTimestamp(guid, timestampStart, timestampEnd, attributes, 10);
+
+        // THEN
+        String expectedResult = "{\"fold\":{\"error.type\":[[\"head\"]],\"error.message\":[[\"head\"]]},"
+                + "\"group\":[[\"_rxid\"]],\"offset\":0,\"limit\":10,"
+                + "\"filter\":[{\"guid\":[[\"equal\",\"1f4a2b3c-0000-4f0a-fd08-00000000dead\"]],"
+                + "\"timestamp\":[[\"at-least\",\"1680943692.\"],[\"at-most\",\"1681943692.\"]]}]}";
+        assertEquals(expectedResult, StringUtils.normalizeSpace(result.toString()));
+    }
+
+    @Test
+    public void filterByGuidEscapesJsonSpecialCharacters() {
+        // A GUID is validated as non-blank only; prove special characters cannot break the JSON.
+        JsonObject result =
+                coronerQueries.filterByGuidAndTimestamp("we\"ird\\guid", "1", "2", Arrays.asList("error.type"), 10);
+
+        String serialized = result.toString();
+        org.junit.Assert.assertTrue(serialized.contains("we\\\"ird\\\\guid"));
+        // Round-trips through the parser without corruption.
+        com.google.gson.JsonParser.parseString(serialized);
+    }
+
+    @Test
+    public void filterByGuidRejectsBlankGuid() {
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidAndTimestamp(null, "1", "2", Arrays.asList("a"), 10));
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidAndTimestamp("  ", "1", "2", Arrays.asList("a"), 10));
+    }
+
+    @Test
+    public void filterByGuidMessageAndTimestampTest() {
+        // GIVEN
+        final String guid = "1f4a2b3c-0000-4f0a-fd08-00000000dead";
+        final String message = "before-disable-1f4a2b3c";
+        final List<String> attributes = Arrays.asList("error.type", "error.message");
+
+        // WHEN
+        JsonObject result = coronerQueries.filterByGuidMessageAndTimestamp(
+                guid, message, "1680943692", "1681943692", attributes, 10);
+
+        // THEN
+        String expectedResult = "{\"fold\":{\"error.type\":[[\"head\"]],\"error.message\":[[\"head\"]]},"
+                + "\"group\":[[\"_rxid\"]],\"offset\":0,\"limit\":10,"
+                + "\"filter\":[{\"guid\":[[\"equal\",\"1f4a2b3c-0000-4f0a-fd08-00000000dead\"]],"
+                + "\"error.message\":[[\"equal\",\"before-disable-1f4a2b3c\"]],"
+                + "\"timestamp\":[[\"at-least\",\"1680943692.\"],[\"at-most\",\"1681943692.\"]]}]}";
+        assertEquals(expectedResult, StringUtils.normalizeSpace(result.toString()));
+    }
+
+    @Test
+    public void filterByGuidMessageRejectsBlankInputs() {
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidMessageAndTimestamp(
+                        "  ", "message", "1", "2", Arrays.asList("a"), 10));
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidMessageAndTimestamp("guid", null, "1", "2", Arrays.asList("a"), 10));
+        org.junit.Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> coronerQueries.filterByGuidMessageAndTimestamp("guid", " ", "1", "2", Arrays.asList("a"), 10));
+    }
+
+    @Test
     public void filterByErrorTypeAndTimestampTest() {
         // GIVEN
         final List<String> attributes = Arrays.asList("error.message", "example-attribute");

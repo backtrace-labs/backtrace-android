@@ -1,10 +1,14 @@
 # Backtrace Android Release Notes
 
 ## Next version
-Bugfixes
-- Removed synchronous base- and split-APK ZIP central-directory inspection from native crash-handler library resolution. That scan was the identified cause of customer-reported cold-start ANRs showing `ZipFile$Source.initCEN`. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks. Production qualification for fatal crash capture and legacy or mixed-bitness devices is tracked separately.
-- Native-integration path-resolution and JNI-bridge failures now disable native integration and return `false` rather than propagating those failures to the host application.
-- Corrected process-ABI selection by preferring the ABI reported for the running process. On API 23 and later, malformed primary ABI metadata falls back to process-bitness-specific ABI lists. API 21-22 retain the device-ordered fallback when primary process ABI metadata is unavailable.
+
+### Bug fixes
+
+- Improved native-integration startup in large APK and Android App Bundle applications by removing synchronous SDK-owned APK ZIP central-directory parsing from crash-handler path resolution. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks.
+- Hardened optional native setup, disable, and dump operations so failures remain nonfatal and managed reporting continues.
+- Added `tryEnableNativeIntegration(...)` methods that report whether native crash-handler registration succeeded while preserving existing `void enableNativeIntegration(...)` APIs.
+- Corrected process-ABI selection for native-library fallback resolution.
+- Prevented native setup and crash-handler diagnostics from logging credentials, argument values, application-provided annotations, attachment paths, or resolved native-library paths.
 
 ## Version 3.13.0
 Improvements

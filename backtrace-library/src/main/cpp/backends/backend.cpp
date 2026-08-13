@@ -102,7 +102,8 @@ void DumpWithoutCrash(jstring message, jboolean set_main_thread_as_faulting_thre
     // crash the host application that setup containment just protected.
     if (!initialized.load(std::memory_order_acquire) || disabled.load(std::memory_order_acquire)) {
         __android_log_print(ANDROID_LOG_WARN, "Backtrace-Android",
-                            "Cannot create a native dump because native integration is not enabled.");
+                            "BT_NATIVE_DUMP_UNAVAILABLE: Cannot create a native dump because "
+                            "native integration is not enabled.");
         return;
     }
 #ifdef CRASHPAD_BACKEND

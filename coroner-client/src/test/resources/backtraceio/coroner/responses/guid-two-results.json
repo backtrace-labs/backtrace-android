@@ -1,0 +1,87 @@
+{
+    "response": {
+        "columns_desc": [
+            {
+                "op": "head",
+                "name": "error.type",
+                "format": "",
+                "type": "dictionary"
+            },
+            {
+                "op": "head",
+                "name": "error.message",
+                "format": "",
+                "type": "dictionary"
+            },
+            {
+                "op": "head",
+                "name": "callstack",
+                "format": "callstack",
+                "type": "dictionary"
+            },
+            {
+                "op": "head",
+                "name": "guid",
+                "format": "uuid",
+                "type": "uuid"
+            },
+            {
+                "op": "head",
+                "name": "classifiers",
+                "format": "labels",
+                "type": "dictionary"
+            }
+        ],
+        "pagination": {
+            "offset": 0,
+            "limit": 10
+        },
+        "columns": [
+            [
+                "head(error.type)",
+                ""
+            ],
+            [
+                "head(error.message)",
+                ""
+            ],
+            [
+                "head(callstack)",
+                "callstack"
+            ],
+            [
+                "head(guid)",
+                "uuid"
+            ],
+            [
+                "head(classifiers)",
+                "labels"
+            ]
+        ],
+        "values": [
+            [
+                "rxid-first",
+                [
+                    ["Crash"],
+                    ["duplicate-report"],
+                    ["{\"frame\":[\"libbacktrace-native.so\"]}"],
+                    ["11111111-2222-3333-4444-555555555555"],
+                    ["native"]
+                ],
+                1
+            ],
+            [
+                "rxid-second",
+                [
+                    ["Crash"],
+                    ["duplicate-report"],
+                    ["{\"frame\":[\"libbacktrace-native.so\"]}"],
+                    ["11111111-2222-3333-4444-555555555555"],
+                    ["native"]
+                ],
+                1
+            ]
+        ]
+    },
+    "error": null
+}
