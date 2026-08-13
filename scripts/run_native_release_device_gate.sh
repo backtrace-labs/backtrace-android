@@ -19,6 +19,8 @@ set -euo pipefail
 # cannot pass this gate — use REQUIRE_INGESTION=0 scripts/run_split_install_test.sh for that.
 # BUNDLETOOL_JAR must point at the pinned bundletool (default: ./bundletool.jar).
 
+readonly BUNDLETOOL_1_17_2_SHA256="2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae"
+
 abi=""
 require_device_64=""
 require_page_size=""
@@ -60,6 +62,8 @@ require_tool java
 require_tool adb
 require_tool git
 require_tool python3
+require_tool keytool
+require_tool sha256sum
 if [ -z "${ANDROID_HOME:-}" ] || [ ! -d "$ANDROID_HOME" ]; then
     echo "ANDROID_HOME must point at an Android SDK" >&2
     missing=1
@@ -86,6 +90,13 @@ if [ ! -f "$bundletool_jar" ]; then
     missing=1
 fi
 if [ "$missing" -ne 0 ]; then
+    exit 2
+fi
+actual_bundletool_sha256="$(sha256sum -- "$bundletool_jar")"
+actual_bundletool_sha256="${actual_bundletool_sha256%% *}"
+if [ "$actual_bundletool_sha256" != "$BUNDLETOOL_1_17_2_SHA256" ]; then
+    echo "bundletool checksum mismatch: the hardware gate requires bundletool 1.17.2" >&2
+    echo "Expected $BUNDLETOOL_1_17_2_SHA256, found $actual_bundletool_sha256" >&2
     exit 2
 fi
 
@@ -116,10 +127,13 @@ if [ "$require_device_64" = "true" ] && [ -z "$abilist64" ]; then
     echo "Device does not advertise a 64-bit ABI list" >&2
     exit 1
 fi
-if [ "$abi" = "armeabi-v7a" ] && ! echo ",$abilist," | grep -q ",armeabi-v7a,"; then
-    echo "Device does not support armeabi-v7a; cannot run the 32-bit qualification" >&2
-    exit 1
-fi
+case ",$abilist," in
+    *",$abi,"*) ;;
+    *)
+        echo "Device does not advertise requested ABI $abi in ro.product.cpu.abilist" >&2
+        exit 1
+        ;;
+esac
 if [ -n "$require_page_size" ] && [ "$page_size" != "$require_page_size" ]; then
     echo "PAGE_SIZE mismatch: expected $require_page_size, found $page_size" >&2
     exit 1

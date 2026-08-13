@@ -206,7 +206,7 @@ public abstract class NativeIntegrationTestService extends Service {
      */
     private void runFreshProcessSafety() {
         String sentinels = "https://example.invalid/minidump?token=SECRET_URL_TOKEN_SENTINEL"
-                + " --annotation=private.customer.value=PRIVATE_CUSTOMER_SENTINEL"
+                + " --annotation=private.application.value=SENSITIVE_ATTRIBUTE_SENTINEL"
                 + " /data/app/~~opaque/split_config.arm64_v8a.apk!/lib/arm64-v8a/libbacktrace-native.so";
 
         runSafetyScenario("malformed-credentials", null, new BacktraceCredentials((String) null, "token"));

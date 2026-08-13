@@ -62,7 +62,8 @@ public class BacktraceCrashHandlerRunner {
      * Runs the crash handler. Diagnostics carry only a stable stage code and the failure class
      * name — never the handler arguments, environment, resolved library path, exception message,
      * or stack trace: Crashpad passes the submission URL (which can carry the minidump token) and
-     * every customer annotation on the argument vector, and exception messages embed paths.
+     * every application-provided annotation on the argument vector, and exception messages embed
+     * paths.
      */
     public boolean run(String[] args, Map<String, String> environmentVariables) {
         if (environmentVariables == null) {

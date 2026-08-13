@@ -18,22 +18,23 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * Crashpad passes the submission URL (which can carry the minidump token) and every customer
- * annotation on the handler argument vector, and exception messages commonly embed rejected
- * library paths; runner logs end up in Logcat and CI artifacts. These tests throw failures whose
- * <em>messages contain every sensitive sentinel</em> and prove that no logged message leaks them:
- * the logger contract carries no {@link Throwable}, and messages hold only a stable stage code and
- * the failure class name.
+ * Crashpad passes the submission URL (which can carry the minidump token) and every
+ * application-provided annotation on the handler argument vector, and exception messages commonly
+ * embed rejected library paths; runner logs end up in Logcat and CI artifacts. These tests throw
+ * failures whose <em>messages contain every sensitive sentinel</em> and prove that no logged
+ * message leaks them: the logger contract carries no {@link Throwable}, and messages hold only a
+ * stable stage code and the failure class name.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class BacktraceCrashHandlerRunnerLoggingTest {
 
     private static final String URL_SENTINEL = "https://example.invalid/minidump?token=SECRET_URL_TOKEN_SENTINEL";
-    private static final String ANNOTATION_SENTINEL = "--annotation=private.customer.value=PRIVATE_CUSTOMER_SENTINEL";
-    private static final String DATABASE_SENTINEL = "/data/data/customer/files/crashpad";
+    private static final String ANNOTATION_SENTINEL =
+            "--annotation=private.application.value=SENSITIVE_ATTRIBUTE_SENTINEL";
+    private static final String DATABASE_SENTINEL = "/data/user/0/example.application/files/crashpad";
     private static final String LIBRARY_SENTINEL =
             "/data/app/~~opaque/split_config.arm64_v8a.apk!/lib/arm64-v8a/libbacktrace-native.so";
-    private static final String ATTACHMENT_SENTINEL = "/customer/attachment/medical-record.txt";
+    private static final String ATTACHMENT_SENTINEL = "/data/user/0/example.application/files/attachment.txt";
     private static final String ALL_SENTINELS = URL_SENTINEL + " " + ANNOTATION_SENTINEL + " " + DATABASE_SENTINEL + " "
             + LIBRARY_SENTINEL + " " + ATTACHMENT_SENTINEL;
     private static final String[] SENSITIVE_ARGS =
@@ -64,8 +65,8 @@ public class BacktraceCrashHandlerRunnerLoggingTest {
         void assertNoSentinelLeaked() {
             for (String sentinel : new String[] {
                 "SECRET_URL_TOKEN_SENTINEL",
-                "PRIVATE_CUSTOMER_SENTINEL",
-                "private.customer.value",
+                "SENSITIVE_ATTRIBUTE_SENTINEL",
+                "private.application.value",
                 DATABASE_SENTINEL,
                 LIBRARY_SENTINEL,
                 ATTACHMENT_SENTINEL,
