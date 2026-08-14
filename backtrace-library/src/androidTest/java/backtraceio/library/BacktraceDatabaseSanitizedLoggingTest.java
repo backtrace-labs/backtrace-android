@@ -12,8 +12,9 @@ import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.logger.Logger;
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +30,8 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class BacktraceDatabaseSanitizedLoggingTest {
 
+    private static final String SUBJECT_TAG = BacktraceDatabase.class.getSimpleName();
+
     private static final String ALL_SENTINELS = "https://example.invalid/minidump?token=SECRET_URL_TOKEN_SENTINEL"
             + " --annotation=private.application.value=SENSITIVE_ATTRIBUTE_SENTINEL"
             + " /data/user/0/example.application/files/crashpad"
@@ -36,33 +39,39 @@ public class BacktraceDatabaseSanitizedLoggingTest {
             + " /data/user/0/example.application/files/attachment.txt";
 
     private static final class RecordingGlobalLogger implements Logger {
-        final List<String> messages = new ArrayList<>();
-        int throwableOverloadCalls;
+        private final CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<>();
+        private final AtomicInteger throwableOverloadCalls = new AtomicInteger();
+
+        private int record(String tag, String message) {
+            if (SUBJECT_TAG.equals(tag)) {
+                messages.add(message);
+            }
+            return 0;
+        }
 
         @Override
         public int d(String tag, String message) {
-            messages.add(message);
-            return 0;
+            return record(tag, message);
         }
 
         @Override
         public int w(String tag, String message) {
-            messages.add(message);
-            return 0;
+            return record(tag, message);
         }
 
         @Override
         public int e(String tag, String message) {
-            messages.add(message);
-            return 0;
+            return record(tag, message);
         }
 
         @Override
         public int e(String tag, String message, Throwable tr) {
-            throwableOverloadCalls++;
-            messages.add(message);
-            if (tr != null && tr.getMessage() != null) {
-                messages.add(tr.getMessage());
+            if (SUBJECT_TAG.equals(tag)) {
+                throwableOverloadCalls.incrementAndGet();
+                messages.add(message);
+                if (tr != null && tr.getMessage() != null) {
+                    messages.add(tr.getMessage());
+                }
             }
             return 0;
         }
@@ -81,7 +90,7 @@ public class BacktraceDatabaseSanitizedLoggingTest {
             assertFalse("token= leaked into diagnostics", anyMessageContains("token="));
             assertFalse("crashpad path leaked into diagnostics", anyMessageContains("/files/crashpad"));
             assertFalse("library path leaked into diagnostics", anyMessageContains("libbacktrace-native.so"));
-            assertEquals("Throwable must never reach the logger on native paths", 0, throwableOverloadCalls);
+            assertEquals("Throwable must never reach the logger on native paths", 0, throwableOverloadCalls.get());
             assertTrue("missing stable code " + expectedCode, anyMessageContains(expectedCode));
             if (expectedFailureClass != null) {
                 assertTrue("missing failure class " + expectedFailureClass, anyMessageContains(expectedFailureClass));
@@ -104,8 +113,7 @@ public class BacktraceDatabaseSanitizedLoggingTest {
         assertTrue(databaseDirectory.mkdirs());
         this.database = new BacktraceDatabase(this.context, databaseDirectory.getAbsolutePath());
         this.credentials = new BacktraceCredentials("https://test.sp.backtrace.io", "1231231231231");
-        this.client = new BacktraceClient(this.context, this.credentials);
-        this.database.start();
+        this.client = new BacktraceClient(this.context, this.credentials, this.database);
 
         this.recordingLogger = new RecordingGlobalLogger();
         BacktraceLogger.setLogger(this.recordingLogger);
