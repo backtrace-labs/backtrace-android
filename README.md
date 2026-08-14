@@ -69,39 +69,4 @@ backtraceClient.metrics.enable()
 
 ## Documentation
 
-For more information about the Android SDK, including installation, usage, and configuration options, see the [Android Integration guide](https://docs.saucelabs.com/error-reporting/platform-integrations/android/setup/) in the Sauce Labs documentation.
-
-## Native crash integration startup
-
-Native crash capture requires a writable `BacktraceDatabase`. Configure initial attributes, attachments, and breadcrumbs before enabling the integration, then call `enableNativeIntegration()` as early as practical:
-
-```java
-BacktraceDatabase database = new BacktraceDatabase(context, databaseSettings);
-BacktraceClient client = new BacktraceClient(context, credentials, database, attributes, attachments);
-
-BacktraceExceptionHandler.enable(client);
-client.enableNativeIntegration();
-```
-
-`enableNativeIntegration()` is synchronous and remains `void` for compatibility. A contained setup
-failure is logged and the call returns normally. To observe the actual setup status, use
-`tryEnableNativeIntegration()`:
-
-```java
-boolean nativeEnabled = client.tryEnableNativeIntegration();
-if (!nativeEnabled) {
-    // Native crash capture is unavailable. Managed reporting remains available.
-}
-```
-
-Keeping initialization in the normal startup sequence provides the earliest native-crash coverage.
-It can be invoked from one application-controlled background thread, but native crashes that occur
-before initialization completes cannot be captured. Make one initial registration attempt per
-process; after a successful registration, disable/re-enable is supported. Do not call enable
-concurrently or race it with `disableNativeIntegration()`. `dumpWithoutCrash()` is a safe no-op
-while native integration is unavailable or disabled.
-
-The SDK resolves its native crash-handler library from the path already selected by Android's linker.
-Backtrace does not open or parse the host application's base or split APK while resolving the crash-handler library.
-See [Native integration startup and threading](docs/native-integration-startup.md) for lifecycle,
-compatibility, and diagnostic details.
+For more information about the Android SDK, including installation, usage, and configuration options, see the [Android Integration guide](https://docs.saucelabs.com/error-reporting/platform-integrations/android/setup/) in the Sauce Labs documentation. For native NDK and JNI crash capture, see [Native Crash Integration for Android](https://docs.saucelabs.com/error-reporting/platform-integrations/android/native-crash-integration/).

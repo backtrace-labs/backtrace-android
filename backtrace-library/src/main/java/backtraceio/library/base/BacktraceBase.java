@@ -293,8 +293,9 @@ public class BacktraceBase implements Client {
      * Native integration is optional: a path-resolution or bridge failure disables it and returns
      * control normally, leaving managed crash reporting operational.
      *
-     * <p>See {@code docs/native-integration-startup.md} for resolution precedence, failure
-     * semantics, threading, lifecycle, and compatibility details.
+     * <p>See <a href="https://docs.saucelabs.com/error-reporting/platform-integrations/android/native-crash-integration/">
+     * Native Crash Integration for Android</a> for resolution precedence, failure semantics,
+     * threading, lifecycle, and compatibility details.
      */
     public void enableNativeIntegration() {
         tryEnableNativeIntegration();
