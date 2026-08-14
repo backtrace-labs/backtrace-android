@@ -107,12 +107,18 @@ find_library( # Sets the name of the path variable.
         log
 )
 
+find_library(
+        dl-lib
+        dl
+)
+
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
 list(APPEND LIBS backtrace-native)
 list(APPEND LIBS ${log-lib})
+list(APPEND LIBS ${dl-lib})
 
 if (BACKEND STREQUAL "CRASHPAD_BACKEND")
     # Pass 16 KB linker flags to Crashpad’s handler so libcrashpad_handler.so loads on 16 KB kernels.

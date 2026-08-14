@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Debug-only native qualification harness. Each service runs in its own named process so a
+         test observes fresh process-global native state (Crashpad initialization is per-process
+         and once-only). Processes share the app UID and normal private-file access; do NOT use
+         android:isolatedProcess, which would diverge from production behavior. -->
+    <application>
+        <service
+            android:name=".NativeSafetyTestService"
+            android:exported="false"
+            android:process=":native_safety_test"
+            android:stopWithTask="true" />
+
+        <service
+            android:name=".NativeNonfatalTestService"
+            android:exported="false"
+            android:process=":native_nonfatal_test"
+            android:stopWithTask="true" />
+
+        <service
+            android:name=".NativeFatalTestService"
+            android:exported="false"
+            android:process=":native_fatal_test"
+            android:stopWithTask="true" />
+
+        <service
+            android:name=".NativeRecoveryTestService"
+            android:exported="false"
+            android:process=":native_recovery_test"
+            android:stopWithTask="true" />
+
+        <service
+            android:name=".NativeLifecycleTestService"
+            android:exported="false"
+            android:process=":native_lifecycle_test"
+            android:stopWithTask="true" />
+
+        <activity
+            android:name=".NativeStartupQualificationActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true" />
+    </application>
+</manifest>
