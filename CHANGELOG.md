@@ -1,12 +1,10 @@
 # Backtrace Android Release Notes
 
-## Next version
-
-### Bug fixes
-
+## Version 3.14.0
+Improvements
 - Improved native-integration startup in large APK and Android App Bundle applications by removing synchronous SDK-owned APK ZIP central-directory parsing from crash-handler path resolution. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks.
-- Hardened optional native setup, disable, and dump operations so failures remain nonfatal and managed reporting continues.
 - Added `tryEnableNativeIntegration(...)` methods that report whether native crash-handler registration succeeded while preserving existing `void enableNativeIntegration(...)` APIs.
+- Contained failures in optional native setup, disable, and dump operations so they remain nonfatal and managed reporting continues.
 - Corrected process-ABI selection for native-library fallback resolution.
 - Prevented native setup and crash-handler diagnostics from logging credentials, argument values, application-provided annotations, attachment paths, or resolved native-library paths.
 
