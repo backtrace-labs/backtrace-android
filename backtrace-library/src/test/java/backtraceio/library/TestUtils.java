@@ -17,8 +17,14 @@ import org.json.JSONObject;
 
 public class TestUtils {
 
+    private static final Gson GSON = new Gson();
+    private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+
     public static String readFileAsString(Object obj, String fileName) {
         ClassLoader classLoader = obj.getClass().getClassLoader();
+        if (classLoader == null) {
+            return null;
+        }
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
 
         if (inputStream != null) {
@@ -47,19 +53,16 @@ public class TestUtils {
 
     public static boolean compareJson(String json1, String json2) {
 
-        final JsonParser parser = new JsonParser();
-        final JsonElement o1 = parser.parse(json1);
-        final JsonElement o2 = parser.parse(json2);
+        final JsonElement o1 = JsonParser.parseString(json1);
+        final JsonElement o2 = JsonParser.parseString(json2);
         final boolean compareResult = o1.equals(o2);
 
         if (!compareResult) {
-            Gson g = new Gson();
-            Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
-            Map<String, Object> json1Map = g.fromJson(json1, mapType);
-            Map<String, Object> json2Map = g.fromJson(json2, mapType);
-            MapDifference<String, Object> x = Maps.difference(json1Map, json2Map);
+            Map<String, Object> json1Map = GSON.fromJson(json1, MAP_TYPE);
+            Map<String, Object> json2Map = GSON.fromJson(json2, MAP_TYPE);
+            MapDifference<String, Object> difference = Maps.difference(json1Map, json2Map);
 
-            System.out.println(Maps.difference(json1Map, json2Map));
+            System.out.println("JSON comparison failed. Differences: " + difference);
             return false;
         }
         return true;
