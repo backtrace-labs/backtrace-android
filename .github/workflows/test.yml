@@ -428,13 +428,6 @@ jobs:
           BACKTRACE_CORONER_URL: ${{ secrets.BACKTRACE_CORONER_URL }}
           BACKTRACE_CORONER_TOKEN: ${{ secrets.BACKTRACE_CORONER_TOKEN }}
         run: |
-<<<<<<< HEAD
-          npm install backtrace-morgue --location=global
-          morgue --version || true
-          # Todo: currently just looks 15 minutes in the past and doesn't filter at all.
-          # --csv=crash.csv
-          morgue --token=${{ secrets.BACKTRACE_API_TOKEN }} --endpoint="https://yolo.sp.backtrace.io" list yolo/android-library --select timestamp --filter=timestamp,greater-than,`date +%s%3N -d "15 minutes ago"` || true
-=======
           python3 - <<'PY'
           import json
           import os
