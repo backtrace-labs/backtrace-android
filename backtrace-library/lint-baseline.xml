@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.11.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.11.1)" variant="all" version="8.11.1">
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="        editor.commit();"
+        errorLine2="               ~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/common/SharedPreferencesManager.java"
+            line="17"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        return name().toLowerCase();"
+        errorLine2="                      ~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/enums/BacktraceBreadcrumbLevel.java"
+            line="20"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        return name().toLowerCase();"
+        errorLine2="                      ~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/enums/BacktraceBreadcrumbType.java"
+            line="22"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        switch (val.toLowerCase()) {"
+        errorLine2="                    ~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/models/types/BacktraceResultStatus.java"
+            line="18"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                    String.format("
+        errorLine2="                    ^">
+        <location
+            file="src/main/java/backtraceio/library/watchdog/BacktraceWatchdog.java"
+            line="77"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        mainThread = currThread.getName().toLowerCase();"
+        errorLine2="                                          ~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/models/json/ThreadData.java"
+            line="51"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="            String threadName = thread.getName().toLowerCase();"
+        errorLine2="                                                 ~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/models/json/ThreadData.java"
+            line="67"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        this(thread.getName().toLowerCase(), currentThread, stack);"
+        errorLine2="                              ~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/models/json/ThreadInformation.java"
+            line="53"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="UnspecifiedRegisterReceiverFlag"
+        message="`backtraceBroadcastReceiver` is missing `RECEIVER_EXPORTED` or `RECEIVER_NOT_EXPORTED` flag for unprotected broadcasts registered for an IntentFilter that cannot be inspected by lint"
+        errorLine1="            context.registerReceiver(backtraceBroadcastReceiver, backtraceBroadcastReceiver.getIntentFilter());"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/breadcrumbs/BacktraceBreadcrumbs.java"
+            line="133"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.1"
+        errorLine1="    implementation &apos;androidx.appcompat:appcompat:1.6.1&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="128"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.vanniktech.maven.publish than 0.34.0 is available: 0.37.0"
+        errorLine1="    id &quot;com.vanniktech.maven.publish&quot; version &quot;0.34.0&quot; apply true"
+        errorLine2="                                              ~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="4"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.mockito:mockito-core than 5.19.0 is available: 5.23.0"
+        errorLine1="    testImplementation &quot;org.mockito:mockito-core:5.19.0&quot;"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="131"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.json:json than 20250517 is available: 20260719"
+        errorLine1="    testImplementation &apos;org.json:json:20250517&apos;"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="132"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.guava:guava than 33.4.8-jre is available: 33.6.0-jre"
+        errorLine1="    testImplementation &quot;com.google.guava:guava:33.4.8-jre&quot;"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="133"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.mockito:mockito-android than 5.19.0 is available: 5.23.0"
+        errorLine1="    androidTestImplementation &quot;org.mockito:mockito-android:5.19.0&quot;"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="138"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="HardwareIds"
+        message="Using `getString` to get device identifiers is not recommended"
+        errorLine1="        String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/models/json/BacktraceStaticAttributes.java"
+            line="112"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="UnsafeDynamicallyLoadedCode"
+        message="Dynamically loading code using `load` is risky, please use `loadLibrary` instead when possible"
+        errorLine1="        System.load(path);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/nativeCalls/SystemLoader.java"
+            line="5"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; `SDK_INT` is never &lt; 21"
+        errorLine1="        if (Build.VERSION.SDK_INT &lt; 21) {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/common/DeviceAttributesHelper.java"
+            line="189"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `ApplicationMetadataCache` which has field `context` pointing to `Context`); this is a memory leak"
+        errorLine1="    private static volatile ApplicationMetadataCache instance;"
+        errorLine2="            ~~~~~~">
+        <location
+            file="src/main/java/backtraceio/library/common/ApplicationMetadataCache.java"
+            line="12"
+            column="13"/>
+    </issue>
+
+</issues>

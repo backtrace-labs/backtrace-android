@@ -71,6 +71,10 @@ class CoronerHttpClient implements HttpClient {
 
         urlConnection.setRequestMethod("POST");
         urlConnection.setUseCaches(false);
+        // Without explicit timeouts a single request can block indefinitely, turning callers'
+        // polling deadlines into soft limits.
+        urlConnection.setConnectTimeout(10_000);
+        urlConnection.setReadTimeout(10_000);
 
         urlConnection.setDoOutput(true);
         urlConnection.setDoInput(true);

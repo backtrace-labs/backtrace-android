@@ -69,4 +69,4 @@ backtraceClient.metrics.enable()
 
 ## Documentation
 
-For more information about the Android SDK, including installation, usage, and configuration options, see the [Android Integration guide](https://docs.saucelabs.com/error-reporting/platform-integrations/android/setup/) in the Sauce Labs documentation.
+For more information about the Android SDK, including installation, usage, and configuration options, see the [Android Integration guide](https://docs.saucelabs.com/error-reporting/platform-integrations/android/setup/) in the Sauce Labs documentation. For native NDK and JNI crash capture, see [Native Crash Integration for Android](https://docs.saucelabs.com/error-reporting/platform-integrations/android/native-crash-integration/).

@@ -1,0 +1,32 @@
+{
+    "filter": [{
+        "error.message": [[
+            "equal",
+            "before-disable-11111111"
+        ]],
+        "guid": [[
+            "equal",
+            "11111111-2222-3333-4444-555555555555"
+        ]],
+        "timestamp": [
+            [
+                "at-least",
+                "1680000000."
+            ],
+            [
+                "at-most",
+                "1680000600."
+            ]
+        ]
+    }],
+    "fold": {
+        "error.type": [["head"]],
+        "error.message": [["head"]],
+        "classifiers": [["head"]],
+        "guid": [["head"]],
+        "callstack": [["head"]]
+    },
+    "offset": 0,
+    "limit": 10,
+    "group": [["_rxid"]]
+}

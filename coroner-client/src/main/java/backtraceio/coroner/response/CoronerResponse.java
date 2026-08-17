@@ -30,11 +30,17 @@ public class CoronerResponse {
         if (this.values == null) {
             throw new CoronerResponseProcessingException("Values property from response is null");
         }
-        if (elementIndex < 0 || elementIndex > this.values.size()) {
+        if (elementIndex < 0 || elementIndex >= this.values.size()) {
             throw new CoronerResponseProcessingException(
-                    "Incorrect element index, value should be between 0 and " + this.values.size());
+                    "Incorrect element index; value must be between 0 and " + (this.values.size() - 1));
         }
         final CoronerResponseGroup responseGroup = values.get(elementIndex);
+        if (responseGroup == null) {
+            throw new CoronerResponseProcessingException("Response group is null for element index: " + elementIndex);
+        }
+        if (this.columnsDesc == null) {
+            throw new CoronerResponseProcessingException("Columns description property from response is null");
+        }
 
         final int attributeIndex = getAttributeIndex(name);
         try {
@@ -53,7 +59,8 @@ public class CoronerResponse {
 
     private int getAttributeIndex(final String attributeName) throws CoronerResponseProcessingException {
         for (int index = 0; index < this.columnsDesc.size(); index++) {
-            if (this.columnsDesc.get(index).name.equals(attributeName)) {
+            final ColumnDescElement columnDesc = this.columnsDesc.get(index);
+            if (columnDesc != null && columnDesc.name != null && columnDesc.name.equals(attributeName)) {
                 return index;
             }
         }
