@@ -64,9 +64,12 @@ android {
         }
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
+
     lint {
-        abortOnError = false
+        abortOnError = true
         targetSdk = 37
+        checkReleaseBuilds = true
+        baseline = file('lint-baseline.xml')
     }
     testOptions {
         targetSdk = 37

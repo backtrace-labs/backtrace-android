@@ -17,6 +17,7 @@ import backtraceio.library.interfaces.Breadcrumbs;
 import backtraceio.library.interfaces.Client;
 import backtraceio.library.interfaces.Database;
 import backtraceio.library.interfaces.Metrics;
+import backtraceio.library.logger.BacktraceLogger;
 import backtraceio.library.models.BacktraceData;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.database.BacktraceDatabaseRecord;
@@ -277,16 +278,68 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is
-     * required to enable this feature).
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     *
+     * <p>Configure initial native attributes, attachments, and breadcrumbs before calling this method.
+     * Native crashes that occur before this method completes cannot be captured.
+     *
+     * <p>Call this method from exactly one application-controlled thread.
+     * It may be invoked on a background thread, but doing so delays native crash coverage until initialization completes.
+     * Do not call it concurrently with
+     * {@link #disableNativeIntegration()}.
+     *
+     * <p>The handler library is located using the path already selected by Android's native linker;
+     * Backtrace does not open or parse the host APK while resolving the crash-handler library.
+     * Native integration is optional: a path-resolution or bridge failure disables it and returns
+     * control normally, leaving managed crash reporting operational.
+     *
+     * <p>See <a href="https://docs.saucelabs.com/error-reporting/platform-integrations/android/native-crash-integration/">
+     * Native Crash Integration for Android</a> for resolution precedence, failure semantics,
+     * threading, lifecycle, and compatibility details.
      */
     public void enableNativeIntegration() {
-        this.database.setupNativeIntegration(this, this.credentials);
+        tryEnableNativeIntegration();
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is
-     * required to enable this feature).
+     * Same as {@link #enableNativeIntegration()}, but reports whether the native crash handler was
+     * actually installed, since the void API returns normally on a contained setup failure.
+     *
+     * @return {@code true} when native integration is enabled
+     */
+    public boolean tryEnableNativeIntegration() {
+        return Boolean.TRUE.equals(this.database.setupNativeIntegration(this, this.credentials));
+    }
+
+    /**
+     * Same as {@link #enableNativeIntegration(boolean)}, but reports whether the native crash
+     * handler was actually installed.
+     *
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @return {@code true} when native integration is enabled
+     */
+    public boolean tryEnableNativeIntegration(boolean enableClientSideUnwinding) {
+        return Boolean.TRUE.equals(
+                this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding));
+    }
+
+    /**
+     * Same as {@link #enableNativeIntegration(boolean, UnwindingMode)}, but reports whether the
+     * native crash handler was actually installed.
+     *
+     * @param enableClientSideUnwinding Enable client side unwinding
+     * @param unwindingMode             Unwinding mode to use for client side unwinding
+     * @return {@code true} when native integration is enabled
+     */
+    public boolean tryEnableNativeIntegration(boolean enableClientSideUnwinding, UnwindingMode unwindingMode) {
+        return Boolean.TRUE.equals(
+                this.database.setupNativeIntegration(this, this.credentials, enableClientSideUnwinding, unwindingMode));
+    }
+
+    /**
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     *
+     * <p>See {@link #enableNativeIntegration()} for threading and coverage requirements.
      *
      * @param enableClientSideUnwinding Enable client side unwinding
      */
@@ -295,8 +348,9 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is
-     * required to enable this feature).
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     *
+     * <p>See {@link #enableNativeIntegration()} for threading and coverage requirements.
      *
      * @param enableClientSideUnwinding Enable client side unwinding
      * @param unwindingMode             Unwinding mode to use for client side
@@ -741,13 +795,39 @@ public class BacktraceBase implements Client {
     }
 
     /**
-     * Force a native crash report and minidump submission
+     * Force a native crash report and minidump submission.
      *
-     * @param message
+     * <p>A safe no-op when native integration is not enabled: after a contained setup failure, or
+     * after {@link #disableNativeIntegration()}, the request is logged and dropped instead of
+     * reaching an uninitialized native backend.
+     *
+     * @param message error message attached to the report
      */
-    public native void dumpWithoutCrash(String message);
+    public void dumpWithoutCrash(String message) {
+        dumpWithoutCrash(message, false);
+    }
 
-    public native void dumpWithoutCrash(String message, boolean setMainThreadAsFaultingThread);
+    public void dumpWithoutCrash(String message, boolean setMainThreadAsFaultingThread) {
+        try {
+            dumpWithoutCrashNative(message, setMainThreadAsFaultingThread);
+        } catch (RuntimeException | LinkageError failure) {
+            BacktraceLogger.e(
+                    LOG_TAG,
+                    "BT_NATIVE_DUMP_UNAVAILABLE: Cannot create a native dump because native"
+                            + " integration is unavailable. Failure type: "
+                            + failureType(failure));
+        }
+    }
+
+    private static String failureType(Throwable failure) {
+        if (failure == null) {
+            return "unknown";
+        }
+        String type = failure.getClass().getName();
+        return type == null || type.trim().isEmpty() ? "unknown" : type;
+    }
+
+    private native void dumpWithoutCrashNative(String message, boolean setMainThreadAsFaultingThread);
 
     /**
      * Sending an exception to Backtrace API

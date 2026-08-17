@@ -15,7 +15,14 @@ public interface Client {
     void send(BacktraceReport report);
 
     /**
-     * Capture unhandled native exceptions (Backtrace database integration is required to enable this feature).
+     * Synchronously installs the native crash handler (Backtrace database integration is required to enable this feature).
+     *
+     * <p>Configure initial native attributes, attachments, and breadcrumbs before calling this method.
+     * Native crashes that occur before this method completes cannot be captured.
+     *
+     * <p>Call this method from exactly one application-controlled thread.
+     * It may be invoked on a background thread, but doing so delays native crash coverage until initialization completes.
+     * Do not call it concurrently with {@code disableNativeIntegration()}.
      */
     void enableNativeIntegration();
 
