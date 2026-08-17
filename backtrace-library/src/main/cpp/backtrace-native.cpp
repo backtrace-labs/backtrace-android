@@ -1,6 +1,7 @@
 #include "backtrace-native.h"
 
 #include <atomic>
+#include <dlfcn.h>
 #include <map>
 #include <mutex>
 #include <string>
@@ -24,6 +25,7 @@ static jint JNI_VERSION = JNI_VERSION_1_6;
 
 // Java VM
 static JavaVM *javaVm;
+static int backtraceLibraryAnchor;
 
 // check if native crash client is already initialized
 std::atomic_bool initialized;
@@ -78,6 +80,18 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
 }
 
 extern "C" {
+JNIEXPORT jstring JNICALL
+Java_backtraceio_library_models_nativeHandler_CrashHandlerConfiguration_resolveLoadedLibraryPath(
+        JNIEnv *env, jclass /* clazz */) {
+    Dl_info libraryInfo{};
+    if (dladdr(static_cast<void *>(&backtraceLibraryAnchor), &libraryInfo) == 0
+            || libraryInfo.dli_fname == nullptr
+            || libraryInfo.dli_fname[0] == '\0') {
+        return nullptr;
+    }
+    return env->NewStringUTF(libraryInfo.dli_fname);
+}
+
 void Crash() {
     *(volatile int *) 0 = 0;
 }
@@ -167,6 +181,16 @@ Java_backtraceio_library_BacktraceDatabase_addAttachment(JNIEnv *env, jobject th
     AddAttachment(jattachment);
 }
 
+JNIEXPORT void JNICALL
+Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrashNative(JNIEnv *env,
+                                                                   jobject thiz,
+                                                                   jstring message,
+                                                                   jboolean set_main_thread_as_faulting_thread) {
+    DumpWithoutCrash(message, set_main_thread_as_faulting_thread);
+}
+
+// Compatibility aliases: older artifacts bound dumpWithoutCrash directly as a native method. Both
+// route through the same guarded backend entry point.
 JNIEXPORT void JNICALL
 Java_backtraceio_library_base_BacktraceBase_dumpWithoutCrash__Ljava_lang_String_2(JNIEnv *env,
                                                                                   jobject thiz,
