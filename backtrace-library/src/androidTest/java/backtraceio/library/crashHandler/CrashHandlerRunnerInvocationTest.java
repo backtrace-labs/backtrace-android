@@ -3,7 +3,10 @@ package backtraceio.library.crashHandler;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import backtraceio.library.models.nativeHandler.CrashHandlerConfiguration;
@@ -60,10 +63,54 @@ public class CrashHandlerRunnerInvocationTest {
         HashMap<String, String> envVariables = new HashMap<String, String>();
         envVariables.put(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, fakePathLibrary);
 
-        when(backtraceCrashHandlerWrapper.handleCrash(any(String[].class))).thenReturn(true);
+        when(backtraceCrashHandlerWrapper.handleCrash(any(String[].class))).thenReturn(false);
 
         BacktraceCrashHandlerRunner runner =
                 new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, mock(SystemLoader.class));
-        assertTrue(runner.run(new String[] {}, envVariables));
+        assertFalse(runner.run(new String[] {}, envVariables));
+    }
+
+    @Test
+    public void blankHandlerPathReturnsFalse() {
+        HashMap<String, String> envVariables = new HashMap<String, String>();
+        envVariables.put(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, "   ");
+
+        SystemLoader loader = mock(SystemLoader.class);
+        BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, loader);
+
+        assertFalse(runner.run(new String[] {}, envVariables));
+        verify(loader, never()).loadLibrary(any());
+    }
+
+    /**
+     * A library the handler process cannot load (for example an APK-backed path its linker rejects)
+     * must fail the run without an uncaught throw and without dispatching to the native handler.
+     */
+    @Test
+    public void libraryLinkageErrorReturnsFalseAndDoesNotInvokeHandler() {
+        HashMap<String, String> envVariables = new HashMap<String, String>();
+        envVariables.put(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, fakePathLibrary);
+
+        SystemLoader loader = mock(SystemLoader.class);
+        doThrow(new UnsatisfiedLinkError("dlopen failed")).when(loader).loadLibrary(any());
+
+        BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, loader);
+
+        assertFalse(runner.run(new String[] {}, envVariables));
+        verify(backtraceCrashHandlerWrapper, never()).handleCrash(any(String[].class));
+    }
+
+    @Test
+    public void securityExceptionReturnsFalseAndDoesNotInvokeHandler() {
+        HashMap<String, String> envVariables = new HashMap<String, String>();
+        envVariables.put(CrashHandlerConfiguration.BACKTRACE_CRASH_HANDLER, fakePathLibrary);
+
+        SystemLoader loader = mock(SystemLoader.class);
+        doThrow(new SecurityException("library load rejected")).when(loader).loadLibrary(any());
+
+        BacktraceCrashHandlerRunner runner = new BacktraceCrashHandlerRunner(backtraceCrashHandlerWrapper, loader);
+
+        assertFalse(runner.run(new String[] {}, envVariables));
+        verify(backtraceCrashHandlerWrapper, never()).handleCrash(any(String[].class));
     }
 }

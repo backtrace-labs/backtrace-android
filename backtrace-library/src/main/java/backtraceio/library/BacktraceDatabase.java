@@ -2,6 +2,7 @@ package backtraceio.library;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.net.Uri;
 import backtraceio.library.base.BacktraceBase;
 import backtraceio.library.breadcrumbs.BacktraceBreadcrumbs;
 import backtraceio.library.common.FileHelper;
@@ -53,7 +54,7 @@ public class BacktraceDatabase implements Database {
     private boolean _enable = false;
     private Breadcrumbs breadcrumbs;
     private CrashHandlerConfiguration crashHandlerConfiguration;
-    private boolean _enabledNativeIntegration = false;
+    private volatile boolean _enabledNativeIntegration = false;
     private NativeCommunication nativeCommunication = new BacktraceCrashHandlerWrapper();
 
     /**
@@ -131,6 +132,19 @@ public class BacktraceDatabase implements Database {
     }
 
     /**
+     * Sanitized failure description for optional-native-integration diagnostics: exception
+     * messages can carry submission URLs, tokens, or filesystem paths (for example from a custom
+     * credential implementation or an UnsatisfiedLinkError), so these paths log only the class.
+     */
+    private static String failureType(Throwable failure) {
+        if (failure == null) {
+            return "unknown";
+        }
+        String type = failure.getClass().getName();
+        return type == null || type.trim().isEmpty() ? "unknown" : type;
+    }
+
+    /**
      * Setup native crash handler
      *
      * @param client      Backtrace client
@@ -157,7 +171,21 @@ public class BacktraceDatabase implements Database {
      * Overrides default native communication bridge
      */
     public void useNativeCommunication(NativeCommunication nativeCommunication) {
+        if (nativeCommunication == null) {
+            throw new IllegalArgumentException("NativeCommunication cannot be null");
+        }
         this.nativeCommunication = nativeCommunication;
+    }
+
+    /**
+     * Test seam: overrides the crash-handler configuration used by
+     * {@link #setupNativeIntegration(BacktraceBase, BacktraceCredentials, boolean, UnwindingMode)}.
+     */
+    void useCrashHandlerConfiguration(CrashHandlerConfiguration crashHandlerConfiguration) {
+        if (crashHandlerConfiguration == null) {
+            throw new IllegalArgumentException("CrashHandlerConfiguration cannot be null");
+        }
+        this.crashHandlerConfiguration = crashHandlerConfiguration;
     }
 
     /**
@@ -178,49 +206,120 @@ public class BacktraceDatabase implements Database {
             return false;
         }
 
-        if (!this.crashHandlerConfiguration.isSupportedAbi()) {
+        // Validate public inputs before performing any side effects; enabling the optional native
+        // integration must never terminate the host application.
+        if (client == null) {
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration requires a Backtrace client.");
+            this._enabledNativeIntegration = false;
+            return false;
+        }
+        if (credentials == null) {
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration requires Backtrace credentials.");
+            this._enabledNativeIntegration = false;
+            return false;
+        }
+        if (nativeCommunication == null || crashHandlerConfiguration == null) {
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration dependencies are unavailable.");
+            this._enabledNativeIntegration = false;
             return false;
         }
 
         final long startSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
-        String minidumpSubmissionUrl = credentials.getMinidumpSubmissionUrl().toString();
-        if (minidumpSubmissionUrl == null) {
+
+        // Preparation failures (credential resolution, ABI policy, crashpad directory, attributes,
+        // attachments, path resolution) disable native crash capture only; managed crash reporting
+        // stays operational. The minidump URL getter runs exactly once, inside containment, because
+        // credential implementations can carry null values or throw while building the URL.
+        final String minidumpSubmissionUrl;
+        final String crashpadDatabaseDirectory;
+        final String classPath;
+        final String[] keys;
+        final String[] values;
+        final String[] attachmentPaths;
+        final String[] environmentVariables;
+        try {
+            Uri minidumpUri = credentials.getMinidumpSubmissionUrl();
+            if (minidumpUri == null || minidumpUri.toString().trim().isEmpty()) {
+                BacktraceLogger.e(
+                        LOG_TAG, "BT_NATIVE_PREPARE_FAILURE: Native integration requires a minidump submission URL.");
+                this._enabledNativeIntegration = false;
+                return false;
+            }
+            minidumpSubmissionUrl = minidumpUri.toString();
+
+            if (!this.crashHandlerConfiguration.isSupportedAbi()) {
+                this._enabledNativeIntegration = false;
+                return false;
+            }
+
+            crashpadDatabaseDirectory = this.crashHandlerConfiguration.useCrashpadDirectory(
+                    getSettings().getDatabasePath());
+
+            // setup default native attributes
+            BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
+            crashpadAttributes.attributes.put(
+                    BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.CrashAttributeType);
+            keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
+            values = crashpadAttributes.attributes.values().toArray(new String[0]);
+
+            // Leave room for breadcrumbs attachment path too
+            List<String> attachmentList = new ArrayList<>(client.getAttachments());
+            attachmentList.add(this.breadcrumbs.getBreadcrumbLogPath());
+            attachmentPaths = attachmentList.toArray(new String[0]);
+
+            ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
+            environmentVariables = this.crashHandlerConfiguration
+                    .getCrashHandlerEnvironmentVariables(applicationInfo)
+                    .toArray(new String[0]);
+            classPath = this.crashHandlerConfiguration.getClassPath();
+        } catch (RuntimeException | LinkageError failure) {
+            this._enabledNativeIntegration = false;
+            BacktraceLogger.e(
+                    LOG_TAG,
+                    "BT_NATIVE_PREPARE_FAILURE: Native integration configuration could not be"
+                            + " prepared. Failure type: "
+                            + failureType(failure));
             return false;
         }
 
-        // Create the crashpad directory if it doesn't exist
-        String crashpadDatabaseDirectory = this.crashHandlerConfiguration.useCrashpadDirectory(
-                getSettings().getDatabasePath());
+        try {
+            _enabledNativeIntegration = nativeCommunication.initializeJavaCrashHandler(
+                    minidumpSubmissionUrl,
+                    crashpadDatabaseDirectory,
+                    classPath,
+                    keys,
+                    values,
+                    attachmentPaths,
+                    environmentVariables);
+        } catch (RuntimeException | LinkageError failure) {
+            this._enabledNativeIntegration = false;
+            BacktraceLogger.e(
+                    LOG_TAG,
+                    "BT_NATIVE_BRIDGE_FAILURE: Native integration was not enabled because the"
+                            + " native initialization bridge failed. Failure type: "
+                            + failureType(failure));
+            return false;
+        }
 
-        // setup default native attributes
-        BacktraceAttributes crashpadAttributes = new BacktraceAttributes(_applicationContext, client.attributes);
-        crashpadAttributes.attributes.put(
-                BacktraceAttributeConsts.ErrorType, BacktraceAttributeConsts.CrashAttributeType);
-        String[] keys = crashpadAttributes.attributes.keySet().toArray(new String[0]);
-        String[] values = crashpadAttributes.attributes.values().toArray(new String[0]);
-
-        // Leave room for breadcrumbs attachment path too
-        List<String> attachmentList = new ArrayList<>(client.getAttachments());
-        attachmentList.add(this.breadcrumbs.getBreadcrumbLogPath());
-        String[] attachmentPaths = attachmentList.toArray(new String[0]);
-
-        ApplicationInfo applicationInfo = _applicationContext.getApplicationInfo();
-
-        _enabledNativeIntegration = nativeCommunication.initializeJavaCrashHandler(
-                minidumpSubmissionUrl,
-                crashpadDatabaseDirectory,
-                this.crashHandlerConfiguration.getClassPath(),
-                keys,
-                values,
-                attachmentPaths,
-                this.crashHandlerConfiguration
-                        .getCrashHandlerEnvironmentVariables(applicationInfo)
-                        .toArray(new String[0]));
+        if (!_enabledNativeIntegration) {
+            BacktraceLogger.e(LOG_TAG, "BT_NATIVE_BRIDGE_FAILURE: The native initialization bridge returned false.");
+        }
 
         if (_enabledNativeIntegration && this.breadcrumbs.isEnabled()) {
-            this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
-                this.addAttribute("breadcrumbs.lastId", Long.toString((breadcrumbId)));
-            });
+            // Nonfatal: a failure installing the breadcrumb hook must not misreport an already
+            // successfully initialized native handler as disabled.
+            try {
+                this.breadcrumbs.setOnSuccessfulBreadcrumbAddEventListener(breadcrumbId -> {
+                    this.addAttribute("breadcrumbs.lastId", Long.toString((breadcrumbId)));
+                });
+            } catch (RuntimeException failure) {
+                BacktraceLogger.e(
+                        LOG_TAG,
+                        "BT_NATIVE_BREADCRUMB_HOOK_FAILURE: Native integration is enabled, but the"
+                                + " breadcrumb synchronization hook could not be installed."
+                                + " Failure type: "
+                                + failureType(failure));
+            }
         }
 
         final long endSetupNativeIntegrationTime = DebugHelper.getCurrentTimeMillis();
@@ -232,13 +331,35 @@ public class BacktraceDatabase implements Database {
         return _enabledNativeIntegration;
     }
 
+    private Runnable nativeDisableAction = this::disable;
+
     /**
-     * Disable native integration
+     * Test seam: overrides the native disable action invoked by {@link #disableNativeIntegration()}.
+     */
+    void useNativeDisableAction(Runnable nativeDisableAction) {
+        if (nativeDisableAction == null) {
+            throw new IllegalArgumentException("Native disable action cannot be null");
+        }
+        this.nativeDisableAction = nativeDisableAction;
+    }
+
+    /**
+     * Disable native integration. Fail-safe: a native bridge failure is logged and the Java-side
+     * state is cleared regardless, so a later enable starts from a consistent state.
      */
     @Override
     public void disableNativeIntegration() {
-        disable();
-        this._enabledNativeIntegration = false;
+        try {
+            nativeDisableAction.run();
+        } catch (RuntimeException | LinkageError failure) {
+            BacktraceLogger.e(
+                    LOG_TAG,
+                    "BT_NATIVE_DISABLE_FAILURE: Native integration could not be disabled through"
+                            + " the native bridge. Failure type: "
+                            + failureType(failure));
+        } finally {
+            this._enabledNativeIntegration = false;
+        }
     }
 
     @Override

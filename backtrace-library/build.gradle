@@ -63,8 +63,11 @@ android {
         }
         androidTest.manifest.srcFile "src/androidTest/java/backtraceio/library/AndroidManifest.xml"
     }
+
     lint {
-        abortOnError false
+        abortOnError = true
+        checkReleaseBuilds = true
+        baseline = file('lint-baseline.xml')
     }
 }
 
