@@ -19,7 +19,6 @@ android {
         ndkVersion '27.3.13750724'
         versionName androidGitVersion.name()
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
-
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -40,10 +39,8 @@ android {
     }
 
     buildTypes {
-        buildTypes {
-            debug {
-                testCoverageEnabled true
-            }
+        debug {
+            testCoverageEnabled true
         }
         release {
             minifyEnabled false
