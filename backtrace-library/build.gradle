@@ -15,6 +15,12 @@ def libVersion = androidGitVersion.name()
 android {
     namespace = "backtraceio.library"
     compileSdk = 37
+
+    // AGP 9 turns built-in Kotlin on by default, which adds kotlin-stdlib to the `api`
+    // configuration and publishes it as a compile-scope dependency. This module is pure
+    // Java, so consumers would inherit the stdlib for no reason. Remove only if Kotlin
+    // sources are ever added here.
+    enableKotlin = false
     defaultConfig {
         minSdk = 21
         ndkVersion = '27.3.13750724'
