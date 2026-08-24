@@ -12,13 +12,18 @@ androidGitVersion {
 
 def libVersion = androidGitVersion.name()
 
+if (libVersion == null || libVersion.trim().isEmpty() || libVersion.trim() == 'null') {
+    throw new GradleException("androidGitVersion.name() resolved to '${libVersion}'. " +
+            "The library version could not be determined. Make sure the git history and tags are available.")
+}
+
 android {
     namespace = "backtraceio.library"
     compileSdk = 36
     defaultConfig {
         minSdk = 21
         ndkVersion = '27.3.13750724'
-        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
+        buildConfigField("String", "VERSION_NAME", "\"${libVersion}\"")
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
