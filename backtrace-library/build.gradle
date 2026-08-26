@@ -19,6 +19,7 @@ if (libVersion == null || libVersion.trim().isEmpty() || libVersion.trim() == 'n
 
 android {
     namespace = "backtraceio.library"
+    enableKotlin = false
     compileSdk = 36
     defaultConfig {
         minSdk = 21
