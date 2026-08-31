@@ -90,6 +90,13 @@ if (CLIENT_SIDE_UNWINDING)
 
     # Bun Libraries
     set(LIBUNWINDSTACK_ENABLED TRUE)
+
+    # libbun's libunwind backend is unused - client-side-unwinding.cpp only ever
+    # requests BUN_BACKEND_LIBUNWINDSTACK. Keep it off explicitly: NDK r29+ ships a
+    # bare LLVM <libunwind.h> that makes libbun auto-enable a backend which then
+    # fails to compile (it needs the ptrace nongnu API no NDK provides).
+    set(LIBUNWIND_ENABLED FALSE)
+
     add_subdirectory(libbun)
 endif ()
 
