@@ -12,10 +12,14 @@ androidGitVersion {
 
 def libVersion = androidGitVersion.name()
 
+if (libVersion == null || libVersion.trim().isEmpty() || libVersion.trim() == 'null') {
+    throw new GradleException("androidGitVersion.name() resolved to '${libVersion}'. " +
+            "The library version could not be determined. Make sure the git history and tags are available.")
+}
+
 android {
     namespace = "backtraceio.library"
     compileSdk = 37
-
     // AGP 9 turns built-in Kotlin on by default, which adds kotlin-stdlib to the `api`
     // configuration and publishes it as a compile-scope dependency. This module is pure
     // Java, so consumers would inherit the stdlib for no reason. Remove only if Kotlin
@@ -32,6 +36,7 @@ android {
         aarMetadata {
             minCompileSdk = 36
         }
+
         buildConfigField("String", "VERSION_NAME", "\"${libVersion}\"")
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
 
