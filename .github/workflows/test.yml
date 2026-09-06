@@ -216,7 +216,8 @@ jobs:
 
       - name: Download bundletool (pinned)
         run: |
-          curl -sL -o bundletool.jar \
+          curl -fSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 \
+            -o bundletool.jar \
             "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
           echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
 
@@ -453,7 +454,8 @@ jobs:
 
       - name: Download bundletool (pinned)
         run: |
-          curl -sL -o bundletool.jar \
+          curl -fSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 \
+            -o bundletool.jar \
             "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
           echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
 
@@ -558,7 +560,8 @@ jobs:
 
       - name: Download bundletool (pinned)
         run: |
-          curl -sL -o bundletool.jar \
+          curl -fSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 \
+            -o bundletool.jar \
             "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
           echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
 
@@ -573,6 +576,11 @@ jobs:
 
       - name: Build AAB, debug APK, and instrumentation APK
         run: ./gradlew :example-app:bundleDebug :example-app:assembleDebug :example-app:assembleDebugAndroidTest
+
+      # setup-gradle only stops the daemon in post-job cleanup, so without this an idle -Xmx4g JVM
+      # competes with the memory-sensitive ps16k emulator for host memory.
+      - name: Release build memory before the emulator boots
+        run: ./gradlew --stop
 
       - name: Enable KVM group permissions
         run: |
@@ -631,7 +639,8 @@ jobs:
 
       - name: Download bundletool (pinned)
         run: |
-          curl -sL -o bundletool.jar \
+          curl -fSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 \
+            -o bundletool.jar \
             "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
           echo "2d4ad908faea64047c1cc9cb747e6aa667c6ab192e09607bd16b67246a8cd6ae  bundletool.jar" | sha256sum -c -
 
