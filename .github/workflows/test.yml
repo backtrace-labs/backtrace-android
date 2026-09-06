@@ -577,6 +577,11 @@ jobs:
       - name: Build AAB, debug APK, and instrumentation APK
         run: ./gradlew :example-app:bundleDebug :example-app:assembleDebug :example-app:assembleDebugAndroidTest
 
+      # setup-gradle only stops the daemon in post-job cleanup, so without this an idle -Xmx4g JVM
+      # competes with the memory-sensitive ps16k emulator for host memory.
+      - name: Release build memory before the emulator boots
+        run: ./gradlew --stop
+
       - name: Enable KVM group permissions
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
