@@ -7,6 +7,30 @@ set -euo pipefail
 # lifecycle) runs with the page-size assertion re-checked inside the gate, plus 16 KB zip alignment
 # of the debug APK.
 
+# The emulator runner returns once sys.boot_completed is set, but system services register
+# after that flag. On the slow-booting ps16k image PackageManager can still be unpublished when
+# bundletool queries the device ("cmd: Can't find service: package"), which fails the run at
+# install time. Wait for the services this gate actually depends on before touching the device.
+wait_for_device_ready() {
+    local deadline=$((SECONDS + 300))
+    adb wait-for-device
+    while [ "$SECONDS" -lt "$deadline" ]; do
+        if [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ] \
+            && adb shell service check package 2>/dev/null | grep -q "Service package: found" \
+            && adb shell service check activity 2>/dev/null | grep -q "Service activity: found" \
+            && adb shell pm path android 2>&1 | grep -q "^package:" \
+            && adb shell pm list features 2>&1 | grep -q "^feature:"; then
+            echo "Device ready: boot completed, PackageManager and ActivityManager registered."
+            return 0
+        fi
+        sleep 5
+    done
+    echo "Device did not become ready within 300s" >&2
+    adb shell service list >&2 || true
+    return 1
+}
+wait_for_device_ready
+
 page_size="$(adb shell getconf PAGE_SIZE | tr -d '\r')"
 test "$page_size" = "16384"
 
