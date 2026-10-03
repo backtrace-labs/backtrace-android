@@ -6,8 +6,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.SystemClock;
 import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -39,10 +41,14 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     private static final long INGESTION_TIMEOUT_MS = 60_000;
 
     @Rule
-    public ActivityScenarioRule<MainActivity> mActivityRule = new ActivityScenarioRule<>(MainActivity.class);
+    public ActivityScenarioRule<MainActivity> mActivityRule =
+            new ActivityScenarioRule<>(new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class)
+                    // Metrics share the sender thread with reports, so an unreachable events endpoint
+                    // would delay the uploads these tests wait for. None of these tests assert on metrics.
+                    .putExtra(MainActivity.EXTRA_DISABLE_METRICS, true));
 
     @Before
-    public void enableMetricsAndBreadcrumbs() {
+    public void enableBreadcrumbs() {
         BacktraceLogger.setLevel(LogLevel.DEBUG);
         // Re-assert RESUMED: some old real devices background the activity right after launch.
         mActivityRule.getScenario().moveToState(Lifecycle.State.RESUMED);
