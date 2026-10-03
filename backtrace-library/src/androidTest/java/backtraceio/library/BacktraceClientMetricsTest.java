@@ -65,6 +65,11 @@ public class BacktraceClientMetricsTest {
                 new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
+
+        // metrics.enable() sends startup events right away; route them to a mock so no test reaches
+        // the real events endpoint. Tests replace these with their own mocks where they assert on them.
+        backtraceClient.metrics.setUniqueEventsRequestHandler(new MockRequestHandler());
+        backtraceClient.metrics.setSummedEventsRequestHandler(new MockRequestHandler());
     }
 
     public class MockRequestHandler implements EventsRequestHandler {
@@ -109,7 +114,7 @@ public class BacktraceClientMetricsTest {
 
         final int timeBetweenRetriesMillis = 1;
 
-        // Enable metrics first - this will send startup events with default handlers
+        // Enable metrics first - this will send startup events to the setUp() mock handlers
         backtraceClient.metrics.enable(
                 new BacktraceMetricsSettings(credentials, defaultBaseUrl, 0, timeBetweenRetriesMillis));
 
