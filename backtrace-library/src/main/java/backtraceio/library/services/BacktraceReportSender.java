@@ -95,7 +95,7 @@ class BacktraceReportSender {
                 BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
                 errorCallback.onEvent(e);
             }
-            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
+            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API, url: " + serverUrl, e);
             result = BacktraceResult.OnError(report, e);
         } finally {
             if (urlConnection != null) {
@@ -165,7 +165,7 @@ class BacktraceReportSender {
                 BacktraceLogger.d(LOG_TAG, "Custom handler on server error");
                 errorCallback.onEvent(e);
             }
-            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API", e);
+            BacktraceLogger.e(LOG_TAG, "Sending HTTP request failed to Backtrace API, url: " + serverUrl, e);
             BacktraceLogger.e(LOG_TAG, "Failed HTTP request URL " + serverUrl);
             result = EventsResult.OnError(payload, e, statusCode);
         } finally {
