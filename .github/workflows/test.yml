@@ -591,9 +591,13 @@ jobs:
       - name: 16 KB runtime qualification
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
-          api-level: 35
+          # API 35 was the first 16 KB image; its ART runtime crashed system_server mid-run
+          # (NPE in ReferenceQueueDaemon), so qualify on the newer API 36 image instead.
+          api-level: 36
           arch: x86_64
           target: google_apis_ps16k
+          # Use all 4 vCPUs of the standard GitHub Linux runner instead of the default 2.
+          cores: 4
           # The ps16k google_apis image thrashes under the default AVD RAM: 16 KB pages inflate
           # every process, and system-wide mem-pressure kills reaped the test service process
           # (alongside the launcher and GMS) seconds after boot.
