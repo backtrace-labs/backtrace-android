@@ -52,7 +52,7 @@ expect_fail "$(sabotage unpinned \
     "an unpinned action"
 
 expect_fail "$(sabotage saucectl-latest \
-    "text.replace('saucectl-version: 0.213.0', 'saucectl-version: latest')")" \
+    "text.replace('saucectl-version: 0.216.3', 'saucectl-version: latest')")" \
     "saucectl-version: latest"
 
 expect_fail "$(sabotage prt \
