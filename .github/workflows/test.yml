@@ -383,7 +383,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           skip-run: true
-          saucectl-version: 0.213.0
+          saucectl-version: 0.216.3
 
       - name: Run saucectl
         env:
