@@ -80,19 +80,19 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         // upload on the single sender thread, routinely exceeds a few seconds.
         waiter.await(SUBMISSION_TIMEOUT_MS, TimeUnit.MILLISECONDS, 1);
         Assert.assertNotNull("No submission result", result[0]);
-        Assert.assertEquals("Submission failed: " + result[0].message, BacktraceResultStatus.Ok, result[0].status);
+        assertEquals("Submission failed: " + result[0].message, BacktraceResultStatus.Ok, result[0].status);
         String rxId = result[0].rxId;
 
         // THEN
         CoronerResponse response = awaitIngestedReport(rxId);
 
-        Assert.assertEquals(1, response.getResultsNumber());
+        assertEquals(1, response.getResultsNumber());
 
         String resultErrorMsg = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Invalid index of selected element!", resultErrorMsg);
+        assertEquals("Invalid index of selected element!", resultErrorMsg);
 
         String resultClassifier = response.getAttribute(0, "classifiers", String.class);
-        Assert.assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
+        assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
     }
 
     /**
@@ -119,32 +119,51 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         return null;
     }
 
+    /**
+     * Polls Coroner until a native dump report with error.message "DumpWithoutCrash" within
+     * [timestampStart, now] is ingested.
+     */
+    private CoronerResponse awaitIngestedDumpWithoutCrash(long timestampStart) throws InterruptedException {
+        long deadline = SystemClock.elapsedRealtime() + INGESTION_TIMEOUT_MS;
+        Exception lastPollFailure = null;
+        while (SystemClock.elapsedRealtime() < deadline) {
+            try {
+                CoronerResponse response = this.getCoronerClient()
+                        .errorTypeTimestampFilter(
+                                "Crash",
+                                Long.toString(timestampStart),
+                                Long.toString(this.getSecondsTimestampNowGMT()),
+                                Arrays.asList("error.message"));
+                lastPollFailure = null;
+                if (response != null && response.getResultsNumber() > 0) {
+                    for (int i = 0; i < response.getResultsNumber(); i++) {
+                        String message = response.getAttribute(i, "error.message", String.class);
+                        if ("DumpWithoutCrash".equals(message)) {
+                            return response;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                lastPollFailure = ex;
+            }
+            Thread.sleep(THREAD_SLEEP_TIME_MS);
+        }
+        Assert.fail("DumpWithoutCrash report not ingested within " + INGESTION_TIMEOUT_MS + " ms"
+                + (lastPollFailure == null ? "" : "; last poll failure: " + lastPollFailure.getMessage()));
+        return null;
+    }
+
     @Test
-    public void dumpWithoutCrash() throws CoronerResponseProcessingException, InterruptedException {
+    public void dumpWithoutCrash() throws InterruptedException {
         // GIVEN
-        CoronerResponse response = null;
         long timestampStart = this.getSecondsTimestampNowGMT();
 
         // WHEN
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
-        Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
 
         // THEN
-        try {
-            response = this.getCoronerClient()
-                    .errorTypeTimestampFilter(
-                            "Crash",
-                            Long.toString(timestampStart),
-                            Long.toString(this.getSecondsTimestampNowGMT()),
-                            Arrays.asList("error.message"));
-        } catch (Exception ex) {
-            Assert.fail(ex.getMessage());
-        }
-
-        Assert.assertNotNull(response);
-        Assert.assertEquals(1, response.getResultsNumber());
-        String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("DumpWithoutCrash", val);
+        CoronerResponse response = awaitIngestedDumpWithoutCrash(timestampStart);
+        Assert.assertNotNull("No Coroner response for DumpWithoutCrash", response);
     }
 
     // @Test
@@ -176,9 +195,9 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         }
 
         Assert.assertNotNull(response);
-        Assert.assertEquals(1, response.getResultsNumber());
+        assertEquals(1, response.getResultsNumber());
         String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Dump without crash", val);
+        assertEquals("Dump without crash", val);
     }
 
     @Test
