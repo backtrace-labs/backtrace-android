@@ -73,6 +73,9 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
+      - name: Install CMake and NDK
+        run: scripts/install_android_sdk_packages.sh
+
       - name: Bugfix libunwindstack-ndk .clang-format symbolic link issue
         run: rm ./backtrace-library/src/main/cpp/libbun/external/libunwindstack-ndk/.clang-format
 
@@ -160,6 +163,9 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
+      - name: Install CMake and NDK
+        run: scripts/install_android_sdk_packages.sh
+
       - name: Build app and instrumentation APKs
         run: ./gradlew :example-app:assembleDebug :example-app:assembleDebugAndroidTest
 
@@ -213,6 +219,9 @@ jobs:
 
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Install CMake and NDK
+        run: scripts/install_android_sdk_packages.sh
 
       - name: Download bundletool (pinned)
         run: |
@@ -313,6 +322,9 @@ jobs:
 
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Install CMake and NDK
+        run: scripts/install_android_sdk_packages.sh
 
       - name: Build device-test artifacts
         run: ./gradlew assembleDebugAndroidTest assembleDebug
@@ -452,6 +464,9 @@ jobs:
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
 
+      - name: Install CMake and NDK
+        run: scripts/install_android_sdk_packages.sh
+
       - name: Download bundletool (pinned)
         run: |
           curl -fSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 \
@@ -557,6 +572,9 @@ jobs:
 
       - name: Accept Android SDK licences
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Install CMake and NDK
+        run: scripts/install_android_sdk_packages.sh
 
       - name: Download bundletool (pinned)
         run: |
