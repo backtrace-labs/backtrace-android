@@ -1,5 +1,12 @@
 # Backtrace Android Release Notes
 
+## Version 3.15.0
+Bugfixes
+- Fixed native crashes after `dumpWithoutCrash(...)` reporting the main thread as the faulting thread. (#232)
+
+Upgrade notes
+- Raised the minimum `compileSdk` for apps to 36. (#220)
+
 ## Version 3.14.0
 Improvements
 - Improved native-integration startup in large APK and Android App Bundle applications by removing synchronous SDK-owned APK ZIP central-directory parsing from crash-handler path resolution. The SDK now prefers the path selected by Android's native linker, with extracted-library and installed-split metadata fallbacks.

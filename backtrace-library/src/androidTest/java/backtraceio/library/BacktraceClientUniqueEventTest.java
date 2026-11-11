@@ -69,6 +69,11 @@ public class BacktraceClientUniqueEventTest {
                 new BacktraceDatabase(context, context.getFilesDir().getAbsolutePath());
 
         backtraceClient = new BacktraceClient(context, credentials, database);
+
+        // metrics.enable() sends startup events right away; route them to a mock so no test reaches
+        // the real events endpoint. Tests replace these with their own mocks where they assert on them.
+        backtraceClient.metrics.setUniqueEventsRequestHandler(new MockRequestHandler());
+        backtraceClient.metrics.setSummedEventsRequestHandler(new MockRequestHandler());
     }
 
     public class MockRequestHandler implements EventsRequestHandler {

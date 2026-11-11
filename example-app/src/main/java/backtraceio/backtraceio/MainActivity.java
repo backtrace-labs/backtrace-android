@@ -32,6 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    /**
+     * Intent extra that skips enabling Backtrace metrics. Instrumentation tests set it so startup
+     * metrics requests don't share the sender thread with the reports under test.
+     */
+    public static final String EXTRA_DISABLE_METRICS = "backtraceio.backtraceio.DISABLE_METRICS";
 
     private BacktraceClient backtraceClient;
     private OnServerResponseEventListener listener;
@@ -51,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL);
+        boolean enableMetrics = !getIntent().getBooleanExtra(EXTRA_DISABLE_METRICS, false);
+        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL, enableMetrics);
 
         symlinkAndWriteFile();
     }
@@ -72,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         writeMyCustomFile(fileNameDateString);
     }
 
-    private BacktraceClient initializeBacktrace(final String submissionUrl) {
+    private BacktraceClient initializeBacktrace(final String submissionUrl, final boolean enableMetrics) {
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
@@ -102,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
         BacktraceExceptionHandler.enable(backtraceClient);
 
-        backtraceClient.metrics.enable();
+        if (enableMetrics) {
+            backtraceClient.metrics.enable();
+        }
 
         // Enable handling of native crashes
         database.setupNativeIntegration(backtraceClient, credentials, true);

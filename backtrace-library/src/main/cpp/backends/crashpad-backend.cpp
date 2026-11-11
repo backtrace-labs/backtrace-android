@@ -433,6 +433,9 @@ void DumpWithoutCrashCrashpad(jstring message, jboolean set_main_thread_as_fault
     if (message != NULL) {
         ClearAnnotation("error.message");
     }
+    if (set_main_thread_as_faulting_thread == true) {
+        ClearAnnotation("_mod_faulting_tid");
+    }
 }
 
 void AddAttributeCrashpad(jstring key, jstring value) {
