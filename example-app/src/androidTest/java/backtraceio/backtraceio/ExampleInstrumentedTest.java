@@ -20,6 +20,7 @@ import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import net.jodah.concurrentunit.Waiter;
@@ -40,12 +41,16 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     private static final long SUBMISSION_TIMEOUT_MS = 60_000;
     private static final long INGESTION_TIMEOUT_MS = 60_000;
 
+    /** Per-test report GUID; declared before the rule so it is initialized when the rule is built. */
+    private final String reportGuid = UUID.randomUUID().toString();
+
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityRule =
             new ActivityScenarioRule<>(new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class)
                     // Metrics share the sender thread with reports, so an unreachable events endpoint
                     // would delay the uploads these tests wait for. None of these tests assert on metrics.
-                    .putExtra(MainActivity.EXTRA_DISABLE_METRICS, true));
+                    .putExtra(MainActivity.EXTRA_DISABLE_METRICS, true)
+                    .putExtra(MainActivity.EXTRA_REPORT_GUID, reportGuid));
 
     @Before
     public void enableBreadcrumbs() {
@@ -119,42 +124,8 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         return null;
     }
 
-    /**
-     * Polls Coroner until a native dump report with error.message "DumpWithoutCrash" within
-     * [timestampStart, now] is ingested.
-     */
-    private CoronerResponse awaitIngestedDumpWithoutCrash(long timestampStart) throws InterruptedException {
-        long deadline = SystemClock.elapsedRealtime() + INGESTION_TIMEOUT_MS;
-        Exception lastPollFailure = null;
-        while (SystemClock.elapsedRealtime() < deadline) {
-            try {
-                CoronerResponse response = this.getCoronerClient()
-                        .errorTypeTimestampFilter(
-                                "Crash",
-                                Long.toString(timestampStart),
-                                Long.toString(this.getSecondsTimestampNowGMT()),
-                                Arrays.asList("error.message"));
-                lastPollFailure = null;
-                if (response != null && response.getResultsNumber() > 0) {
-                    for (int i = 0; i < response.getResultsNumber(); i++) {
-                        String message = response.getAttribute(i, "error.message", String.class);
-                        if ("DumpWithoutCrash".equals(message)) {
-                            return response;
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                lastPollFailure = ex;
-            }
-            Thread.sleep(THREAD_SLEEP_TIME_MS);
-        }
-        Assert.fail("DumpWithoutCrash report not ingested within " + INGESTION_TIMEOUT_MS + " ms"
-                + (lastPollFailure == null ? "" : "; last poll failure: " + lastPollFailure.getMessage()));
-        return null;
-    }
-
     @Test
-    public void dumpWithoutCrash() throws InterruptedException {
+    public void dumpWithoutCrash() {
         // GIVEN
         long timestampStart = this.getSecondsTimestampNowGMT();
 
@@ -162,8 +133,10 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
 
         // THEN
-        CoronerResponse response = awaitIngestedDumpWithoutCrash(timestampStart);
-        Assert.assertNotNull("No Coroner response for DumpWithoutCrash", response);
+        // Correlated by this test's GUID and filtered on the message, so other Crash reports in the
+        // window, dumps from other devices, and duplicate dumps are all rejected.
+        CoronerNativeReportAssertions.awaitExactlyOneWithMessage(
+                this.getCoronerClient(), reportGuid, "DumpWithoutCrash", timestampStart);
     }
 
     // @Test

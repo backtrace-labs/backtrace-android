@@ -38,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
      */
     public static final String EXTRA_DISABLE_METRICS = "backtraceio.backtraceio.DISABLE_METRICS";
 
+    /**
+     * Intent extra overriding the report {@code guid} attribute. Instrumentation tests set a
+     * per-test value so Coroner queries correlate only the reports this test produced, not
+     * reports from other tests or devices in the same run.
+     */
+    public static final String EXTRA_REPORT_GUID = "backtraceio.backtraceio.REPORT_GUID";
+
     private BacktraceClient backtraceClient;
     private OnServerResponseEventListener listener;
     private final int anrTimeout = 3000;
@@ -57,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         boolean enableMetrics = !getIntent().getBooleanExtra(EXTRA_DISABLE_METRICS, false);
-        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL, enableMetrics);
+        String reportGuid = getIntent().getStringExtra(EXTRA_REPORT_GUID);
+        backtraceClient = initializeBacktrace(BuildConfig.BACKTRACE_SUBMISSION_URL, enableMetrics, reportGuid);
 
         symlinkAndWriteFile();
     }
@@ -78,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
         writeMyCustomFile(fileNameDateString);
     }
 
-    private BacktraceClient initializeBacktrace(final String submissionUrl, final boolean enableMetrics) {
+    private BacktraceClient initializeBacktrace(
+            final String submissionUrl, final boolean enableMetrics, final String reportGuid) {
         BacktraceCredentials credentials = new BacktraceCredentials(submissionUrl);
 
         Context context = getApplicationContext();
@@ -96,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
                 put("custom.attribute", "My Custom Attribute");
             }
         };
+        if (reportGuid != null) {
+            // Must be set before native integration starts: the native backend reads `guid` once.
+            attributes.put("guid", reportGuid);
+        }
 
         List<String> attachments = new ArrayList<String>() {
             {
