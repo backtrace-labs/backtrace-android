@@ -41,8 +41,14 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     private static final long SUBMISSION_TIMEOUT_MS = 60_000;
     private static final long INGESTION_TIMEOUT_MS = 60_000;
 
-    /** Per-test report GUID; declared before the rule so it is initialized when the rule is built. */
-    private final String reportGuid = UUID.randomUUID().toString();
+    /**
+     * Report GUID shared by every test in this instrumentation process. Native integration
+     * (Crashpad) initializes once per process and ignores later re-initialization, so the GUID
+     * applied to native reports is the one from the first MainActivity launch. A per-test GUID
+     * would therefore never match native reports from any test but the first; a process-wide
+     * GUID matches regardless of test order. Message and timestamp filters keep tests apart.
+     */
+    private static final String reportGuid = UUID.randomUUID().toString();
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityRule =
