@@ -173,10 +173,17 @@ public class BacktraceDatabaseRecord {
      * @return is saving successful
      */
     public boolean save() {
+        String previousRecordPath = this.recordPath;
         try {
             BacktraceLogger.d(LOG_TAG, "Trying saving data to internal app storage");
             this.diagnosticDataPath = save(record, String.format("%s-attachment", id));
+            if (this.diagnosticDataPath.isEmpty()) {
+                return false;
+            }
             this.reportPath = save(record.getReport(), String.format("%s-report", id));
+            if (this.reportPath.isEmpty()) {
+                return false;
+            }
 
             this.recordPath = new File(this.path, String.format("%s-record.json", this.id)).getAbsolutePath();
 
@@ -184,9 +191,11 @@ public class BacktraceDatabaseRecord {
             byte[] file = json.getBytes(StandardCharsets.UTF_8);
             this.size += file.length;
             recordWriter.write(this, String.format("%s-record", this.id));
-            BacktraceLogger.d(LOG_TAG, "Saving data to internal app storage successful");
             return true;
         } catch (Exception ex) {
+            // The expected metadata path was needed for serialization.
+            // If the write failed, the attempted path is not owned by this record.
+            this.recordPath = previousRecordPath;
             BacktraceLogger.e(LOG_TAG, "Received IOException while saving data to database", ex);
             return false;
         }

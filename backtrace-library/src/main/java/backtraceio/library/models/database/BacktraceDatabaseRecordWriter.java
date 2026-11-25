@@ -34,13 +34,32 @@ public class BacktraceDatabaseRecordWriter implements DatabaseRecordWriter {
     }
 
     public String write(byte[] data, String prefix) throws IOException {
-        String filename = String.format("%s.json", prefix);
-        String tempFilePath = new File(this._destinationPath, String.format("temp_%s", filename)).getAbsolutePath();
-        saveTemporaryFile(tempFilePath, data);
+        File directory = new File(this._destinationPath);
+        File destination = new File(directory, String.format("%s.json", prefix));
+        File temporary = File.createTempFile("temp_", ".tmp", directory);
+        try {
+            try (FileOutputStream output = new FileOutputStream(temporary)) {
+                output.write(data);
+            }
+            if (!temporary.renameTo(destination)) {
+                throw new IOException("Cannot finalize database record file");
+            }
+            return destination.getAbsolutePath();
+        } catch (IOException | RuntimeException | Error writeFailure) {
+            discardTemporaryFile(temporary, writeFailure);
+            throw writeFailure;
+        }
+    }
 
-        String destFilePath = new File(this._destinationPath, filename).getAbsolutePath();
-        this.saveValidRecord(tempFilePath, destFilePath);
-        return destFilePath;
+    private static void discardTemporaryFile(File temporary, Throwable writeFailure) {
+        try {
+            if (temporary.delete() || !temporary.exists()) {
+                return;
+            }
+        } catch (SecurityException ignored) {
+            // Preserve the primary write failure and avoid copying paths into diagnostics.
+        }
+        writeFailure.addSuppressed(new IOException("Cannot remove temporary database record file"));
     }
 
     /**
@@ -55,37 +74,5 @@ public class BacktraceDatabaseRecordWriter implements DatabaseRecordWriter {
             return "";
         }
         return BacktraceSerializeHelper.toJson(data);
-    }
-
-    /**
-     * Save valid diagnostic data from temporary file
-     *
-     * @param sourcePath      temporary file path
-     * @param destinationPath destination path
-     * @throws IOException
-     */
-    private void saveValidRecord(String sourcePath, String destinationPath) throws IOException {
-        File fromFile = new File(sourcePath);
-        File toFile = new File(destinationPath);
-        boolean renameResult = fromFile.renameTo(toFile);
-        if (!renameResult) {
-            BacktraceLogger.e(LOG_TAG, "Can not rename file");
-            throw new IOException(String.format(
-                    "Can not rename file. Source path: %s, destination path: %s", sourcePath, destinationPath));
-        }
-    }
-
-    /**
-     * Save temporary file to storage
-     *
-     * @param path path to temporary file
-     * @param file current file
-     * @throws IOException
-     */
-    private void saveTemporaryFile(String path, byte[] file) throws IOException {
-        BacktraceLogger.d(LOG_TAG, "Saving temporary file");
-        FileOutputStream out = new FileOutputStream(path);
-        out.write(file);
-        out.close();
     }
 }
