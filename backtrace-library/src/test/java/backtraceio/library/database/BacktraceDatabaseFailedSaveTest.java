@@ -26,7 +26,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class BacktraceDatabaseFailedSaveTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     private Logger previousLogger;
     private File databaseDirectory;
@@ -44,9 +45,19 @@ public class BacktraceDatabaseFailedSaveTest {
 
         BacktraceReport report =
                 new BacktraceReport("capture-origin", Collections.singletonList(attachment.getAbsolutePath()));
-        data = new BacktraceData(report.uuid.toString(), null, 1234, "", "fixture",
-                Collections.singletonMap("scope", "origin"), "original-thread", new String[0], report,
-                Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
+        data = new BacktraceData(
+                report.uuid.toString(),
+                null,
+                1234,
+                "",
+                "fixture",
+                Collections.singletonMap("scope", "origin"),
+                "original-thread",
+                new String[0],
+                report,
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                Collections.emptyMap());
         database = new BacktraceDatabaseContext(new BacktraceDatabaseSettings(databaseDirectory.getAbsolutePath()));
     }
 
