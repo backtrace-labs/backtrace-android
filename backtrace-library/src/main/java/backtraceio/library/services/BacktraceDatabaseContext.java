@@ -121,8 +121,10 @@ public class BacktraceDatabaseContext implements DatabaseContext {
         }
 
         BacktraceDatabaseRecord record = new BacktraceDatabaseRecord(backtraceData, this._path);
-        record.save();
-
+        if (!record.save()) {
+            record.delete();
+            return null;
+        }
         return add(record);
     }
 
