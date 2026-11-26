@@ -20,6 +20,7 @@ import backtraceio.library.logger.LogLevel;
 import backtraceio.library.models.BacktraceResult;
 import backtraceio.library.models.types.BacktraceResultStatus;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import net.jodah.concurrentunit.Waiter;
@@ -40,12 +41,22 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     private static final long SUBMISSION_TIMEOUT_MS = 60_000;
     private static final long INGESTION_TIMEOUT_MS = 60_000;
 
+    /**
+     * Report GUID shared by every test in this instrumentation process. Native integration
+     * (Crashpad) initializes once per process and ignores later re-initialization, so the GUID
+     * applied to native reports is the one from the first MainActivity launch. A per-test GUID
+     * would therefore never match native reports from any test but the first; a process-wide
+     * GUID matches regardless of test order. Message and timestamp filters keep tests apart.
+     */
+    private static final String reportGuid = UUID.randomUUID().toString();
+
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityRule =
             new ActivityScenarioRule<>(new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class)
                     // Metrics share the sender thread with reports, so an unreachable events endpoint
                     // would delay the uploads these tests wait for. None of these tests assert on metrics.
-                    .putExtra(MainActivity.EXTRA_DISABLE_METRICS, true));
+                    .putExtra(MainActivity.EXTRA_DISABLE_METRICS, true)
+                    .putExtra(MainActivity.EXTRA_REPORT_GUID, reportGuid));
 
     @Before
     public void enableBreadcrumbs() {
@@ -80,19 +91,19 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         // upload on the single sender thread, routinely exceeds a few seconds.
         waiter.await(SUBMISSION_TIMEOUT_MS, TimeUnit.MILLISECONDS, 1);
         Assert.assertNotNull("No submission result", result[0]);
-        Assert.assertEquals("Submission failed: " + result[0].message, BacktraceResultStatus.Ok, result[0].status);
+        assertEquals("Submission failed: " + result[0].message, BacktraceResultStatus.Ok, result[0].status);
         String rxId = result[0].rxId;
 
         // THEN
         CoronerResponse response = awaitIngestedReport(rxId);
 
-        Assert.assertEquals(1, response.getResultsNumber());
+        assertEquals(1, response.getResultsNumber());
 
         String resultErrorMsg = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Invalid index of selected element!", resultErrorMsg);
+        assertEquals("Invalid index of selected element!", resultErrorMsg);
 
         String resultClassifier = response.getAttribute(0, "classifiers", String.class);
-        Assert.assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
+        assertEquals("java.lang.IndexOutOfBoundsException", resultClassifier);
     }
 
     /**
@@ -120,31 +131,18 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
     }
 
     @Test
-    public void dumpWithoutCrash() throws CoronerResponseProcessingException, InterruptedException {
+    public void dumpWithoutCrash() {
         // GIVEN
-        CoronerResponse response = null;
         long timestampStart = this.getSecondsTimestampNowGMT();
 
         // WHEN
         onView(withId(R.id.dumpWithoutCrash)).perform(click()); // UI action
-        Thread.sleep(THREAD_SLEEP_TIME_MS * 10);
 
         // THEN
-        try {
-            response = this.getCoronerClient()
-                    .errorTypeTimestampFilter(
-                            "Crash",
-                            Long.toString(timestampStart),
-                            Long.toString(this.getSecondsTimestampNowGMT()),
-                            Arrays.asList("error.message"));
-        } catch (Exception ex) {
-            Assert.fail(ex.getMessage());
-        }
-
-        Assert.assertNotNull(response);
-        Assert.assertEquals(1, response.getResultsNumber());
-        String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("DumpWithoutCrash", val);
+        // Correlated by this test's GUID and filtered on the message, so other Crash reports in the
+        // window, dumps from other devices, and duplicate dumps are all rejected.
+        CoronerNativeReportAssertions.awaitExactlyOneWithMessage(
+                this.getCoronerClient(), reportGuid, "DumpWithoutCrash", timestampStart);
     }
 
     // @Test
@@ -176,9 +174,9 @@ public class ExampleInstrumentedTest extends InstrumentedTest {
         }
 
         Assert.assertNotNull(response);
-        Assert.assertEquals(1, response.getResultsNumber());
+        assertEquals(1, response.getResultsNumber());
         String val = response.getAttribute(0, "error.message", String.class);
-        Assert.assertEquals("Dump without crash", val);
+        assertEquals("Dump without crash", val);
     }
 
     @Test
