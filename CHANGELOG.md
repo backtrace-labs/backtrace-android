@@ -1,5 +1,9 @@
 # Backtrace Android Release Notes
 
+## Version 3.15.1
+Bugfixes
+- Fixed failed report saves leaving temporary files behind and adding incomplete records to the database retry queue. (#235)
+
 ## Version 3.15.0
 Bugfixes
 - Fixed native crashes after `dumpWithoutCrash(...)` reporting the main thread as the faulting thread. (#232)
